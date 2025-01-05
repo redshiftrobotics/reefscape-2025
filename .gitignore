@@ -172,6 +172,8 @@ out/
 networktables.json
 simgui.json
 *-window.json
+# why is this not in here by default
+simgui-ds.json 
 
 # Simulation data log directory
 logs/
