@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "richardwillis.vscode-spotless-gradle",
+        "streetsidesoftware.code-spell-checker",
+        "vscjava.vscode-java-pack"
+    ]
+}

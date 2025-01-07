@@ -59,8 +59,52 @@
     "edu.wpi.first.math.**.proto.*",
     "edu.wpi.first.math.**.struct.*",
   ],
-  // Disable Co-Pilot
   "chat.commandCenter.enabled": false,
   "editor.formatOnSave": true,
-  "editor.formatOnType": true
+  "editor.formatOnType": true,
+  "spotlessGradle.format.enable": true,
+  "spotlessGradle.diagnostics.enable": false,
+  "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle",
+  "[json]": {
+    "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle"
+  },
+  "[java]": {
+    "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle"
+  },
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "cSpell.words": [
+    "AHRS",
+    "apriltag",
+    "Arducam",
+    "Brushless",
+    "cancoder",
+    "CANFD",
+    "CANivore",
+    "Choreo",
+    "deadband",
+    "Debouncer",
+    "Feedforward",
+    "Holonomic",
+    "leds",
+    "Lightstrip",
+    "Noob",
+    "odometry",
+    "Pathfind",
+    "Pathfinding",
+    "photonvision",
+    "Quasistatic",
+    "Ramsete",
+    "Robo",
+    "setpoint",
+    "setpoints",
+    "teleop",
+    "teleoperated",
+    "wpilibj"
+  ],
+  "wpilib.selectDefaultSimulateExtension": true,
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
 }
