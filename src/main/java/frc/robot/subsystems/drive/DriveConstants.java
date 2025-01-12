@@ -1,7 +1,6 @@
 package frc.robot.subsystems.drive;
 
 import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -43,7 +42,7 @@ public class DriveConstants {
             new Translation2d(0.9612, 0.9612),
             5.05968,
             14.5);
-        case OLD_DEV_BOT -> new DriveConfig(
+        case DEV_BOT_2024 -> new DriveConfig(
             Units.inchesToMeters(2),
             new Translation2d(0.885, 0.885),
             new Translation2d(0.9612, 0.9612),
@@ -56,9 +55,6 @@ public class DriveConstants {
             5.05968,
             14.5);
       };
-
-  public static PathConstraints PATH_CONSTRAINS =
-      new PathConstraints(3.0, 3.0, 3 * Math.PI, 4 * Math.PI); // Currently a bit arbitrary
 
   // --- Module Config ---
 
@@ -83,7 +79,7 @@ public class DriveConstants {
         BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
         break;
 
-      case OLD_DEV_BOT:
+      case DEV_BOT_2024:
         FRONT_LEFT_MODULE_CONFIG =
             new ModuleConfig(2, 3, 3, Rotation2d.fromRotations(0.631591796875), false);
         FRONT_RIGHT_MODULE_CONFIG =
@@ -145,7 +141,7 @@ public class DriveConstants {
 
   public static final int GYRO_CAN_ID =
       switch (Constants.getRobot()) {
-        case OLD_DEV_BOT -> 40;
+        case DEV_BOT_2024 -> 40;
         default -> -1;
       };
 
@@ -164,7 +160,7 @@ public class DriveConstants {
 
   static {
     switch (Constants.getRobot()) {
-      case OLD_DEV_BOT:
+      case DEV_BOT_2024:
         driveMotor = DCMotor.getNEO(1);
         driveFeedback = new PID(0.000006, 0.0, 0.0);
         driveFeedforward = new FeedForward(0.1, 3.12, 0.40);
