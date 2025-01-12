@@ -86,6 +86,8 @@ public class TeleopDriveController {
     // get length of linear velocity vector, and apply deadband to it for noise reduction
     double magnitude = JoystickUtil.applyDeadband(translation.getNorm());
 
+    if (magnitude == 0) return new Translation2d();
+
     // squaring the magnitude of the vector makes for quicker ramp up and slower fine control,
     // magnitude should always be positive
     double magnitudeSquared = Math.copySign(Math.pow(magnitude, 2), 1);

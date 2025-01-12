@@ -188,11 +188,19 @@ public class ModuleIOSparkMax implements ModuleIO {
     // --- Turn ---
     SparkUtil.clearStickyFault();
 
-    // inputs.turnPosition = Rotation2d.fromRotations(turnRelativeEncoder.getPosition());
-    // inputs.turnVelocityRadPerSec =
-    //     Units.rotationsPerMinuteToRadiansPerSecond(turnRelativeEncoder.getVelocity());
-    // inputs.turnAppliedVolts = turnSpark.getAppliedOutput() * turnSpark.getBusVoltage();
-    // inputs.turnSupplyCurrentAmps = turnSpark.getOutputCurrent();
+    ifOk(
+        turnSpark,
+        turnRelativeEncoder::getPosition,
+        value -> inputs.turnPosition = Rotation2d.fromRotations(value));
+    ifOk(
+        turnSpark,
+        turnRelativeEncoder::getVelocity,
+        value -> inputs.turnVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(value));
+    ifOk(
+        turnSpark,
+        () -> turnSpark.getAppliedOutput() * turnSpark.getBusVoltage(),
+        value -> inputs.turnAppliedVolts = value);
+    ifOk(turnSpark, turnSpark::getOutputCurrent, value -> inputs.turnSupplyCurrentAmps = value);
 
     inputs.turnMotorConnected = turnConnectedDebounce.calculate(!SparkUtil.hasStickyFault());
 
