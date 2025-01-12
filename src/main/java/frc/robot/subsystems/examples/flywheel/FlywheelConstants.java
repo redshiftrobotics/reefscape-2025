@@ -13,7 +13,7 @@ public class FlywheelConstants {
       switch (Constants.getRobot()) {
         case COMP_BOT -> new FlywheelConfig(0, 1, false, false);
         case DEV_BOT -> new FlywheelConfig(0, 1, false, false);
-        case OLD_DEV_BOT -> new FlywheelConfig(0, 1, false, false);
+        case DEV_BOT_2024 -> new FlywheelConfig(0, 1, false, false);
         case SIM_BOT -> new FlywheelConfig(0, 1, false, false);
       };
 
