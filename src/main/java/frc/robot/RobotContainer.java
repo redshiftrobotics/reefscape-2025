@@ -60,12 +60,14 @@ public class RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
 
   // Alerts
-  private final Alert fmsAlert =
+  private final Alert fmsAndNotCompBotAlert =
       new Alert(
           "FMS attached and bot is not comp bot, are you sure this is correct?",
           AlertType.kWarning);
-  private final Alert tuningModeAlert =
+  private final Alert tuningModeActiveAlert =
       new Alert("Tuning mode active, do not use in competition.", AlertType.kWarning);
+  private final Alert onBlockMode =
+      new Alert("On block mode active, do not use in competition.", AlertType.kWarning);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -82,7 +84,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG));
         break;
 
-      case OLD_DEV_BOT:
+      case DEV_BOT_2024:
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
@@ -129,11 +131,14 @@ public class RobotContainer {
     }
 
     // Alerts for constants to avoid using them in competition
-    if (Constants.TUNING_MODE || true) {
-      tuningModeAlert.set(true);
+    if (Constants.TUNING_MODE) {
+      tuningModeActiveAlert.set(true);
+    }
+    if (Constants.ON_BLOCKS_TEST_MODE) {
+      onBlockMode.set(true);
     }
     if (DriverStation.isFMSAttached() && Constants.getRobot() != Constants.RobotType.COMP_BOT) {
-      fmsAlert.set(true);
+      fmsAndNotCompBotAlert.set(true);
     }
 
     // Hide controller missing warnings for sim
@@ -428,6 +433,7 @@ public class RobotContainer {
     // https://pathplanner.dev/gui-editing-paths-and-autos.html#autos
     autoChooser.addOption("Triangle Auto", new PathPlannerAuto("Triangle Auto"));
     autoChooser.addOption("Rotate Auto", new PathPlannerAuto("Rotate Auto"));
+    autoChooser.addOption("Circle Auto", new PathPlannerAuto("Circle Auto"));
   }
 
   private void configureSysIds() {
