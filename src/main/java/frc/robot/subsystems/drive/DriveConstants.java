@@ -36,13 +36,13 @@ public class DriveConstants {
 
   public static final DriveConfig DRIVE_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT, DEV_BOT -> new DriveConfig(
+        case COMP_BOT, T_SHIRT_CANNON_CHASSIS -> new DriveConfig(
             Units.inchesToMeters(2),
             new Translation2d(0.885, 0.885),
             new Translation2d(0.9612, 0.9612),
             5.05968,
             14.5);
-        case DEV_BOT_2024 -> new DriveConfig(
+        case CRESCENDO_CHASSIS_2024 -> new DriveConfig(
             Units.inchesToMeters(2),
             new Translation2d(0.885, 0.885),
             new Translation2d(0.9612, 0.9612),
@@ -79,7 +79,14 @@ public class DriveConstants {
         BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
         break;
 
-      case DEV_BOT_2024:
+      case T_SHIRT_CANNON_CHASSIS:
+        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        break;
+
+      case CRESCENDO_CHASSIS_2024:
         FRONT_LEFT_MODULE_CONFIG =
             new ModuleConfig(2, 3, 3, Rotation2d.fromRotations(0.631591796875), false);
         FRONT_RIGHT_MODULE_CONFIG =
@@ -90,7 +97,6 @@ public class DriveConstants {
             new ModuleConfig(10, 11, 1, Rotation2d.fromRotations(0.453857421875), false);
         break;
 
-      case DEV_BOT:
       case COMP_BOT:
       default:
         FRONT_LEFT_MODULE_CONFIG =
@@ -111,37 +117,20 @@ public class DriveConstants {
   public static final Translation2d BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER;
 
   static {
-    switch (Constants.getRobot()) {
-        // case OLD_DEV_BOT: // Exception, old dev bot is no longer a square
-        //   double frontLeftToRight = Units.inchesToMeters(0);
-        //   double backLeftToRight = Units.inchesToMeters(0);
-        //   double leftFrontToBack = Units.inchesToMeters(0);
-        //   double rightFrontToBack = Units.inchesToMeters(0);
-        //   FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER =
-        //       new Translation2d(leftFrontToBack / 2.0, frontLeftToRight / 2.0);
-        //   FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER =
-        //       new Translation2d(rightFrontToBack / 2.0, -frontLeftToRight / 2.0);
-        //   BACK_LEFT_MODULE_DISTANCE_FROM_CENTER =
-        //       new Translation2d(-leftFrontToBack / 2.0, backLeftToRight / 2.0);
-        //   BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER =
-        //       new Translation2d(-rightFrontToBack / 2.0, -backLeftToRight / 2.0);
-        //   break;
-      default:
-        double trackCenterX = DRIVE_CONFIG.trackCornerToCorner().getX() / 2;
-        double trackCenterY = DRIVE_CONFIG.trackCornerToCorner().getY() / 2;
-        FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(trackCenterX, trackCenterY);
-        FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(trackCenterX, -trackCenterY);
-        BACK_LEFT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(-trackCenterX, trackCenterY);
-        BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(-trackCenterX, -trackCenterY);
-        break;
-    }
+    double trackCenterX = DRIVE_CONFIG.trackCornerToCorner().getX() / 2;
+    double trackCenterY = DRIVE_CONFIG.trackCornerToCorner().getY() / 2;
+    FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(trackCenterX, trackCenterY);
+    FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(trackCenterX, -trackCenterY);
+    BACK_LEFT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(-trackCenterX, trackCenterY);
+    BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(-trackCenterX, -trackCenterY);
   }
 
   // --- Gyro Config ---
 
   public static final int GYRO_CAN_ID =
       switch (Constants.getRobot()) {
-        case DEV_BOT_2024 -> 40;
+        case CRESCENDO_CHASSIS_2024 -> 40;
+        case T_SHIRT_CANNON_CHASSIS -> 0;
         default -> -1;
       };
 
@@ -160,7 +149,7 @@ public class DriveConstants {
 
   static {
     switch (Constants.getRobot()) {
-      case DEV_BOT_2024:
+      case CRESCENDO_CHASSIS_2024:
         driveMotor = DCMotor.getNEO(1);
         driveFeedback = new PID(0.000006, 0.0, 0.0);
         driveFeedforward = new FeedForward(0.1, 3.12, 0.40);
@@ -187,11 +176,11 @@ public class DriveConstants {
         break;
 
       case COMP_BOT:
-      case DEV_BOT:
+      case T_SHIRT_CANNON_CHASSIS:
       default:
         driveMotor = DCMotor.getNEO(1);
+        driveFeedback = new PID(0.000006, 0.0, 0.0);
         driveFeedforward = new FeedForward(0.1, 2.35, 0.53);
-        driveFeedback = new PID(0.1, 0.0, 0.0);
         driveMotorCurrentLimit = 50;
         driveReduction = Mk4iReductions.L3.reduction;
 

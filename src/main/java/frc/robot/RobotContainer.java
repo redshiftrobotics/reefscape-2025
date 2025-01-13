@@ -73,7 +73,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     switch (Constants.getRobot()) {
-      case COMP_BOT, DEV_BOT:
+      case COMP_BOT, T_SHIRT_CANNON_CHASSIS:
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
@@ -84,7 +84,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG));
         break;
 
-      case DEV_BOT_2024:
+      case CRESCENDO_CHASSIS_2024:
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
