@@ -69,6 +69,10 @@ public final class Constants {
     COMP_BOT
   }
 
+  
+  /**
+	 * @link https://www.revrobotics.com/content/docs/REV-11-1105-UM.pdf
+	 */
   public static class LEDPatterns {
     public static final double HOT_PINK = 0.57;
     public static final double DARK_RED = 0.59;
