@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive;
 
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -55,6 +56,11 @@ public class DriveConstants {
             5.05968,
             14.5);
       };
+
+  // --- Path Constraints ---
+
+  public static PathConstraints pathConstraints =
+      new PathConstraints(3.0, 3.0, 3 * Math.PI, 4 * Math.PI); // Currently a bit arbitrary
 
   // --- Module Config ---
 
@@ -229,9 +235,9 @@ public class DriveConstants {
 
   public record HeadingControllerConstants(double Kp, double Kd, double toleranceDegrees) {}
 
-  public static final HeadingControllerConstants HEADING_CONTROLLER_CONSTANTS =
+  public static final HeadingControllerConstants headingControllerConstants =
       switch (Constants.getRobot()) {
-        default -> new HeadingControllerConstants(5.0, 0.0, 1);
+        default -> new HeadingControllerConstants(5.0, 0.4, 1);
       };
 
   // --- Control ---

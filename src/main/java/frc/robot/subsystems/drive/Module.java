@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.robot.Constants;
@@ -186,6 +187,18 @@ public class Module {
   /** Returns the current drive velocity of the module in meters per second. */
   private double getVelocityMetersPerSec() {
     return inputs.driveVelocityRadPerSec * DRIVE_CONFIG.wheelRadius();
+  }
+
+  // --- Characterization ---
+
+  /** Returns the module position in radians. */
+  public double getWheelRadiusCharacterizationPosition() {
+    return inputs.drivePositionRad;
+  }
+
+  /** Returns the module velocity in rotations/sec (native units). */
+  public double getFFCharacterizationVelocity() {
+    return Units.radiansToRotations(inputs.driveVelocityRadPerSec);
   }
 
   // --- To String ---
