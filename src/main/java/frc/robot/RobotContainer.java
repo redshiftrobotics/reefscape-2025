@@ -221,9 +221,8 @@ public class RobotContainer {
           .b()
           .or(RobotModeTriggers.disabled())
           .whileTrue(
-              drive
-                  .runOnce(drive::stop)
-                  .andThen(Commands.idle(drive))
+              Commands.idle(drive)
+                  .beforeStarting(drive::stop)
                   .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
                   .withName("Stop Cancel"));
 
