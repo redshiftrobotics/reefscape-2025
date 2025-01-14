@@ -75,7 +75,7 @@ public class DriveCommands {
     ProfiledPIDController angleController =
         new ProfiledPIDController(
             DriveConstants.headingControllerConstants.Kp(),
-            0.0,
+            DriveConstants.headingControllerConstants.Ki(),
             DriveConstants.headingControllerConstants.Kd(),
             new TrapezoidProfile.Constraints(
                 DRIVE_CONFIG.maxAngularVelocity(), DRIVE_CONFIG.maxAngularAcceleration()));
