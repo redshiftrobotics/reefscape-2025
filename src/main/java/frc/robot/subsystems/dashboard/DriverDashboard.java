@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.controllers.SpeedController.SpeedLevel;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -28,9 +27,7 @@ public class DriverDashboard extends SubsystemBase {
 
   private Supplier<Pose2d> poseSupplier;
   private Supplier<ChassisSpeeds> speedsSupplier;
-  private Supplier<SpeedLevel> speedLevelSupplier;
   private BooleanSupplier fieldRelativeSupplier;
-  private BooleanSupplier angleDrivenSupplier;
 
   // --- Setters ---
 
@@ -58,16 +55,8 @@ public class DriverDashboard extends SubsystemBase {
     this.speedsSupplier = robotSpeedsSupplier;
   }
 
-  public void setSpeedLevelSupplier(Supplier<SpeedLevel> speedLevelSupplier) {
-    this.speedLevelSupplier = speedLevelSupplier;
-  }
-
   public void setFieldRelativeSupplier(BooleanSupplier fieldRelativeSupplier) {
     this.fieldRelativeSupplier = fieldRelativeSupplier;
-  }
-
-  public void setAngleDrivenSupplier(BooleanSupplier angleDrivenSupplier) {
-    this.angleDrivenSupplier = angleDrivenSupplier;
   }
 
   @Override
@@ -85,22 +74,8 @@ public class DriverDashboard extends SubsystemBase {
           "Speed MPH", Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) * 2.2369);
     }
 
-    if (speedLevelSupplier != null) {
-      SpeedLevel speedLevel = speedLevelSupplier.get();
-
-      SmartDashboard.putString("Speed Level", speedLevel.name());
-      SmartDashboard.putString(
-          "Speed Transl", String.format("%.2f%%", speedLevel.getTranslationCoefficient() * 100));
-      SmartDashboard.putString(
-          "Speed Rot", String.format("%.2f%%", speedLevel.getRotationCoefficient() * 100));
-    }
-
     if (fieldRelativeSupplier != null) {
       SmartDashboard.putBoolean("Field Relative", fieldRelativeSupplier.getAsBoolean());
-    }
-
-    if (angleDrivenSupplier != null) {
-      SmartDashboard.putBoolean("Angle Driven", angleDrivenSupplier.getAsBoolean());
     }
   }
 }

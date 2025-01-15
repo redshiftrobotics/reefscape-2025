@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive;
 
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -16,7 +17,6 @@ public class DriveConstants {
   // --- Drive Config ---
 
   public record DriveConfig(
-      double wheelRadius,
       Translation2d trackCornerToCorner,
       Translation2d bumperCornerToCorner,
       double maxLinearVelocity,
@@ -37,24 +37,19 @@ public class DriveConstants {
   public static final DriveConfig DRIVE_CONFIG =
       switch (Constants.getRobot()) {
         case COMP_BOT, T_SHIRT_CANNON_CHASSIS -> new DriveConfig(
-            Units.inchesToMeters(2),
-            new Translation2d(0.885, 0.885),
-            new Translation2d(0.9612, 0.9612),
-            5.05968,
-            14.5);
+            new Translation2d(0.885, 0.885), new Translation2d(0.9612, 0.9612), 5.05968, 14.5);
         case CRESCENDO_CHASSIS_2024 -> new DriveConfig(
-            Units.inchesToMeters(2),
-            new Translation2d(0.885, 0.885),
-            new Translation2d(0.9612, 0.9612),
-            3.81,
-            14.5);
+            new Translation2d(0.885, 0.885), new Translation2d(0.9612, 0.9612), 3.81, 14.5);
         case SIM_BOT -> new DriveConfig(
-            Units.inchesToMeters(2),
-            new Translation2d(0.885, 0.885),
-            new Translation2d(0.9612, 0.9612),
-            5.05968,
-            14.5);
+            new Translation2d(0.885, 0.885), new Translation2d(0.9612, 0.9612), 5.05968, 14.5);
       };
+
+  public static final double wheelRadius = Units.inchesToMeters(2.000);
+
+  // --- Path Constraints ---
+
+  public static final PathConstraints pathConstraints =
+      new PathConstraints(3.0, 3.0, 3 * Math.PI, 4 * Math.PI); // Currently a bit arbitrary
 
   // --- Module Config ---
 
@@ -99,14 +94,10 @@ public class DriveConstants {
 
       case COMP_BOT:
       default:
-        FRONT_LEFT_MODULE_CONFIG =
-            new ModuleConfig(2, 3, 3, Rotation2d.fromRotations(0.631591796875), false);
-        FRONT_RIGHT_MODULE_CONFIG =
-            new ModuleConfig(14, 17, 4, Rotation2d.fromRotations(-0.77587890), false);
-        BACK_LEFT_MODULE_CONFIG =
-            new ModuleConfig(8, 9, 2, Rotation2d.fromRotations(-0.641357421875), false);
-        BACK_RIGHT_MODULE_CONFIG =
-            new ModuleConfig(10, 11, 1, Rotation2d.fromRotations(0.453857421), false);
+        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
         break;
     }
   }
@@ -137,13 +128,13 @@ public class DriveConstants {
   // --- Module Constants ---
 
   public static final DCMotor driveMotor;
-  public static final FeedForward driveFeedforward;
-  public static final PID driveFeedback;
+  public static final FeedForwardConstants driveFeedforward;
+  public static final PIDConstants driveFeedback;
   public static final int driveMotorCurrentLimit;
   public static final double driveReduction;
 
   public static final DCMotor turnMotor;
-  public static final PID turnFeedback;
+  public static final PIDConstants turnFeedback;
   public static final int turnMotorCurrentLimit;
   public static final double turnReduction;
 
@@ -151,26 +142,26 @@ public class DriveConstants {
     switch (Constants.getRobot()) {
       case CRESCENDO_CHASSIS_2024:
         driveMotor = DCMotor.getNEO(1);
-        driveFeedback = new PID(0.000006, 0.0, 0.0);
-        driveFeedforward = new FeedForward(0.1, 3.12, 0.40);
+        driveFeedback = new PIDConstants(0.000006, 0.0, 0.0);
+        driveFeedforward = new FeedForwardConstants(0.1, 3.12, 0.40);
         driveMotorCurrentLimit = 50;
         driveReduction = Mk4Reductions.L1.reduction;
 
         turnMotor = DCMotor.getNEO(1);
-        turnFeedback = new PID(10, 0.0, 0.0002);
+        turnFeedback = new PIDConstants(10, 0.0, 0.0002);
         turnMotorCurrentLimit = 20;
         turnReduction = Mk4Reductions.TURN.reduction;
         break;
 
       case SIM_BOT:
         driveMotor = DCMotor.getNEO(1);
-        driveFeedback = new PID(1.3, 0.0, 0.0);
-        driveFeedforward = new FeedForward(0.0, 0, 0);
+        driveFeedback = new PIDConstants(1.3, 0.0, 0.0);
+        driveFeedforward = new FeedForwardConstants(0.0, 0, 0);
         driveMotorCurrentLimit = 50;
         driveReduction = Mk4iReductions.L3.reduction;
 
         turnMotor = DCMotor.getNEO(1);
-        turnFeedback = new PID(10.0, 0.0, 0.0);
+        turnFeedback = new PIDConstants(10.0, 0.0, 0.0);
         turnMotorCurrentLimit = 20;
         turnReduction = Mk4iReductions.TURN.reduction;
         break;
@@ -179,13 +170,13 @@ public class DriveConstants {
       case T_SHIRT_CANNON_CHASSIS:
       default:
         driveMotor = DCMotor.getNEO(1);
-        driveFeedback = new PID(0.000006, 0.0, 0.0);
-        driveFeedforward = new FeedForward(0.1, 2.35, 0.53);
+        driveFeedback = new PIDConstants(0.000006, 0.0, 0.0);
+        driveFeedforward = new FeedForwardConstants(0.1, 2.35, 0.53);
         driveMotorCurrentLimit = 50;
         driveReduction = Mk4iReductions.L3.reduction;
 
         turnMotor = DCMotor.getNEO(1);
-        turnFeedback = new PID(10.0, 0.0, 0.0);
+        turnFeedback = new PIDConstants(10.0, 0.0, 0.0);
         turnMotorCurrentLimit = 20;
         turnReduction = Mk4iReductions.TURN.reduction;
         break;
@@ -209,7 +200,7 @@ public class DriveConstants {
           robotMassKg,
           robotMOI,
           new com.pathplanner.lib.config.ModuleConfig(
-              DRIVE_CONFIG.wheelRadius(),
+              wheelRadius,
               DRIVE_CONFIG.maxLinearVelocity(),
               wheelCOF,
               driveMotor.withReduction(driveReduction),
@@ -227,18 +218,13 @@ public class DriveConstants {
 
   // --- Heading Controller Config ---
 
-  public record HeadingControllerConstants(double Kp, double Kd, double toleranceDegrees) {}
+  public static final PIDConstants headingControllerConstants = new PIDConstants(5.0, 0, 0.4);
 
-  public static final HeadingControllerConstants HEADING_CONTROLLER_CONSTANTS =
-      switch (Constants.getRobot()) {
-        default -> new HeadingControllerConstants(5.0, 0.0, 1);
-      };
+  // --- General Tuning Records ---
 
-  // --- Control ---
+  public record PIDConstants(double Kp, double Ki, double Kd) {}
 
-  public record PID(double Kp, double Ki, double Kd) {}
-
-  public record FeedForward(double Ks, double Kv, double Ka) {}
+  public record FeedForwardConstants(double Ks, double Kv, double Ka) {}
 
   // --- Module reductions ---
 
