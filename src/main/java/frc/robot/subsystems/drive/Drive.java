@@ -153,7 +153,7 @@ public class Drive extends SubsystemBase {
                 (voltage) -> runCharacterization(voltage.in(Units.Volts)), null, this));
 
     // --- Break mode ---
-    setMotorBrakeOnCoastModeEnabled(true);
+    setMotorBrakeMode(true);
   }
 
   // --- Robot Pose ---
@@ -430,16 +430,22 @@ public class Drive extends SubsystemBase {
   /**
    * Sets whether swerve motors will brake to prevent coasting. IMPORTANT: Only do this after robot
    * has been stopped for a bit
+   *
+   * @param enabled true if motors should brake, false if they should coast
    */
-  public void setMotorBrakeOnCoastModeEnabled(boolean enabled) {
+  public void setMotorBrakeMode(boolean enabled) {
     if (brakeModeEnabled != enabled) {
       modules().forEach(module -> module.setBrakeMode(enabled));
     }
     brakeModeEnabled = enabled;
   }
 
-  /** Get whether swerve motors will brake to prevent coasting, and robot is safe to drive */
-  public boolean getMotorBrakeOnCoastModeEnabled() {
+  /**
+   * Get whether swerve motors will brake to prevent coasting, and robot is safe to drive
+   *
+   * @return true if motors should brake, false if they should coast
+   */
+  public boolean getMotorBrakeMode() {
     return brakeModeEnabled;
   }
 
@@ -472,6 +478,26 @@ public class Drive extends SubsystemBase {
     for (Module module : modules) {
       module.runCharacterization(0, volts);
     }
+  }
+
+  // --- Characterization ---
+
+  /** Returns the position of each module in radians. */
+  public double[] getWheelRadiusCharacterizationPositions() {
+    double[] values = new double[4];
+    for (int i = 0; i < 4; i++) {
+      values[i] = modules[i].getWheelRadiusCharacterizationPosition();
+    }
+    return values;
+  }
+
+  /** Returns the average velocity of the modules in rotations/sec (Phoenix native units). */
+  public double getFFCharacterizationVelocity() {
+    double output = 0.0;
+    for (int i = 0; i < 4; i++) {
+      output += modules[i].getFFCharacterizationVelocity() / 4.0;
+    }
+    return output;
   }
 
   // --- Module Util ---
