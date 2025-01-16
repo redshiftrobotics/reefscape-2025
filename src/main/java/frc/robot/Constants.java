@@ -17,8 +17,9 @@ public final class Constants {
   public static final double LOOP_PERIOD_SECONDS = Robot.defaultPeriodSecs; // 0.02
 
   public static final boolean TUNING_MODE = false;
+  public static final boolean ON_BLOCKS_TEST_MODE = false;
 
-  private static RobotType robotType = RobotType.SIM_BOT;
+  private static RobotType robotType = RobotType.CRESCENDO_CHASSIS_2024;
 
   public static final Alert wrongRobotTypeAlertReal =
       new Alert(
@@ -43,7 +44,9 @@ public final class Constants {
 
   public static Mode getMode() {
     return switch (getRobot()) {
-      case DEV_BOT, COMP_BOT, OLD_DEV_BOT -> RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
+      case COMP_BOT, T_SHIRT_CANNON_CHASSIS, CRESCENDO_CHASSIS_2024 -> RobotBase.isReal()
+          ? Mode.REAL
+          : Mode.REPLAY;
       case SIM_BOT -> Mode.SIM;
     };
   }
@@ -61,8 +64,8 @@ public final class Constants {
 
   public enum RobotType {
     SIM_BOT,
-    DEV_BOT,
-    OLD_DEV_BOT,
+    T_SHIRT_CANNON_CHASSIS,
+    CRESCENDO_CHASSIS_2024,
     COMP_BOT
   }
 

@@ -3,41 +3,48 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.37,
-        "y": 5.55
+        "x": 2.0,
+        "y": 6.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.369999999999999,
-        "y": 5.55
+        "x": 2.0,
+        "y": 4.75
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "CircleStart"
     },
     {
       "anchor": {
-        "x": 3.0,
-        "y": 5.55
+        "x": 4.0,
+        "y": 6.0
+      },
+      "prevControl": {
+        "x": 4.0,
+        "y": 4.75
+      },
+      "nextControl": {
+        "x": 4.0,
+        "y": 7.25
+      },
+      "isLocked": false,
+      "linkedName": "CircleEnd"
+    },
+    {
+      "anchor": {
+        "x": 2.0,
+        "y": 6.0
       },
       "prevControl": {
         "x": 2.0,
-        "y": 5.55
+        "y": 7.25
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "CircleStart"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1.0,
-      "rotationDegrees": 0.0
-    },
-    {
-      "waypointRelativePos": 1,
-      "rotationDegrees": 0.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -50,13 +57,13 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 180.0
+    "velocity": 0.0,
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Rotate",
+  "folder": "Circle",
   "idealStartingState": {
-    "velocity": 0,
+    "velocity": 0.0,
     "rotation": 0.0
   },
   "useDefaultConstraints": true

@@ -7,19 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Triangle"
+            "pathName": "CircleForward"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Triangle 2"
+            "pathName": "Circle180"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Triangle 3"
+            "pathName": "Circle360"
           }
         }
       ]

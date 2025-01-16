@@ -5,15 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 0.5
+            "pathName": "Rotate Forward"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Rotate1"
+            "pathName": "Rotate Backward"
           }
         }
       ]
