@@ -33,7 +33,6 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.utility.OverrideSwitch;
-import java.util.Arrays;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -194,7 +193,7 @@ public class RobotContainer {
 
       driverXbox
           .a()
-          .whileTrue(
+          .onTrue(
               DriveCommands.joystickDriveAtAngle(
                       drive,
                       () -> -driverXbox.getLeftY(),
@@ -202,13 +201,6 @@ public class RobotContainer {
                       () -> Rotation2d.kZero,
                       useFieldRelative)
                   .withName("Drive Rotation Locked"));
-
-      driverXbox
-          .rightTrigger()
-          .onTrue(
-              DriveCommands.driveToNearestPose(
-                      drive, Arrays.asList(FieldConstants.Reef.branchFaces))
-                  .withName("Drive to Nearest Branch"));
 
       driverXbox
           .x()

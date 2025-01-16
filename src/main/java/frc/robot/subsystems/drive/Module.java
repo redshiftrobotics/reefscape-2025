@@ -9,6 +9,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.robot.Constants;
+import frc.robot.utility.tunable.LoggedTunableNumber;
+import frc.robot.utility.tunable.LoggedTunableNumberFactory;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -16,6 +18,18 @@ import org.littletonrobotics.junction.Logger;
  * functionality for using each module regardless of hardware specifics.
  */
 public class Module {
+
+  private static final LoggedTunableNumberFactory driveFeedbackFactory =
+      new LoggedTunableNumberFactory("Drive/Module");
+
+  private static final LoggedTunableNumber driveKp =
+      driveFeedbackFactory.getNumber("DriveKp", DriveConstants.driveFeedback.Kp());
+  private static final LoggedTunableNumber driveKd =
+      driveFeedbackFactory.getNumber("DriveKd", DriveConstants.driveFeedback.Kd());
+  private static final LoggedTunableNumber turnKp =
+      driveFeedbackFactory.getNumber("TurnKp", DriveConstants.turnFeedback.Kp());
+  private static final LoggedTunableNumber turnKd =
+      driveFeedbackFactory.getNumber("TurnKd", DriveConstants.turnFeedback.Kd());
 
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
@@ -46,8 +60,8 @@ public class Module {
             DriveConstants.driveFeedforward.Ka(),
             Constants.LOOP_PERIOD_SECONDS);
 
-    io.setDrivePID(DriveConstants.driveFeedback.Kp(), 0, DriveConstants.driveFeedback.Kd());
-    io.setTurnPID(DriveConstants.turnFeedback.Kp(), 0, DriveConstants.turnFeedback.Kd());
+    io.setDrivePID(driveKd.get(), 0, driveKd.get());
+    io.setTurnPID(turnKp.get(), 0, turnKd.get());
 
     setBrakeMode(true);
 
@@ -70,6 +84,23 @@ public class Module {
   public void updateInputs() {
     Logger.processInputs("Drive/" + toString(), inputs);
     io.updateInputs(inputs);
+
+    // Update tunable numbers
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> {
+          io.setDrivePID(values[0], 0, values[1]);
+        },
+        driveKp,
+        driveKd);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> {
+          io.setTurnPID(values[0], 0, values[1]);
+        },
+        turnKp,
+        turnKd);
 
     // Update alerts
     driveDisconnectedAlert.set(!inputs.driveMotorConnected);

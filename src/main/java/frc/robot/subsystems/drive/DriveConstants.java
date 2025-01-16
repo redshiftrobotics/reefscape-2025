@@ -106,19 +106,17 @@ public class DriveConstants {
     }
   }
 
-  public static final Translation2d FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER;
-  public static final Translation2d FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER;
-  public static final Translation2d BACK_LEFT_MODULE_DISTANCE_FROM_CENTER;
-  public static final Translation2d BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER;
+  private static final double TRACK_CENTER_X = DRIVE_CONFIG.trackCornerToCorner().getX() / 2;
+  private static final double TRACK_CENTER_Y = DRIVE_CONFIG.trackCornerToCorner().getY() / 2;
 
-  static {
-    double trackCenterX = DRIVE_CONFIG.trackCornerToCorner().getX() / 2;
-    double trackCenterY = DRIVE_CONFIG.trackCornerToCorner().getY() / 2;
-    FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(trackCenterX, trackCenterY);
-    FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(trackCenterX, -trackCenterY);
-    BACK_LEFT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(-trackCenterX, trackCenterY);
-    BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(-trackCenterX, -trackCenterY);
-  }
+  public static final Translation2d FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER =
+      new Translation2d(TRACK_CENTER_X, TRACK_CENTER_Y);
+  public static final Translation2d FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER =
+      new Translation2d(TRACK_CENTER_X, -TRACK_CENTER_Y);
+  public static final Translation2d BACK_LEFT_MODULE_DISTANCE_FROM_CENTER =
+      new Translation2d(-TRACK_CENTER_X, TRACK_CENTER_Y);
+  public static final Translation2d BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER =
+      new Translation2d(-TRACK_CENTER_X, -TRACK_CENTER_Y);
 
   // --- Gyro Config ---
 
