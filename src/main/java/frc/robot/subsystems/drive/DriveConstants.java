@@ -75,10 +75,14 @@ public class DriveConstants {
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
-        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        FRONT_LEFT_MODULE_CONFIG =
+            new ModuleConfig(19, 18, 39, Rotation2d.fromRotations(-0.186279296875), false);
+        FRONT_RIGHT_MODULE_CONFIG =
+            new ModuleConfig(2, 1, 37, Rotation2d.fromRotations(-0.677490234375), false);
+        BACK_LEFT_MODULE_CONFIG =
+            new ModuleConfig(11, 10, 36, Rotation2d.fromRotations(-0.8603515625), false);
+        BACK_RIGHT_MODULE_CONFIG =
+            new ModuleConfig(8, 9, 38, Rotation2d.fromRotations(-0.065185546875), false);
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -121,7 +125,7 @@ public class DriveConstants {
   public static final int GYRO_CAN_ID =
       switch (Constants.getRobot()) {
         case CRESCENDO_CHASSIS_2024 -> 40;
-        case T_SHIRT_CANNON_CHASSIS -> 0;
+        case T_SHIRT_CANNON_CHASSIS -> 40;
         default -> -1;
       };
 
@@ -176,7 +180,7 @@ public class DriveConstants {
         driveReduction = Mk4iReductions.L3.reduction;
 
         turnMotor = DCMotor.getNEO(1);
-        turnFeedback = new PIDConstants(10.0, 0.0, 0.0);
+        turnFeedback = new PIDConstants(10, 0.0, 0.0);
         turnMotorCurrentLimit = 20;
         turnReduction = Mk4iReductions.TURN.reduction;
         break;

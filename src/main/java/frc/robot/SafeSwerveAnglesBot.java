@@ -67,6 +67,7 @@ public class SafeSwerveAnglesBot extends LoggedRobot {
     }
 
     if (SmartDashboard.getBoolean("Print", false)) {
+      System.out.println("Swerve Positions");
       for (Map.Entry<String, CANcoder> entry : cancoderMap.entrySet()) {
         System.out.println(
             entry.getKey()
