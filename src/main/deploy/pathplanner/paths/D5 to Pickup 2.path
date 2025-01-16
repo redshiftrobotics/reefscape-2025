@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 5.0
+        "x": 3.0,
+        "y": 4.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0,
-        "y": 6.0
+        "x": 2.793084360752966,
+        "y": 3.392520437686465
       },
       "isLocked": false,
-      "linkedName": "Triangle1 End"
+      "linkedName": "Farthest Coral Drop"
     },
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 1.318174342105263,
+        "y": 1.1096217105263155
       },
       "prevControl": {
-        "x": 2.0,
-        "y": 6.0
+        "x": 2.90251234089385,
+        "y": 3.1350004950096153
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Triangle1 Start"
+      "linkedName": "Coral Pickup 2"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -125.00000000000001
   },
   "reversed": false,
   "folder": "Triangle",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -1.481301510519294
   },
   "useDefaultConstraints": true
 }

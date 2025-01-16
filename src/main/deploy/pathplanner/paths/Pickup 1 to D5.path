@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.337,
+        "y": 6.988
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.9129879494234905,
+        "y": 6.199750410683426
+      },
+      "isLocked": false,
+      "linkedName": "Coral Pickup 1"
+    },
+    {
+      "anchor": {
+        "x": 3.0,
+        "y": 4.0
+      },
+      "prevControl": {
+        "x": 2.8020225961085163,
+        "y": 4.808637083396522
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Farthest Coral Drop"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -1.481301510519294
+  },
+  "reversed": false,
+  "folder": "Triangle",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 125.00000000000001
+  },
+  "useDefaultConstraints": true
+}

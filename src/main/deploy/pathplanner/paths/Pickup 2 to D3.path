@@ -1,0 +1,59 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.318174342105263,
+        "y": 1.1096217105263155
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.9675330264207238,
+        "y": 1.9196187448311908
+      },
+      "isLocked": false,
+      "linkedName": "Coral Pickup 2"
+    },
+    {
+      "anchor": {
+        "x": 5.234210526315789,
+        "y": 2.774177631578947
+      },
+      "prevControl": {
+        "x": 4.964802631578947,
+        "y": 2.2546052631578943
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Far Coral Drop"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": 59.99999999999999
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 119.99999999999999
+  },
+  "reversed": false,
+  "folder": "Triangle",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -125.00000000000001
+  },
+  "useDefaultConstraints": true
+}

@@ -3,41 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.37,
-        "y": 5.55
+        "x": 1.337,
+        "y": 6.988
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.369999999999999,
-        "y": 5.55
+        "x": 2.328951414779345,
+        "y": 6.40922248143223
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Coral Pickup 1"
     },
     {
       "anchor": {
-        "x": 3.0,
-        "y": 5.55
+        "x": 5.25,
+        "y": 5.3
       },
       "prevControl": {
-        "x": 2.0,
-        "y": 5.55
+        "x": 4.670777590388165,
+        "y": 5.649059874469925
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Coral Drop"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1.0,
-      "rotationDegrees": 0.0
-    },
-    {
-      "waypointRelativePos": 1,
-      "rotationDegrees": 0.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -51,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -119.99999999999999
   },
   "reversed": false,
-  "folder": "Rotate",
+  "folder": "Triangle",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 125.00000000000001
   },
   "useDefaultConstraints": true
 }

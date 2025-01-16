@@ -6,7 +6,10 @@
     "Rotate",
     "Triangle"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "New Folder",
+    "New New Folder"
+  ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
@@ -16,7 +19,7 @@
   "robotMOI": 6.883,
   "robotTrackwidth": 0.546,
   "driveWheelRadius": 0.048,
-  "driveGearing": 6.122448979591837,
+  "driveGearing": 8.14,
   "maxDriveSpeed": 3.72,
   "driveMotorType": "NEO",
   "driveCurrentLimit": 50.0,

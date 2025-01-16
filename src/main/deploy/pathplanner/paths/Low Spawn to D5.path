@@ -1,0 +1,86 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.053,
+        "y": 5.05
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.1891967731209805,
+        "y": 4.41170290998124
+      },
+      "isLocked": false,
+      "linkedName": "Low Spawn"
+    },
+    {
+      "anchor": {
+        "x": 4.5318256578947365,
+        "y": 2.3796875
+      },
+      "prevControl": {
+        "x": 5.547784021274148,
+        "y": 2.5470615675128605
+      },
+      "nextControl": {
+        "x": 3.798283450473754,
+        "y": 2.258840084029114
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.3579769736842104,
+        "y": 2.822286184210526
+      },
+      "prevControl": {
+        "x": 3.5885872207595377,
+        "y": 2.7257516621789937
+      },
+      "nextControl": {
+        "x": 2.944243421052631,
+        "y": 2.9954769736842106
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.0,
+        "y": 4.0
+      },
+      "prevControl": {
+        "x": 3.044859631520468,
+        "y": 3.754057702987372
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Farthest Coral Drop"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -1.481301510519294
+  },
+  "reversed": false,
+  "folder": "Triangle",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}
