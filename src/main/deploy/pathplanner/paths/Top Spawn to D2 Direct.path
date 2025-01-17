@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.197304063558577,
-        "y": 7.364447914351734
+        "x": 7.326251170661211,
+        "y": 6.089824140875545
       },
       "isLocked": false,
       "linkedName": "Top Spawn"
     },
     {
       "anchor": {
-        "x": 2.0398026315789473,
-        "y": 6.15139802631579
+        "x": 6.0,
+        "y": 4.05
       },
       "prevControl": {
-        "x": 2.453536184210526,
-        "y": 5.410526315789473
+        "x": 6.428055936351696,
+        "y": 4.686118537099867
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "D2"
     }
   ],
   "rotationTargets": [],
@@ -42,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "reversed": false,
-  "folder": "Rotate",
+  "folder": "Paths B",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

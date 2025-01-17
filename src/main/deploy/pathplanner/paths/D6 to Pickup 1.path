@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.0,
-        "y": 6.15
+        "x": 3.75,
+        "y": 5.35
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.092521640616952,
-        "y": 6.122772706734164
+        "x": 3.3071819875567874,
+        "y": 6.247682755119486
       },
       "isLocked": false,
-      "linkedName": "Mid Spawn"
+      "linkedName": "D6"
     },
     {
       "anchor": {
-        "x": 3.6177631578947365,
-        "y": 5.391282894736841
+        "x": 1.337,
+        "y": 6.988
       },
       "prevControl": {
-        "x": 4.154656737205387,
-        "y": 5.623669667871301
-      },
-      "nextControl": {
-        "x": 2.9731085526315786,
-        "y": 5.112253289473684
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 3.0,
-        "y": 4.0
-      },
-      "prevControl": {
-        "x": 3.1174342105263158,
-        "y": 4.236677631578948
+        "x": 1.612877340965432,
+        "y": 6.459564147791172
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Farthest Coral Drop"
+      "linkedName": "Coral Pickup 1"
     }
   ],
   "rotationTargets": [],
@@ -58,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -1.481301510519294
+    "rotation": 125.00000000000001
   },
   "reversed": false,
-  "folder": "Paths A",
+  "folder": "Paths B",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -59.99999999999999
   },
   "useDefaultConstraints": true
 }

@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pickup 1 to D1"
+            "pathName": "Pickup 1 to D5"
           }
         },
         {
@@ -43,13 +43,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "D1 to Pickup 1"
+            "pathName": "D5 to Pickup 1"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "New Folder",
+  "folder": "No Algae Clear",
   "choreoAuto": false
 }

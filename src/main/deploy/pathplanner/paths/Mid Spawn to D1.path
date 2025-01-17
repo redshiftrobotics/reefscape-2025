@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.930832936554899,
-        "y": 6.099922149818596
+        "x": 6.918834428800632,
+        "y": 6.089960562290159
       },
       "isLocked": false,
       "linkedName": "Mid Spawn"
@@ -20,8 +20,8 @@
         "y": 5.3
       },
       "prevControl": {
-        "x": 6.385216250861292,
-        "y": 5.624974547569194
+        "x": 6.391833679885655,
+        "y": 5.64602262398551
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": -119.99999999999999
   },
   "reversed": false,
-  "folder": "Triangle",
+  "folder": "Paths A",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

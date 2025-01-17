@@ -7,7 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Top Spawn to D5"
+            "pathName": "Top Spawn to D6"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "D6 to Pickup 1"
           }
         },
         {
@@ -19,37 +31,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "D5 to Pickup 2"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Pickup 2 to D5"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "D5 to Pickup 2"
+            "pathName": "Pickup 1 to D6"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "New Folder",
+  "folder": "Algae Clear",
   "choreoAuto": false
 }

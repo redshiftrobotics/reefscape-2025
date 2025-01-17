@@ -3,12 +3,13 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "Rotate",
-    "Triangle"
+    "Paths B",
+    "Paths A"
   ],
   "autoFolders": [
-    "New Folder",
-    "New New Folder"
+    "Algae Clear",
+    "Algae - No Algae Clear",
+    "No Algae Clear"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,

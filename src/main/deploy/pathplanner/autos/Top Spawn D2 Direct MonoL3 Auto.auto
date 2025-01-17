@@ -7,7 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Mid Spawn to D3"
+            "pathName": "Top Spawn to D2 Direct"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "D2 to Pickup 2"
           }
         },
         {
@@ -19,37 +31,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "D3 to Pickup 2"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Pickup 2 to D5"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "D5 to Pickup 2"
+            "pathName": "Pickup 2 to D4"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "No Algae Clear",
+  "folder": "Algae Clear",
   "choreoAuto": false
 }
