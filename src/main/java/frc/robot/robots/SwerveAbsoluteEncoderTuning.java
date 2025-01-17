@@ -1,9 +1,14 @@
-package frc.robot;
+package frc.robot.robots;
 
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -16,6 +21,15 @@ public class SwerveAbsoluteEncoderTuning extends LoggedRobot {
   private final Map<String, CANcoder> cancoderMap = new HashMap<>();
 
   private final Timer timer = new Timer();
+
+  private final boolean BREAK_MODE = false;
+
+  private final SparkMax[] turns = {
+    new SparkMax(DriveConstants.FRONT_LEFT_MODULE_CONFIG.turnID(), MotorType.kBrushless),
+    new SparkMax(DriveConstants.FRONT_RIGHT_MODULE_CONFIG.turnID(), MotorType.kBrushless),
+    new SparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG.turnID(), MotorType.kBrushless),
+    new SparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG.turnID(), MotorType.kBrushless),
+  };
 
   private final CANcoder frontLeftCancoder =
       new CANcoder(DriveConstants.FRONT_LEFT_MODULE_CONFIG.absoluteEncoderChannel());
@@ -45,6 +59,12 @@ public class SwerveAbsoluteEncoderTuning extends LoggedRobot {
   @Override
   public void robotInit() {
     timer.restart();
+    for (SparkMax sparkMax : turns) {
+      SparkMaxConfig config = new SparkMaxConfig();
+      config.idleMode(BREAK_MODE ? IdleMode.kBrake : IdleMode.kCoast);
+      sparkMax.configure(
+          config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    }
   }
 
   @Override

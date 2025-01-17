@@ -145,7 +145,7 @@ public class DriveConstants {
       case CRESCENDO_CHASSIS_2024:
         driveMotor = DCMotor.getNEO(1);
         driveFeedback = new PIDConstants(0.000006, 0.0, 0.0);
-        driveFeedforward = new FeedForwardConstants(0.1, 3.12, 0.40);
+        driveFeedforward = new FeedForwardConstants(0, 0, 0);
         driveMotorCurrentLimit = 50;
         driveReduction = Mk4Reductions.L1.reduction;
 
@@ -172,14 +172,14 @@ public class DriveConstants {
       case T_SHIRT_CANNON_CHASSIS:
       default:
         driveMotor = DCMotor.getNEO(1);
-        driveFeedback = new PIDConstants(0.000006, 0.0, 0.0);
+        driveFeedback = new PIDConstants(0.0000006, 0.0, 0.0);
         driveFeedforward = new FeedForwardConstants(0.1, 2.35, 0.53);
         driveMotorCurrentLimit = 50;
         driveReduction = Mk4iReductions.L3.reduction;
 
         turnMotor = DCMotor.getNEO(1);
         turnFeedback = new PIDConstants(10, 0.0, 0.0);
-        turnMotorCurrentLimit = 20;
+        turnMotorCurrentLimit = 30;
         turnReduction = Mk4iReductions.TURN.reduction;
         break;
     }
