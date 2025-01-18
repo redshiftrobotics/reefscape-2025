@@ -138,8 +138,8 @@ public class Module {
     // Optimize state based on current angle
     // Controllers run in "periodic" when the setpoint is not null
 
-    // state.optimize(getAngle());
-    // state.cosineScale(getAngle());
+    state.optimize(getAngle());
+    state.cosineScale(getAngle());
 
     double velocityRadiansPerSecond = state.speedMetersPerSecond / DriveConstants.wheelRadius;
     double angleRadians = state.angle.getRadians();

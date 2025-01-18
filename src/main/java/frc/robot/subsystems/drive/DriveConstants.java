@@ -98,7 +98,7 @@ public class DriveConstants {
         BACK_LEFT_MODULE_CONFIG =
             new ModuleConfig(11, 10, 36, Rotation2d.fromRotations(-0.8603515625), true);
         BACK_RIGHT_MODULE_CONFIG =
-            new ModuleConfig(8, 9, 38, Rotation2d.fromRotations(-0.065185546875), true);
+            new ModuleConfig(8, 9, 38, Rotation2d.fromRotations(-0.065185546875 + 0.5), true);
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -189,8 +189,8 @@ public class DriveConstants {
       default:
         DRIVE_MOTOR = DCMotor.getNEO(1);
         DRIVE_FEEDBACK = new PIDConstants(0.0001, 0.0, 0.0);
-        // driveFeedforward = new FeedForwardConstants(0.1, 2.35, 0.53);
-        DRIVE_FEED_FORWARD = new FeedForwardConstants(0.0, 0.0, 0.0);
+        DRIVE_FEED_FORWARD = new FeedForwardConstants(0.1, 2.35, 0.53);
+        // DRIVE_FEED_FORWARD = new FeedForwardConstants(0.0, 0.0, 0.0);
         DRIVE_MOTor_CURRENT_LIMIT = 50;
         DRIVE_REDUCTION = Mk4iReductions.L3.reduction;
 
