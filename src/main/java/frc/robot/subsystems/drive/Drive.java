@@ -4,7 +4,6 @@ import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
-import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -120,7 +119,9 @@ public class Drive extends SubsystemBase {
         this::getRobotSpeeds,
         (speeds, feedForward) -> setRobotSpeeds(speeds),
         new PPHolonomicDriveController(
-            new PIDConstants(5, 0, 0), new PIDConstants(5, 0, 0), Constants.LOOP_PERIOD_SECONDS),
+            DriveConstants.driveControllerConstants.toPathPlannerPIDConstants(),
+            DriveConstants.rotationControllerConstants.toPathPlannerPIDConstants(),
+            Constants.LOOP_PERIOD_SECONDS),
         DriveConstants.pathPlannerRobotConfig,
         AllianceFlipUtil::shouldFlip,
         this);
@@ -132,8 +133,7 @@ public class Drive extends SubsystemBase {
 
     PathPlannerLogging.setLogActivePathCallback(
         activePath ->
-            Logger.recordOutput(
-                "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()])));
+            Logger.recordOutput("Odometry/Trajectory", activePath.toArray(Pose2d[]::new)));
     PathPlannerLogging.setLogTargetPoseCallback(
         targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
 

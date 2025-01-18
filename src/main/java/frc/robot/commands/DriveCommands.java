@@ -9,7 +9,6 @@ package frc.robot.commands;
 
 import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,7 +16,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,7 +27,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -40,6 +37,16 @@ public class DriveCommands {
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
+  /**
+   * Creates a command that drives the robot using joystick input.
+   *
+   * @param drive The drive subsystem
+   * @param xSupplier The supplier for the x-axis joystick input
+   * @param ySupplier The supplier for the y-axis joystick input
+   * @param omegaSupplier The supplier for the omega joystick input
+   * @param fieldOriented The supplier for the field oriented toggle
+   * @return The command that drives the robot
+   */
   public static Command joystickDrive(
       Drive drive,
       DoubleSupplier xSupplier,
@@ -64,6 +71,16 @@ public class DriveCommands {
         .finallyDo(drive::stop);
   }
 
+  /**
+   * Creates a command that drives the robot using joystick input with an angle setpoint.
+   *
+   * @param drive The drive subsystem
+   * @param xSupplier The supplier for the x-axis joystick input
+   * @param ySupplier The supplier for the y-axis joystick input
+   * @param rotationSupplier The supplier for the desired robot rotation
+   * @param fieldOriented The supplier for the field oriented toggle
+   * @return The command that drives the robot
+   */
   public static Command joystickDriveAtAngle(
       Drive drive,
       DoubleSupplier xSupplier,
@@ -71,14 +88,12 @@ public class DriveCommands {
       Supplier<Rotation2d> rotationSupplier,
       BooleanSupplier fieldOriented) {
 
-    // Create PID controller
     ProfiledPIDController angleController =
         new ProfiledPIDController(
-            DriveConstants.headingControllerConstants.Kp(),
-            DriveConstants.headingControllerConstants.Ki(),
-            DriveConstants.headingControllerConstants.Kd(),
-            new TrapezoidProfile.Constraints(
-                DRIVE_CONFIG.maxAngularVelocity(), DRIVE_CONFIG.maxAngularAcceleration()));
+            DriveConstants.rotationControllerConstants.Kp(),
+            DriveConstants.rotationControllerConstants.Ki(),
+            DriveConstants.rotationControllerConstants.Kd(),
+            DRIVE_CONFIG.getAngularConstraints());
 
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -109,28 +124,7 @@ public class DriveCommands {
         .finallyDo(drive::stop);
   }
 
-  public static Command driveToNearestPose(Drive drive, List<Pose2d> faces) {
-    List<Pose2d> dropOffSpots =
-        faces.stream()
-            .map(
-                pose ->
-                    pose.transformBy(
-                        new Transform2d(
-                            DriveConstants.DRIVE_CONFIG.bumperCornerToCorner().getX() / 2,
-                            0,
-                            Rotation2d.kPi)))
-            .toList();
-
-    if (faces.isEmpty()) {
-      throw new IllegalArgumentException("Poses list must not be empty");
-    }
-    return Commands.defer(
-        () ->
-            AutoBuilder.pathfindToPose(
-                drive.getPose().nearest(dropOffSpots), DriveConstants.pathConstraints),
-        Set.of(drive));
-  }
-
+  /** Estimated feed forward Ks and Kv by driving robot forward, control motors by voltage */
   public static Command feedforwardCharacterization(Drive drive) {
     List<Double> velocitySamples = new LinkedList<>();
     List<Double> voltageSamples = new LinkedList<>();
@@ -241,8 +235,7 @@ public class DriveCommands {
                         wheelDelta += Math.abs(positions[i] - state.positions[i]) / 4.0;
                       }
                       double wheelRadius =
-                          (state.gyroDelta * DriveConstants.DRIVE_CONFIG.driveBaseRadius())
-                              / wheelDelta;
+                          (state.gyroDelta * DRIVE_CONFIG.driveBaseRadius()) / wheelDelta;
 
                       NumberFormat formatter = new DecimalFormat("#0.000");
                       System.out.println(

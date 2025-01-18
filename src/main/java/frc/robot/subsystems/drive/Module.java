@@ -23,13 +23,13 @@ public class Module {
       new LoggedTunableNumberFactory("Drive/Module");
 
   private static final LoggedTunableNumber driveKp =
-      driveFeedbackFactory.getNumber("DriveKp", DriveConstants.driveFeedback.Kp());
+      driveFeedbackFactory.getNumber("DriveKp", DriveConstants.DRIVE_FEEDBACK.Kp());
   private static final LoggedTunableNumber driveKd =
-      driveFeedbackFactory.getNumber("DriveKd", DriveConstants.driveFeedback.Kd());
+      driveFeedbackFactory.getNumber("DriveKd", DriveConstants.DRIVE_FEEDBACK.Kd());
   private static final LoggedTunableNumber turnKp =
-      driveFeedbackFactory.getNumber("TurnKp", DriveConstants.turnFeedback.Kp());
+      driveFeedbackFactory.getNumber("TurnKp", DriveConstants.TURN_FEEDBACK.Kp());
   private static final LoggedTunableNumber turnKd =
-      driveFeedbackFactory.getNumber("TurnKd", DriveConstants.turnFeedback.Kd());
+      driveFeedbackFactory.getNumber("TurnKd", DriveConstants.TURN_FEEDBACK.Kd());
 
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
@@ -55,9 +55,9 @@ public class Module {
 
     driveFeedforward =
         new SimpleMotorFeedforward(
-            DriveConstants.driveFeedforward.Ks(),
-            DriveConstants.driveFeedforward.Kv(),
-            DriveConstants.driveFeedforward.Ka(),
+            DriveConstants.DRIVE_FEED_FORWARD.Ks(),
+            DriveConstants.DRIVE_FEED_FORWARD.Kv(),
+            DriveConstants.DRIVE_FEED_FORWARD.Ka(),
             Constants.LOOP_PERIOD_SECONDS);
 
     io.setDrivePID(driveKd.get(), 0, driveKd.get());
@@ -138,8 +138,8 @@ public class Module {
     // Optimize state based on current angle
     // Controllers run in "periodic" when the setpoint is not null
 
-    state.optimize(getAngle());
-    state.cosineScale(getAngle());
+    // state.optimize(getAngle());
+    // state.cosineScale(getAngle());
 
     double velocityRadiansPerSecond = state.speedMetersPerSecond / DriveConstants.wheelRadius;
     double angleRadians = state.angle.getRadians();

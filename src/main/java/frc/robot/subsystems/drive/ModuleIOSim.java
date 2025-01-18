@@ -33,13 +33,13 @@ public class ModuleIOSim implements ModuleIO {
     driveSim =
         new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                DriveConstants.driveMotor, 0.025, DriveConstants.driveReduction),
-            DriveConstants.driveMotor);
+                DriveConstants.DRIVE_MOTOR, 0.025, DriveConstants.DRIVE_REDUCTION),
+            DriveConstants.DRIVE_MOTOR);
     turnSim =
         new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                DriveConstants.turnMotor, 0.004, DriveConstants.turnReduction),
-            DriveConstants.turnMotor);
+                DriveConstants.TURN_MOTOR, 0.004, DriveConstants.TURN_REDUCTION),
+            DriveConstants.TURN_MOTOR);
 
     // Create PID
     driveFeedback = new PIDController(0.0, 0.0, 0.0, Constants.LOOP_PERIOD_SECONDS);
