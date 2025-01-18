@@ -183,16 +183,13 @@ public class RobotContainer {
 
       // Default command
       drive.setDefaultCommand(
-          DriveCommands.joystickDrive(drive, () -> 0.5, () -> 0, () -> 0, () -> false)
+          DriveCommands.joystickDrive(
+                  drive,
+                  () -> -driverXbox.getLeftY(),
+                  () -> -driverXbox.getLeftX(),
+                  () -> -driverXbox.getRightX(),
+                  useFieldRelative)
               .withName("Default Drive"));
-      // drive.setDefaultCommand(
-      //     DriveCommands.joystickDrive(
-      //             drive,
-      //             () -> -driverXbox.getLeftY(),
-      //             () -> -driverXbox.getLeftX(),
-      //             () -> -driverXbox.getRightX(),
-      //             useFieldRelative)
-      //         .withName("Default Drive"));
 
       driverXbox
           .a()
