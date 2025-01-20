@@ -29,6 +29,10 @@ public class ModuleIOSim implements ModuleIO {
   private final PIDController driveFeedback;
   private final PIDController turnFeedback;
 
+  private boolean driveClosedLoop = false;
+  private boolean turnClosedLoop = false;
+  private double driveFFVolts = 0;
+
   public ModuleIOSim(ModuleConfig config) {
     driveSim =
         new DCMotorSim(
@@ -50,6 +54,26 @@ public class ModuleIOSim implements ModuleIO {
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
+
+    // Run closed-loop control
+
+    if (driveClosedLoop) {
+      driveAppliedVolts =
+          driveFFVolts + driveFeedback.calculate(driveSim.getAngularVelocityRadPerSec());
+    } else {
+      driveFeedback.reset();
+    }
+
+    if (turnClosedLoop) {
+      turnAppliedVolts = turnFeedback.calculate(turnSim.getAngularPositionRad());
+    } else {
+      turnFeedback.reset();
+    }
+
+    // Update simulation state
+    driveSim.setInputVoltage(MathUtil.clamp(driveAppliedVolts, -12.0, 12.0));
+    turnSim.setInputVoltage(MathUtil.clamp(turnAppliedVolts, -12.0, 12.0));
+
     driveSim.update(Constants.LOOP_PERIOD_SECONDS);
     turnSim.update(Constants.LOOP_PERIOD_SECONDS);
 
@@ -79,26 +103,27 @@ public class ModuleIOSim implements ModuleIO {
 
   @Override
   public void setDriveVoltage(double volts) {
-    driveAppliedVolts = MathUtil.clamp(volts, -12.0, +12.0);
-    driveSim.setInputVoltage(driveAppliedVolts);
+    driveClosedLoop = false;
+    driveAppliedVolts = volts;
   }
 
   @Override
   public void setTurnVoltage(double volts) {
-    turnAppliedVolts = MathUtil.clamp(volts, -12.0, +12.0);
-    turnSim.setInputVoltage(turnAppliedVolts);
+    turnClosedLoop = false;
+    turnAppliedVolts = volts;
   }
 
   @Override
   public void setDriveVelocity(double velocityRadsPerSec, double feedForward) {
-    setDriveVoltage(
-        driveFeedback.calculate(driveSim.getAngularVelocityRadPerSec(), velocityRadsPerSec)
-            + feedForward);
+    driveClosedLoop = true;
+    driveFFVolts = feedForward;
+    driveFeedback.setSetpoint(velocityRadsPerSec);
   }
 
   @Override
   public void setTurnPosition(double angleRads) {
-    setTurnVoltage(turnFeedback.calculate(turnSim.getAngularPositionRad(), angleRads));
+    turnClosedLoop = true;
+    turnFeedback.setSetpoint(angleRads);
   }
 
   @Override
