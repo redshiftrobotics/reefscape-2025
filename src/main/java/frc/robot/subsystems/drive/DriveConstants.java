@@ -148,7 +148,7 @@ public class DriveConstants {
   public static final DCMotor DRIVE_MOTOR;
   public static final FeedForwardConstants DRIVE_FEED_FORWARD;
   public static final PIDConstants DRIVE_FEEDBACK;
-  public static final int DRIVE_MOTor_CURRENT_LIMIT;
+  public static final int DRIVE_MOTOR_CURRENT_LIMIT;
   public static final double DRIVE_REDUCTION;
 
   public static final DCMotor TURN_MOTOR;
@@ -162,7 +162,7 @@ public class DriveConstants {
         DRIVE_MOTOR = DCMotor.getNEO(1);
         DRIVE_FEEDBACK = new PIDConstants(0.000006, 0.0, 0.0);
         DRIVE_FEED_FORWARD = new FeedForwardConstants(0.1, 3.12, 0.40);
-        DRIVE_MOTor_CURRENT_LIMIT = 50;
+        DRIVE_MOTOR_CURRENT_LIMIT = 50;
         DRIVE_REDUCTION = Mk4Reductions.L1.reduction;
 
         TURN_MOTOR = DCMotor.getNEO(1);
@@ -175,7 +175,7 @@ public class DriveConstants {
         DRIVE_MOTOR = DCMotor.getNEO(1);
         DRIVE_FEEDBACK = new PIDConstants(1.3, 0.0, 0.0);
         DRIVE_FEED_FORWARD = new FeedForwardConstants(0.0, 0, 0);
-        DRIVE_MOTor_CURRENT_LIMIT = 50;
+        DRIVE_MOTOR_CURRENT_LIMIT = 50;
         DRIVE_REDUCTION = Mk4iReductions.L3.reduction;
 
         TURN_MOTOR = DCMotor.getNEO(1);
@@ -191,7 +191,7 @@ public class DriveConstants {
         DRIVE_FEEDBACK = new PIDConstants(0.0001, 0.0, 0.0);
         DRIVE_FEED_FORWARD = new FeedForwardConstants(0.1, 2.35, 0.53);
         // DRIVE_FEED_FORWARD = new FeedForwardConstants(0.0, 0.0, 0.0);
-        DRIVE_MOTor_CURRENT_LIMIT = 50;
+        DRIVE_MOTOR_CURRENT_LIMIT = 50;
         DRIVE_REDUCTION = Mk4iReductions.L3.reduction;
 
         TURN_MOTOR = DCMotor.getNEO(1);
@@ -223,7 +223,7 @@ public class DriveConstants {
               DRIVE_CONFIG.maxLinearVelocity(),
               wheelCOF,
               DRIVE_MOTOR.withReduction(DRIVE_REDUCTION),
-              DRIVE_MOTor_CURRENT_LIMIT,
+              DRIVE_MOTOR_CURRENT_LIMIT,
               1),
           moduleTranslations);
 

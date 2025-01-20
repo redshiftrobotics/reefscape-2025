@@ -8,8 +8,13 @@
 package frc.robot.commands;
 
 import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
+import static frc.robot.subsystems.drive.DriveConstants.DRIVE_FEEDBACK;
+import static frc.robot.subsystems.drive.DriveConstants.TURN_FEEDBACK;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -60,17 +65,51 @@ public class DriveCommands {
               if (noRotationDebouncer.calculate(omega == 0.0)) {
                 speeds.omegaRadiansPerSecond = headingController.calculate();
               } else {
-                headingController.setGoal(drive.getRobotPose().getRotation());
+                headingController.setGoalToCurrentHeading();
                 headingController.reset();
               }
               drive.setRobotSpeeds(speeds, useFieldRelative.getAsBoolean());
+            })
+        .beforeStarting(
+            () -> {
+              headingController.setGoalToCurrentHeading();
+              headingController.reset();
             })
         .finallyDo(drive::stop);
   }
 
   /** Drive to a pose, more precise */
-  public static Command driveToPosePrecise(Drive drive) {
-    return Commands.none();
+  public static Command driveToPosePrecise(Drive drive, Pose2d desiredPose) {
+    HolonomicDriveController controller =
+        new HolonomicDriveController(
+            new PIDController(DRIVE_FEEDBACK.Kp(), DRIVE_FEEDBACK.Ki(), DRIVE_FEEDBACK.Kd()),
+            new PIDController(DRIVE_FEEDBACK.Kp(), DRIVE_FEEDBACK.Ki(), DRIVE_FEEDBACK.Kd()),
+            new ProfiledPIDController(
+                TURN_FEEDBACK.Kp(),
+                TURN_FEEDBACK.Ki(),
+                TURN_FEEDBACK.Kd(),
+                DRIVE_CONFIG.getAngularConstraints()));
+    controller.setTolerance(
+        new Pose2d(Units.inchesToMeters(2), Units.inchesToMeters(2), Rotation2d.fromDegrees(5)));
+
+    return drive
+        .run(
+            () ->
+                drive.setRobotSpeeds(
+                    controller.calculate(
+                        drive.getRobotPose(), desiredPose, 0, desiredPose.getRotation())))
+        .until(controller::atReference)
+        .beforeStarting(
+            () -> {
+              controller.getXController().reset();
+              controller.getYController().reset();
+              controller
+                  .getThetaController()
+                  .reset(
+                      drive.getRobotPose().getRotation().getRadians(),
+                      drive.getRobotSpeeds().omegaRadiansPerSecond);
+            })
+        .finallyDo(drive::stop);
   }
 
   /** Pathfind to a pose with pathplanner, only gets you roughly to target pose. */

@@ -135,9 +135,6 @@ public class Module {
 
   /** Runs the module with the specified setpoint state. */
   public void setSpeeds(SwerveModuleState state) {
-    // Optimize state based on current angle
-    // Controllers run in "periodic" when the setpoint is not null
-
     state.optimize(getAngle());
     state.cosineScale(getAngle());
 

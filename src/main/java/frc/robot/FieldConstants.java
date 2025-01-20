@@ -70,18 +70,19 @@ public class FieldConstants {
             Units.inchesToMeters(33.526),
             Units.inchesToMeters(25.824),
             Rotation2d.fromDegrees(144.011 - 90));
-    
-    public static final Pose2d[] alimentFaces = new Pose2d[9];
+
+    public static final Pose2d[] alignmentFaces = new Pose2d[9 * 2];
 
     static {
-
       final double offset = 8;
 
-      double x = 6;
-      
-      for (int i = 0; i < alimentFaces.length; i++) {
-        alimentFaces[i] = new Pose2d(Units.inchesToMeters(33.526), Units.inchesToMeters(x), new Rotation2d());
-        x += offset;
+      for (int i = -4; i < 5; i++) {
+        alignmentFaces[i + 4] =
+            leftCenterFace.plus(
+                new Transform2d(0, Units.inchesToMeters(i * offset), Rotation2d.kZero));
+        alignmentFaces[i + 13] =
+            rightCenterFace.plus(
+                new Transform2d(0, Units.inchesToMeters(i * offset), Rotation2d.kZero));
       }
     }
   }

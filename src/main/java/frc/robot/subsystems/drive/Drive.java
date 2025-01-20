@@ -333,7 +333,7 @@ public class Drive extends SubsystemBase {
 
     speeds = ChassisSpeeds.discretize(speeds, Constants.LOOP_PERIOD_SECONDS);
 
-    SwerveModuleState[] wheelSpeeds = kinematics.toWheelSpeeds(speeds);
+    SwerveModuleState[] wheelSpeeds = kinematics.toSwerveModuleStates(speeds);
 
     setWheelSpeeds(wheelSpeeds);
   }
@@ -411,7 +411,7 @@ public class Drive extends SubsystemBase {
             .map(Translation2d::getAngle)
             .toArray(Rotation2d[]::new);
     kinematics.resetHeadings(headings);
-    setRobotSpeeds(new ChassisSpeeds());
+    setWheelSpeeds(kinematics.toWheelSpeeds(new ChassisSpeeds()));
   }
 
   /**
@@ -419,9 +419,9 @@ public class Drive extends SubsystemBase {
    * their normal driving the next time a nonzero velocity is requested.
    */
   public void stopUsingForwardArrangement() {
-    Rotation2d[] headings = modules().map(module -> new Rotation2d()).toArray(Rotation2d[]::new);
+    Rotation2d[] headings = modules().map(module -> Rotation2d.kZero).toArray(Rotation2d[]::new);
     kinematics.resetHeadings(headings);
-    setRobotSpeeds(new ChassisSpeeds());
+    setWheelSpeeds(kinematics.toWheelSpeeds(new ChassisSpeeds()));
   }
 
   // --- Break Mode ---

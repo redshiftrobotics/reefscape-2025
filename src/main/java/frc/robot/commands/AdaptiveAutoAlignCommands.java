@@ -6,17 +6,22 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
+import org.littletonrobotics.junction.Logger;
 
 public class AdaptiveAutoAlignCommands {
   private final List<Pose2d> poses;
 
+  private int offset = 0;
+
   public AdaptiveAutoAlignCommands(List<Pose2d> poses) {
     Transform2d offset =
-        new Transform2d(DRIVE_CONFIG.bumperCornerToCorner().getX() / 1, 0, Rotation2d.kPi);
+        new Transform2d(DRIVE_CONFIG.bumperCornerToCorner().getX() / 2, 0, Rotation2d.kPi);
     this.poses = poses.stream().map(pose -> pose.transformBy(offset)).toList();
   }
 
@@ -30,25 +35,33 @@ public class AdaptiveAutoAlignCommands {
 
   private double closestScore(Pose2d pose1, Pose2d pose2) {
     Transform2d transform = pose1.minus(pose2);
-    return transform.getTranslation().getNorm()
-        + transform.getRotation().getRadians() * DRIVE_CONFIG.driveBaseRadius();
+    return Math.abs(transform.getTranslation().getNorm())
+        + Math.abs(transform.getRotation().getRadians()) * DRIVE_CONFIG.driveBaseRadius();
   }
 
-  private Command driveToClosest(Drive drive, int offset) {
-    int index = (getClosestPoseIndex(drive) + offset + poses.size()) % poses.size();
-    Pose2d pose = poses.get(index);
-    return DriveCommands.pathfindToPoseCommand(drive, pose, 1, 0);
+  private Command align(Drive drive) {
+    return Commands.defer(
+        () -> {
+          Pose2d pose = poses.get(offset);
+          return DriveCommands.pathfindToPoseCommand(drive, pose, 1, 0)
+              .andThen(DriveCommands.driveToPosePrecise(drive, pose))
+              .beforeStarting(() -> Logger.recordOutput("AutoAlignGoal", new Pose2d[] {pose}))
+              .finallyDo(() -> Logger.recordOutput("AutoAlignGoal", new Pose2d[] {}));
+        },
+        Set.of(drive));
   }
 
   public Command driveToClosest(Drive drive) {
-    return driveToClosest(drive, 0);
+    return align(drive).beforeStarting(() -> this.offset = getClosestPoseIndex(drive));
   }
 
   public Command driveToNext(Drive drive) {
-    return driveToClosest(drive, +1);
+    return align(drive)
+        .beforeStarting(() -> this.offset = (this.offset + 1 + poses.size()) % poses.size());
   }
 
   public Command driveToPrevious(Drive drive) {
-    return driveToClosest(drive, -1);
+    return align(drive)
+        .beforeStarting(() -> this.offset = (this.offset - 1 + poses.size()) % poses.size());
   }
 }

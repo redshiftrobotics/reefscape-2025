@@ -57,6 +57,11 @@ public class HeadingController {
     headingControllerRadians.setGoal(heading.getRadians());
   }
 
+  /** Set goal heading to current heading of chassis */
+  public void setGoalToCurrentHeading() {
+    setGoal(drive.getRobotPose().getRotation());
+  }
+
   /**
    * Get goal heading.
    *
