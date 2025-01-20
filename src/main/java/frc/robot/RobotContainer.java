@@ -175,12 +175,12 @@ public class RobotContainer {
   /** Define button->command mappings. */
   private void configureControllerBindings() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
-    configureDriverControllerBindings();
+    configureDriverControllerBindings(false);
     configureOperatorControllerBindings();
     configureAlertTriggers();
   }
 
-  private void configureDriverControllerBindings() {
+  private void configureDriverControllerBindings(boolean includeAutoAlign) {
     if (driverController instanceof CommandXboxController) {
       final CommandXboxController driverXbox = (CommandXboxController) driverController;
 
@@ -200,11 +200,6 @@ public class RobotContainer {
       final SpeedLevelController level =
           new SpeedLevelController(SpeedLevelController.SpeedLevel.NO_LEVEL);
 
-      final AdaptiveAutoAlignCommands reefAlignmentCommands =
-          new AdaptiveAutoAlignCommands(Arrays.asList(FieldConstants.Reef.alignmentFaces));
-      final AdaptiveAutoAlignCommands intakeAlignmentCommands =
-          new AdaptiveAutoAlignCommands(Arrays.asList(FieldConstants.CoralStation.alignmentFaces));
-
       // Default command
       drive.setDefaultCommand(
           DriveCommands.joystickDrive(
@@ -215,7 +210,8 @@ public class RobotContainer {
                   useFieldRelative::getAsBoolean)
               .withName("Default Drive"));
 
-      // Cause the robot to resist movement by forming an X with the swerve modules
+      // Cause the robot to resist movement by forming an X shape with the swerve modules
+      // Helps prevent getting pushed around
       driverXbox
           .x()
           .whileTrue(
@@ -223,47 +219,57 @@ public class RobotContainer {
                   .startEnd(drive::stopUsingBrakeArrangement, drive::stopUsingForwardArrangement)
                   .withName("Resist Movement With X"));
 
-      // Align to reef
-      driverXbox
-          .rightTrigger()
-          .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Drive to reef"));
+      if (includeAutoAlign) {
+        // Align to reef
+        final AdaptiveAutoAlignCommands reefAlignmentCommands =
+            new AdaptiveAutoAlignCommands(Arrays.asList(FieldConstants.Reef.alignmentFaces));
 
-      Command reefDriveNextCommand =
-          reefAlignmentCommands.driveToNext(drive).withName("Drive to next reef");
-      driverXbox
-          .rightTrigger()
-          .and(driverXbox.leftBumper())
-          .onTrue(Commands.runOnce(reefDriveNextCommand::cancel))
-          .onTrue(reefDriveNextCommand);
+        driverXbox
+            .rightTrigger()
+            .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Drive to reef"));
 
-      Command reefDrivePreviousCommand =
-          reefAlignmentCommands.driveToPrevious(drive).withName("Drive to previous reef");
-      driverXbox
-          .rightTrigger()
-          .and(driverXbox.rightBumper())
-          .onTrue(Commands.runOnce(reefDrivePreviousCommand::cancel))
-          .onTrue(reefDrivePreviousCommand);
+        Command reefDriveNextCommand =
+            reefAlignmentCommands.driveToNext(drive).withName("Drive to next reef");
+        driverXbox
+            .rightTrigger()
+            .and(driverXbox.leftBumper())
+            .onTrue(Commands.runOnce(reefDriveNextCommand::cancel))
+            .onTrue(reefDriveNextCommand);
 
-      // Align to intake
-      driverXbox
-          .leftTrigger()
-          .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Drive to intake"));
+        Command reefDrivePreviousCommand =
+            reefAlignmentCommands.driveToPrevious(drive).withName("Drive to previous reef");
+        driverXbox
+            .rightTrigger()
+            .and(driverXbox.rightBumper())
+            .onTrue(Commands.runOnce(reefDrivePreviousCommand::cancel))
+            .onTrue(reefDrivePreviousCommand);
 
-      Command intakeDriveNextCommand =
-          intakeAlignmentCommands.driveToNext(drive).withName("Drive to next intake");
-      driverXbox
-          .leftTrigger()
-          .and(driverXbox.leftBumper())
-          .onTrue(Commands.runOnce(intakeDriveNextCommand::cancel))
-          .onTrue(intakeDriveNextCommand);
+        // Align to intake
 
-      Command intakeDrivePreviousCommand =
-          intakeAlignmentCommands.driveToPrevious(drive).withName("Drive to previous intake");
-      driverXbox
-          .leftTrigger()
-          .and(driverXbox.rightBumper())
-          .onTrue(Commands.runOnce(intakeDrivePreviousCommand::cancel))
-          .onTrue(intakeDrivePreviousCommand);
+        final AdaptiveAutoAlignCommands intakeAlignmentCommands =
+            new AdaptiveAutoAlignCommands(
+                Arrays.asList(FieldConstants.CoralStation.alignmentFaces));
+
+        driverXbox
+            .leftTrigger()
+            .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Drive to intake"));
+
+        Command intakeDriveNextCommand =
+            intakeAlignmentCommands.driveToNext(drive).withName("Drive to next intake");
+        driverXbox
+            .leftTrigger()
+            .and(driverXbox.leftBumper())
+            .onTrue(Commands.runOnce(intakeDriveNextCommand::cancel))
+            .onTrue(intakeDriveNextCommand);
+
+        Command intakeDrivePreviousCommand =
+            intakeAlignmentCommands.driveToPrevious(drive).withName("Drive to previous intake");
+        driverXbox
+            .leftTrigger()
+            .and(driverXbox.rightBumper())
+            .onTrue(Commands.runOnce(intakeDrivePreviousCommand::cancel))
+            .onTrue(intakeDrivePreviousCommand);
+      }
 
       // Stop the robot and cancel any running commands
       driverXbox

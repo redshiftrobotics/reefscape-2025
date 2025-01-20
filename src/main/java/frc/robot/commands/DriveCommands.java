@@ -42,8 +42,28 @@ public class DriveCommands {
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
-  /** Joystick drive */
   public static Command joystickDrive(
+      Drive drive,
+      Supplier<Translation2d> translationSupplier,
+      DoubleSupplier omegaSupplier,
+      Supplier<SpeedLevelController.SpeedLevel> speedLevelSupplier,
+      BooleanSupplier useFieldRelative) {
+    return drive
+        .run(
+            () -> {
+              Translation2d translation = translationSupplier.get();
+              double omega = omegaSupplier.getAsDouble();
+              ChassisSpeeds speeds =
+                  SpeedLevelController.apply(
+                      new ChassisSpeeds(translation.getX(), translation.getY(), omega),
+                      speedLevelSupplier.get());
+              drive.setRobotSpeeds(speeds, useFieldRelative.getAsBoolean());
+            })
+        .finallyDo(drive::stop);
+  }
+
+  /** Joystick drive */
+  public static Command joystickDriveSmartAngleLock(
       Drive drive,
       Supplier<Translation2d> translationSupplier,
       DoubleSupplier omegaSupplier,
