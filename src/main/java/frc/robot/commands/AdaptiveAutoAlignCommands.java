@@ -6,11 +6,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.IntStream;
 
 public class AdaptiveAutoAlignCommands {
@@ -23,7 +21,7 @@ public class AdaptiveAutoAlignCommands {
   }
 
   private int getClosestPoseIndex(Drive drive) {
-    Pose2d currentPose = drive.getPose();
+    Pose2d currentPose = drive.getRobotPose();
     return IntStream.range(0, poses.size())
         .boxed()
         .min(Comparator.comparingDouble(i -> closestScore(poses.get(i), currentPose)))
@@ -37,13 +35,9 @@ public class AdaptiveAutoAlignCommands {
   }
 
   private Command driveToClosest(Drive drive, int offset) {
-    return Commands.defer(
-        () -> {
-          Pose2d targetPose =
-              poses.get((getClosestPoseIndex(drive) + offset + poses.size()) % poses.size());
-          return Commands.none();
-        },
-        Set.of(drive));
+    int index = (getClosestPoseIndex(drive) + offset + poses.size()) % poses.size();
+    Pose2d pose = poses.get(index);
+    return DriveCommands.pathfindToPoseCommand(drive, pose, 1, 0);
   }
 
   public Command driveToClosest(Drive drive) {

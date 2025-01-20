@@ -9,20 +9,20 @@ package frc.robot.commands;
 
 import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.controllers.HeadingController;
+import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.DriveConstants;
-import frc.robot.utility.JoystickUtil;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -37,91 +37,47 @@ public class DriveCommands {
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
-  /**
-   * Creates a command that drives the robot using joystick input.
-   *
-   * @param drive The drive subsystem
-   * @param xSupplier The supplier for the x-axis joystick input
-   * @param ySupplier The supplier for the y-axis joystick input
-   * @param omegaSupplier The supplier for the omega joystick input
-   * @param fieldOriented The supplier for the field oriented toggle
-   * @return The command that drives the robot
-   */
+  /** Joystick drive */
   public static Command joystickDrive(
       Drive drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
+      Supplier<Translation2d> translationSupplier,
       DoubleSupplier omegaSupplier,
-      BooleanSupplier fieldOriented) {
+      Supplier<SpeedLevelController.SpeedLevel> speedLevelSupplier,
+      BooleanSupplier useFieldRelative) {
+
+    HeadingController headingController = new HeadingController(drive);
+    Debouncer noRotationDebouncer = new Debouncer(0.1);
+
     return drive
         .run(
             () -> {
-              Translation2d translation =
-                  getTranslationMetersPerSecond(
-                      xSupplier.getAsDouble(),
-                      ySupplier.getAsDouble(),
-                      drive.getMaxLinearSpeedMetersPerSec());
-              double omega =
-                  getOmegaRadiansPerSecond(
-                      omegaSupplier.getAsDouble(), drive.getMaxAngularSpeedRadPerSec());
-              drive.setRobotSpeeds(
-                  new ChassisSpeeds(translation.getX(), translation.getY(), omega),
-                  fieldOriented.getAsBoolean());
+              Translation2d translation = translationSupplier.get();
+              double omega = omegaSupplier.getAsDouble();
+              ChassisSpeeds speeds =
+                  SpeedLevelController.apply(
+                      new ChassisSpeeds(translation.getX(), translation.getY(), omega),
+                      speedLevelSupplier.get());
+              if (noRotationDebouncer.calculate(omega == 0.0)) {
+                speeds.omegaRadiansPerSecond = headingController.calculate();
+              } else {
+                headingController.setGoal(drive.getRobotPose().getRotation());
+                headingController.reset();
+              }
+              drive.setRobotSpeeds(speeds, useFieldRelative.getAsBoolean());
             })
         .finallyDo(drive::stop);
   }
 
-  /**
-   * Creates a command that drives the robot using joystick input with an angle setpoint.
-   *
-   * @param drive The drive subsystem
-   * @param xSupplier The supplier for the x-axis joystick input
-   * @param ySupplier The supplier for the y-axis joystick input
-   * @param rotationSupplier The supplier for the desired robot rotation
-   * @param fieldOriented The supplier for the field oriented toggle
-   * @return The command that drives the robot
-   */
-  public static Command joystickDriveAtAngle(
-      Drive drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      Supplier<Rotation2d> rotationSupplier,
-      BooleanSupplier fieldOriented) {
+  /** Drive to a pose, more precise */
+  public static Command driveToPosePrecise(Drive drive) {
+    return Commands.none();
+  }
 
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            DriveConstants.rotationControllerConstants.Kp(),
-            DriveConstants.rotationControllerConstants.Ki(),
-            DriveConstants.rotationControllerConstants.Kd(),
-            DRIVE_CONFIG.getAngularConstraints());
-
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
-
-    return drive
-        .run(
-            () -> {
-              Translation2d translation =
-                  getTranslationMetersPerSecond(
-                      xSupplier.getAsDouble(),
-                      ySupplier.getAsDouble(),
-                      drive.getMaxLinearSpeedMetersPerSec());
-
-              double omega =
-                  angleController.calculate(
-                      drive.getPose().getRotation().getRadians(),
-                      rotationSupplier.get().getRadians());
-
-              drive.setRobotSpeeds(
-                  new ChassisSpeeds(translation.getX(), translation.getY(), omega),
-                  fieldOriented.getAsBoolean());
-            })
-        .beforeStarting(
-            () -> {
-              angleController.reset(
-                  drive.getPose().getRotation().getRadians(),
-                  drive.getRobotSpeeds().omegaRadiansPerSecond);
-            })
-        .finallyDo(drive::stop);
+  /** Pathfind to a pose with pathplanner, only gets you roughly to target pose. */
+  public static Command pathfindToPoseCommand(
+      Drive drive, Pose2d desiredPose, double speedMultiplier, double goalEndVelocity) {
+    return AutoBuilder.pathfindToPose(
+        desiredPose, DRIVE_CONFIG.getPathConstraints(), goalEndVelocity);
   }
 
   /** Estimated feed forward Ks and Kv by driving robot forward, control motors by voltage */
@@ -214,14 +170,14 @@ public class DriveCommands {
             Commands.runOnce(
                 () -> {
                   state.positions = drive.getWheelRadiusCharacterizationPositions();
-                  state.lastAngle = drive.getPose().getRotation();
+                  state.lastAngle = drive.getRobotPose().getRotation();
                   state.gyroDelta = 0.0;
                 }),
 
             // Update gyro delta
             Commands.run(
                     () -> {
-                      Rotation2d rotation = drive.getPose().getRotation();
+                      Rotation2d rotation = drive.getRobotPose().getRotation();
                       state.gyroDelta += Math.abs(rotation.minus(state.lastAngle).getRadians());
                       state.lastAngle = rotation;
                     })
@@ -257,44 +213,5 @@ public class DriveCommands {
     double[] positions = new double[4];
     Rotation2d lastAngle = new Rotation2d();
     double gyroDelta = 0.0;
-  }
-
-  private static Translation2d getTranslationMetersPerSecond(
-      double xInput, double yInput, double maxTranslationSpeedMetersPerSecond) {
-
-    Translation2d translation = new Translation2d(xInput, yInput);
-
-    // get length of linear velocity vector, and apply deadband to it for noise reduction
-    double magnitude = JoystickUtil.applyDeadband(translation.getNorm());
-
-    if (magnitude == 0) return new Translation2d();
-
-    // squaring the magnitude of the vector makes for quicker ramp up and slower fine control,
-    // magnitude should always be positive
-    double magnitudeSquared = Math.copySign(Math.pow(magnitude, 2), 1);
-
-    // get a vector with the same angle as the base linear velocity vector but with the
-    // magnitude squared
-    Translation2d squaredLinearVelocity =
-        new Pose2d(new Translation2d(), translation.getAngle())
-            .transformBy(new Transform2d(magnitudeSquared, 0.0, new Rotation2d()))
-            .getTranslation();
-
-    // return final value
-    return squaredLinearVelocity.times(maxTranslationSpeedMetersPerSecond);
-  }
-
-  private static double getOmegaRadiansPerSecond(
-      double omegaInput, double maxAngularSpeedRadPerSec) {
-
-    // get rotation speed, and apply deadband
-    double omega = JoystickUtil.applyDeadband(omegaInput);
-
-    // square the omega value for quicker ramp up and slower fine control
-    // make sure to copy the sign over for direction
-    double omegaSquared = Math.copySign(Math.pow(omega, 2), omega);
-
-    // return final value
-    return omegaSquared * maxAngularSpeedRadPerSec;
   }
 }

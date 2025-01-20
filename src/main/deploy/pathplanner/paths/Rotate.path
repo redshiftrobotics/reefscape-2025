@@ -4,15 +4,31 @@
     {
       "anchor": {
         "x": 2.0,
-        "y": 5.0
+        "y": 7.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0,
-        "y": 6.0
+        "x": 3.0,
+        "y": 7.0
       },
       "isLocked": false,
-      "linkedName": "Triangle1 End"
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.0,
+        "y": 7.0
+      },
+      "prevControl": {
+        "x": 4.749999999999999,
+        "y": 7.0
+      },
+      "nextControl": {
+        "x": 5.539271035817229,
+        "y": 7.0
+      },
+      "isLocked": false,
+      "linkedName": null
     },
     {
       "anchor": {
@@ -20,15 +36,20 @@
         "y": 7.0
       },
       "prevControl": {
-        "x": 2.0,
-        "y": 6.0
+        "x": 1.0,
+        "y": 7.0
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Triangle1 Start"
+      "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 180.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -45,7 +66,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Triangle",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

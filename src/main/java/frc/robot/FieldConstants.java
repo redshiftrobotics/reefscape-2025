@@ -70,6 +70,20 @@ public class FieldConstants {
             Units.inchesToMeters(33.526),
             Units.inchesToMeters(25.824),
             Rotation2d.fromDegrees(144.011 - 90));
+    
+    public static final Pose2d[] alimentFaces = new Pose2d[9];
+
+    static {
+
+      final double offset = 8;
+
+      double x = 6;
+      
+      for (int i = 0; i < alimentFaces.length; i++) {
+        alimentFaces[i] = new Pose2d(Units.inchesToMeters(33.526), Units.inchesToMeters(x), new Rotation2d());
+        x += offset;
+      }
+    }
   }
 
   public static class Reef {
@@ -83,7 +97,7 @@ public class FieldConstants {
     public static final Pose2d[] centerFaces =
         new Pose2d[6]; // Starting facing the driver station in clockwise order
 
-    public static final Pose2d[] branchFaces =
+    public static final Pose2d[] alignmentFaces =
         new Pose2d
             [12]; // Starting facing the driver station in clockwise order, positions robot is in
     // front of branch
@@ -138,9 +152,9 @@ public class FieldConstants {
         Map<ReefHeight, Pose3d> fillRight = new HashMap<>();
         Map<ReefHeight, Pose3d> fillLeft = new HashMap<>();
 
-        branchFaces[(face * 2) + 0] =
+        alignmentFaces[(face * 2) + 0] =
             centerFaces[face].transformBy(new Transform2d(0, adjustY, new Rotation2d()));
-        branchFaces[(face * 2) + 1] =
+        alignmentFaces[(face * 2) + 1] =
             centerFaces[face].transformBy(new Transform2d(0, -adjustY, new Rotation2d()));
 
         for (ReefHeight level : ReefHeight.values()) {

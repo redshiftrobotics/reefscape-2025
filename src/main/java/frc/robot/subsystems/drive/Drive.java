@@ -60,7 +60,8 @@ public class Drive extends SubsystemBase {
   private SwerveModulePosition[] lastModulePositions;
 
   private Rotation2d rawGyroRotation = new Rotation2d();
-  private Pose2d pose = new Pose2d();
+  private Pose2d robotPose = new Pose2d();
+  private ChassisSpeeds robotSpeeds = new ChassisSpeeds();
 
   /**
    * Creates a new drivetrain for robot
@@ -103,7 +104,7 @@ public class Drive extends SubsystemBase {
 
     lastModulePositions = modules().map(Module::getPosition).toArray(SwerveModulePosition[]::new);
     poseEstimator =
-        new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, pose);
+        new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, robotPose);
 
     // --- Start odometry threads ---
 
@@ -114,7 +115,7 @@ public class Drive extends SubsystemBase {
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configure(
-        this::getPose,
+        this::getRobotPose,
         this::resetPose,
         this::getRobotSpeeds,
         (speeds, feedForward) -> setRobotSpeeds(speeds),
@@ -223,11 +224,16 @@ public class Drive extends SubsystemBase {
         rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
       }
 
-      // Apply update to pose estimator
-      pose = poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+      // Apply update to pose estimator and save new pose
+      robotPose =
+          poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
     }
 
     gyroConnectionAlert.set(!gyroInputs.connected && Constants.getMode() != Mode.SIM);
+
+    // Save robot speeds for performance
+    SwerveModuleState[] wheelSpeeds = getWheelSpeeds();
+    robotSpeeds = kinematics.toChassisSpeeds(wheelSpeeds);
   }
 
   /**
@@ -236,8 +242,8 @@ public class Drive extends SubsystemBase {
    * @return the estimated position of robot
    */
   @AutoLogOutput(key = "Odometry/Robot")
-  public Pose2d getPose() {
-    return pose;
+  public Pose2d getRobotPose() {
+    return robotPose;
   }
 
   /**
@@ -284,7 +290,7 @@ public class Drive extends SubsystemBase {
    * @return translational speed in meters/sec and rotation speed in radians/sec
    */
   public ChassisSpeeds getRobotSpeeds() {
-    return getRobotSpeeds(false);
+    return robotSpeeds;
   }
 
   /**
@@ -294,17 +300,10 @@ public class Drive extends SubsystemBase {
    * @return translational speed in meters/sec and rotation speed in radians/sec
    */
   public ChassisSpeeds getRobotSpeeds(boolean fieldRelative) {
-    SwerveModuleState[] wheelSpeeds = getWheelSpeeds();
-
-    ChassisSpeeds speeds = kinematics.toChassisSpeeds(wheelSpeeds);
-
-    if (fieldRelative) {
-      speeds =
-          ChassisSpeeds.fromRobotRelativeSpeeds(
-              speeds, AllianceFlipUtil.apply(getPose().getRotation()));
-    }
-
-    return speeds;
+    return fieldRelative
+        ? ChassisSpeeds.fromFieldRelativeSpeeds(
+            robotSpeeds, AllianceFlipUtil.apply(getRobotPose().getRotation()))
+        : robotSpeeds;
   }
 
   /**
@@ -327,7 +326,7 @@ public class Drive extends SubsystemBase {
     if (fieldRelative) {
       speeds =
           ChassisSpeeds.fromFieldRelativeSpeeds(
-              speeds, AllianceFlipUtil.apply(getPose().getRotation()));
+              speeds, AllianceFlipUtil.apply(getRobotPose().getRotation()));
     }
 
     Logger.recordOutput("ChassisStates/DesiredRobotSpeeds", speeds);

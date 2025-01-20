@@ -4,6 +4,8 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -22,7 +24,10 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
+import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.controllers.JoystickInputController;
+import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -33,6 +38,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.utility.OverrideSwitch;
+import java.util.List;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -152,7 +158,7 @@ public class RobotContainer {
 
     DriverDashboard dashboard = DriverDashboard.getInstance();
     dashboard.addSubsystem(drive);
-    dashboard.setPoseSupplier(drive::getPose);
+    dashboard.setPoseSupplier(drive::getRobotPose);
     dashboard.setRobotSupplier(drive::getRobotSpeeds);
     dashboard.setFieldRelativeSupplier(() -> false);
 
@@ -160,7 +166,9 @@ public class RobotContainer {
     dashboard.addCommand(
         "Reset Rotation",
         drive.runOnce(
-            () -> drive.resetPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero))),
+            () ->
+                drive.resetPose(
+                    new Pose2d(drive.getRobotPose().getTranslation(), Rotation2d.kZero))),
         true);
   }
 
@@ -181,34 +189,40 @@ public class RobotContainer {
 
       DriverDashboard.getInstance().setFieldRelativeSupplier(useFieldRelative);
 
+      final JoystickInputController input =
+          new JoystickInputController(
+              drive,
+              () -> -driverXbox.getLeftY(),
+              () -> -driverXbox.getLeftX(),
+              () -> -driverXbox.getRightY(),
+              () -> -driverXbox.getRightX());
+
+      final SpeedLevelController level =
+          new SpeedLevelController(SpeedLevelController.SpeedLevel.NO_LEVEL);
+
+      final AdaptiveAutoAlignCommands reefAlignmentCommands =
+          new AdaptiveAutoAlignCommands(List.of(FieldConstants.Reef.aligmentFaces));
+      final AdaptiveAutoAlignCommands intakeAlignmentCommands =
+          new AdaptiveAutoAlignCommands(List.of(FieldConstants));
+
       // Default command
       drive.setDefaultCommand(
           DriveCommands.joystickDrive(
-                  drive,
-                  () -> -driverXbox.getLeftY(),
-                  () -> -driverXbox.getLeftX(),
-                  () -> -driverXbox.getRightX(),
-                  useFieldRelative)
-              .withName("Default Drive"));
+              drive,
+              input::getTranslationMetersPerSecond,
+              input::getOmegaRadiansPerSecond,
+              level::getCurrentSpeedLevel,
+              useFieldRelative::getAsBoolean));
 
-      driverXbox
-          .a()
-          .onTrue(
-              DriveCommands.joystickDriveAtAngle(
-                      drive,
-                      () -> -driverXbox.getLeftY(),
-                      () -> -driverXbox.getLeftX(),
-                      () -> Rotation2d.kZero,
-                      useFieldRelative)
-                  .withName("Drive Rotation Locked"));
-
+      // Cause the robot to resist movement by forming an X with the swerve modules
       driverXbox
           .x()
           .whileTrue(
               drive
                   .startEnd(drive::stopUsingBrakeArrangement, drive::stopUsingForwardArrangement)
-                  .withName("Stop With X"));
+                  .withName("Resist Movement With X"));
 
+      // Stop the robot and cancel any running commands
       driverXbox
           .b()
           .or(RobotModeTriggers.disabled())
@@ -216,18 +230,29 @@ public class RobotContainer {
               Commands.idle(drive)
                   .beforeStarting(drive::stop)
                   .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-                  .withName("Stop Cancel"));
+                  .withName("Stop and Cancel"));
 
     } else if (driverController instanceof CommandJoystick) {
       final CommandJoystick driverJoystick = (CommandJoystick) driverController;
 
+      JoystickInputController driverController =
+          new JoystickInputController(
+              drive,
+              () -> -driverJoystick.getY(),
+              () -> -driverJoystick.getX(),
+              () -> -driverJoystick.getTwist(),
+              () -> 0.0);
+
       drive.setDefaultCommand(
-          DriveCommands.joystickDrive(
-                  drive,
-                  () -> -driverJoystick.getY(),
-                  () -> driverJoystick.getX(),
-                  () -> driverJoystick.getZ(),
-                  () -> true)
+          drive
+              .run(
+                  () -> {
+                    Translation2d translation = driverController.getTranslationMetersPerSecond();
+                    double omega = driverController.getOmegaRadiansPerSecond();
+                    drive.setRobotSpeeds(
+                        new ChassisSpeeds(translation.getX(), translation.getY(), omega));
+                  })
+              .finallyDo(drive::stop)
               .withName("Default Drive"));
     }
   }

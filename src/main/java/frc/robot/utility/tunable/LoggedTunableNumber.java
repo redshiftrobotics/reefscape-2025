@@ -65,7 +65,7 @@ public class LoggedTunableNumber implements DoubleSupplier {
   }
 
   private boolean isTuningEnabled() {
-    return Constants.TUNING_MODE && tuningEnabled;
+    return tuningEnabled && Constants.TUNING_MODE;
   }
 
   /**

@@ -240,6 +240,13 @@ public class DriveConstants {
   public static final PIDConstants driveControllerConstants = new PIDConstants(5.0, 0.0, 0.0);
   public static final PIDConstants rotationControllerConstants = new PIDConstants(5.0, 0, 0.4);
 
+  // --- Heading Controller Config ---
+
+  public record HeadingControllerConfig(PIDConstants pid, double toleranceDegrees) {}
+
+  public static final HeadingControllerConfig HEADING_CONTROLLER_CONFIG =
+      new HeadingControllerConfig(rotationControllerConstants, 1.0);
+
   // --- General Tuning Records ---
 
   public record PIDConstants(double Kp, double Ki, double Kd) {

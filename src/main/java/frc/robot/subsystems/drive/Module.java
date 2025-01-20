@@ -60,7 +60,7 @@ public class Module {
             DriveConstants.DRIVE_FEED_FORWARD.Ka(),
             Constants.LOOP_PERIOD_SECONDS);
 
-    io.setDrivePID(driveKd.get(), 0, driveKd.get());
+    io.setDrivePID(driveKp.get(), 0, driveKd.get());
     io.setTurnPID(turnKp.get(), 0, turnKd.get());
 
     setBrakeMode(true);
