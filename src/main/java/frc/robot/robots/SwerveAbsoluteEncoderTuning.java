@@ -31,6 +31,13 @@ public class SwerveAbsoluteEncoderTuning extends LoggedRobot {
     new SparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG.turnID(), MotorType.kBrushless),
   };
 
+  private final SparkMax[] drives = {
+    new SparkMax(DriveConstants.FRONT_LEFT_MODULE_CONFIG.driveID(), MotorType.kBrushless),
+    new SparkMax(DriveConstants.FRONT_RIGHT_MODULE_CONFIG.driveID(), MotorType.kBrushless),
+    new SparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG.driveID(), MotorType.kBrushless),
+    new SparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG.driveID(), MotorType.kBrushless),
+  };
+
   private final CANcoder frontLeftCancoder =
       new CANcoder(DriveConstants.FRONT_LEFT_MODULE_CONFIG.absoluteEncoderChannel());
   private final CANcoder frontRightCancoder =
@@ -75,7 +82,7 @@ public class SwerveAbsoluteEncoderTuning extends LoggedRobot {
           entry.getValue().getAbsolutePosition().refresh().getValueAsDouble());
     }
 
-    if (timer.advanceIfElapsed(1)) {
+    if (timer.advanceIfElapsed(3)) {
       System.out.println("Swerve Positions");
       for (Map.Entry<String, CANcoder> entry : cancoderMap.entrySet()) {
         System.out.println(
@@ -83,6 +90,20 @@ public class SwerveAbsoluteEncoderTuning extends LoggedRobot {
                 + " Position: "
                 + entry.getValue().getAbsolutePosition().refresh().getValueAsDouble());
       }
+    }
+  }
+
+  @Override
+  public void autonomousInit() {
+    for (SparkMax sparkMax : drives) {
+      sparkMax.set(0.25);
+    }
+  }
+
+  @Override
+  public void autonomousExit() {
+    for (SparkMax sparkMax : drives) {
+      sparkMax.stopMotor();
     }
   }
 }
