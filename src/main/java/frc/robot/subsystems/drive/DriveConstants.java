@@ -57,7 +57,7 @@ public class DriveConstants {
 
   public static final DriveConfig DRIVE_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT, T_SHIRT_CANNON_CHASSIS -> new DriveConfig(
+        case WOOD_BOT_TWO_2025, T_SHIRT_CANNON_CHASSIS -> new DriveConfig(
             new Translation2d(0.885, 0.885), new Translation2d(0.9612, 0.9612), 5.05968, 14.5);
         case CRESCENDO_CHASSIS_2024 -> new DriveConfig(
             new Translation2d(0.885, 0.885), new Translation2d(0.9612, 0.9612), 3.81, 14.5);
@@ -112,12 +112,18 @@ public class DriveConstants {
             new ModuleConfig(10, 11, 1, Rotation2d.fromRotations(0.453857421875), false);
         break;
 
-      case COMP_BOT:
+      case WOOD_BOT_TWO_2025:
+        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
+        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
+        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
+        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
+        break;
+
       default:
-        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
+        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
+        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
+        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
         break;
     }
   }
@@ -140,6 +146,7 @@ public class DriveConstants {
       switch (Constants.getRobot()) {
         case CRESCENDO_CHASSIS_2024 -> 40;
         case T_SHIRT_CANNON_CHASSIS -> 40;
+        case WOOD_BOT_TWO_2025 -> 40;
         default -> -1;
       };
 
@@ -184,7 +191,7 @@ public class DriveConstants {
         TURN_REDUCTION = Mk4iReductions.TURN.reduction;
         break;
 
-      case COMP_BOT:
+      case WOOD_BOT_TWO_2025:
       case T_SHIRT_CANNON_CHASSIS:
       default:
         DRIVE_MOTOR = DCMotor.getNEO(1);

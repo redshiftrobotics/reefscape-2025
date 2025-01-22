@@ -73,7 +73,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     switch (Constants.getRobot()) {
-      case COMP_BOT, T_SHIRT_CANNON_CHASSIS:
+      case WOOD_BOT_TWO_2025, T_SHIRT_CANNON_CHASSIS:
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
@@ -137,7 +137,8 @@ public class RobotContainer {
     if (Constants.ON_BLOCKS_TEST_MODE) {
       onBlockMode.set(true);
     }
-    if (DriverStation.isFMSAttached() && Constants.getRobot() != Constants.RobotType.COMP_BOT) {
+    if (DriverStation.isFMSAttached()
+        && Constants.getRobot() != Constants.RobotType.WOOD_BOT_TWO_2025) {
       fmsAndNotCompBotAlert.set(true);
     }
 
