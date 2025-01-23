@@ -7,7 +7,7 @@ Locations:
 - P(1-2): A Pickup location, labelled one for the top or two for the bottom.
 - Spawn Locations: Low, Mid, and Top. These are where the robot starts.
 
-![Visual guide to understanding the various locations](/resources/Guide-Images/Reefscape%20Diagram%20Annotated.png)
+![Visual guide to understanding the various locations](/resources/Pathplanner-Guide-Images/Reefscape%20Diagram%20Annotated.png)
 
 # Auto Names
 
@@ -28,7 +28,7 @@ Low Spawn D1, D5 P2 Double L1 Auto
 
 A visual representation of this is as follows:
 
-![Low Spawn D1, D5 P2 Double L1 Auto Example](/resources/Guide-Images/Low%20Spawn%20D1,%20D5%20P2%20Double%20L1%20Auto.png)
+![Low Spawn D1, D5 P2 Double L1 Auto Example](/resources/Pathplanner-Guide-Images/Low%20Spawn%20D1,%20D5%20P2%20Double%20L1%20Auto.png)
 
 # Path Names
 
@@ -47,4 +47,4 @@ Top Spawn to D2 Direct
 
 A visual representation of this is as follows:
 
-![Top Spawn to D2 Direct Example](/resources/Guide-Images/Top%20Spawn%20to%20D2%20Direct.png)
+![Top Spawn to D2 Direct Example](/resources/Pathplanner-Guide-Images/Top%20Spawn%20to%20D2%20Direct.png)
