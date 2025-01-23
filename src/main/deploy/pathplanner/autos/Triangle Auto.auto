@@ -9,18 +9,6 @@
           "data": {
             "pathName": "Triangle"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Triangle 2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Triangle 3"
-          }
         }
       ]
     }
