@@ -38,6 +38,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.utility.OverrideSwitch;
+import frc.robot.utility.commands.CustomCommands;
 import java.util.Arrays;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -229,21 +230,21 @@ public class RobotContainer {
             .rightTrigger()
             .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Drive to reef"));
 
-        Command reefDriveNextCommand =
-            reefAlignmentCommands.driveToNext(drive).withName("Drive to next reef");
         driverXbox
             .rightTrigger()
             .and(driverXbox.leftBumper())
-            .onTrue(Commands.runOnce(reefDriveNextCommand::cancel))
-            .onTrue(reefDriveNextCommand);
+            .onTrue(
+                CustomCommands.reInitCommand(
+                    reefAlignmentCommands.driveToNext(drive).withName("Drive to next reef")));
 
-        Command reefDrivePreviousCommand =
-            reefAlignmentCommands.driveToPrevious(drive).withName("Drive to previous reef");
         driverXbox
             .rightTrigger()
             .and(driverXbox.rightBumper())
-            .onTrue(Commands.runOnce(reefDrivePreviousCommand::cancel))
-            .onTrue(reefDrivePreviousCommand);
+            .onTrue(
+                CustomCommands.reInitCommand(
+                    reefAlignmentCommands
+                        .driveToPrevious(drive)
+                        .withName("Drive to previous reef")));
 
         // Align to intake
 
@@ -255,21 +256,21 @@ public class RobotContainer {
             .leftTrigger()
             .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Drive to intake"));
 
-        Command intakeDriveNextCommand =
-            intakeAlignmentCommands.driveToNext(drive).withName("Drive to next intake");
         driverXbox
             .leftTrigger()
             .and(driverXbox.leftBumper())
-            .onTrue(Commands.runOnce(intakeDriveNextCommand::cancel))
-            .onTrue(intakeDriveNextCommand);
+            .onTrue(
+                CustomCommands.reInitCommand(
+                    intakeAlignmentCommands.driveToNext(drive).withName("Drive to next intake")));
 
-        Command intakeDrivePreviousCommand =
-            intakeAlignmentCommands.driveToPrevious(drive).withName("Drive to previous intake");
         driverXbox
             .leftTrigger()
             .and(driverXbox.rightBumper())
-            .onTrue(Commands.runOnce(intakeDrivePreviousCommand::cancel))
-            .onTrue(intakeDrivePreviousCommand);
+            .onTrue(
+                CustomCommands.reInitCommand(
+                    intakeAlignmentCommands
+                        .driveToPrevious(drive)
+                        .withName("Drive to previous intake")));
       }
 
       // Stop the robot and cancel any running commands
