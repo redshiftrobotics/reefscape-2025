@@ -24,6 +24,7 @@ An example of this is the following:
 Low Spawn D1, D5 P2 Double L1 Auto
 
 A visual representation of this is as follows:
+
 ![Low Spawn D1, D5 P2 Double L1 Auto Example](/resources/Guide-Images/Low%20Spawn%20D1,%20D5%20P2%20Double%20L1%20Auto.png)
 
 # Path Names
@@ -40,4 +41,5 @@ An example of this is the following:
 Top Spawn to D2 Direct
 
 A visual representation of this is as follows:
+
 ![Top Spawn to D2 Direct Example](/resources/Guide-Images/Top%20Spawn%20to%20D2%20Direct.png)
