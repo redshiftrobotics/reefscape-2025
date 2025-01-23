@@ -13,13 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pickup 1 to D6"
+            "pathName": "P1 to D6 C2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "D6 to Pickup 1"
+            "pathName": "D6 to P1"
           }
         },
         {
@@ -37,13 +37,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pickup 2 to D4"
+            "pathName": "P2 to D4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "D4 to Pickup 2"
+            "pathName": "D4 to P2"
           }
         },
         {
@@ -61,7 +61,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pickup 2 to D2"
+            "pathName": "P2 to D2"
           }
         }
       ]

@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.318174342105263,
-        "y": 1.1096217105263155
+        "x": 3.625,
+        "y": 5.275
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.1499094288093197,
-        "y": 1.452468103580547
+        "x": 3.2072289299185117,
+        "y": 6.314071448945669
       },
       "isLocked": false,
-      "linkedName": "Coral Pickup 2"
+      "linkedName": "D6 C2"
     },
     {
       "anchor": {
-        "x": 5.869243421052631,
-        "y": 2.985855263157895
+        "x": 1.337,
+        "y": 6.988
       },
       "prevControl": {
-        "x": 5.6821217685933805,
-        "y": 2.6544810494202378
-      },
-      "nextControl": {
-        "x": 6.067489157166451,
-        "y": 3.33692914513885
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 6.0,
-        "y": 4.05
-      },
-      "prevControl": {
-        "x": 5.9467640024369155,
-        "y": 3.466607796973609
+        "x": 2.856922991360923,
+        "y": 5.121291305168891
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "D2"
+      "linkedName": "Coral Pickup 1"
     }
   ],
   "rotationTargets": [],
@@ -58,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 125.00000000000001
   },
   "reversed": false,
   "folder": "Paths B",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -125.00000000000001
+    "rotation": -59.99999999999999
   },
   "useDefaultConstraints": true
 }

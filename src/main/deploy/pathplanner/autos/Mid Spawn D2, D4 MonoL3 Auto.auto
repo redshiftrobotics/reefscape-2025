@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Top Spawn to D6"
+            "pathName": "Mid Spawn to D2"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "D6 to Pickup 1"
+            "pathName": "D2 to P2"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pickup 1 to D6"
+            "pathName": "P2 to D4"
           }
         }
       ]
