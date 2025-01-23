@@ -8,28 +8,30 @@
 package frc.robot.commands;
 
 import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
+import static frc.robot.subsystems.drive.DriveConstants.DRIVE_FEEDBACK;
+import static frc.robot.subsystems.drive.DriveConstants.TURN_FEEDBACK;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.controllers.HeadingController;
+import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.DriveConstants;
-import frc.robot.utility.JoystickUtil;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -42,95 +44,102 @@ public class DriveCommands {
 
   public static Command joystickDrive(
       Drive drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
+      Supplier<Translation2d> translationSupplier,
       DoubleSupplier omegaSupplier,
-      BooleanSupplier fieldOriented) {
+      Supplier<SpeedLevelController.SpeedLevel> speedLevelSupplier,
+      BooleanSupplier useFieldRelative) {
     return drive
         .run(
             () -> {
-              Translation2d translation =
-                  getTranslationMetersPerSecond(
-                      xSupplier.getAsDouble(),
-                      ySupplier.getAsDouble(),
-                      drive.getMaxLinearSpeedMetersPerSec());
-              double omega =
-                  getOmegaRadiansPerSecond(
-                      omegaSupplier.getAsDouble(), drive.getMaxAngularSpeedRadPerSec());
-              drive.setRobotSpeeds(
-                  new ChassisSpeeds(translation.getX(), translation.getY(), omega),
-                  fieldOriented.getAsBoolean());
+              Translation2d translation = translationSupplier.get();
+              double omega = omegaSupplier.getAsDouble();
+              ChassisSpeeds speeds =
+                  SpeedLevelController.apply(
+                      new ChassisSpeeds(translation.getX(), translation.getY(), omega),
+                      speedLevelSupplier.get());
+              drive.setRobotSpeeds(speeds, useFieldRelative.getAsBoolean());
             })
         .finallyDo(drive::stop);
   }
 
-  public static Command joystickDriveAtAngle(
+  /** Joystick drive */
+  public static Command joystickDriveSmartAngleLock(
       Drive drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      Supplier<Rotation2d> rotationSupplier,
-      BooleanSupplier fieldOriented) {
+      Supplier<Translation2d> translationSupplier,
+      DoubleSupplier omegaSupplier,
+      Supplier<SpeedLevelController.SpeedLevel> speedLevelSupplier,
+      BooleanSupplier useFieldRelative) {
 
-    // Create PID controller
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            DriveConstants.headingControllerConstants.Kp(),
-            DriveConstants.headingControllerConstants.Ki(),
-            DriveConstants.headingControllerConstants.Kd(),
-            new TrapezoidProfile.Constraints(
-                DRIVE_CONFIG.maxAngularVelocity(), DRIVE_CONFIG.maxAngularAcceleration()));
-
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
+    HeadingController headingController = new HeadingController(drive);
+    Debouncer noRotationDebouncer = new Debouncer(0.1);
 
     return drive
         .run(
             () -> {
-              Translation2d translation =
-                  getTranslationMetersPerSecond(
-                      xSupplier.getAsDouble(),
-                      ySupplier.getAsDouble(),
-                      drive.getMaxLinearSpeedMetersPerSec());
-
-              double omega =
-                  angleController.calculate(
-                      drive.getPose().getRotation().getRadians(),
-                      rotationSupplier.get().getRadians());
-
-              drive.setRobotSpeeds(
-                  new ChassisSpeeds(translation.getX(), translation.getY(), omega),
-                  fieldOriented.getAsBoolean());
+              Translation2d translation = translationSupplier.get();
+              double omega = omegaSupplier.getAsDouble();
+              ChassisSpeeds speeds =
+                  SpeedLevelController.apply(
+                      new ChassisSpeeds(translation.getX(), translation.getY(), omega),
+                      speedLevelSupplier.get());
+              if (noRotationDebouncer.calculate(omega == 0.0)) {
+                speeds.omegaRadiansPerSecond = headingController.calculate();
+              } else {
+                headingController.setGoalToCurrentHeading();
+                headingController.reset();
+              }
+              drive.setRobotSpeeds(speeds, useFieldRelative.getAsBoolean());
             })
         .beforeStarting(
             () -> {
-              angleController.reset(
-                  drive.getPose().getRotation().getRadians(),
-                  drive.getRobotSpeeds().omegaRadiansPerSecond);
+              headingController.setGoalToCurrentHeading();
+              headingController.reset();
             })
         .finallyDo(drive::stop);
   }
 
-  public static Command driveToNearestPose(Drive drive, List<Pose2d> faces) {
-    List<Pose2d> dropOffSpots =
-        faces.stream()
-            .map(
-                pose ->
-                    pose.transformBy(
-                        new Transform2d(
-                            DriveConstants.DRIVE_CONFIG.bumperCornerToCorner().getX() / 2,
-                            0,
-                            Rotation2d.kPi)))
-            .toList();
+  /** Drive to a pose, more precise */
+  public static Command driveToPosePrecise(Drive drive, Pose2d desiredPose) {
+    HolonomicDriveController controller =
+        new HolonomicDriveController(
+            new PIDController(DRIVE_FEEDBACK.Kp(), DRIVE_FEEDBACK.Ki(), DRIVE_FEEDBACK.Kd()),
+            new PIDController(DRIVE_FEEDBACK.Kp(), DRIVE_FEEDBACK.Ki(), DRIVE_FEEDBACK.Kd()),
+            new ProfiledPIDController(
+                TURN_FEEDBACK.Kp(),
+                TURN_FEEDBACK.Ki(),
+                TURN_FEEDBACK.Kd(),
+                DRIVE_CONFIG.getAngularConstraints()));
+    controller.setTolerance(
+        new Pose2d(Units.inchesToMeters(2), Units.inchesToMeters(2), Rotation2d.fromDegrees(5)));
 
-    if (faces.isEmpty()) {
-      throw new IllegalArgumentException("Poses list must not be empty");
-    }
-    return Commands.defer(
-        () ->
-            AutoBuilder.pathfindToPose(
-                drive.getPose().nearest(dropOffSpots), DriveConstants.pathConstraints),
-        Set.of(drive));
+    return drive
+        .run(
+            () ->
+                drive.setRobotSpeeds(
+                    controller.calculate(
+                        drive.getRobotPose(), desiredPose, 0, desiredPose.getRotation())))
+        .until(controller::atReference)
+        .beforeStarting(
+            () -> {
+              controller.getXController().reset();
+              controller.getYController().reset();
+              controller
+                  .getThetaController()
+                  .reset(
+                      drive.getRobotPose().getRotation().getRadians(),
+                      drive.getRobotSpeeds().omegaRadiansPerSecond);
+            })
+        .finallyDo(drive::stop);
   }
 
+  /** Pathfind to a pose with pathplanner, only gets you roughly to target pose. */
+  public static Command pathfindToPoseCommand(
+      Drive drive, Pose2d desiredPose, double speedMultiplier, double goalEndVelocity) {
+    return AutoBuilder.pathfindToPose(
+        desiredPose, DRIVE_CONFIG.getPathConstraints(), goalEndVelocity);
+  }
+
+  /** Estimated feed forward Ks and Kv by driving robot forward, control motors by voltage */
   public static Command feedforwardCharacterization(Drive drive) {
     List<Double> velocitySamples = new LinkedList<>();
     List<Double> voltageSamples = new LinkedList<>();
@@ -220,14 +229,14 @@ public class DriveCommands {
             Commands.runOnce(
                 () -> {
                   state.positions = drive.getWheelRadiusCharacterizationPositions();
-                  state.lastAngle = drive.getPose().getRotation();
+                  state.lastAngle = drive.getRobotPose().getRotation();
                   state.gyroDelta = 0.0;
                 }),
 
             // Update gyro delta
             Commands.run(
                     () -> {
-                      Rotation2d rotation = drive.getPose().getRotation();
+                      Rotation2d rotation = drive.getRobotPose().getRotation();
                       state.gyroDelta += Math.abs(rotation.minus(state.lastAngle).getRadians());
                       state.lastAngle = rotation;
                     })
@@ -241,8 +250,7 @@ public class DriveCommands {
                         wheelDelta += Math.abs(positions[i] - state.positions[i]) / 4.0;
                       }
                       double wheelRadius =
-                          (state.gyroDelta * DriveConstants.DRIVE_CONFIG.driveBaseRadius())
-                              / wheelDelta;
+                          (state.gyroDelta * DRIVE_CONFIG.driveBaseRadius()) / wheelDelta;
 
                       NumberFormat formatter = new DecimalFormat("#0.000");
                       System.out.println(
@@ -264,44 +272,5 @@ public class DriveCommands {
     double[] positions = new double[4];
     Rotation2d lastAngle = new Rotation2d();
     double gyroDelta = 0.0;
-  }
-
-  private static Translation2d getTranslationMetersPerSecond(
-      double xInput, double yInput, double maxTranslationSpeedMetersPerSecond) {
-
-    Translation2d translation = new Translation2d(xInput, yInput);
-
-    // get length of linear velocity vector, and apply deadband to it for noise reduction
-    double magnitude = JoystickUtil.applyDeadband(translation.getNorm());
-
-    if (magnitude == 0) return new Translation2d();
-
-    // squaring the magnitude of the vector makes for quicker ramp up and slower fine control,
-    // magnitude should always be positive
-    double magnitudeSquared = Math.copySign(Math.pow(magnitude, 2), 1);
-
-    // get a vector with the same angle as the base linear velocity vector but with the
-    // magnitude squared
-    Translation2d squaredLinearVelocity =
-        new Pose2d(new Translation2d(), translation.getAngle())
-            .transformBy(new Transform2d(magnitudeSquared, 0.0, new Rotation2d()))
-            .getTranslation();
-
-    // return final value
-    return squaredLinearVelocity.times(maxTranslationSpeedMetersPerSecond);
-  }
-
-  private static double getOmegaRadiansPerSecond(
-      double omegaInput, double maxAngularSpeedRadPerSec) {
-
-    // get rotation speed, and apply deadband
-    double omega = JoystickUtil.applyDeadband(omegaInput);
-
-    // square the omega value for quicker ramp up and slower fine control
-    // make sure to copy the sign over for direction
-    double omegaSquared = Math.copySign(Math.pow(omega, 2), omega);
-
-    // return final value
-    return omegaSquared * maxAngularSpeedRadPerSec;
   }
 }

@@ -92,12 +92,12 @@ public class ModuleIOSparkMax implements ModuleIO {
     SparkMaxConfig driveConfig = new SparkMaxConfig();
     driveConfig
         .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(DriveConstants.driveMotorCurrentLimit)
+        .smartCurrentLimit(DriveConstants.DRIVE_MOTOR_CURRENT_LIMIT)
         .voltageCompensation(12.0);
     driveConfig
         .encoder
-        .positionConversionFactor(1 / DriveConstants.driveReduction)
-        .velocityConversionFactor(1 / DriveConstants.driveReduction)
+        .positionConversionFactor(1 / DriveConstants.DRIVE_REDUCTION)
+        .velocityConversionFactor(1 / DriveConstants.DRIVE_REDUCTION)
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2);
     driveConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(0.0, 0.0, 0.0, 0.0);
@@ -123,12 +123,12 @@ public class ModuleIOSparkMax implements ModuleIO {
     turnConfig
         .inverted(config.turnMotorInverted())
         .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(DriveConstants.turnMotorCurrentLimit)
+        .smartCurrentLimit(DriveConstants.TURN_MOTOR_CURRENT_LIMIT)
         .voltageCompensation(12.0);
     turnConfig
         .encoder
-        .positionConversionFactor(1 / DriveConstants.turnReduction)
-        .velocityConversionFactor(1 / DriveConstants.turnReduction)
+        .positionConversionFactor(1 / DriveConstants.TURN_REDUCTION)
+        .velocityConversionFactor(1 / DriveConstants.TURN_REDUCTION)
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2);
     turnConfig
@@ -235,7 +235,7 @@ public class ModuleIOSparkMax implements ModuleIO {
   @Override
   public void setDriveVelocity(double velocityRadsPerSec, double feedForwardVoltage) {
     driveFeedback.setReference(
-        Units.radiansToRotations(velocityRadsPerSec),
+        Units.radiansPerSecondToRotationsPerMinute(velocityRadsPerSec),
         ControlType.kVelocity,
         ClosedLoopSlot.kSlot0,
         feedForwardVoltage,

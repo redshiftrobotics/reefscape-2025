@@ -16,10 +16,10 @@ public final class Constants {
 
   public static final double LOOP_PERIOD_SECONDS = Robot.defaultPeriodSecs; // 0.02
 
+  private static RobotType robotType = RobotType.T_SHIRT_CANNON_CHASSIS;
+
   public static final boolean TUNING_MODE = false;
   public static final boolean ON_BLOCKS_TEST_MODE = false;
-
-  private static RobotType robotType = RobotType.CRESCENDO_CHASSIS_2024;
 
   public static final Alert wrongRobotTypeAlertReal =
       new Alert(
@@ -33,7 +33,7 @@ public final class Constants {
   public static RobotType getRobot() {
     if (RobotBase.isReal() && robotType == RobotType.SIM_BOT) {
       wrongRobotTypeAlertReal.set(true);
-      robotType = RobotType.COMP_BOT;
+      robotType = RobotType.WOOD_BOT_TWO_2025;
     }
     if (RobotBase.isSimulation() && robotType != RobotType.SIM_BOT) {
       wrongRobotTypeAlertSim.set(true);
@@ -44,7 +44,7 @@ public final class Constants {
 
   public static Mode getMode() {
     return switch (getRobot()) {
-      case COMP_BOT, T_SHIRT_CANNON_CHASSIS, CRESCENDO_CHASSIS_2024 -> RobotBase.isReal()
+      case WOOD_BOT_TWO_2025, T_SHIRT_CANNON_CHASSIS, CRESCENDO_CHASSIS_2024 -> RobotBase.isReal()
           ? Mode.REAL
           : Mode.REPLAY;
       case SIM_BOT -> Mode.SIM;
@@ -66,7 +66,7 @@ public final class Constants {
     SIM_BOT,
     T_SHIRT_CANNON_CHASSIS,
     CRESCENDO_CHASSIS_2024,
-    COMP_BOT
+    WOOD_BOT_TWO_2025
   }
 
   /** Checks whether the correct robot is selected when deploying. */

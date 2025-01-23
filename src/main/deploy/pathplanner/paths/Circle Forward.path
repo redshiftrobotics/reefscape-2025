@@ -9,10 +9,26 @@
       "prevControl": null,
       "nextControl": {
         "x": 2.0,
-        "y": 4.75
+        "y": 5.5
       },
       "isLocked": false,
-      "linkedName": "CircleStart"
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.0,
+        "y": 5.0
+      },
+      "prevControl": {
+        "x": 2.5,
+        "y": 5.0
+      },
+      "nextControl": {
+        "x": 3.5,
+        "y": 5.0
+      },
+      "isLocked": false,
+      "linkedName": null
     },
     {
       "anchor": {
@@ -21,14 +37,30 @@
       },
       "prevControl": {
         "x": 4.0,
-        "y": 4.75
+        "y": 5.5
       },
       "nextControl": {
         "x": 4.0,
-        "y": 7.25
+        "y": 6.5
       },
       "isLocked": false,
-      "linkedName": "CircleEnd"
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.0,
+        "y": 7.0
+      },
+      "prevControl": {
+        "x": 3.5,
+        "y": 7.0
+      },
+      "nextControl": {
+        "x": 2.5,
+        "y": 7.0
+      },
+      "isLocked": false,
+      "linkedName": null
     },
     {
       "anchor": {
@@ -37,11 +69,11 @@
       },
       "prevControl": {
         "x": 2.0,
-        "y": 7.25
+        "y": 6.598898052314396
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "CircleStart"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -57,13 +89,13 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
+    "velocity": 0,
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Circle",
+  "folder": "New Folder",
   "idealStartingState": {
-    "velocity": 0.0,
+    "velocity": 0,
     "rotation": 0.0
   },
   "useDefaultConstraints": true
