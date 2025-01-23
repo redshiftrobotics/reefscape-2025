@@ -7,7 +7,8 @@ public class CustomCommands {
   private CustomCommands() {}
 
   /**
-   * Constructs a new {@link ReInitCommand} that when scheduled cancels and reschedules the given command.
+   * Constructs a new {@link ReInitCommand} that when scheduled cancels and reschedules the given
+   * command.
    *
    * @param command the command to wrap
    * @return the command

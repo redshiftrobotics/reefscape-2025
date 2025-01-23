@@ -8,7 +8,8 @@ public class ReInitCommand extends Command {
   private final Command command;
 
   /**
-   * Constructs a new {@link ReInitCommand} that when scheduled cancels and reschedules the given command.
+   * Constructs a new {@link ReInitCommand} that when scheduled cancels and reschedules the given
+   * command.
    *
    * @param command the command to wrap
    */
