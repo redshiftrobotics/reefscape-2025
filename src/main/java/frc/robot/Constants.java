@@ -69,11 +69,5 @@ public final class Constants {
     COMP_BOT
   }
 
-  /** Checks whether the correct robot is selected when deploying. */
-  public static void main(String... args) {
-    if (robotType == RobotType.SIM_BOT) {
-      System.err.println("Cannot deploy, invalid robot selected: " + robotType);
-      System.exit(1);
-    }
-  }
+
 }
