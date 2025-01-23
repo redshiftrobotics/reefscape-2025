@@ -1,5 +1,7 @@
 package frc.robot.subsystems.elevator;
 
-public class ElevatorIOSparkMax {
-  
+import com.revrobotics.spark.SparkMax;
+
+public class ElevatorIOSparkMax implements ElevatorIO {
+  //private final SparkMax 
 }
