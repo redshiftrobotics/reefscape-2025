@@ -8,8 +8,8 @@ This markdown file describes the formatting of our folders.
   * Commands and Subsystems are folders for commands and subsystems for the Robot.
   * Utility stores utilities for the robot, such as code to flip auto directions if on the red or blue side.
 ### Features
-* idk
+* To be determined
 ### Dependencies 
 * WPILib
+* Elastic
 * Pathplanner
-* and more i assume
