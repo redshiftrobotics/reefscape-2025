@@ -3,9 +3,7 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "Circle",
-    "Rotate",
-    "Triangle"
+    "New Folder"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.0,
