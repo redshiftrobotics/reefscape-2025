@@ -1,9 +1,8 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.robot.subsystems.examples.flywheel.FlywheelConstants.FEED_FORWARD_CONFIG;
-import static frc.robot.subsystems.examples.flywheel.FlywheelConstants.PID_CONFIG;
 
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,32 +11,16 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import com.revrobotics.spark.SparkMax;
+
 public class Elevator extends SubsystemBase {
   private final ElevatorIO io;
   private final elevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-
-  private final SimpleMotorFeedforward ffModel;
-  private final SysIdRoutine sysId;
+  private final SparkMax motor;
 
   /** Creates a new Flywheel. */
   public Elevator(ElevatorIO io) {
     this.io = io;
-
-    ffModel =
-        new SimpleMotorFeedforward(
-            FEED_FORWARD_CONFIG.Ks(), FEED_FORWARD_CONFIG.Kv(), FEED_FORWARD_CONFIG.Ka());
-
-    io.configurePID(PID_CONFIG.Kp(), PID_CONFIG.Ki(), PID_CONFIG.Kd());
-
-    // Configure SysId
-    sysId =
-        new SysIdRoutine(
-            new SysIdRoutine.Config(
-                null,
-                null,
-                null,
-                state -> Logger.recordOutput("Elevator/SysIdState", state.toString())),
-            new SysIdRoutine.Mechanism(voltage -> runVolts(voltage.in(Volts)), null, this));
   }
 
   @Override
@@ -47,43 +30,13 @@ public class Elevator extends SubsystemBase {
   }
 
   /** Run open loop at the specified voltage. */
-  public void runVolts(double volts) {
-    io.setVoltage(volts);
+  public void goToStage(int stage) {
+    switch ()
   }
 
-  /** Run closed loop at the specified velocity. */
-  public void runVelocity(double velocityRPM) {
-    double velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
-    io.setVelocity(velocityRadPerSec, ffModel.calculate(velocityRadPerSec));
-
-    // Log elevator setpoint
-    Logger.recordOutput("Elevator/SetpointRPM", velocityRPM);
-  }
-
-  /** Stops the elevator. */
-  public void stop() {
-    runVelocity(0);
+  /** Reset. */
+  public void reset() {
+    io.goToHeight(0);
     io.stop();
-  }
-
-  /** Returns a command to run a quasistatic test in the specified direction. */
-  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return sysId.quasistatic(direction);
-  }
-
-  /** Returns a command to run a dynamic test in the specified direction. */
-  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return sysId.dynamic(direction);
-  }
-
-  /** Returns the current velocity in RPM. */
-  @AutoLogOutput
-  public double getVelocityRPM() {
-    return Units.radiansPerSecondToRotationsPerMinute(inputs.velocityRadPerSec);
-  }
-
-  /** Returns the current velocity in radians per second. */
-  public double getCharacterizationVelocity() {
-    return inputs.velocityRadPerSec;
   }
 }

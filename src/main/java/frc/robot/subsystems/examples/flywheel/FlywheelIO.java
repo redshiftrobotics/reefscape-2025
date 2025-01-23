@@ -26,4 +26,5 @@ public interface FlywheelIO {
 
   /** Set velocity PID constants. */
   public default void configurePID(double Kp, double Ki, double Kd) {}
+  
 }
