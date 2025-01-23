@@ -1,7 +1,8 @@
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -39,7 +40,9 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
+import java.io.IOException;
 import java.util.Arrays;
+import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -124,11 +127,11 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Chooser", new SendableChooser<Command>());
 
     // Configure autos
-    configureAutos();
+    configureAutos(autoChooser);
 
     // Configure sys ids
     if (Constants.TUNING_MODE) {
-      configureSysIds();
+      configureSysIds(autoChooser);
     }
 
     // Alerts for constants to avoid using them in competition
@@ -343,28 +346,41 @@ public class RobotContainer {
         .onChange(rumbleControllers(0.2).withTimeout(0.2));
   }
 
-  private void configureAutos() {
+  private void configureAutos(LoggedDashboardChooser<Command> dashboardChooser) {
     // Set up named commands for path planner auto
     // https://pathplanner.dev/pplib-named-commands.html
     NamedCommands.registerCommand("StopWithX", drive.runOnce(drive::stopUsingBrakeArrangement));
+
     // Path planner Autos
     // https://pathplanner.dev/gui-editing-paths-and-autos.html#autos
-    autoChooser.addOption("Triangle Auto", new PathPlannerAuto("Triangle Auto"));
-    autoChooser.addOption("Rotate Auto", new PathPlannerAuto("Rotate Auto"));
-    autoChooser.addOption("Circle Auto", new PathPlannerAuto("Circle Auto"));
+    dashboardChooser.addOption("Triangle Auto", AutoBuilder.buildAuto("Triangle Auto"));
+    dashboardChooser.addOption("Rotate Auto", AutoBuilder.buildAuto("Rotate Auto"));
+    dashboardChooser.addOption("Circle Auto", AutoBuilder.buildAuto("Circle Auto"));
+
+    // Choreo Autos
+    // https://pathplanner.dev/pplib-choreo-interop.html#load-choreo-trajectory-as-a-pathplannerpath
+    try {
+      dashboardChooser.addOption(
+          "Four Coral Test",
+          AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("Four Coral Auto")));
+    } catch (IOException e) {
+      System.out.println("Failed to load Choreo auto " + e.getMessage());
+    } catch (ParseException e) {
+      System.out.println("Failed to parse Choreo auto " + e.getMessage());
+    }
   }
 
-  private void configureSysIds() {
+  private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {
     // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/introduction.html
-    autoChooser.addOption(
+    dashboardChooser.addOption(
         "Drive SysId (Quasistatic Forward)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    dashboardChooser.addOption(
         "Drive SysId (Quasistatic Reverse)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
+    dashboardChooser.addOption(
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    dashboardChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
