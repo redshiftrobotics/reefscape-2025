@@ -35,6 +35,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.EstimatedRobotPose;
 
 /** Swerve drivetrain (chassis) of robot. This contains four swerve modules and a gyro */
 public class Drive extends SubsystemBase {
@@ -262,8 +263,8 @@ public class Drive extends SubsystemBase {
    * @param timestamp the timestamp of the vision measurement in seconds. You must use a timestamp
    *     with an epoch since FPGA time startup.
    */
-  public void addVisionMeasurement(Pose2d visionPose, double timestamp) {
-    poseEstimator.addVisionMeasurement(visionPose, timestamp);
+  public void addVisionMeasurement(EstimatedRobotPose estimatedPose) {
+    poseEstimator.addVisionMeasurement(estimatedPose.estimatedPose.toPose2d(), estimatedPose.timestampSeconds);
   }
 
   /**
@@ -277,9 +278,9 @@ public class Drive extends SubsystemBase {
    *     theta], with units in meters and radians.
    */
   public void addVisionMeasurement(
-      Pose2d visionPose, double timestamp, Matrix<N3, N1> standardDeviations) {
+      EstimatedRobotPose estimatedPose, Matrix<N3, N1> standardDeviations) {
     poseEstimator.setVisionMeasurementStdDevs(standardDeviations);
-    addVisionMeasurement(visionPose, timestamp);
+    addVisionMeasurement(estimatedPose);
   }
 
   // --- Robot Speeds ---
