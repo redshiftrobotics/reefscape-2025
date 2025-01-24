@@ -17,10 +17,10 @@ public final class Constants {
 
   public static final double LOOP_PERIOD_SECONDS = Robot.defaultPeriodSecs; // 0.02
 
+  private static RobotType robotType = null;
+
   public static final boolean TUNING_MODE = false;
   public static final boolean ON_BLOCKS_TEST_MODE = false;
-
-  private static RobotType robotType;
 
   public static final Alert wrongRobotTypeAlertReal =
       new Alert(
@@ -67,22 +67,24 @@ public final class Constants {
     SIM_BOT,
     T_SHIRT_CANNON_CHASSIS,
     CRESCENDO_CHASSIS_2024,
-    WOOD_BOT_TWO_2025
+    WOOD_BOT_TWO_2025,
   }
 
   static {
-    if (RobotBase.isReal()) {
-      switch (RobotController.getSerialNumber()) {
-        case "03238024":
-          robotType = RobotType.CRESCENDO_CHASSIS_2024;
-          break;
-        case "032D216B":
-        default:
-          robotType = RobotType.WOOD_BOT_TWO_2025;
-          break;
+    if (robotType == null) {
+      if (RobotBase.isReal()) {
+        switch (RobotController.getSerialNumber()) {
+          case "03238024":
+            robotType = RobotType.CRESCENDO_CHASSIS_2024;
+            break;
+          case "032D216B":
+          default:
+            robotType = RobotType.WOOD_BOT_TWO_2025;
+            break;
+        }
+      } else if (RobotBase.isSimulation()) {
+        robotType = RobotType.SIM_BOT;
       }
-    } else if (RobotBase.isSimulation()) {
-      robotType = RobotType.SIM_BOT;
     }
   }
 }

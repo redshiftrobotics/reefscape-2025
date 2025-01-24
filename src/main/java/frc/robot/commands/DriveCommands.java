@@ -71,19 +71,24 @@ public class DriveCommands {
       BooleanSupplier useFieldRelative) {
 
     HeadingController headingController = new HeadingController(drive);
-    Debouncer noRotationDebouncer = new Debouncer(0.1);
+    Debouncer noRotationDebouncer = new Debouncer(0.75);
 
     return drive
         .run(
             () -> {
               Translation2d translation = translationSupplier.get();
               double omega = omegaSupplier.getAsDouble();
+
+              boolean noOmega = noRotationDebouncer.calculate(omega == 0.0);
+              double headingControlOmega = headingController.calculate();
+
               ChassisSpeeds speeds =
                   SpeedLevelController.apply(
                       new ChassisSpeeds(translation.getX(), translation.getY(), omega),
                       speedLevelSupplier.get());
-              if (noRotationDebouncer.calculate(omega == 0.0)) {
-                speeds.omegaRadiansPerSecond = headingController.calculate();
+
+              if (noOmega) {
+                speeds.omegaRadiansPerSecond = headingController.atGoal() ? 0 : headingControlOmega;
               } else {
                 headingController.setGoalToCurrentHeading();
                 headingController.reset();

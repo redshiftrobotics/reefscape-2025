@@ -113,10 +113,14 @@ public class DriveConstants {
         break;
 
       case WOOD_BOT_TWO_2025:
-        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
-        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
-        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
-        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
+        FRONT_LEFT_MODULE_CONFIG =
+            new ModuleConfig(2, 1, 37, Rotation2d.fromRotations(-0.880126953125), true);
+        FRONT_RIGHT_MODULE_CONFIG =
+            new ModuleConfig(19, 18, 36, Rotation2d.fromRotations(-0.29833984375), true);
+        BACK_LEFT_MODULE_CONFIG =
+            new ModuleConfig(8, 9, 39, Rotation2d.fromRotations(-0.32373046875), true);
+        BACK_RIGHT_MODULE_CONFIG =
+            new ModuleConfig(11, 10, 38, Rotation2d.fromRotations(-0.8935546875), true);
         break;
 
       default:

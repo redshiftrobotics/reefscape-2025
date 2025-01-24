@@ -24,6 +24,15 @@ public class HeadingController {
    * @param drive drivetrain of robot
    */
   public HeadingController(Drive drive) {
+    this(drive, HEADING_CONTROLLER_CONFIG.toleranceDegrees());
+  }
+
+  /**
+   * Creates a new HeadingController object
+   *
+   * @param drive drivetrain of robot
+   */
+  public HeadingController(Drive drive, double toleranceDegrees) {
     this.drive = drive;
 
     headingControllerRadians =
@@ -37,8 +46,7 @@ public class HeadingController {
 
     headingControllerRadians.enableContinuousInput(-Math.PI, Math.PI);
 
-    headingControllerRadians.setTolerance(
-        Units.degreesToRadians(HEADING_CONTROLLER_CONFIG.toleranceDegrees()));
+    headingControllerRadians.setTolerance(Units.degreesToRadians(toleranceDegrees));
   }
 
   /** Reset last position and rotation to prepare for new use */
