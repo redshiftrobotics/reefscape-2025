@@ -9,9 +9,9 @@ public class LEDSubsystem extends SubsystemBase {
     public Spark pwm;
     public double pattern;
 
-    public LEDStrip(Spark pw, double pa) {
+    public LEDStrip(Spark pw, double pattern) {
       pwm = pw;
-      pattern = pa;
+      this.pattern = pattern;
     }
   }
 
