@@ -16,9 +16,9 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   private LEDStrip[] strips;
-  
+
   public LEDSubsystem(int... pwmPorts) {
-    //Create all the strip objects
+    // Create all the strip objects
     strips = new LEDStrip[pwmPorts.length];
     for (int i = pwmPorts.length; i >= 0; i--) {
       strips[i] = new LEDStrip(new Spark(pwmPorts[i]), LEDPatterns.BLACK);
@@ -34,18 +34,20 @@ public class LEDSubsystem extends SubsystemBase {
 
   /**
    * @brief Apply a pattern to a specific LED strip
-   * @param strip The strip index to apply to. These are the same as the indices of LEDStrip objects in the constructor
-   * @param pattern The pattern to apply to the strip. See the below link for details, or use the LEDPatterns constant.
+   * @param strip The strip index to apply to. These are the same as the indices of LEDStrip objects
+   *     in the constructor
+   * @param pattern The pattern to apply to the strip. See the below link for details, or use the
+   *     LEDPatterns constant.
    * @link https://www.revrobotics.com/content/docs/REV-11-1105-UM.pdf
    */
   public void applyPatternTo(int strip, double pattern) {
-    if (strip >= 0 && strip < strips.length)
-      strips[strip].pattern = pattern;
+    if (strip >= 0 && strip < strips.length) strips[strip].pattern = pattern;
   }
 
   /**
    * @brief Apply a pattern to all LED strips
-   * @param pattern The pattern to apply to the strips. See the below link for details, or use the LEDPatterns constant.
+   * @param pattern The pattern to apply to the strips. See the below link for details, or use the
+   *     LEDPatterns constant.
    * @link https://www.revrobotics.com/content/docs/REV-11-1105-UM.pdf
    */
   public void applyPatternToAll(double pattern) {
