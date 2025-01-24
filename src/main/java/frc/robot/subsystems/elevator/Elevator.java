@@ -2,21 +2,10 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.*;
 
-import frc.robot.subsystems.elevator.ElevatorConstants;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
-
-import com.revrobotics.spark.SparkMax;
 
 public class Elevator extends SubsystemBase {
   private final ElevatorIO io;
-  private final elevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-  private final SparkMax motor;
 
   /** Creates a new Flywheel. */
   public Elevator(ElevatorIO io) {
@@ -25,18 +14,28 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
-    io.updateInputs(inputs);
-    Logger.processInputs("Elevator", inputs);
+    io.updateMotors();
   }
 
   /** Run open loop at the specified voltage. */
   public void goToStage(int stage) {
-    switch ()
+    switch (stage) {
+      case 0:
+        io.setGoalHeight(stage);
+      case 1:
+        io.setGoalHeight(ElevatorConstants.LEVEL_ONE_HEIGHT);
+      case 2:
+        io.setGoalHeight(ElevatorConstants.LEVEL_TWO_HEIGHT);
+      case 3:
+        io.setGoalHeight(ElevatorConstants.LEVEL_THREE_HEIGHT);
+      case 4:
+        io.setGoalHeight(ElevatorConstants.LEVEL_FOUR_HEIGHT);
+    }
   }
 
   /** Reset. */
   public void reset() {
-    io.goToHeight(0);
+    goToStage(0);
     io.stop();
   }
 }
