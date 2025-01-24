@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static final double FF_START_DELAY_SECONDS = 2.0; // Secs
@@ -72,7 +71,7 @@ public class DriveCommands {
       BooleanSupplier useFieldRelative) {
 
     HeadingController headingController = new HeadingController(drive);
-    Debouncer noRotationDebouncer = new Debouncer(0.1);
+    Debouncer noRotationDebouncer = new Debouncer(0.75);
 
     return drive
         .run(
