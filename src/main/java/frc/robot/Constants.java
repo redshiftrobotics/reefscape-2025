@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 
 /**
  * The Constants class provides a convenient place to hold robot-wide numerical or boolean
@@ -16,7 +17,7 @@ public final class Constants {
 
   public static final double LOOP_PERIOD_SECONDS = Robot.defaultPeriodSecs; // 0.02
 
-  private static RobotType robotType = RobotType.T_SHIRT_CANNON_CHASSIS;
+  private static RobotType robotType = null;
 
   public static final boolean TUNING_MODE = false;
   public static final boolean ON_BLOCKS_TEST_MODE = false;
@@ -66,14 +67,24 @@ public final class Constants {
     SIM_BOT,
     T_SHIRT_CANNON_CHASSIS,
     CRESCENDO_CHASSIS_2024,
-    WOOD_BOT_TWO_2025
+    WOOD_BOT_TWO_2025,
   }
 
-  /** Checks whether the correct robot is selected when deploying. */
-  public static void main(String... args) {
-    if (robotType == RobotType.SIM_BOT) {
-      System.err.println("Cannot deploy, invalid robot selected: " + robotType);
-      System.exit(1);
+  static {
+    if (robotType == null) {
+      if (RobotBase.isReal()) {
+        switch (RobotController.getSerialNumber()) {
+          case "03238024":
+            robotType = RobotType.CRESCENDO_CHASSIS_2024;
+            break;
+          case "032D216B":
+          default:
+            robotType = RobotType.WOOD_BOT_TWO_2025;
+            break;
+        }
+      } else if (RobotBase.isSimulation()) {
+        robotType = RobotType.SIM_BOT;
+      }
     }
   }
 }
