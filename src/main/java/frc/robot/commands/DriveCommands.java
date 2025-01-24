@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static final double FF_START_DELAY_SECONDS = 2.0; // Secs
@@ -78,12 +79,17 @@ public class DriveCommands {
             () -> {
               Translation2d translation = translationSupplier.get();
               double omega = omegaSupplier.getAsDouble();
+
+              boolean noOmega = noRotationDebouncer.calculate(omega == 0.0);
+              double headingControlOmega = headingController.calculate();
+
               ChassisSpeeds speeds =
                   SpeedLevelController.apply(
                       new ChassisSpeeds(translation.getX(), translation.getY(), omega),
                       speedLevelSupplier.get());
-              if (noRotationDebouncer.calculate(omega == 0.0)) {
-                speeds.omegaRadiansPerSecond = headingController.calculate();
+
+              if (noOmega) {
+                speeds.omegaRadiansPerSecond = headingController.atGoal() ? 0 : headingControlOmega;
               } else {
                 headingController.setGoalToCurrentHeading();
                 headingController.reset();

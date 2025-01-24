@@ -16,7 +16,7 @@ public final class Constants {
 
   public static final double LOOP_PERIOD_SECONDS = Robot.defaultPeriodSecs; // 0.02
 
-  private static RobotType robotType = RobotType.T_SHIRT_CANNON_CHASSIS;
+  private static RobotType robotType = RobotType.WOOD_BOT_TWO_2025;
 
   public static final boolean TUNING_MODE = false;
   public static final boolean ON_BLOCKS_TEST_MODE = false;

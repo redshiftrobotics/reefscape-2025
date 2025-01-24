@@ -66,6 +66,9 @@ public class SwerveAbsoluteEncoderTuning extends LoggedRobot {
   @Override
   public void robotInit() {
     timer.restart();
+
+    SmartDashboard.putBoolean("Break Mode", BREAK_MODE);
+
     for (SparkMax sparkMax : turns) {
       SparkMaxConfig config = new SparkMaxConfig();
       config.idleMode(BREAK_MODE ? IdleMode.kBrake : IdleMode.kCoast);
@@ -83,6 +86,7 @@ public class SwerveAbsoluteEncoderTuning extends LoggedRobot {
     }
 
     if (timer.advanceIfElapsed(3)) {
+      System.out.println();
       System.out.println("Swerve Positions");
       for (Map.Entry<String, CANcoder> entry : cancoderMap.entrySet()) {
         System.out.println(
@@ -96,7 +100,7 @@ public class SwerveAbsoluteEncoderTuning extends LoggedRobot {
   @Override
   public void autonomousInit() {
     for (SparkMax sparkMax : drives) {
-      sparkMax.set(0.25);
+      sparkMax.set(0.1);
     }
   }
 
