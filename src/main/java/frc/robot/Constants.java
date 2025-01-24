@@ -74,7 +74,7 @@ public final class Constants {
     if (RobotBase.isReal()) {
       switch (RobotController.getSerialNumber()) {
         default:
-          robotType = RobotType.COMP_BOT;
+          robotType = RobotType.WOOD_BOT_TWO_2025;
           break;
       }
     } else if (RobotBase.isSimulation()) {
