@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 
 /**
  * The Constants class provides a convenient place to hold robot-wide numerical or boolean
@@ -19,7 +20,7 @@ public final class Constants {
   public static final boolean TUNING_MODE = false;
   public static final boolean ON_BLOCKS_TEST_MODE = false;
 
-  private static RobotType robotType = RobotType.CRESCENDO_CHASSIS_2024;
+  private static RobotType robotType;
 
   public static final Alert wrongRobotTypeAlertReal =
       new Alert(
@@ -69,5 +70,15 @@ public final class Constants {
     COMP_BOT
   }
 
-
+  static {
+    if (RobotBase.isReal()) {
+      switch (RobotController.getSerialNumber()) {
+        default:
+          robotType = RobotType.COMP_BOT;
+          break;
+      }
+    } else if (RobotBase.isSimulation()) {
+      robotType = RobotType.SIM_BOT;
+    }
+  }
 }
