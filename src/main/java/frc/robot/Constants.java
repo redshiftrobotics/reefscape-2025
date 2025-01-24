@@ -73,6 +73,7 @@ public final class Constants {
   static {
     if (RobotBase.isReal()) {
       switch (RobotController.getSerialNumber()) {
+        case "032D216B":
         default:
           robotType = RobotType.WOOD_BOT_TWO_2025;
           break;
