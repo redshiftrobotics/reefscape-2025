@@ -10,15 +10,15 @@ public class SetLightPattern extends Command {
   //Set this to -1 to have the command apply to all strips
   private int stripID;
 
-  public SetLightPattern(LEDSubsystem led, int strip, double patt) {
+  public SetLightPattern(LEDSubsystem led, int strip, double pattern) {
     if (strip < -1)
       throw new IllegalArgumentException("LED configuration commands may ONLY use -1 or higher for strip IDs!");
     ledSystem = led;
-    pattern = patt;
+    this.pattern = pattern;
   }
 
-  public SetLightPattern(LEDSubsystem led, double patt) {
-    this(led, -1, patt);
+  public SetLightPattern(LEDSubsystem led, double pattern) {
+    this(led, -1, pattern);
   }
 
   @Override
