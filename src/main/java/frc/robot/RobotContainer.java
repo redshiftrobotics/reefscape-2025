@@ -180,7 +180,7 @@ public class RobotContainer {
   /** Define button->command mappings. */
   private void configureControllerBindings() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
-    configureDriverControllerBindings(false);
+    configureDriverControllerBindings(true);
     configureOperatorControllerBindings();
     configureAlertTriggers();
   }
@@ -224,6 +224,16 @@ public class RobotContainer {
                   .startEnd(drive::stopUsingBrakeArrangement, drive::stopUsingForwardArrangement)
                   .withName("Resist Movement With X"));
 
+      // Stop the robot and cancel any running commands
+      driverXbox
+          .b()
+          .or(RobotModeTriggers.disabled())
+          .onTrue(
+              Commands.idle(drive)
+                  .beforeStarting(drive::stop)
+                  .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+                  .withName("Stop and Cancel"));
+
       if (includeAutoAlign) {
         // Align to reef
         final AdaptiveAutoAlignCommands reefAlignmentCommands =
@@ -248,6 +258,8 @@ public class RobotContainer {
                     reefAlignmentCommands
                         .driveToPrevious(drive)
                         .withName("Drive to previous reef")));
+
+        driverXbox.rightTrigger(0.1).onFalse(drive.runOnce(drive::stop));
 
         // Align to intake
 
@@ -274,18 +286,9 @@ public class RobotContainer {
                     intakeAlignmentCommands
                         .driveToPrevious(drive)
                         .withName("Drive to previous intake")));
+
+        driverXbox.leftTrigger(0.1).onFalse(drive.runOnce(drive::stop));
       }
-
-      // Stop the robot and cancel any running commands
-      driverXbox
-          .b()
-          .or(RobotModeTriggers.disabled())
-          .whileTrue(
-              Commands.idle(drive)
-                  .beforeStarting(drive::stop)
-                  .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-                  .withName("Stop and Cancel"));
-
     } else if (driverController instanceof CommandJoystick) {
       final CommandJoystick driverJoystick = (CommandJoystick) driverController;
 
