@@ -5,6 +5,7 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 
@@ -22,21 +23,41 @@ public class DriveConstants {
       double maxLinearVelocity,
       double maxLinearAcceleration) {
     public double driveBaseRadius() {
-      return trackCornerToCorner.getNorm() * 0.5;
+      return trackCornerToCorner.getNorm() / 2;
     }
 
     public double maxAngularVelocity() {
-      return maxLinearVelocity / driveBaseRadius();
+      return maxLinearVelocity() / driveBaseRadius();
     }
 
     public double maxAngularAcceleration() {
-      return maxLinearAcceleration / driveBaseRadius();
+      return maxLinearAcceleration() / driveBaseRadius();
+    }
+
+    public Constraints getLinearConstraints() {
+      return new Constraints(maxLinearVelocity(), maxLinearAcceleration());
+    }
+
+    public Constraints getAngularConstraints() {
+      return new Constraints(maxAngularVelocity(), maxAngularAcceleration());
+    }
+
+    public PathConstraints getPathConstraints() {
+      return getPathConstraints(1);
+    }
+
+    public PathConstraints getPathConstraints(double speedMultiplier) {
+      return new PathConstraints(
+          maxLinearVelocity() * speedMultiplier,
+          maxLinearAcceleration(),
+          maxAngularVelocity() * speedMultiplier,
+          maxAngularAcceleration());
     }
   }
 
   public static final DriveConfig DRIVE_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT, T_SHIRT_CANNON_CHASSIS -> new DriveConfig(
+        case WOOD_BOT_TWO_2025, T_SHIRT_CANNON_CHASSIS -> new DriveConfig(
             new Translation2d(0.885, 0.885), new Translation2d(0.9612, 0.9612), 5.05968, 14.5);
         case CRESCENDO_CHASSIS_2024 -> new DriveConfig(
             new Translation2d(0.885, 0.885), new Translation2d(0.9612, 0.9612), 3.81, 14.5);
@@ -45,11 +66,6 @@ public class DriveConstants {
       };
 
   public static final double wheelRadius = Units.inchesToMeters(2.000);
-
-  // --- Path Constraints ---
-
-  public static final PathConstraints pathConstraints =
-      new PathConstraints(3.0, 3.0, 3 * Math.PI, 4 * Math.PI); // Currently a bit arbitrary
 
   // --- Module Config ---
 
@@ -75,10 +91,14 @@ public class DriveConstants {
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
-        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        FRONT_LEFT_MODULE_CONFIG =
+            new ModuleConfig(19, 18, 39, Rotation2d.fromRotations(-0.186279296875), true);
+        FRONT_RIGHT_MODULE_CONFIG =
+            new ModuleConfig(2, 1, 37, Rotation2d.fromRotations(-0.677490234375 + 0.5), true);
+        BACK_LEFT_MODULE_CONFIG =
+            new ModuleConfig(11, 10, 36, Rotation2d.fromRotations(-0.8603515625), true);
+        BACK_RIGHT_MODULE_CONFIG =
+            new ModuleConfig(8, 9, 38, Rotation2d.fromRotations(-0.065185546875 + 0.5), true);
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -92,93 +112,99 @@ public class DriveConstants {
             new ModuleConfig(10, 11, 1, Rotation2d.fromRotations(0.453857421875), false);
         break;
 
-      case COMP_BOT:
+      case WOOD_BOT_TWO_2025:
+        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
+        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
+        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
+        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
+        break;
+
       default:
-        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
+        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
+        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
+        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
         break;
     }
   }
 
-  public static final Translation2d FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER;
-  public static final Translation2d FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER;
-  public static final Translation2d BACK_LEFT_MODULE_DISTANCE_FROM_CENTER;
-  public static final Translation2d BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER;
+  private static final double TRACK_CENTER_X = DRIVE_CONFIG.trackCornerToCorner().getX() / 2;
+  private static final double TRACK_CENTER_Y = DRIVE_CONFIG.trackCornerToCorner().getY() / 2;
 
-  static {
-    double trackCenterX = DRIVE_CONFIG.trackCornerToCorner().getX() / 2;
-    double trackCenterY = DRIVE_CONFIG.trackCornerToCorner().getY() / 2;
-    FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(trackCenterX, trackCenterY);
-    FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(trackCenterX, -trackCenterY);
-    BACK_LEFT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(-trackCenterX, trackCenterY);
-    BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER = new Translation2d(-trackCenterX, -trackCenterY);
-  }
+  public static final Translation2d FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER =
+      new Translation2d(TRACK_CENTER_X, TRACK_CENTER_Y);
+  public static final Translation2d FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER =
+      new Translation2d(TRACK_CENTER_X, -TRACK_CENTER_Y);
+  public static final Translation2d BACK_LEFT_MODULE_DISTANCE_FROM_CENTER =
+      new Translation2d(-TRACK_CENTER_X, TRACK_CENTER_Y);
+  public static final Translation2d BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER =
+      new Translation2d(-TRACK_CENTER_X, -TRACK_CENTER_Y);
 
   // --- Gyro Config ---
 
   public static final int GYRO_CAN_ID =
       switch (Constants.getRobot()) {
         case CRESCENDO_CHASSIS_2024 -> 40;
-        case T_SHIRT_CANNON_CHASSIS -> 0;
+        case T_SHIRT_CANNON_CHASSIS -> 40;
+        case WOOD_BOT_TWO_2025 -> 40;
         default -> -1;
       };
 
   // --- Module Constants ---
 
-  public static final DCMotor driveMotor;
-  public static final FeedForwardConstants driveFeedforward;
-  public static final PIDConstants driveFeedback;
-  public static final int driveMotorCurrentLimit;
-  public static final double driveReduction;
+  public static final DCMotor DRIVE_MOTOR;
+  public static final FeedForwardConstants DRIVE_FEED_FORWARD;
+  public static final PIDConstants DRIVE_FEEDBACK;
+  public static final int DRIVE_MOTOR_CURRENT_LIMIT;
+  public static final double DRIVE_REDUCTION;
 
-  public static final DCMotor turnMotor;
-  public static final PIDConstants turnFeedback;
-  public static final int turnMotorCurrentLimit;
-  public static final double turnReduction;
+  public static final DCMotor TURN_MOTOR;
+  public static final PIDConstants TURN_FEEDBACK;
+  public static final int TURN_MOTOR_CURRENT_LIMIT;
+  public static final double TURN_REDUCTION;
 
   static {
     switch (Constants.getRobot()) {
       case CRESCENDO_CHASSIS_2024:
-        driveMotor = DCMotor.getNEO(1);
-        driveFeedback = new PIDConstants(0.000006, 0.0, 0.0);
-        driveFeedforward = new FeedForwardConstants(0.1, 3.12, 0.40);
-        driveMotorCurrentLimit = 50;
-        driveReduction = Mk4Reductions.L1.reduction;
+        DRIVE_MOTOR = DCMotor.getNEO(1);
+        DRIVE_FEEDBACK = new PIDConstants(0.000006, 0.0, 0.0);
+        DRIVE_FEED_FORWARD = new FeedForwardConstants(0.1, 3.12, 0.40);
+        DRIVE_MOTOR_CURRENT_LIMIT = 50;
+        DRIVE_REDUCTION = Mk4Reductions.L1.reduction;
 
-        turnMotor = DCMotor.getNEO(1);
-        turnFeedback = new PIDConstants(10, 0.0, 0.0002);
-        turnMotorCurrentLimit = 20;
-        turnReduction = Mk4Reductions.TURN.reduction;
+        TURN_MOTOR = DCMotor.getNEO(1);
+        TURN_FEEDBACK = new PIDConstants(10, 0.0, 0.0002);
+        TURN_MOTOR_CURRENT_LIMIT = 20;
+        TURN_REDUCTION = Mk4Reductions.TURN.reduction;
         break;
 
       case SIM_BOT:
-        driveMotor = DCMotor.getNEO(1);
-        driveFeedback = new PIDConstants(1.3, 0.0, 0.0);
-        driveFeedforward = new FeedForwardConstants(0.0, 0, 0);
-        driveMotorCurrentLimit = 50;
-        driveReduction = Mk4iReductions.L3.reduction;
+        DRIVE_MOTOR = DCMotor.getNEO(1);
+        DRIVE_FEEDBACK = new PIDConstants(1.3, 0.0, 0.0);
+        DRIVE_FEED_FORWARD = new FeedForwardConstants(0.0, 0, 0);
+        DRIVE_MOTOR_CURRENT_LIMIT = 50;
+        DRIVE_REDUCTION = Mk4iReductions.L3.reduction;
 
-        turnMotor = DCMotor.getNEO(1);
-        turnFeedback = new PIDConstants(10.0, 0.0, 0.0);
-        turnMotorCurrentLimit = 20;
-        turnReduction = Mk4iReductions.TURN.reduction;
+        TURN_MOTOR = DCMotor.getNEO(1);
+        TURN_FEEDBACK = new PIDConstants(10.0, 0.0, 0.0);
+        TURN_MOTOR_CURRENT_LIMIT = 20;
+        TURN_REDUCTION = Mk4iReductions.TURN.reduction;
         break;
 
-      case COMP_BOT:
+      case WOOD_BOT_TWO_2025:
       case T_SHIRT_CANNON_CHASSIS:
       default:
-        driveMotor = DCMotor.getNEO(1);
-        driveFeedback = new PIDConstants(0.000006, 0.0, 0.0);
-        driveFeedforward = new FeedForwardConstants(0.1, 2.35, 0.53);
-        driveMotorCurrentLimit = 50;
-        driveReduction = Mk4iReductions.L3.reduction;
+        DRIVE_MOTOR = DCMotor.getNEO(1);
+        DRIVE_FEEDBACK = new PIDConstants(0.0001, 0.0, 0.0);
+        DRIVE_FEED_FORWARD = new FeedForwardConstants(0.1, 2.35, 0.53);
+        // DRIVE_FEED_FORWARD = new FeedForwardConstants(0.0, 0.0, 0.0);
+        DRIVE_MOTOR_CURRENT_LIMIT = 50;
+        DRIVE_REDUCTION = Mk4iReductions.L3.reduction;
 
-        turnMotor = DCMotor.getNEO(1);
-        turnFeedback = new PIDConstants(10.0, 0.0, 0.0);
-        turnMotorCurrentLimit = 20;
-        turnReduction = Mk4iReductions.TURN.reduction;
+        TURN_MOTOR = DCMotor.getNEO(1);
+        TURN_FEEDBACK = new PIDConstants(10, 0.0, 0.0);
+        TURN_MOTOR_CURRENT_LIMIT = 20;
+        TURN_REDUCTION = Mk4iReductions.TURN.reduction;
         break;
     }
   }
@@ -203,8 +229,8 @@ public class DriveConstants {
               wheelRadius,
               DRIVE_CONFIG.maxLinearVelocity(),
               wheelCOF,
-              driveMotor.withReduction(driveReduction),
-              driveMotorCurrentLimit,
+              DRIVE_MOTOR.withReduction(DRIVE_REDUCTION),
+              DRIVE_MOTOR_CURRENT_LIMIT,
               1),
           moduleTranslations);
 
@@ -216,13 +242,25 @@ public class DriveConstants {
         default -> 100.0;
       };
 
+  // --- Movement Controller Config ---
+
+  public static final PIDConstants driveControllerConstants = new PIDConstants(5.0, 0.0, 0.0);
+  public static final PIDConstants rotationControllerConstants = new PIDConstants(5.0, 0, 0.4);
+
   // --- Heading Controller Config ---
 
-  public static final PIDConstants headingControllerConstants = new PIDConstants(5.0, 0, 0.4);
+  public record HeadingControllerConfig(PIDConstants pid, double toleranceDegrees) {}
+
+  public static final HeadingControllerConfig HEADING_CONTROLLER_CONFIG =
+      new HeadingControllerConfig(rotationControllerConstants, 1.0);
 
   // --- General Tuning Records ---
 
-  public record PIDConstants(double Kp, double Ki, double Kd) {}
+  public record PIDConstants(double Kp, double Ki, double Kd) {
+    public com.pathplanner.lib.config.PIDConstants toPathPlannerPIDConstants() {
+      return new com.pathplanner.lib.config.PIDConstants(Kp, Ki, Kd);
+    }
+  }
 
   public record FeedForwardConstants(double Ks, double Kv, double Ka) {}
 
@@ -230,6 +268,7 @@ public class DriveConstants {
 
   // https://www.swervedrivespecialties.com/products/mk4i-swerve-module
   private enum Mk4iReductions {
+    // Note: Mk4i turn motors are inverted!
     L1((50.0 / 14.0) * (19.0 / 25.0) * (45.0 / 15.0)),
     L2((50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0)),
     L3((50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0)),
