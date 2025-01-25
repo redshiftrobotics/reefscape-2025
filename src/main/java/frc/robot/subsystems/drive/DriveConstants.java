@@ -1,6 +1,5 @@
 package frc.robot.subsystems.drive;
 
-import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -63,6 +62,20 @@ public class DriveConstants {
             new Translation2d(0.885, 0.885), new Translation2d(0.9612, 0.9612), 5.05968, 14.5);
       };
 
+
+  // --- Module Offsets ---
+  private static final double TRACK_CENTER_X = DRIVE_CONFIG.trackCornerToCorner().getX() / 2;
+  private static final double TRACK_CENTER_Y = DRIVE_CONFIG.trackCornerToCorner().getY() / 2;
+
+  public static final Translation2d FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER =
+      new Translation2d(TRACK_CENTER_X, TRACK_CENTER_Y);
+  public static final Translation2d FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER =
+      new Translation2d(TRACK_CENTER_X, -TRACK_CENTER_Y);
+  public static final Translation2d BACK_LEFT_MODULE_DISTANCE_FROM_CENTER =
+      new Translation2d(-TRACK_CENTER_X, TRACK_CENTER_Y);
+  public static final Translation2d BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER =
+      new Translation2d(-TRACK_CENTER_X, -TRACK_CENTER_Y);
+
   // --- Gyro Config ---
 
   public static final int GYRO_CAN_ID =
@@ -75,28 +88,15 @@ public class DriveConstants {
 
   // --- Pathplanner Config ---
 
-  private static final double robotMassKg = 74.088;
-  private static final double robotMOI = 6.883;
-  private static final double wheelCOF = 1.2;
-  private static final Translation2d[] moduleTranslations = {
-    ModuleConstants.FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER,
-    ModuleConstants.FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER,
-    ModuleConstants.BACK_LEFT_MODULE_DISTANCE_FROM_CENTER,
-    ModuleConstants.BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER
+  public static final double robotMassKg = 74.088;
+  public static final double robotMOI = 6.883;
+  public static final double wheelCOF = 1.2;
+  public static final Translation2d[] moduleTranslations = {
+    DriveConstants.FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER,
+    DriveConstants.FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER,
+    DriveConstants.BACK_LEFT_MODULE_DISTANCE_FROM_CENTER,
+    DriveConstants.BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER
   };
-
-  public static final RobotConfig pathPlannerRobotConfig =
-      new RobotConfig(
-          robotMassKg,
-          robotMOI,
-          new com.pathplanner.lib.config.ModuleConfig(
-              ModuleConstants.WHEEL_RADIUS,
-              DRIVE_CONFIG.maxLinearVelocity(),
-              wheelCOF,
-              ModuleConstants.DRIVE_MOTOR.withReduction(ModuleConstants.DRIVE_REDUCTION),
-              ModuleConstants.DRIVE_MOTOR_CURRENT_LIMIT,
-              1),
-          moduleTranslations);
 
   // --- Odometry Frequency ---
 

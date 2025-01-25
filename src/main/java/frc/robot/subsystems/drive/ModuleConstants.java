@@ -1,9 +1,6 @@
 package frc.robot.subsystems.drive;
 
-import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
-
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
@@ -77,17 +74,6 @@ public class ModuleConstants {
     }
   }
 
-  private static final double TRACK_CENTER_X = DRIVE_CONFIG.trackCornerToCorner().getX() / 2;
-  private static final double TRACK_CENTER_Y = DRIVE_CONFIG.trackCornerToCorner().getY() / 2;
-
-  public static final Translation2d FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER =
-      new Translation2d(TRACK_CENTER_X, TRACK_CENTER_Y);
-  public static final Translation2d FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER =
-      new Translation2d(TRACK_CENTER_X, -TRACK_CENTER_Y);
-  public static final Translation2d BACK_LEFT_MODULE_DISTANCE_FROM_CENTER =
-      new Translation2d(-TRACK_CENTER_X, TRACK_CENTER_Y);
-  public static final Translation2d BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER =
-      new Translation2d(-TRACK_CENTER_X, -TRACK_CENTER_Y);
   // --- Module Constants ---
 
   public static final DCMotor DRIVE_MOTOR;

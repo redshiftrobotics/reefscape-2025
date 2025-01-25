@@ -4,6 +4,7 @@ import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -87,10 +88,10 @@ public class Drive extends SubsystemBase {
     // Create and save modules and give them position
     modules =
         new Module[] {
-          new Module(flModuleIO, ModuleConstants.FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER),
-          new Module(frModuleIO, ModuleConstants.FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER),
-          new Module(blModuleIO, ModuleConstants.BACK_LEFT_MODULE_DISTANCE_FROM_CENTER),
-          new Module(brModuleIO, ModuleConstants.BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER)
+          new Module(flModuleIO, DriveConstants.FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER),
+          new Module(frModuleIO, DriveConstants.FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER),
+          new Module(blModuleIO, DriveConstants.BACK_LEFT_MODULE_DISTANCE_FROM_CENTER),
+          new Module(brModuleIO, DriveConstants.BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER)
         };
 
     // --- Set up kinematics ---
@@ -123,7 +124,17 @@ public class Drive extends SubsystemBase {
             DriveConstants.TRANSLATION_CONTROLLER_CONSTANTS_TRAJECTORY.toPathPlannerPIDConstants(),
             DriveConstants.ROTATION_CONTROLLER_CONSTANTS_TRAJECTORY.toPathPlannerPIDConstants(),
             Constants.LOOP_PERIOD_SECONDS),
-        DriveConstants.pathPlannerRobotConfig,
+        new RobotConfig(
+            DriveConstants.robotMassKg,
+            DriveConstants.robotMOI,
+            new com.pathplanner.lib.config.ModuleConfig(
+                ModuleConstants.WHEEL_RADIUS,
+                DRIVE_CONFIG.maxLinearVelocity(),
+                DriveConstants.wheelCOF,
+                ModuleConstants.DRIVE_MOTOR.withReduction(ModuleConstants.DRIVE_REDUCTION),
+                ModuleConstants.DRIVE_MOTOR_CURRENT_LIMIT,
+                1),
+            moduleTranslations),
         AllianceFlipUtil::shouldFlip,
         this);
 
