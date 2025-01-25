@@ -8,8 +8,8 @@
 package frc.robot.commands;
 
 import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
-import static frc.robot.subsystems.drive.DriveConstants.DRIVE_FEEDBACK;
-import static frc.robot.subsystems.drive.DriveConstants.TURN_FEEDBACK;
+import static frc.robot.subsystems.drive.DriveConstants.ROTATION_CONTROLLER_CONSTANTS;
+import static frc.robot.subsystems.drive.DriveConstants.TRANSLATION_CONTROLLER_CONSTANTS;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.controller.HolonomicDriveController;
@@ -75,12 +75,18 @@ public class DriveCommands {
   public static Command driveToPosePrecise(Drive drive, Pose2d desiredPose) {
     HolonomicDriveController controller =
         new HolonomicDriveController(
-            new PIDController(DRIVE_FEEDBACK.Kp(), DRIVE_FEEDBACK.Ki(), DRIVE_FEEDBACK.Kd()),
-            new PIDController(DRIVE_FEEDBACK.Kp(), DRIVE_FEEDBACK.Ki(), DRIVE_FEEDBACK.Kd()),
+            new PIDController(
+                TRANSLATION_CONTROLLER_CONSTANTS.Kp(),
+                TRANSLATION_CONTROLLER_CONSTANTS.Ki(),
+                TRANSLATION_CONTROLLER_CONSTANTS.Kd()),
+            new PIDController(
+                TRANSLATION_CONTROLLER_CONSTANTS.Kp(),
+                TRANSLATION_CONTROLLER_CONSTANTS.Ki(),
+                TRANSLATION_CONTROLLER_CONSTANTS.Kd()),
             new ProfiledPIDController(
-                TURN_FEEDBACK.Kp(),
-                TURN_FEEDBACK.Ki(),
-                TURN_FEEDBACK.Kd(),
+                ROTATION_CONTROLLER_CONSTANTS.Kp(),
+                ROTATION_CONTROLLER_CONSTANTS.Ki(),
+                ROTATION_CONTROLLER_CONSTANTS.Kd(),
                 DRIVE_CONFIG.getAngularConstraints()));
     controller.setTolerance(
         new Pose2d(Units.inchesToMeters(2), Units.inchesToMeters(2), Rotation2d.fromDegrees(5)));

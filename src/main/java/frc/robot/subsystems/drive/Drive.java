@@ -87,10 +87,10 @@ public class Drive extends SubsystemBase {
     // Create and save modules and give them position
     modules =
         new Module[] {
-          new Module(flModuleIO, DriveConstants.FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER),
-          new Module(frModuleIO, DriveConstants.FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER),
-          new Module(blModuleIO, DriveConstants.BACK_LEFT_MODULE_DISTANCE_FROM_CENTER),
-          new Module(brModuleIO, DriveConstants.BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER)
+          new Module(flModuleIO, ModuleConstants.FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER),
+          new Module(frModuleIO, ModuleConstants.FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER),
+          new Module(blModuleIO, ModuleConstants.BACK_LEFT_MODULE_DISTANCE_FROM_CENTER),
+          new Module(brModuleIO, ModuleConstants.BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER)
         };
 
     // --- Set up kinematics ---
@@ -120,8 +120,8 @@ public class Drive extends SubsystemBase {
         this::getRobotSpeeds,
         (speeds, feedForward) -> setRobotSpeeds(speeds),
         new PPHolonomicDriveController(
-            DriveConstants.driveControllerConstants.toPathPlannerPIDConstants(),
-            DriveConstants.rotationControllerConstants.toPathPlannerPIDConstants(),
+            DriveConstants.TRANSLATION_CONTROLLER_CONSTANTS_TRAJECTORY.toPathPlannerPIDConstants(),
+            DriveConstants.ROTATION_CONTROLLER_CONSTANTS_TRAJECTORY.toPathPlannerPIDConstants(),
             Constants.LOOP_PERIOD_SECONDS),
         DriveConstants.pathPlannerRobotConfig,
         AllianceFlipUtil::shouldFlip,

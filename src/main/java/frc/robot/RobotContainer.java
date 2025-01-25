@@ -1,10 +1,13 @@
 package frc.robot;
 
+import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Alert;
@@ -34,6 +37,7 @@ import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.ModuleConstants;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
@@ -81,10 +85,10 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-                new ModuleIOSparkMax(DriveConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(DriveConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG));
+                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -92,10 +96,10 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIONavX(),
-                new ModuleIOSparkMax(DriveConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(DriveConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG));
+                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         break;
 
       case SIM_BOT:
@@ -103,10 +107,10 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIO() {},
-                new ModuleIOSim(DriveConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSim(DriveConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSim(DriveConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSim(DriveConstants.BACK_RIGHT_MODULE_CONFIG));
+                new ModuleIOSim(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSim(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSim(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSim(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         break;
 
       default:
@@ -174,12 +178,21 @@ public class RobotContainer {
                 drive.resetPose(
                     new Pose2d(drive.getRobotPose().getTranslation(), Rotation2d.kZero))),
         true);
+
+    dashboard.addCommand(
+        "Reset To Reef",
+        () ->
+            drive.resetPose(
+                FieldConstants.Reef.centerFaces[0].transformBy(
+                    new Transform2d(
+                        DRIVE_CONFIG.bumperCornerToCorner().getX() / 2, 0, Rotation2d.kPi))),
+        true);
   }
 
   /** Define button->command mappings. */
   private void configureControllerBindings() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
-    configureDriverControllerBindings(false);
+    configureDriverControllerBindings(true);
     configureOperatorControllerBindings();
     configureAlertTriggers();
   }
@@ -206,7 +219,7 @@ public class RobotContainer {
 
       // Default command
       drive.setDefaultCommand(
-          DriveCommands.joystickDriveSmartAngleLock(
+          DriveCommands.joystickDrive(
                   drive,
                   input::getTranslationMetersPerSecond,
                   input::getOmegaRadiansPerSecond,
