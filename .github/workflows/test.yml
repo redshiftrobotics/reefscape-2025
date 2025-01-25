@@ -1,7 +1,7 @@
-name: Build
+name: Test
 
 on:
-  push:
+  pull_request: # Finally :)
 
 jobs:
   build-gradle-project:
@@ -15,5 +15,5 @@ jobs:
         run: chmod +x gradlew
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
-      - name: Build robot code
-        run: ./gradlew build
+      - name: Test robot code
+        run: ./gradlew test
