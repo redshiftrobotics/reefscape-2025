@@ -207,7 +207,7 @@ public class RobotContainer {
 
       // Default command
       drive.setDefaultCommand(
-          DriveCommands.joystickDrive(
+          DriveCommands.joystickDriveSmartAngleLock(
                   drive,
                   input::getTranslationMetersPerSecond,
                   input::getOmegaRadiansPerSecond,

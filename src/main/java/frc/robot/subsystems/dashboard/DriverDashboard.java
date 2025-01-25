@@ -2,6 +2,7 @@ package frc.robot.subsystems.dashboard;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -61,6 +62,8 @@ public class DriverDashboard extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    SmartDashboard.putNumber("Game Time", Timer.getMatchTime());
 
     if (poseSupplier != null) {
       Pose2d pose = poseSupplier.get();

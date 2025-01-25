@@ -11,5 +11,5 @@ This markdown file describes the formatting of our folders.
 * To be determined
 ### Dependencies
 * WPILib
-* Elastic
+* AdvantageKit
 * Pathplanner
