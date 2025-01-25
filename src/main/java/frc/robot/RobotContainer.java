@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -180,7 +179,7 @@ public class RobotContainer {
   /** Define button->command mappings. */
   private void configureControllerBindings() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
-    configureDriverControllerBindings(true);
+    configureDriverControllerBindings(false);
     configureOperatorControllerBindings();
     configureAlertTriggers();
   }
@@ -228,11 +227,7 @@ public class RobotContainer {
       driverXbox
           .b()
           .or(RobotModeTriggers.disabled())
-          .onTrue(
-              Commands.idle(drive)
-                  .beforeStarting(drive::stop)
-                  .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-                  .withName("Stop and Cancel"));
+          .onTrue(drive.runOnce(drive::stop).withName("Stop and Cancel"));
 
       if (includeAutoAlign) {
         // Align to reef

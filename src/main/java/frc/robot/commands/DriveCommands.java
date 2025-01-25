@@ -15,7 +15,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,7 +24,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.controllers.HeadingController;
 import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.subsystems.drive.Drive;
 import java.text.DecimalFormat;
@@ -69,38 +67,8 @@ public class DriveCommands {
       DoubleSupplier omegaSupplier,
       Supplier<SpeedLevelController.SpeedLevel> speedLevelSupplier,
       BooleanSupplier useFieldRelative) {
-
-    HeadingController headingController = new HeadingController(drive);
-    Debouncer noRotationDebouncer = new Debouncer(0.75);
-
-    return drive
-        .run(
-            () -> {
-              Translation2d translation = translationSupplier.get();
-              double omega = omegaSupplier.getAsDouble();
-
-              boolean noOmega = noRotationDebouncer.calculate(omega == 0.0);
-              double headingControlOmega = headingController.calculate();
-
-              ChassisSpeeds speeds =
-                  SpeedLevelController.apply(
-                      new ChassisSpeeds(translation.getX(), translation.getY(), omega),
-                      speedLevelSupplier.get());
-
-              if (noOmega) {
-                speeds.omegaRadiansPerSecond = headingController.atGoal() ? 0 : headingControlOmega;
-              } else {
-                headingController.setGoalToCurrentHeading();
-                headingController.reset();
-              }
-              drive.setRobotSpeeds(speeds, useFieldRelative.getAsBoolean());
-            })
-        .beforeStarting(
-            () -> {
-              headingController.setGoalToCurrentHeading();
-              headingController.reset();
-            })
-        .finallyDo(drive::stop);
+    return new SmartJoystickDriveAngleLock(
+        drive, translationSupplier, omegaSupplier, speedLevelSupplier, useFieldRelative);
   }
 
   /** Drive to a pose, more precise */
