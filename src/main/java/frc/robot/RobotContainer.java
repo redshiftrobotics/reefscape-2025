@@ -192,7 +192,7 @@ public class RobotContainer {
   /** Define button->command mappings. */
   private void configureControllerBindings() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
-    configureDriverControllerBindings(true);
+    configureDriverControllerBindings(false);
     configureOperatorControllerBindings();
     configureAlertTriggers();
   }
