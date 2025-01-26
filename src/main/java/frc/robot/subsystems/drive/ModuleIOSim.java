@@ -7,7 +7,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
-import frc.robot.subsystems.drive.DriveConstants.ModuleConfig;
+import frc.robot.subsystems.drive.ModuleConstants.ModuleConfig;
 
 /**
  * Physics sim implementation of module IO.
@@ -37,13 +37,13 @@ public class ModuleIOSim implements ModuleIO {
     driveSim =
         new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                DriveConstants.DRIVE_MOTOR, 0.025, DriveConstants.DRIVE_REDUCTION),
-            DriveConstants.DRIVE_MOTOR);
+                ModuleConstants.DRIVE_MOTOR, 0.025, ModuleConstants.DRIVE_REDUCTION),
+            ModuleConstants.DRIVE_MOTOR);
     turnSim =
         new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                DriveConstants.TURN_MOTOR, 0.004, DriveConstants.TURN_REDUCTION),
-            DriveConstants.TURN_MOTOR);
+                ModuleConstants.TURN_MOTOR, 0.004, ModuleConstants.TURN_REDUCTION),
+            ModuleConstants.TURN_MOTOR);
 
     // Create PID
     driveFeedback = new PIDController(0.0, 0.0, 0.0, Constants.LOOP_PERIOD_SECONDS);

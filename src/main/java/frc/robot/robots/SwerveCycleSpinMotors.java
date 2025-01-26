@@ -5,7 +5,7 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
-import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.drive.ModuleConstants;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,38 +32,41 @@ public class SwerveCycleSpinMotors extends Robot {
     motors.add(
         new NamedMotor(
             "FrontLeftDrive",
-            new SparkMax(DriveConstants.FRONT_LEFT_MODULE_CONFIG.driveID(), MotorType.kBrushless)));
+            new SparkMax(
+                ModuleConstants.FRONT_LEFT_MODULE_CONFIG.driveID(), MotorType.kBrushless)));
     motors.add(
         new NamedMotor(
             "FrontRightDrive",
             new SparkMax(
-                DriveConstants.FRONT_RIGHT_MODULE_CONFIG.driveID(), MotorType.kBrushless)));
+                ModuleConstants.FRONT_RIGHT_MODULE_CONFIG.driveID(), MotorType.kBrushless)));
     motors.add(
         new NamedMotor(
             "BackLeftDrive",
-            new SparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG.driveID(), MotorType.kBrushless)));
+            new SparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG.driveID(), MotorType.kBrushless)));
     motors.add(
         new NamedMotor(
             "BackRightDrive",
-            new SparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG.driveID(), MotorType.kBrushless)));
+            new SparkMax(
+                ModuleConstants.BACK_RIGHT_MODULE_CONFIG.driveID(), MotorType.kBrushless)));
 
     // Turn motors
     motors.add(
         new NamedMotor(
             "FrontLeftTurn",
-            new SparkMax(DriveConstants.FRONT_LEFT_MODULE_CONFIG.turnID(), MotorType.kBrushless)));
+            new SparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG.turnID(), MotorType.kBrushless)));
     motors.add(
         new NamedMotor(
             "FrontRightTurn",
-            new SparkMax(DriveConstants.FRONT_RIGHT_MODULE_CONFIG.turnID(), MotorType.kBrushless)));
+            new SparkMax(
+                ModuleConstants.FRONT_RIGHT_MODULE_CONFIG.turnID(), MotorType.kBrushless)));
     motors.add(
         new NamedMotor(
             "BackLeftTurn",
-            new SparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG.turnID(), MotorType.kBrushless)));
+            new SparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG.turnID(), MotorType.kBrushless)));
     motors.add(
         new NamedMotor(
             "BackRightTurn",
-            new SparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG.turnID(), MotorType.kBrushless)));
+            new SparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG.turnID(), MotorType.kBrushless)));
 
     System.out.println(motors);
   }

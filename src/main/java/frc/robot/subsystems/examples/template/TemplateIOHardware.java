@@ -1,15 +1,13 @@
 package frc.robot.subsystems.examples.template;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
-import edu.wpi.first.math.util.Units;
-
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.util.Units;
 
 /** Hardware implementation of the TemplateIO. */
 public class TemplateIOHardware implements TemplateIO {
