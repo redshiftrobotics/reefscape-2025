@@ -37,6 +37,9 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
+import frc.robot.subsystems.vision.AprilTagVision;
+import frc.robot.subsystems.vision.CameraIOSim;
+import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.utility.OverrideSwitch;
 import java.util.Arrays;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -51,6 +54,7 @@ public class RobotContainer {
 
   // Subsystems
   private final Drive drive;
+  private final AprilTagVision vision;
 
   // Controller
   private final CommandGenericHID driverController = new CommandXboxController(0);
@@ -73,7 +77,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     switch (Constants.getRobot()) {
-      case WOOD_BOT_TWO_2025, T_SHIRT_CANNON_CHASSIS:
+      case WOOD_BOT_TWO_2025:
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
@@ -82,6 +86,19 @@ public class RobotContainer {
                 new ModuleIOSparkMax(DriveConstants.FRONT_RIGHT_MODULE_CONFIG),
                 new ModuleIOSparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG));
+        vision = new AprilTagVision();
+        break;
+
+      case T_SHIRT_CANNON_CHASSIS:
+        // Real robot, instantiate hardware IO implementations
+        drive =
+            new Drive(
+                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
+                new ModuleIOSparkMax(DriveConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(DriveConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG));
+        vision = new AprilTagVision();
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -93,6 +110,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(DriveConstants.FRONT_RIGHT_MODULE_CONFIG),
                 new ModuleIOSparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG));
+        vision = new AprilTagVision();
         break;
 
       case SIM_BOT:
@@ -104,6 +122,8 @@ public class RobotContainer {
                 new ModuleIOSim(DriveConstants.FRONT_RIGHT_MODULE_CONFIG),
                 new ModuleIOSim(DriveConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSim(DriveConstants.BACK_RIGHT_MODULE_CONFIG));
+        vision =
+            new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         break;
 
       default:
@@ -115,8 +135,19 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        vision = new AprilTagVision();
         break;
     }
+
+    vision.addVisionEstimateConsumer(
+        (estimate) -> {
+          if (estimate.status().isSuccess() && Constants.getMode() != Mode.SIM) {
+            drive.addVisionMeasurement(
+                estimate.robotPose().toPose2d(),
+                estimate.timestampSeconds(),
+                estimate.standardDeviations());
+          }
+        });
 
     // Can also use AutoBuilder.buildAutoChooser(); instead of SendableChooser to
     // auto populate
@@ -211,7 +242,8 @@ public class RobotContainer {
                   useFieldRelative::getAsBoolean)
               .withName("Default Drive"));
 
-      // Cause the robot to resist movement by forming an X shape with the swerve modules
+      // Cause the robot to resist movement by forming an X shape with the swerve
+      // modules
       // Helps prevent getting pushed around
       driverXbox
           .x()

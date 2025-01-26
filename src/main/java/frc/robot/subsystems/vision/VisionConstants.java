@@ -1,22 +1,29 @@
-// Copyright 2021-2025 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 
 public class VisionConstants {
-  public static final AprilTagFieldLayout aprilTagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+  // --- Vision Config ---
+
+  public record CameraConfig(String cameraName, Transform3d robotToCamera) {}
+
+  // Set cameraName on PhotonVision web interface. Edit camera name from camera type to camera
+  // position. To find robotToCamera, measure the distance from the camera to the center of the
+  // robot or use the robot's CAD model.
+
+  // Docs: https://docs.photonvision.org/en/latest/docs/apriltag-pipelines/coordinate-systems.html
+
+  public static final CameraConfig FRONT_CAMERA =
+      new CameraConfig(
+          "frontCam",
+          new Transform3d(
+              new Translation3d(0, 0, 0.1), new Rotation3d(0, Units.degreesToRadians(-45), 0)));
+
+  public static final AprilTagFieldLayout FIELD =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 }
