@@ -22,7 +22,7 @@ public class VisionConstants {
       new CameraConfig(
           "frontCam",
           new Transform3d(
-              new Translation3d(0, 0, 0.1), new Rotation3d(0, Units.degreesToRadians(-45), 0)));
+              new Translation3d(0, 0, 0.1), new Rotation3d(0, Units.degreesToRadians(0), 0)));
 
   public static final AprilTagFieldLayout FIELD =
       AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);

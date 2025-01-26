@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.littletonrobotics.junction.Logger;
 
@@ -47,6 +48,8 @@ public class Camera {
   private Set<Integer> tagsIdsOnField;
 
   private VisionResult[] results = new VisionResult[0];
+
+  private Supplier<Pose2d> lastRobotPoseSupplier;
 
   private final Alert missingCameraAlert;
 
@@ -88,7 +91,41 @@ public class Camera {
     io.updateInputs(inputs);
     missingCameraAlert.set(inputs.connected);
 
-    // results =
+    results = new VisionResult[inputs.updatesReceived];
+    for (int i = 0; i < inputs.updatesReceived; i++) {
+      Pose3d[] tagPositionsOnField = getTagPositionsOnField(inputs.tagsUsed[i]);
+
+      if (inputs.hasNewData[i]) {
+        results[i] =
+            new VisionResult(
+                true,
+                inputs.estimatedRobotPose[i],
+                inputs.timestampSecondFPGA[i],
+                inputs.tagsUsed[i],
+                tagPositionsOnField,
+                getStandardDeviations(tagPositionsOnField, inputs.estimatedRobotPose[i]),
+                lastRobotPoseSupplier == null
+                    ? getStatus(inputs.estimatedRobotPose[i], inputs.tagsUsed[i])
+                    : getStatus(
+                        inputs.estimatedRobotPose[i],
+                        inputs.tagsUsed[i],
+                        lastRobotPoseSupplier.get()));
+      } else {
+        results[i] =
+            new VisionResult(
+                false,
+                null,
+                0,
+                new int[0],
+                new Pose3d[0],
+                VecBuilder.fill(0, 0, 0),
+                VisionResultStatus.NO_DATA);
+      }
+    }
+  }
+
+  public void setLastRobotPoseSupplier(Supplier<Pose2d> lastRobotPose) {
+    this.lastRobotPoseSupplier = lastRobotPose;
   }
 
   public VisionResult[] getResults() {
@@ -108,14 +145,14 @@ public class Camera {
    * global measurements from this camera less. The matrix is in the form [x, y, theta], with units
    * in meters and radians.
    */
-  private Matrix<N3, N1> getStandardDeviations(Pose3d[] tagPositionsOnField, Pose2d lastRobotPose) {
+  private Matrix<N3, N1> getStandardDeviations(Pose3d[] tagPositionsOnField, Pose3d lastRobotPose) {
 
     // Get data about distance to each tag that is present on field
     DoubleSummaryStatistics distancesToTags =
         Arrays.stream(tagPositionsOnField)
             .mapToDouble(
                 (tagPose3d) ->
-                    tagPose3d.toPose2d().getTranslation().getDistance(lastRobotPose.getTranslation()))
+                    tagPose3d.getTranslation().getDistance(lastRobotPose.getTranslation()))
             .summaryStatistics();
 
     // This equation is heuristic, good enough but can probably be improved
@@ -124,8 +161,7 @@ public class Camera {
     // tags decreases uncertainty linearly
     double standardDeviation =
         distancesToTags.getCount() > 0
-            ? Math.pow(distancesToTags.getAverage(), 2)
-                * Math.pow(distancesToTags.getCount(), -1)
+            ? Math.pow(distancesToTags.getAverage(), 2) * Math.pow(distancesToTags.getCount(), -1)
             : Double.POSITIVE_INFINITY;
 
     double xyStandardDeviation = xyStdDevCoefficient.get() * standardDeviation;
@@ -137,15 +173,15 @@ public class Camera {
   }
 
   /** Get the status of the vision measurement */
-  @SuppressWarnings("unused")
-  private VisionResultStatus getStatus(VisionResult result, Pose2d lastRobotPose) {
-    VisionResultStatus status = getStatus(result);
+  private VisionResultStatus getStatus(
+      Pose3d estimatedRobotPose, int[] tagsUsed, Pose2d lastRobotPose) {
+    VisionResultStatus status = getStatus(estimatedRobotPose, tagsUsed);
 
     if (!status.isSuccess()) {
       return status;
     }
 
-    Pose2d estimatedRobotPose2d = result.estimatedRobotPose().toPose2d();
+    Pose2d estimatedRobotPose2d = estimatedRobotPose.toPose2d();
 
     if (!MathUtil.isNear(
         estimatedRobotPose2d.getRotation().getDegrees(),
@@ -162,39 +198,33 @@ public class Camera {
     return status;
   }
 
-  private VisionResultStatus getStatus(VisionResult result) {
+  private VisionResultStatus getStatus(Pose3d estimatedRobotPose, int[] tagsUsed) {
 
-    if (!result.hasNewData()) {
-      return VisionResultStatus.NO_DATA;
-    }
-
-    if (result.tagsUsed().length == 0) {
+    if (tagsUsed.length == 0) {
       return VisionResultStatus.NO_TARGETS_VISIBLE;
     }
 
-    if (!Arrays.stream(result.tagsUsed()).allMatch(tagsIdsOnField::contains)) {
+    if (!Arrays.stream(tagsUsed).allMatch(tagsIdsOnField::contains)) {
       return VisionResultStatus.INVALID_TAG;
     }
 
-    if (result.estimatedRobotPose().getX() < 0
-        || result.estimatedRobotPose().getY() < 0
-        || result.estimatedRobotPose().getX() > aprilTagFieldLayout.getFieldLength()
-        || result.estimatedRobotPose().getY() > aprilTagFieldLayout.getFieldWidth()) {
+    if (estimatedRobotPose.getX() < 0
+        || estimatedRobotPose.getY() < 0
+        || estimatedRobotPose.getX() > aprilTagFieldLayout.getFieldLength()
+        || estimatedRobotPose.getY() > aprilTagFieldLayout.getFieldWidth()) {
       return VisionResultStatus.INVALID_POSE_OUTSIDE_FIELD;
     }
 
-    if (!MathUtil.isNear(0, result.estimatedRobotPose().getZ(), zHeightToleranceMeters.get())) {
+    if (!MathUtil.isNear(0, estimatedRobotPose.getZ(), zHeightToleranceMeters.get())) {
       return VisionResultStatus.Z_HEIGHT_BAD;
     }
 
     double pitchAndRollToleranceValueRadians =
         Units.degreesToRadians(pitchAndRollToleranceDegrees.get());
     if (!MathUtil.isNear(
-            0, result.estimatedRobotPose().getRotation().getX(), pitchAndRollToleranceValueRadians)
+            0, estimatedRobotPose.getRotation().getX(), pitchAndRollToleranceValueRadians)
         && !MathUtil.isNear(
-            0,
-            result.estimatedRobotPose().getRotation().getY(),
-            pitchAndRollToleranceValueRadians)) {
+            0, estimatedRobotPose.getRotation().getY(), pitchAndRollToleranceValueRadians)) {
       return VisionResultStatus.PITCH_OR_ROLL_BAD;
     }
 

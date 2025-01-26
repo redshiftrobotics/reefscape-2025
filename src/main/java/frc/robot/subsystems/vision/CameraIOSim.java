@@ -25,9 +25,8 @@ public class CameraIOSim extends CameraIOPhotonVision {
 
     SimCameraProperties cameraProperties = new SimCameraProperties();
 
-    // https://www.uctronics.com/download/Amazon/B0332_OV9281_Global_Shutter_UVC_Camera_Datasheet.pdf
     // These values depend on photonvision config, update them as well as in assets config
-    cameraProperties.setCalibration(800, 600, Rotation2d.fromDegrees(70));
+    cameraProperties.setCalibration(800, 600, Rotation2d.fromDegrees(100));
     cameraProperties.setCalibError(0.01, 0.10);
     cameraProperties.setFPS(15);
 

@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVision extends SubsystemBase {
@@ -32,7 +32,9 @@ public class AprilTagVision extends SubsystemBase {
 
   @Override
   public void periodic() {
-    cameras().forEach(Camera::periodic);
+    for (Camera camera : cameras) {
+      camera.periodic();
+    }
 
     for (Camera camera : cameras) {
       String root = "Vision/" + camera.getCameraName();
@@ -71,13 +73,15 @@ public class AprilTagVision extends SubsystemBase {
     }
   }
 
+  public void setLastRobotPose(Supplier<Pose2d> lastRobotPose) {
+    for (Camera camera : cameras) {
+      camera.setLastRobotPoseSupplier(lastRobotPose);
+    }
+  }
+
   public void addVisionEstimateConsumer(
       Consumer<TimestampedRobotPoseEstimate> timestampRobotPoseEstimateConsumer) {
     timestampRobotPoseEstimateConsumers.add(timestampRobotPoseEstimateConsumer);
-  }
-
-  private Stream<Camera> cameras() {
-    return Arrays.stream(cameras);
   }
 
   @Override

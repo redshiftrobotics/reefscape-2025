@@ -8,10 +8,12 @@ import org.littletonrobotics.junction.AutoLog;
 public interface CameraIO {
   @AutoLog
   public static class CameraIOInputs {
+    int updatesReceived;
+
+    boolean[] hasNewData;
     Pose3d[] estimatedRobotPose;
     double[] timestampSecondFPGA;
     int[][] tagsUsed;
-    boolean[] hasNewData;
 
     boolean connected = false;
   }
