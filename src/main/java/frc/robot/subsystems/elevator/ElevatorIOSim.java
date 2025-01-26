@@ -28,7 +28,17 @@ public class ElevatorIOSim implements ElevatorIO {
           true,
           ElevatorConstants.DEFAULT_HEIGHT);
 
-  public void setGoalHeight(double targetHeight) {}
+  private boolean closedLoop = false;
+
+  public void setGoalHeight(double targetHeight) {
+    closedLoop = true;
+    controller.setGoal(targetHeight);
+  }
+
+  public void setVoltage(double volts) {
+    closedLoop = false;
+    sim.setInputVoltage(volts);
+  }
 
   public void updateMotors() {}
 
@@ -46,5 +56,7 @@ public class ElevatorIOSim implements ElevatorIO {
     feedforward = new ElevatorFeedforward(Ks, Kg, Kv);
   }
 
-  public void stop() {}
+  public void stop() {
+    setVoltage(0.0);
+  }
 }

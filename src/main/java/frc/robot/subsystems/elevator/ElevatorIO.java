@@ -12,6 +12,8 @@ public interface ElevatorIO {
 
   public default void setGoalHeight(double targetHeight) {}
 
+  public default void setVoltage(double volts) {}
+
   public default void updateMotors() {}
 
   public default void configurePID(
