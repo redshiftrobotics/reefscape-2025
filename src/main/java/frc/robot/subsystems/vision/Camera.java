@@ -10,7 +10,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
-import frc.robot.subsystems.vision.CameraIO.VisionResult;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
 import java.util.Arrays;
@@ -47,12 +46,15 @@ public class Camera {
   private AprilTagFieldLayout aprilTagFieldLayout;
   private Set<Integer> tagsIdsOnField;
 
-  private ExtendedVisionResult[] results = new ExtendedVisionResult[0];
+  private VisionResult[] results = new VisionResult[0];
 
   private final Alert missingCameraAlert;
 
-  public static record ExtendedVisionResult(
-      VisionResult result,
+  public static record VisionResult(
+      boolean hasNewData,
+      Pose3d estimatedRobotPose,
+      double timestampSecondFPGA,
+      int[] tagsUsed,
       Pose3d[] tagPositionsOnField,
       Matrix<N3, N1> standardDeviation,
       VisionResultStatus status) {}
@@ -86,25 +88,16 @@ public class Camera {
     io.updateInputs(inputs);
     missingCameraAlert.set(inputs.connected);
 
-    results =
-        Arrays.stream(inputs.results)
-            .map(
-                result ->
-                    new ExtendedVisionResult(
-                        result,
-                        getTagPositionsOnField(result),
-                        getStandardDeviations(result),
-                        getStatus(result)))
-            .toArray(ExtendedVisionResult[]::new);
+    // results =
   }
 
-  public ExtendedVisionResult[] getResults() {
+  public VisionResult[] getResults() {
     return results;
   }
 
-  private Pose3d[] getTagPositionsOnField(VisionResult result) {
-    return result.tagsUsed().stream()
-        .map(aprilTagFieldLayout::getTagPose)
+  private Pose3d[] getTagPositionsOnField(int[] tagsUsed) {
+    return Arrays.stream(tagsUsed)
+        .mapToObj(aprilTagFieldLayout::getTagPose)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toArray(Pose3d[]::new);
@@ -115,16 +108,14 @@ public class Camera {
    * global measurements from this camera less. The matrix is in the form [x, y, theta], with units
    * in meters and radians.
    */
-  private Matrix<N3, N1> getStandardDeviations(VisionResult result) {
+  private Matrix<N3, N1> getStandardDeviations(Pose3d[] tagPositionsOnField, Pose2d lastRobotPose) {
 
     // Get data about distance to each tag that is present on field
-    DoubleSummaryStatistics distanceToTagsUsedSummary =
-        Arrays.stream(getTagPositionsOnField(result))
+    DoubleSummaryStatistics distancesToTags =
+        Arrays.stream(tagPositionsOnField)
             .mapToDouble(
                 (tagPose3d) ->
-                    tagPose3d
-                        .getTranslation()
-                        .getDistance(result.estimatedRobotPose().getTranslation()))
+                    tagPose3d.toPose2d().getTranslation().getDistance(lastRobotPose.getTranslation()))
             .summaryStatistics();
 
     // This equation is heuristic, good enough but can probably be improved
@@ -132,9 +123,9 @@ public class Camera {
     // standard deviations). Average distance increases uncertainty exponentially while more
     // tags decreases uncertainty linearly
     double standardDeviation =
-        distanceToTagsUsedSummary.getCount() > 0
-            ? Math.pow(distanceToTagsUsedSummary.getAverage(), 2)
-                * Math.pow(distanceToTagsUsedSummary.getCount(), -1)
+        distancesToTags.getCount() > 0
+            ? Math.pow(distancesToTags.getAverage(), 2)
+                * Math.pow(distancesToTags.getCount(), -1)
             : Double.POSITIVE_INFINITY;
 
     double xyStandardDeviation = xyStdDevCoefficient.get() * standardDeviation;
@@ -177,11 +168,11 @@ public class Camera {
       return VisionResultStatus.NO_DATA;
     }
 
-    if (result.tagsUsed().isEmpty()) {
+    if (result.tagsUsed().length == 0) {
       return VisionResultStatus.NO_TARGETS_VISIBLE;
     }
 
-    if (!result.tagsUsed().stream().allMatch(tagsIdsOnField::contains)) {
+    if (!Arrays.stream(result.tagsUsed()).allMatch(tagsIdsOnField::contains)) {
       return VisionResultStatus.INVALID_TAG;
     }
 

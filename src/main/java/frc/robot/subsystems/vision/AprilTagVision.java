@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.vision.Camera.ExtendedVisionResult;
+import frc.robot.subsystems.vision.Camera.VisionResult;
 import frc.robot.subsystems.vision.Camera.VisionResultStatus;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,11 +35,11 @@ public class AprilTagVision extends SubsystemBase {
     cameras().forEach(Camera::periodic);
 
     for (Camera camera : cameras) {
-      for (ExtendedVisionResult result : camera.getResults()) {
+      String root = "Vision/" + camera.getCameraName();
 
-        String root = "Vision/" + camera.getCameraName();
+      for (VisionResult result : camera.getResults()) {
 
-        if (!result.result().hasNewData()) {
+        if (!result.hasNewData()) {
           Logger.recordOutput(root + "/tagsUsedPositions", new Pose3d[] {});
           continue;
         }
@@ -47,8 +47,8 @@ public class AprilTagVision extends SubsystemBase {
         // Get Data
         TimestampedRobotPoseEstimate visionEstimate =
             new TimestampedRobotPoseEstimate(
-                result.result().estimatedRobotPose(),
-                result.result().timestampSecondFPGA(),
+                result.estimatedRobotPose(),
+                result.timestampSecondFPGA(),
                 result.standardDeviation(),
                 result.status());
 

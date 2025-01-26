@@ -3,7 +3,6 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose3d;
 import frc.robot.subsystems.vision.VisionConstants.CameraConfig;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
@@ -60,29 +59,38 @@ public class CameraIOPhotonVision implements CameraIO {
   public void updateInputs(CameraIOInputs inputs) {
 
     List<PhotonPipelineResult> pipelineResults = camera.getAllUnreadResults();
-    List<VisionResult> poseResults = new ArrayList<>();
 
-    for (PhotonPipelineResult result : pipelineResults) {
-      Optional<EstimatedRobotPose> estimatedRobotPoseOptional = photonPoseEstimator.update(result);
+    Pose3d[] estimatedRobotPose = new Pose3d[pipelineResults.size()];
+    double[] timestampSecondFPGA = new double[pipelineResults.size()];
+    int[][] tagsUsed = new int[pipelineResults.size()][];
+    boolean[] hasNewData = new boolean[pipelineResults.size()];
+
+    for (int i = 0; i < pipelineResults.size(); i++) {
+      Optional<EstimatedRobotPose> estimatedRobotPoseOptional = photonPoseEstimator.update(pipelineResults.get(i));
 
       if (estimatedRobotPoseOptional.isPresent()) {
 
         EstimatedRobotPose estimateRobotPose = estimatedRobotPoseOptional.get();
 
-        poseResults.add(
-            new VisionResult(
-                estimateRobotPose.estimatedPose,
-                estimateRobotPose.timestampSeconds,
-                estimateRobotPose.targetsUsed.stream()
-                    .map(PhotonTrackedTarget::getFiducialId)
-                    .toList(),
-                false));
+        estimatedRobotPose[i] = estimateRobotPose.estimatedPose;
+        timestampSecondFPGA[i] = estimateRobotPose.timestampSeconds;
+        tagsUsed[i] = estimateRobotPose.targetsUsed.stream()
+            .map(PhotonTrackedTarget::getFiducialId)
+            .mapToInt(Integer::intValue)
+            .toArray();
+        hasNewData[i] = true;
       } else {
-        poseResults.add(new VisionResult(Pose3d.kZero, 0, List.of(), false));
+        estimatedRobotPose[i] = null;
+        timestampSecondFPGA[i] = 0;
+        tagsUsed[i] = new int[0];
+        hasNewData[i] = false;
       }
     }
-
-    inputs.results = poseResults.toArray(VisionResult[]::new);
+  
+    inputs.estimatedRobotPose = estimatedRobotPose;
+    inputs.timestampSecondFPGA = timestampSecondFPGA;
+    inputs.tagsUsed = tagsUsed;
+    inputs.hasNewData = hasNewData;
     inputs.connected = camera.isConnected();
   }
 
