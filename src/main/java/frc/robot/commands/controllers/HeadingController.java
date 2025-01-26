@@ -118,4 +118,13 @@ public class HeadingController {
   public boolean atGoal() {
     return headingControllerRadians.atGoal();
   }
+
+  /**
+   * Get the error in the heading
+   *
+   * @return error in the heading in radians
+   */
+  public double getError() {
+    return headingControllerRadians.getPositionError();
+  }
 }

@@ -1,9 +1,13 @@
 package frc.robot;
 
+import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
+
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Alert;
@@ -14,7 +18,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -34,6 +37,7 @@ import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.ModuleConstants;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
@@ -41,7 +45,10 @@ import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.utility.OverrideSwitch;
+import frc.robot.utility.commands.CustomCommands;
+import java.io.IOException;
 import java.util.Arrays;
+import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -77,27 +84,15 @@ public class RobotContainer {
   public RobotContainer() {
 
     switch (Constants.getRobot()) {
-      case WOOD_BOT_TWO_2025:
+      case WOOD_BOT_TWO_2025, T_SHIRT_CANNON_CHASSIS:
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
                 new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-                new ModuleIOSparkMax(DriveConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(DriveConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG));
-        vision = new AprilTagVision();
-        break;
-
-      case T_SHIRT_CANNON_CHASSIS:
-        // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-                new ModuleIOSparkMax(DriveConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(DriveConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG));
+                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
         break;
 
@@ -106,10 +101,10 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIONavX(),
-                new ModuleIOSparkMax(DriveConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(DriveConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG));
+                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
         break;
 
@@ -118,12 +113,11 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIO() {},
-                new ModuleIOSim(DriveConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSim(DriveConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSim(DriveConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSim(DriveConstants.BACK_RIGHT_MODULE_CONFIG));
-        vision =
-            new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
+                new ModuleIOSim(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSim(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSim(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSim(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+        vision = new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         break;
 
       default:
@@ -154,11 +148,11 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Chooser", new SendableChooser<Command>());
 
     // Configure autos
-    configureAutos();
+    configureAutos(autoChooser);
 
     // Configure sys ids
     if (Constants.TUNING_MODE) {
-      configureSysIds();
+      configureSysIds(autoChooser);
     }
 
     // Alerts for constants to avoid using them in competition
@@ -202,6 +196,15 @@ public class RobotContainer {
                 drive.resetPose(
                     new Pose2d(drive.getRobotPose().getTranslation(), Rotation2d.kZero))),
         true);
+
+    dashboard.addCommand(
+        "Reset To Reef",
+        () ->
+            drive.resetPose(
+                FieldConstants.Reef.centerFaces[0].transformBy(
+                    new Transform2d(
+                        DRIVE_CONFIG.bumperCornerToCorner().getX() / 2, 0, Rotation2d.kPi))),
+        true);
   }
 
   /** Define button->command mappings. */
@@ -234,7 +237,7 @@ public class RobotContainer {
 
       // Default command
       drive.setDefaultCommand(
-          DriveCommands.joystickDriveSmartAngleLock(
+          DriveCommands.joystickDrive(
                   drive,
                   input::getTranslationMetersPerSecond,
                   input::getOmegaRadiansPerSecond,
@@ -252,6 +255,12 @@ public class RobotContainer {
                   .startEnd(drive::stopUsingBrakeArrangement, drive::stopUsingForwardArrangement)
                   .withName("Resist Movement With X"));
 
+      // Stop the robot and cancel any running commands
+      driverXbox
+          .b()
+          .or(RobotModeTriggers.disabled())
+          .onTrue(drive.runOnce(drive::stop).withName("Stop and Cancel"));
+
       if (includeAutoAlign) {
         // Align to reef
         final AdaptiveAutoAlignCommands reefAlignmentCommands =
@@ -261,21 +270,23 @@ public class RobotContainer {
             .rightTrigger()
             .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Drive to reef"));
 
-        Command reefDriveNextCommand =
-            reefAlignmentCommands.driveToNext(drive).withName("Drive to next reef");
         driverXbox
             .rightTrigger()
             .and(driverXbox.leftBumper())
-            .onTrue(Commands.runOnce(reefDriveNextCommand::cancel))
-            .onTrue(reefDriveNextCommand);
+            .onTrue(
+                CustomCommands.reInitCommand(
+                    reefAlignmentCommands.driveToNext(drive).withName("Drive to next reef")));
 
-        Command reefDrivePreviousCommand =
-            reefAlignmentCommands.driveToPrevious(drive).withName("Drive to previous reef");
         driverXbox
             .rightTrigger()
             .and(driverXbox.rightBumper())
-            .onTrue(Commands.runOnce(reefDrivePreviousCommand::cancel))
-            .onTrue(reefDrivePreviousCommand);
+            .onTrue(
+                CustomCommands.reInitCommand(
+                    reefAlignmentCommands
+                        .driveToPrevious(drive)
+                        .withName("Drive to previous reef")));
+
+        driverXbox.rightTrigger(0.1).onFalse(drive.runOnce(drive::stop));
 
         // Align to intake
 
@@ -287,33 +298,24 @@ public class RobotContainer {
             .leftTrigger()
             .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Drive to intake"));
 
-        Command intakeDriveNextCommand =
-            intakeAlignmentCommands.driveToNext(drive).withName("Drive to next intake");
         driverXbox
             .leftTrigger()
             .and(driverXbox.leftBumper())
-            .onTrue(Commands.runOnce(intakeDriveNextCommand::cancel))
-            .onTrue(intakeDriveNextCommand);
+            .onTrue(
+                CustomCommands.reInitCommand(
+                    intakeAlignmentCommands.driveToNext(drive).withName("Drive to next intake")));
 
-        Command intakeDrivePreviousCommand =
-            intakeAlignmentCommands.driveToPrevious(drive).withName("Drive to previous intake");
         driverXbox
             .leftTrigger()
             .and(driverXbox.rightBumper())
-            .onTrue(Commands.runOnce(intakeDrivePreviousCommand::cancel))
-            .onTrue(intakeDrivePreviousCommand);
+            .onTrue(
+                CustomCommands.reInitCommand(
+                    intakeAlignmentCommands
+                        .driveToPrevious(drive)
+                        .withName("Drive to previous intake")));
+
+        driverXbox.leftTrigger(0.1).onFalse(drive.runOnce(drive::stop));
       }
-
-      // Stop the robot and cancel any running commands
-      driverXbox
-          .b()
-          .or(RobotModeTriggers.disabled())
-          .whileTrue(
-              Commands.idle(drive)
-                  .beforeStarting(drive::stop)
-                  .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-                  .withName("Stop and Cancel"));
-
     } else if (driverController instanceof CommandJoystick) {
       final CommandJoystick driverJoystick = (CommandJoystick) driverController;
 
@@ -374,28 +376,41 @@ public class RobotContainer {
         .onChange(rumbleControllers(0.2).withTimeout(0.2));
   }
 
-  private void configureAutos() {
+  private void configureAutos(LoggedDashboardChooser<Command> dashboardChooser) {
     // Set up named commands for path planner auto
     // https://pathplanner.dev/pplib-named-commands.html
     NamedCommands.registerCommand("StopWithX", drive.runOnce(drive::stopUsingBrakeArrangement));
+
     // Path planner Autos
     // https://pathplanner.dev/gui-editing-paths-and-autos.html#autos
-    autoChooser.addOption("Triangle Auto", new PathPlannerAuto("Triangle Auto"));
-    autoChooser.addOption("Rotate Auto", new PathPlannerAuto("Rotate Auto"));
-    autoChooser.addOption("Circle Auto", new PathPlannerAuto("Circle Auto"));
+    dashboardChooser.addOption("Triangle Auto", AutoBuilder.buildAuto("Triangle Auto"));
+    dashboardChooser.addOption("Rotate Auto", AutoBuilder.buildAuto("Rotate Auto"));
+    dashboardChooser.addOption("Circle Auto", AutoBuilder.buildAuto("Circle Auto"));
+
+    // Choreo Autos
+    // https://pathplanner.dev/pplib-choreo-interop.html#load-choreo-trajectory-as-a-pathplannerpath
+    try {
+      dashboardChooser.addOption(
+          "Four Coral Test",
+          AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("Four Coral Auto")));
+    } catch (IOException e) {
+      System.out.println("Failed to load Choreo auto " + e.getMessage());
+    } catch (ParseException e) {
+      System.out.println("Failed to parse Choreo auto " + e.getMessage());
+    }
   }
 
-  private void configureSysIds() {
+  private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {
     // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/introduction.html
-    autoChooser.addOption(
+    dashboardChooser.addOption(
         "Drive SysId (Quasistatic Forward)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    dashboardChooser.addOption(
         "Drive SysId (Quasistatic Reverse)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
+    dashboardChooser.addOption(
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    dashboardChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 

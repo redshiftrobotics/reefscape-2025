@@ -32,6 +32,9 @@ public final class Constants {
           AlertType.kError);
 
   public static RobotType getRobot() {
+    if (robotType == null) {
+      robotType = determineRobotType(RobotType.T_SHIRT_CANNON_CHASSIS);
+    }
     if (RobotBase.isReal() && robotType == RobotType.SIM_BOT) {
       wrongRobotTypeAlertReal.set(true);
       robotType = RobotType.WOOD_BOT_TWO_2025;
@@ -70,21 +73,18 @@ public final class Constants {
     WOOD_BOT_TWO_2025,
   }
 
-  static {
-    if (robotType == null) {
-      if (RobotBase.isReal()) {
-        switch (RobotController.getSerialNumber()) {
-          case "03238024":
-            robotType = RobotType.CRESCENDO_CHASSIS_2024;
-            break;
-          case "032D216B":
-          default:
-            robotType = RobotType.WOOD_BOT_TWO_2025;
-            break;
-        }
-      } else if (RobotBase.isSimulation()) {
-        robotType = RobotType.SIM_BOT;
+  private static RobotType determineRobotType(RobotType fallbackType) {
+    if (RobotBase.isReal()) {
+      switch (RobotController.getSerialNumber()) {
+        case "03238024":
+          return RobotType.CRESCENDO_CHASSIS_2024;
+        case "032D216B":
+        default:
+          return fallbackType;
       }
+    } else if (RobotBase.isSimulation()) {
+      return RobotType.SIM_BOT;
     }
+    return fallbackType;
   }
 }

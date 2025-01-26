@@ -5,6 +5,7 @@ import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
@@ -21,7 +22,10 @@ public class AdaptiveAutoAlignCommands {
 
   public AdaptiveAutoAlignCommands(List<Pose2d> poses) {
     Transform2d offset =
-        new Transform2d(DRIVE_CONFIG.bumperCornerToCorner().getX() / 2, 0, Rotation2d.kPi);
+        new Transform2d(
+            DRIVE_CONFIG.bumperCornerToCorner().getX() / 2 + Units.inchesToMeters(3),
+            0,
+            Rotation2d.kPi);
     this.poses = poses.stream().map(pose -> pose.transformBy(offset)).toList();
   }
 

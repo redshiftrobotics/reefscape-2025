@@ -4,6 +4,7 @@ import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -120,10 +121,20 @@ public class Drive extends SubsystemBase {
         this::getRobotSpeeds,
         (speeds, feedForward) -> setRobotSpeeds(speeds),
         new PPHolonomicDriveController(
-            DriveConstants.driveControllerConstants.toPathPlannerPIDConstants(),
-            DriveConstants.rotationControllerConstants.toPathPlannerPIDConstants(),
+            DriveConstants.TRANSLATION_CONTROLLER_CONSTANTS_TRAJECTORY.toPathPlannerPIDConstants(),
+            DriveConstants.ROTATION_CONTROLLER_CONSTANTS_TRAJECTORY.toPathPlannerPIDConstants(),
             Constants.LOOP_PERIOD_SECONDS),
-        DriveConstants.pathPlannerRobotConfig,
+        new RobotConfig(
+            DriveConstants.robotMassKg,
+            DriveConstants.robotMOI,
+            new com.pathplanner.lib.config.ModuleConfig(
+                ModuleConstants.WHEEL_RADIUS,
+                DRIVE_CONFIG.maxLinearVelocity(),
+                DriveConstants.wheelCOF,
+                ModuleConstants.DRIVE_MOTOR.withReduction(ModuleConstants.DRIVE_REDUCTION),
+                ModuleConstants.DRIVE_MOTOR_CURRENT_LIMIT,
+                1),
+            moduleTranslations),
         AllianceFlipUtil::shouldFlip,
         this);
 
