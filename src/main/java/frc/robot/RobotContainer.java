@@ -117,7 +117,8 @@ public class RobotContainer {
                 new ModuleIOSim(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
                 new ModuleIOSim(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSim(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
-        vision = new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
+        vision =
+            new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         break;
 
       default:
@@ -132,6 +133,8 @@ public class RobotContainer {
         vision = new AprilTagVision();
         break;
     }
+
+    vision.setLastRobotPose(drive::getRobotPose);
 
     vision.addVisionEstimateConsumer(
         (estimate) -> {

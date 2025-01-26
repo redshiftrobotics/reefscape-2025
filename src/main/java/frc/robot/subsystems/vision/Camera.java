@@ -89,7 +89,7 @@ public class Camera {
   public void periodic() {
     Logger.processInputs("Vision/" + getCameraName(), inputs);
     io.updateInputs(inputs);
-    missingCameraAlert.set(inputs.connected);
+    missingCameraAlert.set(!inputs.connected);
 
     results = new VisionResult[inputs.updatesReceived];
     for (int i = 0; i < inputs.updatesReceived; i++) {

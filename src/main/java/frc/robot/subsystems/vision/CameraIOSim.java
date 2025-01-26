@@ -50,7 +50,6 @@ public class CameraIOSim extends CameraIOPhotonVision {
     Pose2d robotPose = robotPoseSupplier.get();
     visionSim.update(robotPose);
     super.updateInputs(inputs);
-    inputs.connected = true;
   }
 
   @Override
