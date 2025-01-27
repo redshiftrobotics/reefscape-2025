@@ -135,7 +135,7 @@ public class RobotContainer {
         break;
     }
 
-    vision.setLastRobotPose(drive::getRobotPose);
+    vision.setLastRobotPoseSupplier(drive::getRobotPose);
 
     vision.addVisionEstimateConsumer(
         (estimate) -> {
@@ -191,6 +191,8 @@ public class RobotContainer {
     dashboard.setPoseSupplier(drive::getRobotPose);
     dashboard.setRobotSupplier(drive::getRobotSpeeds);
     dashboard.setFieldRelativeSupplier(() -> false);
+
+    dashboard.setHasVisionEstimate(vision::hasVisionEstimate);
 
     dashboard.addCommand("Reset Pose", () -> drive.resetPose(new Pose2d()), true);
     dashboard.addCommand(
