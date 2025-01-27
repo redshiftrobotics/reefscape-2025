@@ -42,6 +42,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.vision.AprilTagVision;
+import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.utility.OverrideSwitch;
@@ -93,7 +94,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
-        vision = new AprilTagVision();
+        vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.FRONT_CAMERA));
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -138,7 +139,7 @@ public class RobotContainer {
 
     vision.addVisionEstimateConsumer(
         (estimate) -> {
-          if (estimate.status().isSuccess() && Constants.getMode() != Mode.SIM) {
+          if (estimate.status().isSuccess()) {
             drive.addVisionMeasurement(
                 estimate.robotPose().toPose2d(),
                 estimate.timestampSeconds(),
