@@ -10,7 +10,6 @@ import frc.robot.subsystems.vision.Camera.VisionResult;
 import frc.robot.subsystems.vision.Camera.VisionResultStatus;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -32,7 +31,7 @@ public class AprilTagVision extends SubsystemBase {
   public AprilTagVision(CameraIO... camerasIO) {
     this.cameras =
         Arrays.stream(camerasIO)
-            .map(io -> new Camera(io, VisionConstants.FIELD))
+            .map(io -> new Camera(io))
             .toArray(Camera[]::new);
   }
 
@@ -46,9 +45,9 @@ public class AprilTagVision extends SubsystemBase {
 
     String root = "Vision";
 
-    List<Pose3d> robotPosesAccepted = new LinkedList<>();
-    List<Pose3d> robotPosesRejected = new LinkedList<>();
-    List<Pose3d> tagPoses = new LinkedList<>();
+    List<Pose3d> robotPosesAccepted = new ArrayList<>();
+    List<Pose3d> robotPosesRejected = new ArrayList<>();
+    List<Pose3d> tagPoses = new ArrayList<>();
 
     hasVisionEstimate = false;
 

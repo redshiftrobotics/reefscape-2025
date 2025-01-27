@@ -1,6 +1,5 @@
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -44,7 +43,6 @@ public class Camera {
   private final CameraIO io;
   private final CameraIOInputsAutoLogged inputs = new CameraIOInputsAutoLogged();
 
-  private AprilTagFieldLayout aprilTagFieldLayout;
   private Set<Integer> tagsIdsOnField;
 
   private VisionResult[] results = new VisionResult[0];
@@ -67,14 +65,12 @@ public class Camera {
    *
    * @param io camera implantation
    */
-  public Camera(CameraIO io, AprilTagFieldLayout aprilTagFieldLayout) {
+  public Camera(CameraIO io) {
     this.io = io;
 
-    io.setAprilTagFieldLayout(aprilTagFieldLayout);
-
-    this.aprilTagFieldLayout = aprilTagFieldLayout;
+    io.setAprilTagFieldLayout(VisionConstants.FIELD);
     this.tagsIdsOnField =
-        aprilTagFieldLayout.getTags().stream().map((tag) -> tag.ID).collect(Collectors.toSet());
+        VisionConstants.FIELD.getTags().stream().map((tag) -> tag.ID).collect(Collectors.toSet());
 
     this.missingCameraAlert =
         new Alert("Missing Camera: " + this.getCameraName(), Alert.AlertType.kError);
@@ -134,7 +130,7 @@ public class Camera {
 
   private Pose3d[] getTagPositionsOnField(int[] tagsUsed) {
     return Arrays.stream(tagsUsed)
-        .mapToObj(aprilTagFieldLayout::getTagPose)
+        .mapToObj(VisionConstants.FIELD::getTagPose)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toArray(Pose3d[]::new);
@@ -210,8 +206,8 @@ public class Camera {
 
     if (estimatedRobotPose.getX() < 0
         || estimatedRobotPose.getY() < 0
-        || estimatedRobotPose.getX() > aprilTagFieldLayout.getFieldLength()
-        || estimatedRobotPose.getY() > aprilTagFieldLayout.getFieldWidth()) {
+        || estimatedRobotPose.getX() > VisionConstants.FIELD.getFieldLength()
+        || estimatedRobotPose.getY() > VisionConstants.FIELD.getFieldWidth()) {
       return VisionResultStatus.INVALID_POSE_OUTSIDE_FIELD;
     }
 
