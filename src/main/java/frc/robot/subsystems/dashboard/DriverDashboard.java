@@ -29,6 +29,7 @@ public class DriverDashboard extends SubsystemBase {
   private Supplier<Pose2d> poseSupplier;
   private Supplier<ChassisSpeeds> speedsSupplier;
   private BooleanSupplier fieldRelativeSupplier;
+  private BooleanSupplier hasVisionEstimate;
 
   // --- Setters ---
 
@@ -60,6 +61,10 @@ public class DriverDashboard extends SubsystemBase {
     this.fieldRelativeSupplier = fieldRelativeSupplier;
   }
 
+  public void setHasVisionEstimate(BooleanSupplier hasVisionEstimate) {
+    this.hasVisionEstimate = hasVisionEstimate;
+  }
+
   @Override
   public void periodic() {
 
@@ -79,6 +84,10 @@ public class DriverDashboard extends SubsystemBase {
 
     if (fieldRelativeSupplier != null) {
       SmartDashboard.putBoolean("Field Relative", fieldRelativeSupplier.getAsBoolean());
+    }
+
+    if (hasVisionEstimate != null) {
+      SmartDashboard.putBoolean("Vision", hasVisionEstimate.getAsBoolean());
     }
   }
 }

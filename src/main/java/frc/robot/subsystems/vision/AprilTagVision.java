@@ -10,6 +10,7 @@ import frc.robot.subsystems.vision.Camera.VisionResult;
 import frc.robot.subsystems.vision.Camera.VisionResultStatus;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -18,10 +19,15 @@ import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVision extends SubsystemBase {
 
+  public static final boolean DO_SUMMARY_LOGGING = true;
+  public static final boolean DO_CAMERA_LOGGING = false;
+
   private final Camera[] cameras;
 
   private List<Consumer<TimestampedRobotPoseEstimate>> timestampRobotPoseEstimateConsumers =
       new ArrayList<>();
+  
+  private boolean hasVisionEstimate = false;
 
   public AprilTagVision(CameraIO... camerasIO) {
     this.cameras =
@@ -32,53 +38,100 @@ public class AprilTagVision extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    // Run periodic for all cameras, as their are not real subsystems
     for (Camera camera : cameras) {
       camera.periodic();
     }
 
-    for (Camera camera : cameras) {
-      String root = "Vision/" + camera.getCameraName();
+    String root = "Vision";
 
+    List<TimestampedRobotPoseEstimate> robotPosesAccepted = new LinkedList<>();
+    List<Pose3d> robotPosesRejected = new LinkedList<>();
+    List<Pose3d> tagPoses = new LinkedList<>();
+
+    // Loop through all cameras
+    for (Camera camera : cameras) {
+      String cameraRoot = root + "/" + camera.getCameraName();
+
+      // Loop through all results that the camera has
       for (VisionResult result : camera.getResults()) {
 
         if (!result.hasNewData()) {
-          Logger.recordOutput(root + "/tagsUsedPositions", new Pose3d[] {});
+          Logger.recordOutput(cameraRoot + "/tagsUsedPositions", new Pose3d[] {});
           continue;
         }
 
         // Get Data
-        TimestampedRobotPoseEstimate visionEstimate =
-            new TimestampedRobotPoseEstimate(
-                result.estimatedRobotPose(),
-                result.timestampSecondFPGA(),
-                result.standardDeviation(),
-                result.status());
+        TimestampedRobotPoseEstimate visionEstimate = new TimestampedRobotPoseEstimate(
+            result.estimatedRobotPose(),
+            result.timestampSecondFPGA(),
+            result.standardDeviation(),
+            result.status());
 
         // Logging
+        if (DO_CAMERA_LOGGING) {
+          Logger.recordOutput(cameraRoot + "/tagsUsedPositions", result.tagPositionsOnField());
 
-        Logger.recordOutput(root + "/tagsUsedPositions", result.tagPositionsOnField());
+          Logger.recordOutput(cameraRoot + "/positionEstimate", visionEstimate.robotPose());
 
-        Logger.recordOutput(root + "/positionEstimate", visionEstimate.robotPose());
+          Logger.recordOutput(cameraRoot + "/status", visionEstimate.status);
+          Logger.recordOutput(cameraRoot + "/statusIsSuccess", visionEstimate.status.isSuccess());
+        }
 
-        Logger.recordOutput(root + "/status", visionEstimate.status);
-        Logger.recordOutput(root + "/statusIsSuccess", visionEstimate.status.isSuccess());
+        if (visionEstimate.isSuccess()) {
+          robotPosesAccepted.add(visionEstimate);
+        }
 
-        // Give consumers estimate
-
-        for (Consumer<TimestampedRobotPoseEstimate> consumer :
-            timestampRobotPoseEstimateConsumers) {
-          consumer.accept(visionEstimate);
+        if (DO_SUMMARY_LOGGING) {
+          if (!visionEstimate.isSuccess()) {
+            robotPosesRejected.add(visionEstimate.robotPose());
+          }
+          tagPoses.addAll(Arrays.asList(result.tagPositionsOnField()));
         }
       }
     }
+
+    hasVisionEstimate = !robotPosesAccepted.isEmpty();
+
+    // Call all consumers
+    for (Consumer<TimestampedRobotPoseEstimate> consumer : timestampRobotPoseEstimateConsumers) {
+      for (TimestampedRobotPoseEstimate visionEstimate : robotPosesAccepted) {
+        consumer.accept(visionEstimate);
+      }
+    }
+
+    if (DO_SUMMARY_LOGGING) {
+      Logger.recordOutput(root + "/robotPosesAccepted", robotPosesAccepted.stream().map(TimestampedRobotPoseEstimate::robotPose).toArray(Pose3d[]::new));
+      Logger.recordOutput(root + "/robotPosesRejected", robotPosesRejected.toArray(new Pose3d[0]));
+      Logger.recordOutput(root + "/tagPoses", tagPoses.toArray(new Pose3d[0]));
+    }
+  }
+  
+
+  /** 
+   * Get whether or not the vision system has a valid estimate
+   */
+  public boolean hasVisionEstimate() {
+    return hasVisionEstimate;
   }
 
-  public void setLastRobotPose(Supplier<Pose2d> lastRobotPose) {
+  /**
+   * Set the last robot pose supplier for all cameras
+   *
+   * @param lastRobotPose the last robot pose supplier
+   */
+  public void setLastRobotPoseSupplier(Supplier<Pose2d> lastRobotPose) {
     for (Camera camera : cameras) {
       camera.setLastRobotPoseSupplier(lastRobotPose);
     }
   }
 
+  /**
+   * Add a consumer for the vision estimate
+   *
+   * @param timestampRobotPoseEstimateConsumer the consumer for the vision estimate
+   */
   public void addVisionEstimateConsumer(
       Consumer<TimestampedRobotPoseEstimate> timestampRobotPoseEstimateConsumer) {
     timestampRobotPoseEstimateConsumers.add(timestampRobotPoseEstimateConsumer);
