@@ -2,11 +2,13 @@ package frc.robot.subsystems.dashboard;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -17,7 +19,10 @@ public class DriverDashboard extends SubsystemBase {
 
   private static DriverDashboard instance;
 
-  private DriverDashboard() {}
+  private DriverDashboard() {
+    SmartDashboard.putString("RobotName", Constants.getRobot().toString());
+    SmartDashboard.putString("RobotRoboRioSerialNumber", RobotController.getSerialNumber());
+  }
 
   public static DriverDashboard getInstance() {
     if (instance == null) instance = new DriverDashboard();
