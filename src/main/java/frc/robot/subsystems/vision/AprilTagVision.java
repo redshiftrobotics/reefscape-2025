@@ -35,7 +35,7 @@ public class AprilTagVision extends SubsystemBase {
   @Override
   public void periodic() {
 
-    // Run periodic for all cameras, as their are not real subsystems
+    // Run periodic for all cameras, as they are not real subsystems
     for (Camera camera : cameras) {
       camera.periodic();
     }
