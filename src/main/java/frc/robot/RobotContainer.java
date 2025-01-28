@@ -41,6 +41,10 @@ import frc.robot.subsystems.drive.ModuleConstants;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
+import frc.robot.subsystems.vision.AprilTagVision;
+import frc.robot.subsystems.vision.CameraIOPhotonVision;
+import frc.robot.subsystems.vision.CameraIOSim;
+import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
 import java.io.IOException;
@@ -58,6 +62,7 @@ public class RobotContainer {
 
   // Subsystems
   private final Drive drive;
+  private final AprilTagVision vision;
 
   // Controller
   private final CommandGenericHID driverController = new CommandXboxController(0);
@@ -80,8 +85,8 @@ public class RobotContainer {
   public RobotContainer() {
 
     switch (Constants.getRobot()) {
-      case WOOD_BOT_TWO_2025, T_SHIRT_CANNON_CHASSIS:
-        // Real robot, instantiate hardware IO implementations
+      case WOOD_BOT_TWO_2025:
+        // Real robot (Wood bot test chassis), instantiate hardware IO implementations
         drive =
             new Drive(
                 new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
@@ -89,10 +94,23 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+        vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.FRONT_CAMERA));
+        break;
+
+      case T_SHIRT_CANNON_CHASSIS:
+        // Real robot (T-Shirt cannon chassis), instantiate hardware IO implementations
+        drive =
+            new Drive(
+                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+        vision = new AprilTagVision();
         break;
 
       case CRESCENDO_CHASSIS_2024:
-        // Real robot, instantiate hardware IO implementations
+        // Real robot (robot from last year chassis), instantiate hardware IO implementations
         drive =
             new Drive(
                 new GyroIONavX(),
@@ -100,6 +118,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+        vision = new AprilTagVision();
         break;
 
       case SIM_BOT:
@@ -111,6 +130,8 @@ public class RobotContainer {
                 new ModuleIOSim(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
                 new ModuleIOSim(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSim(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+        vision =
+            new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         break;
 
       default:
@@ -122,8 +143,21 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        vision = new AprilTagVision();
         break;
     }
+
+    vision.setLastRobotPoseSupplier(drive::getRobotPose);
+
+    vision.addVisionEstimateConsumer(
+        (estimate) -> {
+          if (estimate.status().isSuccess()) {
+            drive.addVisionMeasurement(
+                estimate.robotPose().toPose2d(),
+                estimate.timestampSeconds(),
+                estimate.standardDeviations());
+          }
+        });
 
     // Can also use AutoBuilder.buildAutoChooser(); instead of SendableChooser to
     // auto populate
@@ -169,6 +203,8 @@ public class RobotContainer {
     dashboard.setPoseSupplier(drive::getRobotPose);
     dashboard.setRobotSupplier(drive::getRobotSpeeds);
     dashboard.setFieldRelativeSupplier(() -> false);
+
+    dashboard.setHasVisionEstimate(vision::hasVisionEstimate);
 
     dashboard.addCommand("Reset Pose", () -> drive.resetPose(new Pose2d()), true);
     dashboard.addCommand(
@@ -227,7 +263,8 @@ public class RobotContainer {
                   useFieldRelative::getAsBoolean)
               .withName("Default Drive"));
 
-      // Cause the robot to resist movement by forming an X shape with the swerve modules
+      // Cause the robot to resist movement by forming an X shape with the swerve
+      // modules
       // Helps prevent getting pushed around
       driverXbox
           .x()

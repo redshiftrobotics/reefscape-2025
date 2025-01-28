@@ -7,21 +7,20 @@
       "height": 832,
       "state": {
         "sidebar": {
-          "width": 300,
+          "width": 320,
           "expanded": [
-            "/RealOutputs/Odometry",
-            "/RealOutputs/SwerveStates",
-            "/RealOutputs/ChassisStates",
             "/RealOutputs/Odometry/Robot",
-            "/RealOutputs",
             "/RealOutputs/SwerveStates/ModuleDesiredWheelSpeeds",
-            "/RealOutputs/SwerveStates/MeasuredWheelSpeeds",
             "/RealOutputs/SwerveStates/ModuleDesiredWheelSpeeds/0",
             "/RealOutputs/SwerveStates/MeasuredWheelSpeeds/0",
             "/RealOutputs/Odometry/Robot/rotation",
-            "/DriverStation",
             "/RealOutputs/SwerveStates/MeasuredWheelSpeeds/0/angle",
-            "/RealOutputs/SwerveStates/ModuleDesiredWheelSpeeds/0/angle"
+            "/RealOutputs/SwerveStates/ModuleDesiredWheelSpeeds/0/angle",
+            "/RealOutputs",
+            "/RealOutputs/Vision/frontCam",
+            "/RealOutputs/Vision/robotPosesRejected",
+            "/RealOutputs/Vision/robotPosesAccepted",
+            "/Vision/frontCam"
           ]
         },
         "tabs": {
@@ -46,14 +45,14 @@
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
-                      "model": "2025 KitBot"
+                      "model": "demo_8032"
                     }
                   },
                   {
                     "type": "swerveStates",
                     "logKey": "/RealOutputs/SwerveStates/DesiredWheelSpeeds",
                     "logType": "SwerveModuleState[]",
-                    "visible": false,
+                    "visible": true,
                     "options": {
                       "color": "#ff0000",
                       "arrangement": "0,1,2,3"
@@ -78,6 +77,33 @@
                       "model": "2025 KitBot",
                       "color": "#00ff00"
                     }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/Vision/robotPosesAccepted",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "model": "demo_8032",
+                      "color": "#ff00ff"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/Vision/robotPosesRejected",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "model": "demo_8032",
+                      "color": "#ffff00"
+                    }
+                  },
+                  {
+                    "type": "axes",
+                    "logKey": "/RealOutputs/Vision/tagPoses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {}
                   }
                 ],
                 "game": "2025 Field",
@@ -88,14 +114,14 @@
                 "cameraIndex": -5,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  10.28116,
-                  1.5748000000000002,
-                  6.295394842760901e-16
+                  7.518571914882382,
+                  1.0952209176358136,
+                  -2.790117612025427
                 ],
                 "cameraTarget": [
-                  0,
-                  0.5,
-                  0
+                  5.524650911502281,
+                  -0.8023068711719472,
+                  6.212692734318392
                 ]
               },
               "controlsHeight": 200
@@ -111,6 +137,24 @@
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {}
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/Vision/robotPosesRejected",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ffff00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/Vision/robotPosesAccepted",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff00ff"
+                    }
                   }
                 ],
                 "game": "2025 Field",
