@@ -85,8 +85,8 @@ public class RobotContainer {
   public RobotContainer() {
 
     switch (Constants.getRobot()) {
-      case WOOD_BOT_TWO_2025, T_SHIRT_CANNON_CHASSIS:
-        // Real robot, instantiate hardware IO implementations
+      case WOOD_BOT_TWO_2025:
+        // Real robot (Wood bot test chassis), instantiate hardware IO implementations
         drive =
             new Drive(
                 new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
@@ -97,8 +97,20 @@ public class RobotContainer {
         vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.FRONT_CAMERA));
         break;
 
+      case T_SHIRT_CANNON_CHASSIS:
+        // Real robot (T-Shirt cannon chassis), instantiate hardware IO implementations
+        drive =
+            new Drive(
+                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+        vision = new AprilTagVision();
+        break;
+
       case CRESCENDO_CHASSIS_2024:
-        // Real robot, instantiate hardware IO implementations
+        // Real robot (robot from last year chassis), instantiate hardware IO implementations
         drive =
             new Drive(
                 new GyroIONavX(),

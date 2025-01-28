@@ -29,10 +29,7 @@ public class AprilTagVision extends SubsystemBase {
   private boolean hasVisionEstimate = false;
 
   public AprilTagVision(CameraIO... camerasIO) {
-    this.cameras =
-        Arrays.stream(camerasIO)
-            .map(io -> new Camera(io))
-            .toArray(Camera[]::new);
+    this.cameras = Arrays.stream(camerasIO).map(io -> new Camera(io)).toArray(Camera[]::new);
   }
 
   @Override
