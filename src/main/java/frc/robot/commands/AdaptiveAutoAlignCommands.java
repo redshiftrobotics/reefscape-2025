@@ -3,12 +3,11 @@ package frc.robot.commands;
 import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.utility.AllianceFlipUtil;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -20,20 +19,20 @@ public class AdaptiveAutoAlignCommands {
 
   private int offset = 0;
 
-  public AdaptiveAutoAlignCommands(List<Pose2d> poses) {
-    Transform2d offset =
-        new Transform2d(
-            DRIVE_CONFIG.bumperCornerToCorner().getX() / 2 + Units.inchesToMeters(3),
-            0,
-            Rotation2d.kPi);
+  public AdaptiveAutoAlignCommands(List<Pose2d> poses, Transform2d offset) {
     this.poses = poses.stream().map(pose -> pose.transformBy(offset)).toList();
+  }
+
+  private Pose2d getPose(int index) {
+    System.out.println(AllianceFlipUtil.shouldFlip());
+    return AllianceFlipUtil.apply(poses.get(index));
   }
 
   private int getClosestPoseIndex(Drive drive) {
     Pose2d currentPose = drive.getRobotPose();
     return IntStream.range(0, poses.size())
         .boxed()
-        .min(Comparator.comparingDouble(i -> closestScore(poses.get(i), currentPose)))
+        .min(Comparator.comparingDouble(i -> closestScore(getPose(i), currentPose)))
         .get();
   }
 
@@ -46,7 +45,7 @@ public class AdaptiveAutoAlignCommands {
   private Command align(Drive drive) {
     return Commands.defer(
         () -> {
-          Pose2d pose = poses.get(offset);
+          Pose2d pose = getPose(offset);
           return DriveCommands.pathfindToPoseCommand(drive, pose, 1, 0)
               .andThen(DriveCommands.driveToPosePrecise(drive, pose))
               .beforeStarting(() -> Logger.recordOutput("AutoAlignGoal", new Pose2d[] {pose}))

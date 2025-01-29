@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -151,7 +152,7 @@ public class RobotContainer {
 
     vision.addVisionEstimateConsumer(
         (estimate) -> {
-          if (estimate.status().isSuccess()) {
+          if (estimate.status().isSuccess() && Constants.getMode() != Mode.SIM) {
             drive.addVisionMeasurement(
                 estimate.robotPose().toPose2d(),
                 estimate.timestampSeconds(),
@@ -228,7 +229,7 @@ public class RobotContainer {
   /** Define button->command mappings. */
   private void configureControllerBindings() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
-    configureDriverControllerBindings(false);
+    configureDriverControllerBindings(true);
     configureOperatorControllerBindings();
     configureAlertTriggers();
   }
@@ -282,7 +283,12 @@ public class RobotContainer {
       if (includeAutoAlign) {
         // Align to reef
         final AdaptiveAutoAlignCommands reefAlignmentCommands =
-            new AdaptiveAutoAlignCommands(Arrays.asList(FieldConstants.Reef.alignmentFaces));
+            new AdaptiveAutoAlignCommands(
+                Arrays.asList(FieldConstants.Reef.alignmentFaces),
+                new Transform2d(
+                    DRIVE_CONFIG.bumperCornerToCorner().getX() / 2 + Units.inchesToMeters(3),
+                    0,
+                    Rotation2d.kPi));
 
         driverXbox
             .rightTrigger()
@@ -310,7 +316,11 @@ public class RobotContainer {
 
         final AdaptiveAutoAlignCommands intakeAlignmentCommands =
             new AdaptiveAutoAlignCommands(
-                Arrays.asList(FieldConstants.CoralStation.alignmentFaces));
+                Arrays.asList(FieldConstants.CoralStation.alignmentFaces),
+                new Transform2d(
+                    DRIVE_CONFIG.bumperCornerToCorner().getX() / 2 + Units.inchesToMeters(3),
+                    0,
+                    Rotation2d.kPi));
 
         driverXbox
             .leftTrigger()

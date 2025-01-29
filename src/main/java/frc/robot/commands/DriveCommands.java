@@ -8,6 +8,7 @@
 package frc.robot.commands;
 
 import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
+import static frc.robot.subsystems.drive.DriveConstants.POSE_POSITION_TOLERANCE;
 import static frc.robot.subsystems.drive.DriveConstants.ROTATION_CONTROLLER_CONSTANTS;
 import static frc.robot.subsystems.drive.DriveConstants.TRANSLATION_CONTROLLER_CONSTANTS;
 
@@ -88,8 +89,7 @@ public class DriveCommands {
                 ROTATION_CONTROLLER_CONSTANTS.Ki(),
                 ROTATION_CONTROLLER_CONSTANTS.Kd(),
                 DRIVE_CONFIG.getAngularConstraints()));
-    controller.setTolerance(
-        new Pose2d(Units.inchesToMeters(2), Units.inchesToMeters(2), Rotation2d.fromDegrees(5)));
+    controller.setTolerance(POSE_POSITION_TOLERANCE);
 
     return drive
         .run(
