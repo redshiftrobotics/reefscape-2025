@@ -3,14 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-<<<<<<<< HEAD:src/main/deploy/pathplanner/paths/Mid Spawn to D2.path
         "x": 8.0,
         "y": 6.15
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.496487636919544,
-        "y": 5.648988541786226
+        "x": 7.207643230836557,
+        "y": 5.244137257252626
       },
       "isLocked": false,
       "linkedName": "Mid Spawn"
@@ -21,85 +20,12 @@
         "y": 3.85
       },
       "prevControl": {
-        "x": 7.106745115992547,
-        "y": 4.922494293682458
+        "x": 6.590597407992318,
+        "y": 4.516284658792933
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "D2"
-========
-        "x": 2.0,
-        "y": 6.0
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 2.0,
-        "y": 5.5
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 3.0,
-        "y": 5.0
-      },
-      "prevControl": {
-        "x": 2.5,
-        "y": 5.0
-      },
-      "nextControl": {
-        "x": 3.5,
-        "y": 5.0
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 4.0,
-        "y": 6.0
-      },
-      "prevControl": {
-        "x": 4.0,
-        "y": 5.5
-      },
-      "nextControl": {
-        "x": 4.0,
-        "y": 6.5
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 3.0,
-        "y": 7.0
-      },
-      "prevControl": {
-        "x": 3.5,
-        "y": 7.0
-      },
-      "nextControl": {
-        "x": 2.5,
-        "y": 7.0
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.0,
-        "y": 6.0
-      },
-      "prevControl": {
-        "x": 2.0,
-        "y": 6.598898052314396
-      },
-      "nextControl": null,
-      "isLocked": false,
-      "linkedName": null
->>>>>>>> main:src/main/deploy/pathplanner/paths/Circle Forward.path
     }
   ],
   "rotationTargets": [],
@@ -119,11 +45,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-<<<<<<<< HEAD:src/main/deploy/pathplanner/paths/Mid Spawn to D2.path
   "folder": "Paths B",
-========
-  "folder": "New Folder",
->>>>>>>> main:src/main/deploy/pathplanner/paths/Circle Forward.path
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0
