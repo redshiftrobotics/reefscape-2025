@@ -3,32 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.318174342105263,
-        "y": 1.1096217105263155
+        "x": 8.0,
+        "y": 6.15
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.1499094288093197,
-        "y": 1.452468103580547
+        "x": 7.27325117066121,
+        "y": 4.9898241408755455
       },
       "isLocked": false,
-      "linkedName": "Coral Pickup 2"
-    },
-    {
-      "anchor": {
-        "x": 5.869243421052631,
-        "y": 2.985855263157895
-      },
-      "prevControl": {
-        "x": 5.6821217685933805,
-        "y": 2.6544810494202378
-      },
-      "nextControl": {
-        "x": 6.067489157166451,
-        "y": 3.33692914513885
-      },
-      "isLocked": false,
-      "linkedName": null
+      "linkedName": "Mid Spawn"
     },
     {
       "anchor": {
@@ -36,8 +20,8 @@
         "y": 3.85
       },
       "prevControl": {
-        "x": 5.9467640024369155,
-        "y": 3.266607796973609
+        "x": 6.428055936351696,
+        "y": 4.48611853709987
       },
       "nextControl": null,
       "isLocked": false,
@@ -64,7 +48,7 @@
   "folder": "Paths B",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -125.00000000000001
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }
