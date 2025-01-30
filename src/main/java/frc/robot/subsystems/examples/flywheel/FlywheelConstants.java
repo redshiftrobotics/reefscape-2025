@@ -11,9 +11,9 @@ public class FlywheelConstants {
 
   public static final FlywheelConfig FLYWHEEL_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT -> new FlywheelConfig(0, 1, false, false);
-        case DEV_BOT -> new FlywheelConfig(0, 1, false, false);
-        case OLD_DEV_BOT -> new FlywheelConfig(0, 1, false, false);
+        case WOOD_BOT_TWO_2025 -> new FlywheelConfig(0, 1, false, false);
+        case T_SHIRT_CANNON_CHASSIS -> new FlywheelConfig(0, 1, false, false);
+        case CRESCENDO_CHASSIS_2024 -> new FlywheelConfig(0, 1, false, false);
         case SIM_BOT -> new FlywheelConfig(0, 1, false, false);
       };
 

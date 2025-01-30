@@ -4,7 +4,7 @@ import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
-import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -61,7 +61,8 @@ public class Drive extends SubsystemBase {
   private SwerveModulePosition[] lastModulePositions;
 
   private Rotation2d rawGyroRotation = new Rotation2d();
-  private Pose2d pose = new Pose2d();
+  private Pose2d robotPose = new Pose2d();
+  private ChassisSpeeds robotSpeeds = new ChassisSpeeds();
 
   /**
    * Creates a new drivetrain for robot
@@ -104,7 +105,7 @@ public class Drive extends SubsystemBase {
 
     lastModulePositions = modules().map(Module::getPosition).toArray(SwerveModulePosition[]::new);
     poseEstimator =
-        new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, pose);
+        new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, robotPose);
 
     // --- Start odometry threads ---
 
@@ -115,13 +116,25 @@ public class Drive extends SubsystemBase {
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configure(
-        this::getPose,
+        this::getRobotPose,
         this::resetPose,
         this::getRobotSpeeds,
         (speeds, feedForward) -> setRobotSpeeds(speeds),
         new PPHolonomicDriveController(
-            new PIDConstants(5, 0, 0), new PIDConstants(5, 0, 0), Constants.LOOP_PERIOD_SECONDS),
-        DriveConstants.pathPlannerRobotConfig,
+            DriveConstants.TRANSLATION_CONTROLLER_CONSTANTS_TRAJECTORY.toPathPlannerPIDConstants(),
+            DriveConstants.ROTATION_CONTROLLER_CONSTANTS_TRAJECTORY.toPathPlannerPIDConstants(),
+            Constants.LOOP_PERIOD_SECONDS),
+        new RobotConfig(
+            DriveConstants.robotMassKg,
+            DriveConstants.robotMOI,
+            new com.pathplanner.lib.config.ModuleConfig(
+                ModuleConstants.WHEEL_RADIUS,
+                DRIVE_CONFIG.maxLinearVelocity(),
+                DriveConstants.wheelCOF,
+                ModuleConstants.DRIVE_MOTOR.withReduction(ModuleConstants.DRIVE_REDUCTION),
+                ModuleConstants.DRIVE_MOTOR_CURRENT_LIMIT,
+                1),
+            moduleTranslations),
         AllianceFlipUtil::shouldFlip,
         this);
 
@@ -132,8 +145,7 @@ public class Drive extends SubsystemBase {
 
     PathPlannerLogging.setLogActivePathCallback(
         activePath ->
-            Logger.recordOutput(
-                "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()])));
+            Logger.recordOutput("Odometry/Trajectory", activePath.toArray(Pose2d[]::new)));
     PathPlannerLogging.setLogTargetPoseCallback(
         targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
 
@@ -153,7 +165,7 @@ public class Drive extends SubsystemBase {
                 (voltage) -> runCharacterization(voltage.in(Units.Volts)), null, this));
 
     // --- Break mode ---
-    setMotorBrakeOnCoastModeEnabled(true);
+    setMotorBrakeMode(true);
   }
 
   // --- Robot Pose ---
@@ -214,7 +226,7 @@ public class Drive extends SubsystemBase {
       }
 
       // Update gyro angle
-      if (gyroInputs.connected) {
+      if (gyroInputs.connected && !Constants.ON_BLOCKS_TEST_MODE) {
         // Use the real gyro angle
         rawGyroRotation = gyroInputs.odometryYawPositions[i];
       } else {
@@ -223,11 +235,16 @@ public class Drive extends SubsystemBase {
         rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
       }
 
-      // Apply update to pose estimator
-      pose = poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+      // Apply update to pose estimator and save new pose
+      robotPose =
+          poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
     }
 
     gyroConnectionAlert.set(!gyroInputs.connected && Constants.getMode() != Mode.SIM);
+
+    // Save robot speeds for performance
+    SwerveModuleState[] wheelSpeeds = getWheelSpeeds();
+    robotSpeeds = kinematics.toChassisSpeeds(wheelSpeeds);
   }
 
   /**
@@ -236,8 +253,8 @@ public class Drive extends SubsystemBase {
    * @return the estimated position of robot
    */
   @AutoLogOutput(key = "Odometry/Robot")
-  public Pose2d getPose() {
-    return pose;
+  public Pose2d getRobotPose() {
+    return robotPose;
   }
 
   /**
@@ -284,7 +301,7 @@ public class Drive extends SubsystemBase {
    * @return translational speed in meters/sec and rotation speed in radians/sec
    */
   public ChassisSpeeds getRobotSpeeds() {
-    return getRobotSpeeds(false);
+    return robotSpeeds;
   }
 
   /**
@@ -294,17 +311,10 @@ public class Drive extends SubsystemBase {
    * @return translational speed in meters/sec and rotation speed in radians/sec
    */
   public ChassisSpeeds getRobotSpeeds(boolean fieldRelative) {
-    SwerveModuleState[] wheelSpeeds = getWheelSpeeds();
-
-    ChassisSpeeds speeds = kinematics.toChassisSpeeds(wheelSpeeds);
-
-    if (fieldRelative) {
-      speeds =
-          ChassisSpeeds.fromRobotRelativeSpeeds(
-              speeds, AllianceFlipUtil.apply(getPose().getRotation()));
-    }
-
-    return speeds;
+    return fieldRelative
+        ? ChassisSpeeds.fromFieldRelativeSpeeds(
+            robotSpeeds, AllianceFlipUtil.apply(getRobotPose().getRotation()))
+        : robotSpeeds;
   }
 
   /**
@@ -327,14 +337,14 @@ public class Drive extends SubsystemBase {
     if (fieldRelative) {
       speeds =
           ChassisSpeeds.fromFieldRelativeSpeeds(
-              speeds, AllianceFlipUtil.apply(getPose().getRotation()));
+              speeds, AllianceFlipUtil.apply(getRobotPose().getRotation()));
     }
 
     Logger.recordOutput("ChassisStates/DesiredRobotSpeeds", speeds);
 
     speeds = ChassisSpeeds.discretize(speeds, Constants.LOOP_PERIOD_SECONDS);
 
-    SwerveModuleState[] wheelSpeeds = kinematics.toWheelSpeeds(speeds);
+    SwerveModuleState[] wheelSpeeds = kinematics.toSwerveModuleStates(speeds);
 
     setWheelSpeeds(wheelSpeeds);
   }
@@ -412,7 +422,7 @@ public class Drive extends SubsystemBase {
             .map(Translation2d::getAngle)
             .toArray(Rotation2d[]::new);
     kinematics.resetHeadings(headings);
-    setRobotSpeeds(new ChassisSpeeds());
+    setWheelSpeeds(kinematics.toWheelSpeeds(new ChassisSpeeds()));
   }
 
   /**
@@ -420,9 +430,9 @@ public class Drive extends SubsystemBase {
    * their normal driving the next time a nonzero velocity is requested.
    */
   public void stopUsingForwardArrangement() {
-    Rotation2d[] headings = modules().map(module -> new Rotation2d()).toArray(Rotation2d[]::new);
+    Rotation2d[] headings = modules().map(module -> Rotation2d.kZero).toArray(Rotation2d[]::new);
     kinematics.resetHeadings(headings);
-    setRobotSpeeds(new ChassisSpeeds());
+    setWheelSpeeds(kinematics.toWheelSpeeds(new ChassisSpeeds()));
   }
 
   // --- Break Mode ---
@@ -430,16 +440,22 @@ public class Drive extends SubsystemBase {
   /**
    * Sets whether swerve motors will brake to prevent coasting. IMPORTANT: Only do this after robot
    * has been stopped for a bit
+   *
+   * @param enabled true if motors should brake, false if they should coast
    */
-  public void setMotorBrakeOnCoastModeEnabled(boolean enabled) {
+  public void setMotorBrakeMode(boolean enabled) {
     if (brakeModeEnabled != enabled) {
       modules().forEach(module -> module.setBrakeMode(enabled));
     }
     brakeModeEnabled = enabled;
   }
 
-  /** Get whether swerve motors will brake to prevent coasting, and robot is safe to drive */
-  public boolean getMotorBrakeOnCoastModeEnabled() {
+  /**
+   * Get whether swerve motors will brake to prevent coasting, and robot is safe to drive
+   *
+   * @return true if motors should brake, false if they should coast
+   */
+  public boolean getMotorBrakeMode() {
     return brakeModeEnabled;
   }
 
@@ -472,6 +488,26 @@ public class Drive extends SubsystemBase {
     for (Module module : modules) {
       module.runCharacterization(0, volts);
     }
+  }
+
+  // --- Characterization ---
+
+  /** Returns the position of each module in radians. */
+  public double[] getWheelRadiusCharacterizationPositions() {
+    double[] values = new double[4];
+    for (int i = 0; i < 4; i++) {
+      values[i] = modules[i].getWheelRadiusCharacterizationPosition();
+    }
+    return values;
+  }
+
+  /** Returns the average velocity of the modules in rotations/sec (Phoenix native units). */
+  public double getFFCharacterizationVelocity() {
+    double output = 0.0;
+    for (int i = 0; i < 4; i++) {
+      output += modules[i].getFFCharacterizationVelocity() / 4.0;
+    }
+    return output;
   }
 
   // --- Module Util ---

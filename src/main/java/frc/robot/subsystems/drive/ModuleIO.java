@@ -12,7 +12,6 @@ public interface ModuleIO {
     double driveVelocityRadPerSec = 0.0;
     double driveAppliedVolts = 0.0;
     double driveSupplyCurrentAmps = 0.0;
-    double driveTorqueCurrentAmps = 0.0;
 
     boolean turnMotorConnected = false;
     Rotation2d turnAbsolutePosition = new Rotation2d();
