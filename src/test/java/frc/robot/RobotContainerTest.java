@@ -7,9 +7,8 @@ import org.junit.jupiter.api.Test;
 public class RobotContainerTest {
 
   @Test
-  @DisplayName("Create robot container")
+  @DisplayName("Instantiate RobotContainer")
   public void createRobotContainer() {
-    // Instantiate RobotContainer
     new RobotContainer();
   }
 }

@@ -2,12 +2,14 @@ package frc.robot.subsystems.dashboard;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.controllers.SpeedController.SpeedLevel;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -17,7 +19,10 @@ public class DriverDashboard extends SubsystemBase {
 
   private static DriverDashboard instance;
 
-  private DriverDashboard() {}
+  private DriverDashboard() {
+    SmartDashboard.putString("RobotName", Constants.getRobot().toString());
+    SmartDashboard.putString("RobotRoboRioSerialNumber", RobotController.getSerialNumber());
+  }
 
   public static DriverDashboard getInstance() {
     if (instance == null) instance = new DriverDashboard();
@@ -28,9 +33,8 @@ public class DriverDashboard extends SubsystemBase {
 
   private Supplier<Pose2d> poseSupplier;
   private Supplier<ChassisSpeeds> speedsSupplier;
-  private Supplier<SpeedLevel> speedLevelSupplier;
   private BooleanSupplier fieldRelativeSupplier;
-  private BooleanSupplier angleDrivenSupplier;
+  private BooleanSupplier hasVisionEstimate;
 
   // --- Setters ---
 
@@ -58,20 +62,18 @@ public class DriverDashboard extends SubsystemBase {
     this.speedsSupplier = robotSpeedsSupplier;
   }
 
-  public void setSpeedLevelSupplier(Supplier<SpeedLevel> speedLevelSupplier) {
-    this.speedLevelSupplier = speedLevelSupplier;
-  }
-
   public void setFieldRelativeSupplier(BooleanSupplier fieldRelativeSupplier) {
     this.fieldRelativeSupplier = fieldRelativeSupplier;
   }
 
-  public void setAngleDrivenSupplier(BooleanSupplier angleDrivenSupplier) {
-    this.angleDrivenSupplier = angleDrivenSupplier;
+  public void setHasVisionEstimate(BooleanSupplier hasVisionEstimate) {
+    this.hasVisionEstimate = hasVisionEstimate;
   }
 
   @Override
   public void periodic() {
+
+    SmartDashboard.putNumber("Game Time", Timer.getMatchTime());
 
     if (poseSupplier != null) {
       Pose2d pose = poseSupplier.get();
@@ -85,22 +87,12 @@ public class DriverDashboard extends SubsystemBase {
           "Speed MPH", Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) * 2.2369);
     }
 
-    if (speedLevelSupplier != null) {
-      SpeedLevel speedLevel = speedLevelSupplier.get();
-
-      SmartDashboard.putString("Speed Level", speedLevel.name());
-      SmartDashboard.putString(
-          "Speed Transl", String.format("%.2f%%", speedLevel.getTranslationCoefficient() * 100));
-      SmartDashboard.putString(
-          "Speed Rot", String.format("%.2f%%", speedLevel.getRotationCoefficient() * 100));
-    }
-
     if (fieldRelativeSupplier != null) {
       SmartDashboard.putBoolean("Field Relative", fieldRelativeSupplier.getAsBoolean());
     }
 
-    if (angleDrivenSupplier != null) {
-      SmartDashboard.putBoolean("Angle Driven", angleDrivenSupplier.getAsBoolean());
+    if (hasVisionEstimate != null) {
+      SmartDashboard.putBoolean("Vision", hasVisionEstimate.getAsBoolean());
     }
   }
 }

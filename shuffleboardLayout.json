@@ -28,7 +28,7 @@
               "Visuals/Counter clockwise": false
             }
           },
-          "0,0": {
+          "0,2": {
             "size": [
               1,
               1
@@ -43,22 +43,7 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "0,1": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/Angle Driven",
-              "_title": "Angle Driven",
-              "_glyph": 2,
-              "_showGlyph": true,
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
-          "3,0": {
+          "0,0": {
             "size": [
               1,
               2
@@ -90,42 +75,6 @@
               "_showGlyph": true
             }
           },
-          "0,2": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "List Layout",
-              "_title": "Speed Level",
-              "_glyph": 223,
-              "_showGlyph": true,
-              "Layout/Label position": "TOP",
-              "_children": [
-                {
-                  "_type": "Text View",
-                  "_source0": "network_table:///SmartDashboard/Speed Level",
-                  "_title": "Speed Level",
-                  "_glyph": 223,
-                  "_showGlyph": true
-                },
-                {
-                  "_type": "Text View",
-                  "_source0": "network_table:///SmartDashboard/Speed Transl",
-                  "_title": "Speed Transl",
-                  "_glyph": 148,
-                  "_showGlyph": false
-                },
-                {
-                  "_type": "Text View",
-                  "_source0": "network_table:///SmartDashboard/Speed Rot",
-                  "_title": "Speed Rot",
-                  "_glyph": 148,
-                  "_showGlyph": false
-                }
-              ]
-            }
-          },
           "9,1": {
             "size": [
               1,
@@ -154,7 +103,7 @@
           },
           "0,3": {
             "size": [
-              4,
+              3,
               1
             ],
             "content": {
@@ -167,7 +116,7 @@
           },
           "1,2": {
             "size": [
-              3,
+              2,
               1
             ],
             "content": {
@@ -178,7 +127,7 @@
               "_showGlyph": true
             }
           },
-          "8,3": {
+          "0,4": {
             "size": [
               3,
               1

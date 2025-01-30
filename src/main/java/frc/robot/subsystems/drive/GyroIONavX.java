@@ -21,7 +21,7 @@ public class GyroIONavX implements GyroIO {
 
   /** Create a new NaxX IMU */
   public GyroIONavX() {
-    navX = new AHRS(SERIAL_PORT_ID, (int) DriveConstants.odometryFrequencyHertz);
+    navX = new AHRS(SERIAL_PORT_ID, (int) DriveConstants.ODOMETRY_FREQUENCY_HERTZ);
 
     yawTimestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
     yawPositionQueue = SparkOdometryThread.getInstance().registerSignal(navX::getYaw);

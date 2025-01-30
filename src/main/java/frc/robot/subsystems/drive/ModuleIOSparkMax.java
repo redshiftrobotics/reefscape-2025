@@ -22,7 +22,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
-import frc.robot.subsystems.drive.DriveConstants.ModuleConfig;
+import frc.robot.subsystems.drive.ModuleConstants.ModuleConfig;
 import frc.robot.utility.SparkUtil;
 import java.util.Queue;
 
@@ -86,25 +86,25 @@ public class ModuleIOSparkMax implements ModuleIO {
     cancoder.getConfigurator().apply(magnetSensorConfig);
 
     turnAbsolutePosition = cancoder.getAbsolutePosition();
-    turnAbsolutePosition.setUpdateFrequency(DriveConstants.odometryFrequencyHertz);
+    turnAbsolutePosition.setUpdateFrequency(DriveConstants.ODOMETRY_FREQUENCY_HERTZ);
 
     // Configure drive motor
     SparkMaxConfig driveConfig = new SparkMaxConfig();
     driveConfig
         .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(DriveConstants.driveMotorCurrentLimit)
+        .smartCurrentLimit(ModuleConstants.DRIVE_MOTOR_CURRENT_LIMIT)
         .voltageCompensation(12.0);
     driveConfig
         .encoder
-        .positionConversionFactor(1 / DriveConstants.driveReduction)
-        .velocityConversionFactor(1 / DriveConstants.driveReduction)
+        .positionConversionFactor(1 / ModuleConstants.DRIVE_REDUCTION)
+        .velocityConversionFactor(1 / ModuleConstants.DRIVE_REDUCTION)
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2);
     driveConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(0.0, 0.0, 0.0, 0.0);
     driveConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
-        .primaryEncoderPositionPeriodMs((int) (1000.0 / DriveConstants.odometryFrequencyHertz))
+        .primaryEncoderPositionPeriodMs((int) (1000.0 / DriveConstants.ODOMETRY_FREQUENCY_HERTZ))
         .primaryEncoderVelocityAlwaysOn(true)
         .primaryEncoderVelocityPeriodMs(20)
         .appliedOutputPeriodMs(20)
@@ -123,12 +123,12 @@ public class ModuleIOSparkMax implements ModuleIO {
     turnConfig
         .inverted(config.turnMotorInverted())
         .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(DriveConstants.turnMotorCurrentLimit)
+        .smartCurrentLimit(ModuleConstants.TURN_MOTOR_CURRENT_LIMIT)
         .voltageCompensation(12.0);
     turnConfig
         .encoder
-        .positionConversionFactor(1 / DriveConstants.turnReduction)
-        .velocityConversionFactor(1 / DriveConstants.turnReduction)
+        .positionConversionFactor(1 / ModuleConstants.TURN_REDUCTION)
+        .velocityConversionFactor(1 / ModuleConstants.TURN_REDUCTION)
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2);
     turnConfig
@@ -140,7 +140,7 @@ public class ModuleIOSparkMax implements ModuleIO {
     turnConfig
         .signals
         .absoluteEncoderPositionAlwaysOn(true)
-        .absoluteEncoderPositionPeriodMs((int) (1000.0 / DriveConstants.odometryFrequencyHertz))
+        .absoluteEncoderPositionPeriodMs((int) (1000.0 / DriveConstants.ODOMETRY_FREQUENCY_HERTZ))
         .absoluteEncoderVelocityAlwaysOn(true)
         .absoluteEncoderVelocityPeriodMs(20)
         .appliedOutputPeriodMs(20)
@@ -188,11 +188,19 @@ public class ModuleIOSparkMax implements ModuleIO {
     // --- Turn ---
     SparkUtil.clearStickyFault();
 
-    // inputs.turnPosition = Rotation2d.fromRotations(turnRelativeEncoder.getPosition());
-    // inputs.turnVelocityRadPerSec =
-    //     Units.rotationsPerMinuteToRadiansPerSecond(turnRelativeEncoder.getVelocity());
-    // inputs.turnAppliedVolts = turnSpark.getAppliedOutput() * turnSpark.getBusVoltage();
-    // inputs.turnSupplyCurrentAmps = turnSpark.getOutputCurrent();
+    ifOk(
+        turnSpark,
+        turnRelativeEncoder::getPosition,
+        value -> inputs.turnPosition = Rotation2d.fromRotations(value));
+    ifOk(
+        turnSpark,
+        turnRelativeEncoder::getVelocity,
+        value -> inputs.turnVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(value));
+    ifOk(
+        turnSpark,
+        () -> turnSpark.getAppliedOutput() * turnSpark.getBusVoltage(),
+        value -> inputs.turnAppliedVolts = value);
+    ifOk(turnSpark, turnSpark::getOutputCurrent, value -> inputs.turnSupplyCurrentAmps = value);
 
     inputs.turnMotorConnected = turnConnectedDebounce.calculate(!SparkUtil.hasStickyFault());
 
@@ -227,7 +235,7 @@ public class ModuleIOSparkMax implements ModuleIO {
   @Override
   public void setDriveVelocity(double velocityRadsPerSec, double feedForwardVoltage) {
     driveFeedback.setReference(
-        Units.radiansToRotations(velocityRadsPerSec),
+        Units.radiansPerSecondToRotationsPerMinute(velocityRadsPerSec),
         ControlType.kVelocity,
         ClosedLoopSlot.kSlot0,
         feedForwardVoltage,
