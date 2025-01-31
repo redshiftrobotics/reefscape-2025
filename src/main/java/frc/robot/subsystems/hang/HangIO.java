@@ -9,26 +9,30 @@ public interface HangIO {
     //
   }
 
-  public void updateInputs(HangIOInputs inputs);
+  public default void updateInputs(HangIOInputs inputs) {}
 
   /**
    * Set the desired angle for the arm to travel to.
    *
    * @param setpoint The desired angle for the arm to travel to.
    */
-  public void setSetpoint(Rotation2d setpoint);
+  public default void setSetpoint(Rotation2d setpoint) {}
 
   /**
    * Get the desired angle for the arm to travel to.
    *
    * @return The angle the arm is currently traveling to.
    */
-  public double getSetpoint();
+  public default double getSetpoint() {
+    return 0;
+  }
 
   /**
    * Get the current position of the arm.
    *
    * @return The current position of the arm.
    */
-  public double getPosition();
+  public default double getPosition() {
+    return 0;
+  }
 }
