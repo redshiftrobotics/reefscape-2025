@@ -13,7 +13,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 4.0
           }
         },
         {
@@ -25,13 +25,19 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 2.5
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "P2 to D4"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 4.0
           }
         }
       ]

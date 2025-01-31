@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Add Coral",
+      "name": "placeCoralL1",
       "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
