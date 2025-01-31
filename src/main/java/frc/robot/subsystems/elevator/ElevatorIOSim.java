@@ -40,7 +40,12 @@ public class ElevatorIOSim implements ElevatorIO {
     sim.setInputVoltage(volts);
   }
 
-  public void updateMotors() {}
+  public void updateMotors() {
+    if (closedLoop) {
+      double pidVal = controller.calculate(sim.getPositionMeters());
+      sim.setInputVoltage(pidVal + feedforward.calculate(controller.getSetpoint().velocity));
+    }
+  }
 
   public void configurePID(
       double maxVelocity,

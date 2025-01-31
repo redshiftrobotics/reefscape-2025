@@ -1,15 +1,21 @@
 package frc.robot.subsystems.elevator;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import frc.robot.Constants;
 
 public class ElevatorIOSparkMax implements ElevatorIO {
   private final SparkMax motor;
   private final RelativeEncoder encoder;
+  private boolean closedLoop = false;
+  private TrapezoidProfile.Constraints constraints;
+  private ProfiledPIDController controller;
+  private ElevatorFeedforward feedforward;
 
   public ElevatorIOSparkMax() {
     motor = new SparkMax(ElevatorConstants.motorID, MotorType.kBrushless);
@@ -22,7 +28,12 @@ public class ElevatorIOSparkMax implements ElevatorIO {
     motor.setVoltage(volts);
   }
 
-  public void updateMotors() {}
+  public void updateMotors() {
+    if (closedLoop) {
+      double pidVal = controller.calculate(encoder.getPosition());
+      motor.setVoltage(pidVal + feedforward.calculate(controller.getSetpoint().velocity));
+    }
+  }
 
   public void configurePID(
       double maxVelocity,
@@ -33,9 +44,9 @@ public class ElevatorIOSparkMax implements ElevatorIO {
       double Ks,
       double Kg,
       double Kv) {
-    SparkMaxConfig config = new SparkMaxConfig();
-    config.closedLoop.pidf(Kp, Ki, Kd, 0.0, null);
-    motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    constraints = new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration);
+    controller = new ProfiledPIDController(Kp, Ki, Kd, constraints, Constants.LOOP_PERIOD_SECONDS);
+    feedforward = new ElevatorFeedforward(Ks, Kg, Kv);
   }
 
   public void stop() {
