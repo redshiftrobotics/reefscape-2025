@@ -24,8 +24,7 @@ public class HangIOSim implements HangIO {
 
   // TODO: Get values from design
   private SingleJointedArmSim armSim =
-      new SingleJointedArmSim(
-          DCMotor.getNEO(1), 1, 1, Units.inchesToMeters(18), 0, 3, true, 0, null);
+      new SingleJointedArmSim(DCMotor.getNEO(1), 1, 1, Units.inchesToMeters(18), 0, 3, true, 0);
   private Mechanism2d mech2d = new Mechanism2d(60, 60);
   private MechanismRoot2d armPivot = mech2d.getRoot("ArmPivot", 30, 30);
   private MechanismLigament2d arm =
@@ -43,6 +42,8 @@ public class HangIOSim implements HangIO {
 
   @Override
   public void updateInputs(HangIOInputs inputs) {
+    motor.set(controller.calculate(getPosition(), setpoint));
+
     armSim.setInput(motor.get() * RobotController.getBatteryVoltage());
 
     armSim.update(0.02);
