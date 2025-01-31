@@ -1,6 +1,5 @@
 package frc.robot.subsystems.hang;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface HangIO {
@@ -16,7 +15,7 @@ public interface HangIO {
    *
    * @param setpoint The desired angle for the arm to travel to.
    */
-  public default void setSetpoint(Rotation2d setpoint) {}
+  public default void setSetpoint(double setpoint) {}
 
   /**
    * Get the desired angle for the arm to travel to.

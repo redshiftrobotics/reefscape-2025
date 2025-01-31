@@ -1,7 +1,7 @@
 package frc.robot.subsystems.hang;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
@@ -23,7 +24,8 @@ public class HangIOSim implements HangIO {
 
   // TODO: Get values from design
   private SingleJointedArmSim armSim =
-      new SingleJointedArmSim(null, 0, 0, Units.inchesToMeters(18), 0, 0, false, 0, null);
+      new SingleJointedArmSim(
+          DCMotor.getNEO(1), 1, 1, Units.inchesToMeters(18), 0, 3, true, 0, null);
   private Mechanism2d mech2d = new Mechanism2d(60, 60);
   private MechanismRoot2d armPivot = mech2d.getRoot("ArmPivot", 30, 30);
   private MechanismLigament2d arm =
@@ -37,6 +39,8 @@ public class HangIOSim implements HangIO {
 
   private PIDController controller = new PIDController(0, 0, 0);
 
+  private double setpoint;
+
   @Override
   public void updateInputs(HangIOInputs inputs) {
     armSim.setInput(motor.get() * RobotController.getBatteryVoltage());
@@ -48,21 +52,23 @@ public class HangIOSim implements HangIO {
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(armSim.getCurrentDrawAmps()));
 
-    // arm
+    arm.setAngle(Units.radiansToDegrees(armSim.getAngleRads()));
+
+    SmartDashboard.putData(mech2d);
   }
 
   @Override
-  public void setSetpoint(Rotation2d setpoint) {
-    //
+  public void setSetpoint(double setpoint) {
+    this.setpoint = setpoint;
   }
 
   @Override
   public double getSetpoint() {
-    return 0;
+    return setpoint;
   }
 
   @Override
   public double getPosition() {
-    return 0;
+    return encoderSim.getDistance();
   }
 }

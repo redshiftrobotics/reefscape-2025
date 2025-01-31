@@ -38,6 +38,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.hang.Hang;
+import frc.robot.subsystems.hang.HangIO;
 import frc.robot.subsystems.hang.HangIOSim;
 import frc.robot.utility.OverrideSwitch;
 import java.util.Arrays;
@@ -85,7 +86,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(DriveConstants.FRONT_RIGHT_MODULE_CONFIG),
                 new ModuleIOSparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG));
-        hang = new Hang(new HangIO()); // TODO
+        hang = new Hang(new HangIO() {}); // TODO
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -97,7 +98,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(DriveConstants.FRONT_RIGHT_MODULE_CONFIG),
                 new ModuleIOSparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG));
-        hang = new Hang(new HangIO()); // TODO
+        hang = new Hang(new HangIO() {}); // TODO
         break;
 
       case SIM_BOT:
@@ -121,7 +122,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        hang = new Hang(new HangIO()); // TODO
+        hang = new Hang(new HangIO() {}); // TODO
         break;
     }
 
