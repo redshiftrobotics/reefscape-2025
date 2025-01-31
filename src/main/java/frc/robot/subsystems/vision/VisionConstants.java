@@ -25,6 +25,20 @@ public class VisionConstants {
               new Translation3d(Units.inchesToMeters(27.5 / 2.0 + 1.0), 0, Units.inchesToMeters(3)),
               new Rotation3d(0, Units.degreesToRadians(0), 0)));
 
+  public static final CameraConfig WOODV2_LEFT_CAMERA =
+      new CameraConfig(
+          "leftCam",
+          new Transform3d(
+              new Translation3d(0, Units.inchesToMeters(27.5 / 2.0 + 1.0), Units.inchesToMeters(3)),
+              new Rotation3d(0, Units.degreesToRadians(0), 0)));
+              
+  public static final CameraConfig WOODV2_RIGHT_CAMERA =
+      new CameraConfig(
+          "rightCam",
+          new Transform3d(
+              new Translation3d(0, -Units.inchesToMeters(27.5 / 2.0 + 1.0), Units.inchesToMeters(3)),
+              new Rotation3d(0, Units.degreesToRadians(0), 0)));
+            
   public static final AprilTagFieldLayout FIELD =
       AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 }
