@@ -359,6 +359,8 @@ public class RobotContainer {
     autoChooser.addOption("Triangle Auto", new PathPlannerAuto("Triangle Auto"));
     autoChooser.addOption("Rotate Auto", new PathPlannerAuto("Rotate Auto"));
     autoChooser.addOption("Circle Auto", new PathPlannerAuto("Circle Auto"));
+    // autoChooser.addOption("NOT-PROD HANG SIM TEST", new InstantCommand(() ->
+    // hang.setSetpoint(2)));
   }
 
   private void configureSysIds() {

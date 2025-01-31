@@ -16,4 +16,31 @@ public class Hang extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Hang Arm", inputs);
   }
+
+  /**
+   * Set the desired angle for the arm to travel to.
+   *
+   * @param setpoint The desired angle for the arm to travel to.
+   */
+  public void setSetpoint(double setpoint) {
+    io.setSetpoint(setpoint);
+  }
+
+  /**
+   * Get the desired angle for the arm to travel to.
+   *
+   * @return The angle the arm is currently traveling to.
+   */
+  public double getSetpoint() {
+    return io.getSetpoint();
+  }
+
+  /**
+   * Get the current position of the arm.
+   *
+   * @return The current position of the arm.
+   */
+  public double getPosition() {
+    return io.getPosition();
+  }
 }
