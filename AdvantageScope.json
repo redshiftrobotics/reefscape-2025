@@ -3,20 +3,27 @@
     {
       "x": -8,
       "y": -8,
-      "width": 2576,
-      "height": 1416,
+      "width": 1552,
+      "height": 832,
       "state": {
         "sidebar": {
-          "width": 324,
+          "width": 377,
           "expanded": [
-            "/RealOutputs",
+            "/RealOutputs/Odometry/Robot",
+            "/RealOutputs/SwerveStates/ModuleDesiredWheelSpeeds",
             "/RealOutputs/SwerveStates/ModuleDesiredWheelSpeeds/0",
             "/RealOutputs/SwerveStates/MeasuredWheelSpeeds/0",
+            "/RealOutputs/Odometry/Robot/rotation",
             "/RealOutputs/SwerveStates/MeasuredWheelSpeeds/0/angle",
             "/RealOutputs/SwerveStates/ModuleDesiredWheelSpeeds/0/angle",
-            "/RealOutputs/Odometry/TrajectorySetpoint/translation",
-            "/RealOutputs/Odometry/TrajectorySetpoint/rotation",
-            "/RealOutputs/Vision/frontCam"
+            "/RealOutputs",
+            "/RealOutputs/Vision/frontCam",
+            "/Vision/frontCam",
+            "/RealOutputs/Vision",
+            "/RealOutputs/Vision/rightCamera",
+            "/RealOutputs/Vision/leftCamera",
+            "/Vision/rightCamera",
+            "/RealOutputs/AutoAlignGoal"
           ]
         },
         "tabs": {
@@ -41,17 +48,27 @@
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
-                      "model": "demo8032"
+                      "model": "demo_8032"
                     }
                   },
                   {
                     "type": "swerveStates",
                     "logKey": "/RealOutputs/SwerveStates/DesiredWheelSpeeds",
                     "logType": "SwerveModuleState[]",
-                    "visible": false,
+                    "visible": true,
                     "options": {
                       "color": "#ff0000",
                       "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "/RealOutputs/Vision/tagPoses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
                     }
                   },
                   {
@@ -70,26 +87,9 @@
                     "logType": "Pose2d",
                     "visible": false,
                     "options": {
-                      "model": "2025 KitBot",
+                      "model": "crechendo_8032",
                       "color": "#00ff00"
                     }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "/RealOutputs/AutoAlignGoal",
-                    "logType": "Pose2d[]",
-                    "visible": true,
-                    "options": {
-                      "model": "demo8032",
-                      "color": "#ff00ff"
-                    }
-                  },
-                  {
-                    "type": "axes",
-                    "logKey": "/RealOutputs/Vision/tagPoses",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {}
                   },
                   {
                     "type": "ghost",
@@ -97,8 +97,8 @@
                     "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
-                      "model": "demo8032",
-                      "color": "#00ffff"
+                      "model": "demo_8032",
+                      "color": "#ff00ff"
                     }
                   },
                   {
@@ -107,8 +107,18 @@
                     "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
-                      "model": "demo8032",
+                      "model": "demo_8032",
                       "color": "#ffff00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/AutoAlignGoal",
+                    "logType": "Pose2d[]",
+                    "visible": true,
+                    "options": {
+                      "model": "crechendo_8032",
+                      "color": "#00ff00"
                     }
                   }
                 ],
@@ -117,17 +127,17 @@
               },
               "controllerUUID": "e8hgomb1yslv0cwpvfxkohzvzsz5j7n2",
               "renderer": {
-                "cameraIndex": -3,
+                "cameraIndex": -5,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  10.28116,
-                  1.5748000000000002,
-                  6.295394842760901e-16
+                  5.468866627616376,
+                  2.506454220208772,
+                  3.6563175284107627
                 ],
                 "cameraTarget": [
-                  0,
-                  0.5,
-                  0
+                  9.795945915909991,
+                  -3.179106978197895,
+                  -6.179737945148541
                 ]
               },
               "controlsHeight": 200
@@ -145,47 +155,28 @@
                     "options": {}
                   },
                   {
-                    "type": "trajectory",
-                    "logKey": "/RealOutputs/Odometry/Trajectory",
-                    "logType": "Pose2d[]",
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/Vision/robotPosesRejected",
+                    "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
-                      "color": "#00ff00",
-                      "size": "normal"
-                    }
-                  },
-                  {
-                    "type": "arrow",
-                    "logKey": "/RealOutputs/AutoAlignGoal",
-                    "logType": "Pose2d[]",
-                    "visible": true,
-                    "options": {
-                      "position": "center"
+                      "color": "#ffff00"
                     }
                   },
                   {
                     "type": "ghost",
                     "logKey": "/RealOutputs/Vision/robotPosesAccepted",
                     "logType": "Pose3d[]",
-                    "visible": false,
+                    "visible": true,
                     "options": {
                       "color": "#ff00ff"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "/RealOutputs/Vision/robotPosesRejected",
-                    "logType": "Pose3d[]",
-                    "visible": false,
-                    "options": {
-                      "color": "#ffff00"
                     }
                   }
                 ],
                 "game": "2025 Field",
                 "bumpers": "auto",
                 "origin": "blue",
-                "orientation": 1,
+                "orientation": 0,
                 "size": 30
               },
               "controllerUUID": "rdy54xgxb86v999c510rijuebtpjrgc5",
@@ -317,7 +308,7 @@
               "title": "Joysticks",
               "controller": [
                 "Xbox Controller (White)",
-                "None",
+                "Xbox Controller (Blue)",
                 "None",
                 "None",
                 "None",
@@ -457,6 +448,18 @@
       }
     }
   ],
-  "satellites": [],
-  "version": "4.1.1"
+  "satellites": [
+    {
+      "x": 316,
+      "y": 180,
+      "width": 967,
+      "height": 475,
+      "state": {
+        "type": 2,
+        "visualizer": null
+      },
+      "uuid": "rdy54xgxb86v999c510rijuebtpjrgc5"
+    }
+  ],
+  "version": "4.1.0"
 }

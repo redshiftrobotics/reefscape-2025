@@ -3,6 +3,7 @@ package frc.robot.commands;
 import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -20,7 +21,13 @@ public class AdaptiveAutoAlignCommands {
   private int offset = 0;
 
   public AdaptiveAutoAlignCommands(List<Pose2d> poses, Transform2d offset) {
-    this.poses = poses.stream().map(pose -> pose.transformBy(offset)).toList();
+    this.poses =
+        poses.stream()
+            .map(
+                pose ->
+                    pose.transformBy(offset)
+                        .transformBy(new Transform2d(0, 0, Rotation2d.kCW_90deg)))
+            .toList();
   }
 
   private Pose2d getPose(int index) {
