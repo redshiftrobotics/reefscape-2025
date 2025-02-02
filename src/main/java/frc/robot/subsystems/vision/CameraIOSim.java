@@ -1,6 +1,5 @@
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.subsystems.vision.VisionConstants.CameraConfig;
@@ -26,7 +25,7 @@ public class CameraIOSim extends CameraIOPhotonVision {
     SimCameraProperties cameraProperties = new SimCameraProperties();
 
     // These values depend on photonvision config, update them as well as in assets config
-    cameraProperties.setCalibration(800, 600, Rotation2d.fromDegrees(100));
+    cameraProperties.setCalibration(800, 600, Rotation2d.fromDegrees(70));
     cameraProperties.setCalibError(0.01, 0.10);
     cameraProperties.setFPS(15);
 
@@ -43,6 +42,7 @@ public class CameraIOSim extends CameraIOPhotonVision {
     // --- Vision Sim ---
     visionSim = new VisionSystemSim(config.cameraName());
     visionSim.addCamera(cameraSim, config.robotToCamera());
+    visionSim.addAprilTags(VisionConstants.FIELD);
   }
 
   @Override
@@ -50,13 +50,5 @@ public class CameraIOSim extends CameraIOPhotonVision {
     Pose2d robotPose = robotPoseSupplier.get();
     visionSim.update(robotPose);
     super.updateInputs(inputs);
-  }
-
-  @Override
-  public void setAprilTagFieldLayout(AprilTagFieldLayout layout) {
-    super.setAprilTagFieldLayout(layout);
-
-    visionSim.clearAprilTags();
-    visionSim.addAprilTags(layout);
   }
 }

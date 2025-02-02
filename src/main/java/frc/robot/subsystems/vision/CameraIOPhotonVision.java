@@ -1,7 +1,7 @@
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.subsystems.vision.VisionConstants.CameraConfig;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +16,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 public class CameraIOPhotonVision implements CameraIO {
   private final PhotonCamera camera;
   private final PhotonPoseEstimator photonPoseEstimator;
+  private final Transform3d robotToCamera;
 
   public CameraIOPhotonVision(CameraConfig config) {
 
@@ -24,6 +25,8 @@ public class CameraIOPhotonVision implements CameraIO {
 
     camera.setDriverMode(false);
     camera.setLED(VisionLEDMode.kOff);
+
+    robotToCamera = config.robotToCamera();
 
     // --- Setup Pose Estimator ---
 
@@ -51,11 +54,6 @@ public class CameraIOPhotonVision implements CameraIO {
   }
 
   @Override
-  public void setAprilTagFieldLayout(AprilTagFieldLayout fieldTags) {
-    photonPoseEstimator.setFieldTags(fieldTags);
-  }
-
-  @Override
   public void updateInputs(CameraIOInputs inputs) {
 
     List<PhotonPipelineResult> pipelineResults = camera.getAllUnreadResults();
@@ -63,6 +61,7 @@ public class CameraIOPhotonVision implements CameraIO {
     Pose3d[] estimatedRobotPose = new Pose3d[pipelineResults.size()];
     double[] timestampSecondFPGA = new double[pipelineResults.size()];
     int[][] tagsUsed = new int[pipelineResults.size()][];
+    PhotonTrackedTarget[][] targets = new PhotonTrackedTarget[pipelineResults.size()][];
     boolean[] hasNewData = new boolean[pipelineResults.size()];
 
     inputs.updatesReceived = pipelineResults.size();
@@ -77,6 +76,7 @@ public class CameraIOPhotonVision implements CameraIO {
 
         estimatedRobotPose[i] = estimateRobotPose.estimatedPose;
         timestampSecondFPGA[i] = estimateRobotPose.timestampSeconds;
+        targets[i] = (PhotonTrackedTarget[]) estimateRobotPose.targetsUsed.toArray();
         tagsUsed[i] =
             estimateRobotPose.targetsUsed.stream()
                 .map(PhotonTrackedTarget::getFiducialId)
@@ -87,6 +87,7 @@ public class CameraIOPhotonVision implements CameraIO {
         estimatedRobotPose[i] = Pose3d.kZero;
         timestampSecondFPGA[i] = 0;
         tagsUsed[i] = new int[0];
+        targets[i] = new PhotonTrackedTarget[0];
         hasNewData[i] = false;
       }
     }
@@ -101,5 +102,9 @@ public class CameraIOPhotonVision implements CameraIO {
   @Override
   public String getCameraName() {
     return camera.getName();
+  }
+  @Override
+  public Transform3d getRobotToCamera() {
+    return robotToCamera;
   }
 }

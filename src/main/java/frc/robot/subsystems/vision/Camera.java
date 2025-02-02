@@ -11,6 +11,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
+
 import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.Optional;
@@ -18,6 +19,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 /** Wrapper for CameraIO layer */
 public class Camera {
@@ -51,6 +54,9 @@ public class Camera {
 
   private final Alert missingCameraAlert;
 
+  private int singleTagId = 0;
+  private VisionResult[] singleTagResults;
+
   public static record VisionResult(
       boolean hasNewData,
       Pose3d estimatedRobotPose,
@@ -58,7 +64,22 @@ public class Camera {
       int[] tagsUsed,
       Pose3d[] tagPositionsOnField,
       Matrix<N3, N1> standardDeviation,
-      VisionResultStatus status) {}
+      VisionResultStatus status) {
+      
+    public VisionResult() {
+      this(
+          false,
+          new Pose3d(),
+          0.0,
+          new int[0],
+          new Pose3d[0],
+          VecBuilder.fill(0,0,0),
+          VisionResultStatus.NO_DATA
+      );
+    }
+
+  }
+  
 
   /**
    * Create a new robot camera with IO layer
@@ -68,7 +89,6 @@ public class Camera {
   public Camera(CameraIO io) {
     this.io = io;
 
-    io.setAprilTagFieldLayout(VisionConstants.FIELD);
     this.tagsIdsOnField =
         VisionConstants.FIELD.getTags().stream().map((tag) -> tag.ID).collect(Collectors.toSet());
 
@@ -88,34 +108,62 @@ public class Camera {
     missingCameraAlert.set(!inputs.connected);
 
     results = new VisionResult[inputs.updatesReceived];
+    singleTagResults = new VisionResult[inputs.updatesReceived];
+    
+
     for (int i = 0; i < inputs.updatesReceived; i++) {
       Pose3d[] tagPositionsOnField = getTagPositionsOnField(inputs.tagsUsed[i]);
 
       if (inputs.hasNewData[i]) {
-        results[i] =
-            new VisionResult(
-                true,
-                inputs.estimatedRobotPose[i],
-                inputs.timestampSecondFPGA[i],
-                inputs.tagsUsed[i],
-                tagPositionsOnField,
-                getStandardDeviations(tagPositionsOnField, inputs.estimatedRobotPose[i]),
-                lastRobotPoseSupplier == null
-                    ? getStatus(inputs.estimatedRobotPose[i], inputs.tagsUsed[i])
-                    : getStatus(
-                        inputs.estimatedRobotPose[i],
-                        inputs.tagsUsed[i],
-                        lastRobotPoseSupplier.get()));
+        results[i] = new VisionResult(
+            true,
+            inputs.estimatedRobotPose[i],
+            inputs.timestampSecondFPGA[i],
+            inputs.tagsUsed[i],
+            tagPositionsOnField,
+            getStandardDeviations(tagPositionsOnField, inputs.estimatedRobotPose[i]),
+            lastRobotPoseSupplier == null
+                ? getStatus(inputs.estimatedRobotPose[i], inputs.tagsUsed[i])
+                : getStatus(
+                    inputs.estimatedRobotPose[i],
+                    inputs.tagsUsed[i],
+                    lastRobotPoseSupplier.get()
+                )
+        );
+        /* inputs.targets is a 2D array, PhotonTrackedTarget[][]
+         * This code takes all targets from a specific result, inputs.targets[i]
+         * and filters through them for ones matching the singleTagId.
+         */
+        PhotonTrackedTarget[] resultTargets = 
+            (PhotonTrackedTarget[]) Arrays.stream(inputs.targets[i])
+                .filter(possibleTarget -> possibleTarget.fiducialId == singleTagId).toArray();
+        if (resultTargets.length == 0) {
+          singleTagResults[i] = new VisionResult();
+          continue;
+        }
+        
+        PhotonTrackedTarget target = resultTargets[0];
+        Pose3d estPose = PhotonUtils.estimateFieldToRobotAprilTag(
+            target.bestCameraToTarget,
+            VisionConstants.FIELD.getTagPose(target.fiducialId).get(),
+            io.getRobotToCamera());
+        Pose3d tagPose = VisionConstants.FIELD.getTagPose(target.fiducialId).get();
+        results[i] = new VisionResult(
+            true,
+            estPose,
+            inputs.timestampSecondFPGA[i],
+            new int[] {target.getFiducialId()},
+            new Pose3d[] {tagPose},
+            getStandardDeviations(new Pose3d[] {tagPose}, estPose),
+            lastRobotPoseSupplier == null
+                ? getStatus(estPose, new int[] {target.getFiducialId()})
+                : getStatus(estPose, new int[] {target.getFiducialId()}, lastRobotPoseSupplier.get())
+            
+            
+        );
       } else {
-        results[i] =
-            new VisionResult(
-                false,
-                null,
-                0,
-                new int[0],
-                new Pose3d[0],
-                VecBuilder.fill(0, 0, 0),
-                VisionResultStatus.NO_DATA);
+        results[i] = new VisionResult();
+        singleTagResults[i] = new VisionResult();
       }
     }
   }
@@ -126,6 +174,10 @@ public class Camera {
 
   public VisionResult[] getResults() {
     return results;
+  }
+
+  public VisionResult[] getSingleTagResults() {
+    return singleTagResults;
   }
 
   private Pose3d[] getTagPositionsOnField(int[] tagsUsed) {
@@ -186,12 +238,16 @@ public class Camera {
       return VisionResultStatus.NOT_CLOSE_ENOUGH_TO_GYRO_ROTATION;
     }
 
-    if (estimatedRobotPose2d.getTranslation().getDistance(lastRobotPose.getTranslation())
-        > maxValidDistanceAwayFromCurrentEstimateMeters.get()) {
+    if (estimatedRobotPose2d.getTranslation()
+        .getDistance(lastRobotPose.getTranslation()) > maxValidDistanceAwayFromCurrentEstimateMeters.get()) {
       return VisionResultStatus.TOO_FAR_FROM_EXISTING_ESTIMATE;
     }
 
     return status;
+  }
+  
+  public void setSingleTagId(int fiducialId) {
+    singleTagId = fiducialId;
   }
 
   private VisionResultStatus getStatus(Pose3d estimatedRobotPose, int[] tagsUsed) {
