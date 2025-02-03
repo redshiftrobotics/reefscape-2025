@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Rotate Forward"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Rotate Backward"
+            "pathName": "Rotate"
           }
         }
       ]

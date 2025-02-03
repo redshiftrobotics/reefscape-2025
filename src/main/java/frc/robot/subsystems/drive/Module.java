@@ -9,6 +9,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.robot.Constants;
+import frc.robot.utility.tunable.LoggedTunableNumber;
+import frc.robot.utility.tunable.LoggedTunableNumberFactory;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -16,6 +18,18 @@ import org.littletonrobotics.junction.Logger;
  * functionality for using each module regardless of hardware specifics.
  */
 public class Module {
+
+  private static final LoggedTunableNumberFactory driveFeedbackFactory =
+      new LoggedTunableNumberFactory("Drive/Module");
+
+  private static final LoggedTunableNumber driveKp =
+      driveFeedbackFactory.getNumber("DriveKp", ModuleConstants.DRIVE_FEEDBACK.Kp());
+  private static final LoggedTunableNumber driveKd =
+      driveFeedbackFactory.getNumber("DriveKd", ModuleConstants.DRIVE_FEEDBACK.Kd());
+  private static final LoggedTunableNumber turnKp =
+      driveFeedbackFactory.getNumber("TurnKp", ModuleConstants.TURN_FEEDBACK.Kp());
+  private static final LoggedTunableNumber turnKd =
+      driveFeedbackFactory.getNumber("TurnKd", ModuleConstants.TURN_FEEDBACK.Kd());
 
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
@@ -41,13 +55,13 @@ public class Module {
 
     driveFeedforward =
         new SimpleMotorFeedforward(
-            DriveConstants.driveFeedforward.Ks(),
-            DriveConstants.driveFeedforward.Kv(),
-            DriveConstants.driveFeedforward.Ka(),
+            ModuleConstants.DRIVE_FEED_FORWARD.Ks(),
+            ModuleConstants.DRIVE_FEED_FORWARD.Kv(),
+            ModuleConstants.DRIVE_FEED_FORWARD.Ka(),
             Constants.LOOP_PERIOD_SECONDS);
 
-    io.setDrivePID(DriveConstants.driveFeedback.Kp(), 0, DriveConstants.driveFeedback.Kd());
-    io.setTurnPID(DriveConstants.turnFeedback.Kp(), 0, DriveConstants.turnFeedback.Kd());
+    io.setDrivePID(driveKp.get(), 0, driveKd.get());
+    io.setTurnPID(turnKp.get(), 0, turnKd.get());
 
     setBrakeMode(true);
 
@@ -71,6 +85,23 @@ public class Module {
     Logger.processInputs("Drive/" + toString(), inputs);
     io.updateInputs(inputs);
 
+    // Update tunable numbers
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> {
+          io.setDrivePID(values[0], 0, values[1]);
+        },
+        driveKp,
+        driveKd);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> {
+          io.setTurnPID(values[0], 0, values[1]);
+        },
+        turnKp,
+        turnKd);
+
     // Update alerts
     driveDisconnectedAlert.set(!inputs.driveMotorConnected);
     turnDisconnectedAlert.set(!inputs.turnMotorConnected);
@@ -86,7 +117,7 @@ public class Module {
 
     for (int i = 0; i < sampleCount; i++) {
 
-      double positionMeters = inputs.odometryDrivePositionsRad[i] * DriveConstants.wheelRadius;
+      double positionMeters = inputs.odometryDrivePositionsRad[i] * ModuleConstants.WHEEL_RADIUS;
       Rotation2d angle = inputs.odometryTurnPositions[i];
 
       odometryPositions[i] = new SwerveModulePosition(positionMeters, angle);
@@ -104,13 +135,10 @@ public class Module {
 
   /** Runs the module with the specified setpoint state. */
   public void setSpeeds(SwerveModuleState state) {
-    // Optimize state based on current angle
-    // Controllers run in "periodic" when the setpoint is not null
-
     state.optimize(getAngle());
     state.cosineScale(getAngle());
 
-    double velocityRadiansPerSecond = state.speedMetersPerSecond / DriveConstants.wheelRadius;
+    double velocityRadiansPerSecond = state.speedMetersPerSecond / ModuleConstants.WHEEL_RADIUS;
     double angleRadians = state.angle.getRadians();
 
     io.setDriveVelocity(
@@ -179,12 +207,12 @@ public class Module {
 
   /** Returns the current drive position of the module in meters. */
   private double getPositionMeters() {
-    return inputs.drivePositionRad * DriveConstants.wheelRadius;
+    return inputs.drivePositionRad * ModuleConstants.WHEEL_RADIUS;
   }
 
   /** Returns the current drive velocity of the module in meters per second. */
   private double getVelocityMetersPerSec() {
-    return inputs.driveVelocityRadPerSec * DriveConstants.wheelRadius;
+    return inputs.driveVelocityRadPerSec * ModuleConstants.WHEEL_RADIUS;
   }
 
   // --- Characterization ---

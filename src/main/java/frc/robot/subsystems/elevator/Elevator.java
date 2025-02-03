@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Elevator extends SubsystemBase {
   private final ElevatorIO io;
 
-  /** Creates a new Flywheel. */
+  /** Creates a new Elevator. */
   public Elevator(ElevatorIO io) {
     this.io = io;
   }

@@ -2,7 +2,6 @@ name: Build
 
 on:
   push:
-  pull_request: # Finally :)
 
 jobs:
   build-gradle-project:
@@ -17,4 +16,4 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
       - name: Build robot code
-        run: ./gradlew build # TODO: Run unit tests once those are set up
+        run: ./gradlew build
