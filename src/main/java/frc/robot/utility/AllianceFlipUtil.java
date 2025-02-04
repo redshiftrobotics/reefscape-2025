@@ -6,10 +6,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import java.util.Optional;
 
 /** Utility functions for flipping from the blue to red alliance. */
 public class AllianceFlipUtil {
+
+  public static final Alliance DEFAULT_ALLIANCE = Alliance.Blue;
 
   private AllianceFlipUtil() {}
 
@@ -27,9 +28,9 @@ public class AllianceFlipUtil {
   public static Pose2d apply(Pose2d pose) {
     return shouldFlip() ? FlippingUtil.flipFieldPose(pose) : pose;
   }
+  
   /** Get whether to flip. If alliance is blue or unknown don't flip, if it is red then flip. */
   public static boolean shouldFlip() {
-    Optional<Alliance> alliance = DriverStation.getAlliance();
-    return alliance.isPresent() && alliance.get() == Alliance.Red;
+    return DriverStation.getAlliance().orElse(DEFAULT_ALLIANCE).equals(Alliance.Red);
   }
 }
