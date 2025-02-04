@@ -28,7 +28,7 @@ public class AllianceFlipUtil {
   public static Pose2d apply(Pose2d pose) {
     return shouldFlip() ? FlippingUtil.flipFieldPose(pose) : pose;
   }
-  
+
   /** Get whether to flip. If alliance is blue or unknown don't flip, if it is red then flip. */
   public static boolean shouldFlip() {
     return DriverStation.getAlliance().orElse(DEFAULT_ALLIANCE).equals(Alliance.Red);
