@@ -9,21 +9,6 @@
         "sidebar": {
           "width": 377,
           "expanded": [
-            "/RealOutputs/Odometry/Robot",
-            "/RealOutputs/SwerveStates/ModuleDesiredWheelSpeeds",
-            "/RealOutputs/SwerveStates/ModuleDesiredWheelSpeeds/0",
-            "/RealOutputs/SwerveStates/MeasuredWheelSpeeds/0",
-            "/RealOutputs/Odometry/Robot/rotation",
-            "/RealOutputs/SwerveStates/MeasuredWheelSpeeds/0/angle",
-            "/RealOutputs/SwerveStates/ModuleDesiredWheelSpeeds/0/angle",
-            "/RealOutputs",
-            "/RealOutputs/Vision/frontCam",
-            "/Vision/frontCam",
-            "/RealOutputs/Vision",
-            "/RealOutputs/Vision/rightCamera",
-            "/RealOutputs/Vision/leftCamera",
-            "/Vision/rightCamera",
-            "/RealOutputs/AutoAlignGoal"
           ]
         },
         "tabs": {
@@ -87,7 +72,7 @@
                     "logType": "Pose2d",
                     "visible": false,
                     "options": {
-                      "model": "crechendo_8032",
+                      "model": "demo_8032",
                       "color": "#00ff00"
                     }
                   },
@@ -117,7 +102,7 @@
                     "logType": "Pose2d[]",
                     "visible": true,
                     "options": {
-                      "model": "crechendo_8032",
+                      "model": "demo_8032",
                       "color": "#00ff00"
                     }
                   }
