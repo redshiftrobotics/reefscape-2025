@@ -24,7 +24,6 @@ public class AdaptiveAutoAlignCommands {
   }
 
   private Pose2d getPose(int index) {
-    System.out.println(AllianceFlipUtil.shouldFlip());
     return AllianceFlipUtil.apply(poses.get(index));
   }
 
