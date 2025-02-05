@@ -3,12 +3,13 @@
     {
       "x": -8,
       "y": -8,
-      "width": 1552,
-      "height": 832,
+      "width": 2560,
+      "height": 1400,
       "state": {
         "sidebar": {
-          "width": 377,
+          "width": 324,
           "expanded": [
+            "/RealOutputs"
           ]
         },
         "tabs": {
@@ -40,7 +41,7 @@
                     "type": "swerveStates",
                     "logKey": "/RealOutputs/SwerveStates/DesiredWheelSpeeds",
                     "logType": "SwerveModuleState[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#ff0000",
                       "arrangement": "0,1,2,3"
@@ -50,7 +51,7 @@
                     "type": "vision",
                     "logKey": "/RealOutputs/Vision/tagPoses",
                     "logType": "Pose3d[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#00ff00",
                       "size": "normal"
@@ -78,12 +79,29 @@
                   },
                   {
                     "type": "ghost",
+                    "logKey": "/RealOutputs/AutoAlignGoal",
+                    "logType": "Pose2d[]",
+                    "visible": false,
+                    "options": {
+                      "model": "demo_8032",
+                      "color": "#00ff00"
+                    }
+                  },
+                  {
+                    "type": "axes",
+                    "logKey": "/RealOutputs/Vision/tagPoses",
+                    "logType": "Pose3d[]",
+                    "visible": false,
+                    "options": {}
+                  },
+                  {
+                    "type": "ghost",
                     "logKey": "/RealOutputs/Vision/robotPosesAccepted",
                     "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
                       "model": "demo_8032",
-                      "color": "#ff00ff"
+                      "color": "#00ffff"
                     }
                   },
                   {
@@ -95,16 +113,6 @@
                       "model": "demo_8032",
                       "color": "#ffff00"
                     }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "/RealOutputs/AutoAlignGoal",
-                    "logType": "Pose2d[]",
-                    "visible": true,
-                    "options": {
-                      "model": "demo_8032",
-                      "color": "#00ff00"
-                    }
                   }
                 ],
                 "game": "2025 Field",
@@ -112,17 +120,17 @@
               },
               "controllerUUID": "e8hgomb1yslv0cwpvfxkohzvzsz5j7n2",
               "renderer": {
-                "cameraIndex": -5,
+                "cameraIndex": -3,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  5.468866627616376,
-                  2.506454220208772,
-                  3.6563175284107627
+                  10.28116,
+                  1.5748000000000002,
+                  6.295394842760901e-16
                 ],
                 "cameraTarget": [
-                  9.795945915909991,
-                  -3.179106978197895,
-                  -6.179737945148541
+                  0,
+                  0.5,
+                  0
                 ]
               },
               "controlsHeight": 200
@@ -140,28 +148,47 @@
                     "options": {}
                   },
                   {
-                    "type": "ghost",
-                    "logKey": "/RealOutputs/Vision/robotPosesRejected",
-                    "logType": "Pose3d[]",
+                    "type": "trajectory",
+                    "logKey": "/RealOutputs/Odometry/Trajectory",
+                    "logType": "Pose2d[]",
                     "visible": true,
                     "options": {
-                      "color": "#ffff00"
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "arrow",
+                    "logKey": "/RealOutputs/AutoAlignGoal",
+                    "logType": "Pose2d[]",
+                    "visible": true,
+                    "options": {
+                      "position": "center"
                     }
                   },
                   {
                     "type": "ghost",
                     "logKey": "/RealOutputs/Vision/robotPosesAccepted",
                     "logType": "Pose3d[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#ff00ff"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/Vision/robotPosesRejected",
+                    "logType": "Pose3d[]",
+                    "visible": false,
+                    "options": {
+                      "color": "#ffff00"
                     }
                   }
                 ],
                 "game": "2025 Field",
                 "bumpers": "auto",
                 "origin": "blue",
-                "orientation": 0,
+                "orientation": 1,
                 "size": 30
               },
               "controllerUUID": "rdy54xgxb86v999c510rijuebtpjrgc5",
@@ -293,7 +320,7 @@
               "title": "Joysticks",
               "controller": [
                 "Xbox Controller (White)",
-                "Xbox Controller (Blue)",
+                "None",
                 "None",
                 "None",
                 "None",
@@ -433,18 +460,6 @@
       }
     }
   ],
-  "satellites": [
-    {
-      "x": 316,
-      "y": 180,
-      "width": 967,
-      "height": 475,
-      "state": {
-        "type": 2,
-        "visualizer": null
-      },
-      "uuid": "rdy54xgxb86v999c510rijuebtpjrgc5"
-    }
-  ],
-  "version": "4.1.0"
+  "satellites": [],
+  "version": "4.1.1"
 }
