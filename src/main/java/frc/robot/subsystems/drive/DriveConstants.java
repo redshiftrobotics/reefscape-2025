@@ -1,7 +1,6 @@
 package frc.robot.subsystems.drive;
 
 import com.pathplanner.lib.path.PathConstraints;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -125,8 +124,8 @@ public class DriveConstants {
 
   public static final PIDConstants TRANSLATION_CONTROLLER_CONSTANTS = new PIDConstants(5.0, 0.0, 1);
   public static final PIDConstants ROTATION_CONTROLLER_CONSTANTS = new PIDConstants(5.0, 0, 1);
-  public static final Pose2d POSE_POSITION_TOLERANCE =
-      new Pose2d(Units.inchesToMeters(0.5), Units.inchesToMeters(0.5), Rotation2d.fromDegrees(1));
+  public static final double TRANSLATION_TOLERANCE = Units.inchesToMeters(0.5);
+  public static final Rotation2d ROTATION_TOLERANCE = Rotation2d.fromDegrees(1);
 
   // --- Heading Controller Config ---
 

@@ -283,6 +283,17 @@ public class RobotContainer {
           .or(RobotModeTriggers.disabled())
           .onTrue(drive.runOnce(drive::stop).withName("Stop and Cancel"));
 
+      driverXbox
+          .rightBumper()
+          .whileTrue(
+              DriveCommands.joystickHeadingDrive(
+                      drive,
+                      input::getTranslationMetersPerSecond,
+                      input::getHeadingDirection,
+                      level::getCurrentSpeedLevel,
+                      useFieldRelative::getAsBoolean)
+                  .withName("Heading Drive"));
+
       if (includeAutoAlign) {
         // Align to reef
         final AdaptiveAutoAlignCommands reefAlignmentCommands =
