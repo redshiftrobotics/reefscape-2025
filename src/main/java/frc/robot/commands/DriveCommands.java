@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.utility.AllianceFlipUtil;
-
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -91,7 +90,9 @@ public class DriveCommands {
                 controller.setGoal(heading.get().getRadians());
               }
 
-              double omega = controller.calculate(AllianceFlipUtil.apply(drive.getRobotPose().getRotation()).getRadians());
+              double omega =
+                  controller.calculate(
+                      AllianceFlipUtil.apply(drive.getRobotPose().getRotation()).getRadians());
 
               ChassisSpeeds speeds =
                   SpeedLevelController.apply(
