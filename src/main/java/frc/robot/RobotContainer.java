@@ -95,7 +95,10 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
-        vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.FRONT_CAMERA));
+        vision =
+            new AprilTagVision(
+                new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA),
+                new CameraIOPhotonVision(VisionConstants.WOODV2_RIGHT_CAMERA));
         break;
 
       case T_SHIRT_CANNON_CHASSIS:

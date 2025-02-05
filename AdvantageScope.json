@@ -9,14 +9,6 @@
         "sidebar": {
           "width": 324,
           "expanded": [
-            "/RealOutputs",
-            "/RealOutputs/SwerveStates/ModuleDesiredWheelSpeeds/0",
-            "/RealOutputs/SwerveStates/MeasuredWheelSpeeds/0",
-            "/RealOutputs/SwerveStates/MeasuredWheelSpeeds/0/angle",
-            "/RealOutputs/SwerveStates/ModuleDesiredWheelSpeeds/0/angle",
-            "/RealOutputs/Odometry/TrajectorySetpoint/translation",
-            "/RealOutputs/Odometry/TrajectorySetpoint/rotation",
-            "/RealOutputs/Vision/frontCam"
           ]
         },
         "tabs": {
@@ -55,6 +47,16 @@
                     }
                   },
                   {
+                    "type": "vision",
+                    "logKey": "/RealOutputs/Vision/tagPoses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
                     "type": "trajectory",
                     "logKey": "/RealOutputs/Odometry/Trajectory",
                     "logType": "Pose2d[]",
@@ -70,7 +72,7 @@
                     "logType": "Pose2d",
                     "visible": false,
                     "options": {
-                      "model": "2025 KitBot",
+                      "model": "demo_8032",
                       "color": "#00ff00"
                     }
                   },
@@ -109,6 +111,16 @@
                     "options": {
                       "model": "demo8032",
                       "color": "#ffff00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/AutoAlignGoal",
+                    "logType": "Pose2d[]",
+                    "visible": true,
+                    "options": {
+                      "model": "demo_8032",
+                      "color": "#00ff00"
                     }
                   }
                 ],

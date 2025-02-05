@@ -52,11 +52,21 @@ public class AprilTagVision extends SubsystemBase {
     for (Camera camera : cameras) {
       String cameraRoot = root + "/" + camera.getCameraName();
 
+      if (DO_CAMERA_LOGGING && camera.getResults().length == 0) {
+        Logger.recordOutput(cameraRoot + "/tagsUsedPositions", new Pose3d[] {});
+        Logger.recordOutput(cameraRoot + "/positionEstimate", new Pose3d[] {});
+        Logger.recordOutput(cameraRoot + "/status", VisionResultStatus.NO_DATA);
+        Logger.recordOutput(cameraRoot + "/success", false);
+      }
+
       // Loop through all results that the camera has
       for (VisionResult result : camera.getResults()) {
 
         if (!result.hasNewData()) {
           Logger.recordOutput(cameraRoot + "/tagsUsedPositions", new Pose3d[] {});
+          Logger.recordOutput(cameraRoot + "/positionEstimate", new Pose3d[] {});
+          Logger.recordOutput(cameraRoot + "/status", VisionResultStatus.NO_DATA);
+          Logger.recordOutput(cameraRoot + "/success", false);
           continue;
         }
 
@@ -76,8 +86,8 @@ public class AprilTagVision extends SubsystemBase {
 
           Logger.recordOutput(cameraRoot + "/positionEstimate", visionEstimate.robotPose());
 
-          Logger.recordOutput(cameraRoot + "/status", visionEstimate.status);
-          Logger.recordOutput(cameraRoot + "/statusIsSuccess", visionEstimate.status.isSuccess());
+          Logger.recordOutput(cameraRoot + "/status", visionEstimate.status());
+          Logger.recordOutput(cameraRoot + "/success", visionEstimate.status().isSuccess());
         }
 
         if (DO_SUMMARY_LOGGING) {
