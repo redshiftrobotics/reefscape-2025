@@ -3,12 +3,13 @@
     {
       "x": -8,
       "y": -8,
-      "width": 2576,
-      "height": 1416,
+      "width": 2560,
+      "height": 1400,
       "state": {
         "sidebar": {
           "width": 324,
           "expanded": [
+            "/RealOutputs"
           ]
         },
         "tabs": {
@@ -33,7 +34,7 @@
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
-                      "model": "demo8032"
+                      "model": "demo_8032"
                     }
                   },
                   {
@@ -50,7 +51,7 @@
                     "type": "vision",
                     "logKey": "/RealOutputs/Vision/tagPoses",
                     "logType": "Pose3d[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#00ff00",
                       "size": "normal"
@@ -80,17 +81,17 @@
                     "type": "ghost",
                     "logKey": "/RealOutputs/AutoAlignGoal",
                     "logType": "Pose2d[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {
-                      "model": "demo8032",
-                      "color": "#ff00ff"
+                      "model": "demo_8032",
+                      "color": "#00ff00"
                     }
                   },
                   {
                     "type": "axes",
                     "logKey": "/RealOutputs/Vision/tagPoses",
                     "logType": "Pose3d[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {}
                   },
                   {
@@ -99,7 +100,7 @@
                     "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
-                      "model": "demo8032",
+                      "model": "demo_8032",
                       "color": "#00ffff"
                     }
                   },
@@ -109,18 +110,8 @@
                     "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
-                      "model": "demo8032",
-                      "color": "#ffff00"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "/RealOutputs/AutoAlignGoal",
-                    "logType": "Pose2d[]",
-                    "visible": true,
-                    "options": {
                       "model": "demo_8032",
-                      "color": "#00ff00"
+                      "color": "#ffff00"
                     }
                   }
                 ],
