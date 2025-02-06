@@ -23,13 +23,13 @@ public class Module {
       new LoggedTunableNumberFactory("Drive/Module");
 
   private static final LoggedTunableNumber driveKp =
-      driveFeedbackFactory.getNumber("DriveKp", DriveConstants.DRIVE_FEEDBACK.Kp());
+      driveFeedbackFactory.getNumber("DriveKp", ModuleConstants.DRIVE_FEEDBACK.Kp());
   private static final LoggedTunableNumber driveKd =
-      driveFeedbackFactory.getNumber("DriveKd", DriveConstants.DRIVE_FEEDBACK.Kd());
+      driveFeedbackFactory.getNumber("DriveKd", ModuleConstants.DRIVE_FEEDBACK.Kd());
   private static final LoggedTunableNumber turnKp =
-      driveFeedbackFactory.getNumber("TurnKp", DriveConstants.TURN_FEEDBACK.Kp());
+      driveFeedbackFactory.getNumber("TurnKp", ModuleConstants.TURN_FEEDBACK.Kp());
   private static final LoggedTunableNumber turnKd =
-      driveFeedbackFactory.getNumber("TurnKd", DriveConstants.TURN_FEEDBACK.Kd());
+      driveFeedbackFactory.getNumber("TurnKd", ModuleConstants.TURN_FEEDBACK.Kd());
 
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
@@ -55,9 +55,9 @@ public class Module {
 
     driveFeedforward =
         new SimpleMotorFeedforward(
-            DriveConstants.DRIVE_FEED_FORWARD.Ks(),
-            DriveConstants.DRIVE_FEED_FORWARD.Kv(),
-            DriveConstants.DRIVE_FEED_FORWARD.Ka(),
+            ModuleConstants.DRIVE_FEED_FORWARD.Ks(),
+            ModuleConstants.DRIVE_FEED_FORWARD.Kv(),
+            ModuleConstants.DRIVE_FEED_FORWARD.Ka(),
             Constants.LOOP_PERIOD_SECONDS);
 
     io.setDrivePID(driveKp.get(), 0, driveKd.get());
@@ -117,7 +117,7 @@ public class Module {
 
     for (int i = 0; i < sampleCount; i++) {
 
-      double positionMeters = inputs.odometryDrivePositionsRad[i] * DriveConstants.wheelRadius;
+      double positionMeters = inputs.odometryDrivePositionsRad[i] * ModuleConstants.WHEEL_RADIUS;
       Rotation2d angle = inputs.odometryTurnPositions[i];
 
       odometryPositions[i] = new SwerveModulePosition(positionMeters, angle);
@@ -138,7 +138,7 @@ public class Module {
     state.optimize(getAngle());
     state.cosineScale(getAngle());
 
-    double velocityRadiansPerSecond = state.speedMetersPerSecond / DriveConstants.wheelRadius;
+    double velocityRadiansPerSecond = state.speedMetersPerSecond / ModuleConstants.WHEEL_RADIUS;
     double angleRadians = state.angle.getRadians();
 
     io.setDriveVelocity(
@@ -207,12 +207,12 @@ public class Module {
 
   /** Returns the current drive position of the module in meters. */
   private double getPositionMeters() {
-    return inputs.drivePositionRad * DriveConstants.wheelRadius;
+    return inputs.drivePositionRad * ModuleConstants.WHEEL_RADIUS;
   }
 
   /** Returns the current drive velocity of the module in meters per second. */
   private double getVelocityMetersPerSec() {
-    return inputs.driveVelocityRadPerSec * DriveConstants.wheelRadius;
+    return inputs.driveVelocityRadPerSec * ModuleConstants.WHEEL_RADIUS;
   }
 
   // --- Characterization ---

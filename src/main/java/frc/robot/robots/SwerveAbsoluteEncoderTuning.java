@@ -11,7 +11,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.drive.ModuleConstants;
 import java.util.HashMap;
 import java.util.Map;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -25,27 +25,27 @@ public class SwerveAbsoluteEncoderTuning extends LoggedRobot {
   private final boolean BREAK_MODE = false;
 
   private final SparkMax[] turns = {
-    new SparkMax(DriveConstants.FRONT_LEFT_MODULE_CONFIG.turnID(), MotorType.kBrushless),
-    new SparkMax(DriveConstants.FRONT_RIGHT_MODULE_CONFIG.turnID(), MotorType.kBrushless),
-    new SparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG.turnID(), MotorType.kBrushless),
-    new SparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG.turnID(), MotorType.kBrushless),
+    new SparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG.turnID(), MotorType.kBrushless),
+    new SparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG.turnID(), MotorType.kBrushless),
+    new SparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG.turnID(), MotorType.kBrushless),
+    new SparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG.turnID(), MotorType.kBrushless),
   };
 
   private final SparkMax[] drives = {
-    new SparkMax(DriveConstants.FRONT_LEFT_MODULE_CONFIG.driveID(), MotorType.kBrushless),
-    new SparkMax(DriveConstants.FRONT_RIGHT_MODULE_CONFIG.driveID(), MotorType.kBrushless),
-    new SparkMax(DriveConstants.BACK_LEFT_MODULE_CONFIG.driveID(), MotorType.kBrushless),
-    new SparkMax(DriveConstants.BACK_RIGHT_MODULE_CONFIG.driveID(), MotorType.kBrushless),
+    new SparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG.driveID(), MotorType.kBrushless),
+    new SparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG.driveID(), MotorType.kBrushless),
+    new SparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG.driveID(), MotorType.kBrushless),
+    new SparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG.driveID(), MotorType.kBrushless),
   };
 
   private final CANcoder frontLeftCancoder =
-      new CANcoder(DriveConstants.FRONT_LEFT_MODULE_CONFIG.absoluteEncoderChannel());
+      new CANcoder(ModuleConstants.FRONT_LEFT_MODULE_CONFIG.absoluteEncoderChannel());
   private final CANcoder frontRightCancoder =
-      new CANcoder(DriveConstants.FRONT_RIGHT_MODULE_CONFIG.absoluteEncoderChannel());
+      new CANcoder(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG.absoluteEncoderChannel());
   private final CANcoder backLeftCancoder =
-      new CANcoder(DriveConstants.BACK_LEFT_MODULE_CONFIG.absoluteEncoderChannel());
+      new CANcoder(ModuleConstants.BACK_LEFT_MODULE_CONFIG.absoluteEncoderChannel());
   private final CANcoder backRightCancoder =
-      new CANcoder(DriveConstants.BACK_RIGHT_MODULE_CONFIG.absoluteEncoderChannel());
+      new CANcoder(ModuleConstants.BACK_RIGHT_MODULE_CONFIG.absoluteEncoderChannel());
 
   public SwerveAbsoluteEncoderTuning() {
     cancoderMap.put("frontLeft", frontLeftCancoder);
@@ -66,6 +66,9 @@ public class SwerveAbsoluteEncoderTuning extends LoggedRobot {
   @Override
   public void robotInit() {
     timer.restart();
+
+    SmartDashboard.putBoolean("Break Mode", BREAK_MODE);
+
     for (SparkMax sparkMax : turns) {
       SparkMaxConfig config = new SparkMaxConfig();
       config.idleMode(BREAK_MODE ? IdleMode.kBrake : IdleMode.kCoast);
@@ -83,6 +86,7 @@ public class SwerveAbsoluteEncoderTuning extends LoggedRobot {
     }
 
     if (timer.advanceIfElapsed(3)) {
+      System.out.println();
       System.out.println("Swerve Positions");
       for (Map.Entry<String, CANcoder> entry : cancoderMap.entrySet()) {
         System.out.println(
@@ -96,7 +100,7 @@ public class SwerveAbsoluteEncoderTuning extends LoggedRobot {
   @Override
   public void autonomousInit() {
     for (SparkMax sparkMax : drives) {
-      sparkMax.set(0.25);
+      sparkMax.set(0.1);
     }
   }
 
