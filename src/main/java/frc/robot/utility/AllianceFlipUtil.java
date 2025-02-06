@@ -15,20 +15,17 @@ public class AllianceFlipUtil {
 
   /** Flips a translation to the correct side of the field based on the current alliance color. */
   public static Translation2d apply(Translation2d translation) {
-    if (shouldFlip()) translation = FlippingUtil.flipFieldPosition(translation);
-    return translation;
+    return shouldFlip() ? FlippingUtil.flipFieldPosition(translation) : translation;
   }
 
   /** Flips a rotation 180 degrees based on the current alliance color. */
   public static Rotation2d apply(Rotation2d rotation) {
-    if (shouldFlip()) rotation = FlippingUtil.flipFieldRotation(rotation);
-    return rotation;
+    return shouldFlip() ? FlippingUtil.flipFieldRotation(rotation) : rotation;
   }
 
   /** Flips a pose to the correct side of the field based on the current alliance color. */
   public static Pose2d apply(Pose2d pose) {
-    if (shouldFlip()) FlippingUtil.flipFieldPose(pose);
-    return pose;
+    return shouldFlip() ? FlippingUtil.flipFieldPose(pose) : pose;
   }
   /** Get whether to flip. If alliance is blue or unknown don't flip, if it is red then flip. */
   public static boolean shouldFlip() {
