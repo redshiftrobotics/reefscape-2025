@@ -3,7 +3,6 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import org.littletonrobotics.junction.AutoLog;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 /** IO layer interface for april tag detection systems */
 public interface CameraIO {
@@ -14,8 +13,8 @@ public interface CameraIO {
     boolean[] hasNewData;
     Pose3d[] estimatedRobotPose;
     double[] timestampSecondFPGA;
-    PhotonTrackedTarget[][] targets;
     int[][] tagsUsed;
+    Transform3d[][] tagTransforms;
 
     boolean connected = false;
   }

@@ -5,6 +5,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -19,7 +20,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonUtils;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 /** Wrapper for CameraIO layer */
 public class Camera {
@@ -110,6 +110,7 @@ public class Camera {
       Pose3d[] tagPositionsOnField = getTagPositionsOnField(inputs.tagsUsed[i]);
 
       if (inputs.hasNewData[i]) {
+        // Full field localization result
         results[i] =
             new VisionResult(
                 true,
@@ -124,39 +125,40 @@ public class Camera {
                         inputs.estimatedRobotPose[i],
                         inputs.tagsUsed[i],
                         lastRobotPoseSupplier.get()));
-        /* inputs.targets is a 2D array, PhotonTrackedTarget[][]
-         * This code takes all targets from a specific result, inputs.targets[i]
-         * and filters through them for ones matching the singleTagId.
-         */
-        PhotonTrackedTarget[] resultTargets =
-            (PhotonTrackedTarget[])
-                Arrays.stream(inputs.targets[i])
-                    .filter(possibleTarget -> possibleTarget.fiducialId == singleTagId)
-                    .toArray();
-        if (resultTargets.length == 0) {
+
+        // Single tag processing
+        boolean singleTagFound = false;
+        Transform3d tagTransform = new Transform3d();
+        for (int j = 0; j < inputs.tagsUsed[i].length; j++) {
+          if (inputs.tagsUsed[i][j] == singleTagId) {
+            tagTransform = inputs.tagTransforms[i][j];
+            singleTagFound = true;
+            break;
+          }
+        }
+        if (!singleTagFound) {
           singleTagResults[i] = new VisionResult();
           continue;
         }
-
-        PhotonTrackedTarget target = resultTargets[0];
         Pose3d estPose =
             PhotonUtils.estimateFieldToRobotAprilTag(
-                target.bestCameraToTarget,
-                VisionConstants.FIELD.getTagPose(target.fiducialId).get(),
+                tagTransform,
+                VisionConstants.FIELD.getTagPose(singleTagId).get(),
                 io.getRobotToCamera());
-        Pose3d tagPose = VisionConstants.FIELD.getTagPose(target.fiducialId).get();
-        results[i] =
+        Pose3d tagPose = VisionConstants.FIELD.getTagPose(singleTagId).get();
+
+        // Single tag localization result
+        singleTagResults[i] =
             new VisionResult(
                 true,
                 estPose,
                 inputs.timestampSecondFPGA[i],
-                new int[] {target.getFiducialId()},
+                new int[] {singleTagId},
                 new Pose3d[] {tagPose},
                 getStandardDeviations(new Pose3d[] {tagPose}, estPose),
                 lastRobotPoseSupplier == null
-                    ? getStatus(estPose, new int[] {target.getFiducialId()})
-                    : getStatus(
-                        estPose, new int[] {target.getFiducialId()}, lastRobotPoseSupplier.get()));
+                    ? getStatus(estPose, new int[] {singleTagId})
+                    : getStatus(estPose, new int[] {singleTagId}, lastRobotPoseSupplier.get()));
 
       } else {
         results[i] = new VisionResult();

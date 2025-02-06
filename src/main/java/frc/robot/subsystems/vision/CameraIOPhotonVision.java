@@ -61,7 +61,7 @@ public class CameraIOPhotonVision implements CameraIO {
     Pose3d[] estimatedRobotPose = new Pose3d[pipelineResults.size()];
     double[] timestampSecondFPGA = new double[pipelineResults.size()];
     int[][] tagsUsed = new int[pipelineResults.size()][];
-    PhotonTrackedTarget[][] targets = new PhotonTrackedTarget[pipelineResults.size()][];
+    Transform3d[][] targets = new Transform3d[pipelineResults.size()][];
     boolean[] hasNewData = new boolean[pipelineResults.size()];
 
     inputs.updatesReceived = pipelineResults.size();
@@ -76,18 +76,23 @@ public class CameraIOPhotonVision implements CameraIO {
 
         estimatedRobotPose[i] = estimateRobotPose.estimatedPose;
         timestampSecondFPGA[i] = estimateRobotPose.timestampSeconds;
-        targets[i] = (PhotonTrackedTarget[]) estimateRobotPose.targetsUsed.toArray();
         tagsUsed[i] =
             estimateRobotPose.targetsUsed.stream()
                 .map(PhotonTrackedTarget::getFiducialId)
                 .mapToInt(Integer::intValue)
                 .toArray();
+
+        targets[i] =
+            (Transform3d[])
+                estimateRobotPose.targetsUsed.stream()
+                    .map((target) -> target.bestCameraToTarget)
+                    .toArray();
         hasNewData[i] = true;
       } else {
         estimatedRobotPose[i] = Pose3d.kZero;
         timestampSecondFPGA[i] = 0;
         tagsUsed[i] = new int[0];
-        targets[i] = new PhotonTrackedTarget[0];
+        targets[i] = new Transform3d[0];
         hasNewData[i] = false;
       }
     }
