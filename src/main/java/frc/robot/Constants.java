@@ -74,6 +74,8 @@ public final class Constants {
       switch (RobotController.getSerialNumber()) {
         case "03238024":
           return RobotType.CRESCENDO_CHASSIS_2024;
+        case "032D2143":
+          return RobotType.T_SHIRT_CANNON_CHASSIS;
         case "032D216B":
           return RobotType.WOOD_BOT_TWO_2025;
       }
