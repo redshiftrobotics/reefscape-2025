@@ -17,24 +17,23 @@ public final class Constants {
 
   public static final double LOOP_PERIOD_SECONDS = Robot.defaultPeriodSecs; // 0.02
 
+  private static final RobotType DEFAULT_ROBOT_TYPE = RobotType.WOOD_BOT_TWO_2025;
   private static RobotType robotType = null;
 
   public static final boolean TUNING_MODE = false;
   public static final boolean ON_BLOCKS_TEST_MODE = false;
 
-  public static final Alert wrongRobotTypeAlertReal =
-      new Alert(
-          "Invalid robot selected, using competition robot as default.", Alert.AlertType.kWarning);
-
-  private static final Alert wrongRobotTypeAlertSim =
-      new Alert(
-          "Invalid robot selected for simulation robot, using simulation robot as default.",
-          AlertType.kError);
-
   public static RobotType getRobot() {
+    if (robotType == null) {
+      robotType = determineRobotType();
+      if (robotType == null) {
+        wrongRobotTypeFailedDetermination.set(true);
+        robotType = DEFAULT_ROBOT_TYPE;
+      }
+    }
     if (RobotBase.isReal() && robotType == RobotType.SIM_BOT) {
       wrongRobotTypeAlertReal.set(true);
-      robotType = RobotType.WOOD_BOT_TWO_2025;
+      robotType = DEFAULT_ROBOT_TYPE;
     }
     if (RobotBase.isSimulation() && robotType != RobotType.SIM_BOT) {
       wrongRobotTypeAlertSim.set(true);
@@ -70,21 +69,38 @@ public final class Constants {
     WOOD_BOT_TWO_2025,
   }
 
-  static {
-    if (robotType == null) {
-      if (RobotBase.isReal()) {
-        switch (RobotController.getSerialNumber()) {
-          case "03238024":
-            robotType = RobotType.CRESCENDO_CHASSIS_2024;
-            break;
-          case "032D216B":
-          default:
-            robotType = RobotType.WOOD_BOT_TWO_2025;
-            break;
-        }
-      } else if (RobotBase.isSimulation()) {
-        robotType = RobotType.SIM_BOT;
+  private static RobotType determineRobotType() {
+    if (RobotBase.isReal()) {
+      switch (RobotController.getSerialNumber()) {
+        case "03238024":
+          return RobotType.CRESCENDO_CHASSIS_2024;
+        case "032D2143":
+          return RobotType.T_SHIRT_CANNON_CHASSIS;
+        case "032D216B":
+          return RobotType.WOOD_BOT_TWO_2025;
       }
+    } else if (RobotBase.isSimulation()) {
+      return RobotType.SIM_BOT;
     }
+    return null;
   }
+
+  private static final Alert wrongRobotTypeAlertReal =
+      new Alert(
+          String.format(
+              "Invalid robot selected, using %s robot as default.", DEFAULT_ROBOT_TYPE.toString()),
+          Alert.AlertType.kWarning);
+
+  private static final Alert wrongRobotTypeAlertSim =
+      new Alert(
+          String.format(
+              "Invalid robot selected for simulation robot, using simulation robot as default."),
+          AlertType.kError);
+
+  private static final Alert wrongRobotTypeFailedDetermination =
+      new Alert(
+          String.format(
+              "Failed to determine robot from RoboRio serial number, using %s robot as default.",
+              DEFAULT_ROBOT_TYPE.toString()),
+          AlertType.kError);
 }

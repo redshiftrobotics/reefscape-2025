@@ -38,7 +38,7 @@ public class GyroIOPigeon2 implements GyroIO {
     // Tell the Pigeon2 to start with a yaw of 0
     pigeon.setYaw(0);
 
-    yaw.setUpdateFrequency(DriveConstants.odometryFrequencyHertz);
+    yaw.setUpdateFrequency(DriveConstants.ODOMETRY_FREQUENCY_HERTZ);
 
     // Just have it be 50Hz, as its not needed for odometry and is not on a SparkOdometryThread
     yawVelocity.setUpdateFrequency(50);
