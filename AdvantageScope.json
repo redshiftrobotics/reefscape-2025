@@ -7,20 +7,8 @@
       "height": 832,
       "state": {
         "sidebar": {
-          "width": 320,
+          "width": 377,
           "expanded": [
-            "/RealOutputs/Odometry/Robot",
-            "/RealOutputs/SwerveStates/ModuleDesiredWheelSpeeds",
-            "/RealOutputs/SwerveStates/ModuleDesiredWheelSpeeds/0",
-            "/RealOutputs/SwerveStates/MeasuredWheelSpeeds/0",
-            "/RealOutputs/Odometry/Robot/rotation",
-            "/RealOutputs/SwerveStates/MeasuredWheelSpeeds/0/angle",
-            "/RealOutputs/SwerveStates/ModuleDesiredWheelSpeeds/0/angle",
-            "/RealOutputs",
-            "/RealOutputs/Vision/frontCam",
-            "/RealOutputs/Vision/robotPosesRejected",
-            "/RealOutputs/Vision/robotPosesAccepted",
-            "/Vision/frontCam"
           ]
         },
         "tabs": {
@@ -59,6 +47,16 @@
                     }
                   },
                   {
+                    "type": "vision",
+                    "logKey": "/RealOutputs/Vision/tagPoses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
                     "type": "trajectory",
                     "logKey": "/RealOutputs/Odometry/Trajectory",
                     "logType": "Pose2d[]",
@@ -72,9 +70,9 @@
                     "type": "ghost",
                     "logKey": "/RealOutputs/Odometry/TrajectorySetpoint",
                     "logType": "Pose2d",
-                    "visible": true,
+                    "visible": false,
                     "options": {
-                      "model": "2025 KitBot",
+                      "model": "demo_8032",
                       "color": "#00ff00"
                     }
                   },
@@ -99,11 +97,14 @@
                     }
                   },
                   {
-                    "type": "axes",
-                    "logKey": "/RealOutputs/Vision/tagPoses",
-                    "logType": "Pose3d[]",
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/AutoAlignGoal",
+                    "logType": "Pose2d[]",
                     "visible": true,
-                    "options": {}
+                    "options": {
+                      "model": "demo_8032",
+                      "color": "#00ff00"
+                    }
                   }
                 ],
                 "game": "2025 Field",
@@ -114,14 +115,14 @@
                 "cameraIndex": -5,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  7.518571914882382,
-                  1.0952209176358136,
-                  -2.790117612025427
+                  5.468866627616376,
+                  2.506454220208772,
+                  3.6563175284107627
                 ],
                 "cameraTarget": [
-                  5.524650911502281,
-                  -0.8023068711719472,
-                  6.212692734318392
+                  9.795945915909991,
+                  -3.179106978197895,
+                  -6.179737945148541
                 ]
               },
               "controlsHeight": 200
@@ -432,6 +433,18 @@
       }
     }
   ],
-  "satellites": [],
+  "satellites": [
+    {
+      "x": 316,
+      "y": 180,
+      "width": 967,
+      "height": 475,
+      "state": {
+        "type": 2,
+        "visualizer": null
+      },
+      "uuid": "rdy54xgxb86v999c510rijuebtpjrgc5"
+    }
+  ],
   "version": "4.1.0"
 }
