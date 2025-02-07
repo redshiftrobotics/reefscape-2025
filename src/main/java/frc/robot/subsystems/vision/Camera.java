@@ -53,27 +53,32 @@ public class Camera {
 
   private final Alert missingCameraAlert;
 
-  private int singleTagId = 0;
+  private int singleTagId = -1;
   private VisionResult[] singleTagResults;
 
   public static record VisionResult(
       boolean hasNewData,
       Pose3d estimatedRobotPose,
       double timestampSecondFPGA,
+      boolean singleTag,
       int[] tagsUsed,
       Pose3d[] tagPositionsOnField,
       Matrix<N3, N1> standardDeviation,
       VisionResultStatus status) {
 
-    public VisionResult() {
+    public VisionResult(boolean singleTag) {
       this(
           false,
           new Pose3d(),
           0.0,
+          singleTag,
           new int[0],
           new Pose3d[0],
           VecBuilder.fill(0, 0, 0),
           VisionResultStatus.NO_DATA);
+    }
+    public VisionResult() {
+      this(false);
     }
   }
 
@@ -116,6 +121,7 @@ public class Camera {
                 true,
                 inputs.estimatedRobotPose[i],
                 inputs.timestampSecondFPGA[i],
+                false,
                 inputs.tagsUsed[i],
                 tagPositionsOnField,
                 getStandardDeviations(tagPositionsOnField, inputs.estimatedRobotPose[i]),
@@ -153,6 +159,7 @@ public class Camera {
                 true,
                 estPose,
                 inputs.timestampSecondFPGA[i],
+                true,
                 new int[] {singleTagId},
                 new Pose3d[] {tagPose},
                 getStandardDeviations(new Pose3d[] {tagPose}, estPose),
@@ -162,7 +169,7 @@ public class Camera {
 
       } else {
         results[i] = new VisionResult();
-        singleTagResults[i] = new VisionResult();
+        singleTagResults[i] = new VisionResult(true);
       }
     }
   }

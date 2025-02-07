@@ -42,4 +42,6 @@ public class VisionConstants {
 
   public static final AprilTagFieldLayout FIELD =
       AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+
+  public static final int AprilTagCount = FIELD.getTags().size();
 }

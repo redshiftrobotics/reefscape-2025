@@ -23,7 +23,9 @@ public class AprilTagVision extends SubsystemBase {
 
   private final Camera[] cameras;
 
-  private List<Consumer<TimestampedRobotPoseEstimate>> timestampRobotPoseEstimateConsumers =
+  private int singleTagId = -1;
+
+  private List<Consumer<TimedRobotPoseEstimate>> timedRobotPoseEstimateConsumers =
       new ArrayList<>();
 
   private boolean hasVisionEstimate = false;
@@ -45,6 +47,9 @@ public class AprilTagVision extends SubsystemBase {
     List<Pose3d> robotPosesAccepted = new ArrayList<>();
     List<Pose3d> robotPosesRejected = new ArrayList<>();
     List<Pose3d> tagPoses = new ArrayList<>();
+    
+    List<Pose3d> specializedrobotPosesAccepted = new ArrayList<>();
+    List<Pose3d> specializedrobotPosesRejected = new ArrayList<>();
 
     hasVisionEstimate = false;
 
@@ -53,42 +58,26 @@ public class AprilTagVision extends SubsystemBase {
       String cameraRoot = root + "/" + camera.getCameraName();
 
       if (DO_CAMERA_LOGGING && camera.getResults().length == 0) {
-        Logger.recordOutput(cameraRoot + "/tagsUsedPositions", new Pose3d[] {});
-        Logger.recordOutput(cameraRoot + "/positionEstimate", new Pose3d[] {});
-        Logger.recordOutput(cameraRoot + "/status", VisionResultStatus.NO_DATA);
-        Logger.recordOutput(cameraRoot + "/success", false);
+        recordBlankVisionEstimate(cameraRoot, false);
       }
 
       // Loop through all results that the camera has
       for (VisionResult result : camera.getResults()) {
-
+        
+        if (DO_CAMERA_LOGGING) {
+          recordVisionEstimate(cameraRoot, result);
+        }
+        
         if (!result.hasNewData()) {
-          Logger.recordOutput(cameraRoot + "/tagsUsedPositions", new Pose3d[] {});
-          Logger.recordOutput(cameraRoot + "/positionEstimate", new Pose3d[] {});
-          Logger.recordOutput(cameraRoot + "/status", VisionResultStatus.NO_DATA);
-          Logger.recordOutput(cameraRoot + "/success", false);
           continue;
         }
 
         // Get Data
-        TimestampedRobotPoseEstimate visionEstimate =
-            new TimestampedRobotPoseEstimate(
-                result.estimatedRobotPose(),
-                result.timestampSecondFPGA(),
-                result.standardDeviation(),
-                result.status());
+        TimedRobotPoseEstimate visionEstimate = new TimedRobotPoseEstimate(result);
 
         hasVisionEstimate = hasVisionEstimate || visionEstimate.isSuccess();
 
         // Logging
-        if (DO_CAMERA_LOGGING) {
-          Logger.recordOutput(cameraRoot + "/tagsUsedPositions", result.tagPositionsOnField());
-
-          Logger.recordOutput(cameraRoot + "/positionEstimate", visionEstimate.robotPose());
-
-          Logger.recordOutput(cameraRoot + "/status", visionEstimate.status());
-          Logger.recordOutput(cameraRoot + "/success", visionEstimate.status().isSuccess());
-        }
 
         if (DO_SUMMARY_LOGGING) {
           if (visionEstimate.isSuccess()) {
@@ -99,9 +88,16 @@ public class AprilTagVision extends SubsystemBase {
           tagPoses.addAll(Arrays.asList(result.tagPositionsOnField()));
         }
 
-        for (Consumer<TimestampedRobotPoseEstimate> consumer :
-            timestampRobotPoseEstimateConsumers) {
+        for (Consumer<TimedRobotPoseEstimate> consumer : timedRobotPoseEstimateConsumers) {
           consumer.accept(visionEstimate);
+        }
+      }
+      // Specialized estimation
+      if (singleTagId > 0 && singleTagId <= VisionConstants.AprilTagCount) {
+        for (VisionResult result : camera.getSingleTagResults()) {
+          if (!result.hasNewData()) {
+            recordBlankVisionEstimate(cameraRoot, true);
+          }
         }
       }
     }
@@ -118,6 +114,12 @@ public class AprilTagVision extends SubsystemBase {
     return hasVisionEstimate;
   }
 
+  public void setSingleTagEstimateId(int fiducialId) {
+    singleTagId = fiducialId;
+    for (Camera camera : cameras) {
+      camera.setSingleTagId(fiducialId);
+    }
+  }
   /**
    * Set the last robot pose supplier for all cameras
    *
@@ -132,11 +134,11 @@ public class AprilTagVision extends SubsystemBase {
   /**
    * Add a consumer for the vision estimate
    *
-   * @param timestampRobotPoseEstimateConsumer the consumer for the vision estimate
+   * @param timedRobotPoseEstimateConsumer the consumer for the vision estimate
    */
   public void addVisionEstimateConsumer(
-      Consumer<TimestampedRobotPoseEstimate> timestampRobotPoseEstimateConsumer) {
-    timestampRobotPoseEstimateConsumers.add(timestampRobotPoseEstimateConsumer);
+      Consumer<TimedRobotPoseEstimate> timedRobotPoseEstimateConsumer) {
+    timedRobotPoseEstimateConsumers.add(timedRobotPoseEstimateConsumer);
   }
 
   @Override
@@ -147,7 +149,21 @@ public class AprilTagVision extends SubsystemBase {
         Arrays.stream(cameras).map(Camera::getCameraName).collect(Collectors.joining(", ")));
   }
 
-  public record TimestampedRobotPoseEstimate(
+  private void recordBlankVisionEstimate(String cameraRoot, boolean specialized) {
+    Logger.recordOutput(cameraRoot + "/tagsUsedPositions" + (specialized ? "Specialized" : ""), new Pose3d[] {});
+    Logger.recordOutput(cameraRoot + "/positionEstimate" + (specialized ? "Specialized" : ""), new Pose3d[] {});
+    Logger.recordOutput(cameraRoot + "/status" + (specialized ? "Specialized" : ""), VisionResultStatus.NO_DATA);
+    Logger.recordOutput(cameraRoot + "/success" + (specialized ? "Specialized" : ""), false);
+  }
+
+  private void recordVisionEstimate(String cameraRoot, VisionResult result) {
+    String specialized = result.singleTag() ? "Specialized" : "";
+    Logger.recordOutput(cameraRoot + "/tagsUsedPositions" + specialized, result.tagPositionsOnField());
+    Logger.recordOutput(cameraRoot + "/positionEstimate" + specialized, result.estimatedRobotPose());
+    Logger.recordOutput(cameraRoot + "/status" + specialized, result.status());
+    Logger.recordOutput(cameraRoot + "/success" + specialized, result.status().isSuccess());
+  }
+  public record TimedRobotPoseEstimate(
       Pose3d robotPose,
       double timestampSeconds,
       Matrix<N3, N1> standardDeviations,
@@ -159,6 +175,14 @@ public class AprilTagVision extends SubsystemBase {
 
     public boolean isSuccess() {
       return status.isSuccess();
+    }
+
+    public TimedRobotPoseEstimate (VisionResult result) {
+      this(
+          result.estimatedRobotPose(),
+          result.timestampSecondFPGA(),
+          result.standardDeviation(),
+          result.status());
     }
   }
 }
