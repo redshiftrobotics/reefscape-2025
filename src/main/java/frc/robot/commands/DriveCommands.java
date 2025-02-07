@@ -73,9 +73,9 @@ public class DriveCommands {
 
     ProfiledPIDController controller =
         new ProfiledPIDController(
-            ROTATION_CONTROLLER_CONSTANTS.Kp(),
-            ROTATION_CONTROLLER_CONSTANTS.Ki(),
-            ROTATION_CONTROLLER_CONSTANTS.Kd(),
+            ROTATION_CONTROLLER_CONSTANTS.kP(),
+            ROTATION_CONTROLLER_CONSTANTS.kI(),
+            ROTATION_CONTROLLER_CONSTANTS.kD(),
             DRIVE_CONFIG.getAngularConstraints());
     controller.setTolerance(ROTATION_TOLERANCE.getRadians());
     controller.enableContinuousInput(0, Units.rotationsToRadians(1));
@@ -131,17 +131,17 @@ public class DriveCommands {
     HolonomicDriveController controller =
         new HolonomicDriveController(
             new PIDController(
-                TRANSLATION_CONTROLLER_CONSTANTS.Kp(),
-                TRANSLATION_CONTROLLER_CONSTANTS.Ki(),
-                TRANSLATION_CONTROLLER_CONSTANTS.Kd()),
+                TRANSLATION_CONTROLLER_CONSTANTS.kP(),
+                TRANSLATION_CONTROLLER_CONSTANTS.kI(),
+                TRANSLATION_CONTROLLER_CONSTANTS.kD()),
             new PIDController(
-                TRANSLATION_CONTROLLER_CONSTANTS.Kp(),
-                TRANSLATION_CONTROLLER_CONSTANTS.Ki(),
-                TRANSLATION_CONTROLLER_CONSTANTS.Kd()),
+                TRANSLATION_CONTROLLER_CONSTANTS.kP(),
+                TRANSLATION_CONTROLLER_CONSTANTS.kI(),
+                TRANSLATION_CONTROLLER_CONSTANTS.kD()),
             new ProfiledPIDController(
-                ROTATION_CONTROLLER_CONSTANTS.Kp(),
-                ROTATION_CONTROLLER_CONSTANTS.Ki(),
-                ROTATION_CONTROLLER_CONSTANTS.Kd(),
+                ROTATION_CONTROLLER_CONSTANTS.kP(),
+                ROTATION_CONTROLLER_CONSTANTS.kI(),
+                ROTATION_CONTROLLER_CONSTANTS.kD(),
                 DRIVE_CONFIG.getAngularConstraints()));
     controller.setTolerance(
         new Pose2d(TRANSLATION_TOLERANCE, TRANSLATION_TOLERANCE, ROTATION_TOLERANCE));

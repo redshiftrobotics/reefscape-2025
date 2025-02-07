@@ -15,12 +15,13 @@ import edu.wpi.first.wpilibj.RobotController;
  */
 public final class Constants {
 
+  // Time between loops in seconds, dt
   public static final double LOOP_PERIOD_SECONDS = Robot.defaultPeriodSecs; // 0.02
 
   private static final RobotType DEFAULT_ROBOT_TYPE = RobotType.WOOD_BOT_TWO_2025;
   private static RobotType robotType = null;
 
-  public static final boolean TUNING_MODE = false;
+  public static final boolean TUNING_MODE = true;
   public static final boolean ON_BLOCKS_TEST_MODE = false;
 
   public static RobotType getRobot() {

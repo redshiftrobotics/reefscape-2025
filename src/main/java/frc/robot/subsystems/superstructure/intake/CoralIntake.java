@@ -3,13 +3,13 @@ package frc.robot.subsystems.superstructure.intake;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
-/** The subsystem that the person will actually use for the Template. */
-public class CoralIntakeControl extends SubsystemBase {
+/** Wheels for subsystem */
+public class CoralIntake extends SubsystemBase {
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
   /** Creates a new Template. */
-  public CoralIntakeControl(IntakeIO io) {
+  public CoralIntake(IntakeIO io) {
     this.io = io;
   }
 

@@ -8,5 +8,5 @@ public interface IntakeIO {
   public static class IntakeIOInputs {}
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(IntakeIOInputs inputs) {}
+  default void updateInputs(IntakeIOInputs inputs) {}
 }

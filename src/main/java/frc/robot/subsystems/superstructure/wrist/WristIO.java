@@ -8,5 +8,5 @@ public interface WristIO {
   public static class WristIOInputs {}
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(WristIOInputs inputs) {}
+  default void updateInputs(WristIOInputs inputs) {}
 }

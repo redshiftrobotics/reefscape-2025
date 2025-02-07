@@ -6,9 +6,27 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
+    public boolean motorConnected = false;
+
+    public double positionRad = 0.0;
     public double velocityRadPerSec = 0.0;
+
+    public double[] appliedVolts = new double[0];
+    public double[] supplyCurrentAmps = new double[0];
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(ElevatorIOInputs inputs) {}
+  default void updateInputs(ElevatorIOInputs inputs) {}
+
+  default void setGoalPosition(double positionRad, double feedforward) {}
+
+  default void runOpenLoop(double output) {}
+
+  default void runVolts(double volts) {}
+
+  default void stop() {}
+
+  default void setPID(double kP, double kI, double kD) {}
+
+  default void setBrakeMode(boolean enable) {}
 }
