@@ -32,6 +32,7 @@ import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
+import frc.robot.subsystems.Intake.CoralIntake;
 import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -64,6 +65,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final AprilTagVision vision;
+  private final CoralIntake coralIntake;
 
   // Controller
   private final CommandGenericHID driverController = new CommandXboxController(0);
