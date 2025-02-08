@@ -17,12 +17,17 @@ public class CoralIntakeIO extends SubsystemBase {
 
   //motor stuff
 
-  public void MoveLeftMotor(double Speed) {
+  public void moveLeftMotor(double Speed) {
     leftMotor.set(MathUtil.clamp(Speed, -0.5, 0.5));
   }
 
-  public void MoveRightMotor(double Speed) {
+  public void moveRightMotor(double Speed) {
     rightMotor.set(MathUtil.clamp(Speed, -0.5, 0.5));
+  }
+
+  public void stop() {
+    leftMotor.stopMotor();
+    rightMotor.stopMotor();
   }
 
   //TODO add the sensor stuff

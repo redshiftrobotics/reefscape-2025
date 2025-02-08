@@ -17,13 +17,18 @@ public class ScoreCoral2 extends Command {
   // for l2
   @Override
   public void execute() {
-    coralIntake.MoveRightMotor(0.3);
-    coralIntake.MoveLeftMotor(0.3);
+    coralIntake.moveRightMotor(0.3);
+    coralIntake.moveLeftMotor(0.3);
   }
 
 
   @Override
   public boolean isFinished() {
     return true;
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    coralIntake.stop();
   }
 }
