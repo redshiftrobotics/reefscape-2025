@@ -60,7 +60,7 @@ public class Camera {
       boolean hasNewData,
       Pose3d estimatedRobotPose,
       double timestampSecondFPGA,
-      boolean singleTag,
+      boolean specialized,
       int[] tagsUsed,
       Pose3d[] tagPositionsOnField,
       Matrix<N3, N1> standardDeviation,
@@ -77,6 +77,7 @@ public class Camera {
           VecBuilder.fill(0, 0, 0),
           VisionResultStatus.NO_DATA);
     }
+
     public VisionResult() {
       this(false);
     }
@@ -182,7 +183,7 @@ public class Camera {
     return results;
   }
 
-  public VisionResult[] getSingleTagResults() {
+  public VisionResult[] getSpecializedResults() {
     return singleTagResults;
   }
 

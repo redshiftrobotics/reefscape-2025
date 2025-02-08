@@ -25,10 +25,14 @@ public class AprilTagVision extends SubsystemBase {
 
   private int singleTagId = -1;
 
-  private List<Consumer<TimedRobotPoseEstimate>> timedRobotPoseEstimateConsumers =
+  private List<Consumer<TimeStampedRobotPoseEstimate>> visionEstimateConsumers = new ArrayList<>();
+
+  private List<Consumer<TimeStampedRobotPoseEstimate>> visionSpecializedEstimateConsumers =
       new ArrayList<>();
 
   private boolean hasVisionEstimate = false;
+
+  private boolean hasSpecializedVisionEstimate = false;
 
   public AprilTagVision(CameraIO... camerasIO) {
     this.cameras = Arrays.stream(camerasIO).map(io -> new Camera(io)).toArray(Camera[]::new);
@@ -47,33 +51,35 @@ public class AprilTagVision extends SubsystemBase {
     List<Pose3d> robotPosesAccepted = new ArrayList<>();
     List<Pose3d> robotPosesRejected = new ArrayList<>();
     List<Pose3d> tagPoses = new ArrayList<>();
-    
-    List<Pose3d> specializedrobotPosesAccepted = new ArrayList<>();
-    List<Pose3d> specializedrobotPosesRejected = new ArrayList<>();
+    List<Pose3d> specializedRobotPosesAccepted = new ArrayList<>();
+    List<Pose3d> specializedRobotPosesRejected = new ArrayList<>();
 
     hasVisionEstimate = false;
+    hasSpecializedVisionEstimate = false;
+
+    String specializedRoot = root + "/specialized";
 
     // Loop through all cameras
     for (Camera camera : cameras) {
       String cameraRoot = root + "/" + camera.getCameraName();
 
       if (DO_CAMERA_LOGGING && camera.getResults().length == 0) {
-        recordBlankVisionEstimate(cameraRoot, false);
+        recordBlankVisionEstimate(cameraRoot);
       }
 
       // Loop through all results that the camera has
       for (VisionResult result : camera.getResults()) {
-        
+
         if (DO_CAMERA_LOGGING) {
           recordVisionEstimate(cameraRoot, result);
         }
-        
+
         if (!result.hasNewData()) {
           continue;
         }
 
         // Get Data
-        TimedRobotPoseEstimate visionEstimate = new TimedRobotPoseEstimate(result);
+        TimeStampedRobotPoseEstimate visionEstimate = new TimeStampedRobotPoseEstimate(result);
 
         hasVisionEstimate = hasVisionEstimate || visionEstimate.isSuccess();
 
@@ -88,30 +94,69 @@ public class AprilTagVision extends SubsystemBase {
           tagPoses.addAll(Arrays.asList(result.tagPositionsOnField()));
         }
 
-        for (Consumer<TimedRobotPoseEstimate> consumer : timedRobotPoseEstimateConsumers) {
+        for (Consumer<TimeStampedRobotPoseEstimate> consumer : visionEstimateConsumers) {
           consumer.accept(visionEstimate);
         }
       }
+
       // Specialized estimation
       if (singleTagId > 0 && singleTagId <= VisionConstants.AprilTagCount) {
-        for (VisionResult result : camera.getSingleTagResults()) {
+        for (VisionResult result : camera.getSpecializedResults()) {
+          if (DO_CAMERA_LOGGING) {
+            recordVisionEstimate(specializedRoot, result);
+          }
+
           if (!result.hasNewData()) {
-            recordBlankVisionEstimate(cameraRoot, true);
+            continue;
+          }
+          TimeStampedRobotPoseEstimate specializedVisionEstimate =
+              new TimeStampedRobotPoseEstimate(result);
+          hasSpecializedVisionEstimate =
+              hasSpecializedVisionEstimate || specializedVisionEstimate.isSuccess();
+
+          if (DO_SUMMARY_LOGGING) {
+            if (specializedVisionEstimate.isSuccess()) {
+              specializedRobotPosesAccepted.add(specializedVisionEstimate.robotPose);
+            } else {
+              specializedRobotPosesRejected.add(specializedVisionEstimate.robotPose);
+            }
+          }
+
+          for (Consumer<TimeStampedRobotPoseEstimate> consumer :
+              visionSpecializedEstimateConsumers) {
+            consumer.accept(specializedVisionEstimate);
           }
         }
       }
     }
 
     if (DO_SUMMARY_LOGGING) {
+      // Log results
       Logger.recordOutput(root + "/robotPosesAccepted", robotPosesAccepted.toArray(Pose3d[]::new));
       Logger.recordOutput(root + "/robotPosesRejected", robotPosesRejected.toArray(Pose3d[]::new));
       Logger.recordOutput(root + "/tagPoses", tagPoses.toArray(Pose3d[]::new));
+
+      // Log specialized results
+      if (singleTagId > 0 && singleTagId <= VisionConstants.AprilTagCount) {
+        Logger.recordOutput(
+            specializedRoot + "/robotPosesAccepted",
+            specializedRobotPosesAccepted.toArray(Pose3d[]::new));
+        Logger.recordOutput(
+            specializedRoot + "/robotPosesRejected",
+            specializedRobotPosesRejected.toArray(Pose3d[]::new));
+        Logger.recordOutput(
+            specializedRoot + "/tagPose", VisionConstants.FIELD.getTagPose(singleTagId).get());
+      }
     }
   }
 
   /** Get whether or not the vision system has a valid estimate */
   public boolean hasVisionEstimate() {
     return hasVisionEstimate;
+  }
+
+  public boolean hasSpecializedVisionEstimate() {
+    return hasSpecializedVisionEstimate;
   }
 
   public void setSingleTagEstimateId(int fiducialId) {
@@ -134,12 +179,15 @@ public class AprilTagVision extends SubsystemBase {
   /**
    * Add a consumer for the vision estimate
    *
-   * @param timedRobotPoseEstimateConsumer the consumer for the vision estimate
+   * @param timeStampedRobotPoseEstimateConsumer the consumer for the vision estimate
    */
   public void addVisionEstimateConsumer(
-      Consumer<TimedRobotPoseEstimate> timedRobotPoseEstimateConsumer) {
-    timedRobotPoseEstimateConsumers.add(timedRobotPoseEstimateConsumer);
+      Consumer<TimeStampedRobotPoseEstimate> timeStampedRobotPoseEstimateConsumer) {
+    visionEstimateConsumers.add(timeStampedRobotPoseEstimateConsumer);
   }
+
+  public void addSpecializedVisionEstimateConsumer(
+      Consumer<TimeStampedRobotPoseEstimate> estimateConsumer) {}
 
   @Override
   public String toString() {
@@ -149,21 +197,21 @@ public class AprilTagVision extends SubsystemBase {
         Arrays.stream(cameras).map(Camera::getCameraName).collect(Collectors.joining(", ")));
   }
 
-  private void recordBlankVisionEstimate(String cameraRoot, boolean specialized) {
-    Logger.recordOutput(cameraRoot + "/tagsUsedPositions" + (specialized ? "Specialized" : ""), new Pose3d[] {});
-    Logger.recordOutput(cameraRoot + "/positionEstimate" + (specialized ? "Specialized" : ""), new Pose3d[] {});
-    Logger.recordOutput(cameraRoot + "/status" + (specialized ? "Specialized" : ""), VisionResultStatus.NO_DATA);
-    Logger.recordOutput(cameraRoot + "/success" + (specialized ? "Specialized" : ""), false);
+  private void recordBlankVisionEstimate(String cameraRoot) {
+    Logger.recordOutput(cameraRoot + "/tagsUsedPositions", new Pose3d[] {});
+    Logger.recordOutput(cameraRoot + "/positionEstimate", new Pose3d[] {});
+    Logger.recordOutput(cameraRoot + "/status", VisionResultStatus.NO_DATA);
+    Logger.recordOutput(cameraRoot + "/success", false);
   }
 
   private void recordVisionEstimate(String cameraRoot, VisionResult result) {
-    String specialized = result.singleTag() ? "Specialized" : "";
-    Logger.recordOutput(cameraRoot + "/tagsUsedPositions" + specialized, result.tagPositionsOnField());
-    Logger.recordOutput(cameraRoot + "/positionEstimate" + specialized, result.estimatedRobotPose());
-    Logger.recordOutput(cameraRoot + "/status" + specialized, result.status());
-    Logger.recordOutput(cameraRoot + "/success" + specialized, result.status().isSuccess());
+    Logger.recordOutput(cameraRoot + "/tagsUsedPositions", result.tagPositionsOnField());
+    Logger.recordOutput(cameraRoot + "/positionEstimate", result.estimatedRobotPose());
+    Logger.recordOutput(cameraRoot + "/status", result.status());
+    Logger.recordOutput(cameraRoot + "/success", result.status().isSuccess());
   }
-  public record TimedRobotPoseEstimate(
+
+  public record TimeStampedRobotPoseEstimate(
       Pose3d robotPose,
       double timestampSeconds,
       Matrix<N3, N1> standardDeviations,
@@ -177,7 +225,7 @@ public class AprilTagVision extends SubsystemBase {
       return status.isSuccess();
     }
 
-    public TimedRobotPoseEstimate (VisionResult result) {
+    public TimeStampedRobotPoseEstimate(VisionResult result) {
       this(
           result.estimatedRobotPose(),
           result.timestampSecondFPGA(),
