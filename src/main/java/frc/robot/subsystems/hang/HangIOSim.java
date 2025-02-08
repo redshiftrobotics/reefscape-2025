@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
@@ -24,7 +25,7 @@ public class HangIOSim implements HangIO {
 
   // TODO: Get values from design
   private SingleJointedArmSim armSim =
-      new SingleJointedArmSim(DCMotor.getNEO(1), 1, 1, Units.inchesToMeters(18), 0, 3, true, 0);
+      new SingleJointedArmSim(DCMotor.getNEO(1), 1, 1, Units.inchesToMeters(18), 0, 3, false, 0);
   private LoggedMechanism2d mech2d = new LoggedMechanism2d(60, 60);
   private LoggedMechanismRoot2d armPivot = mech2d.getRoot("ArmPivot", 30, 30);
   private LoggedMechanismLigament2d arm =
@@ -36,19 +37,22 @@ public class HangIOSim implements HangIO {
               6,
               new Color8Bit(Color.kYellow)));
 
-  private PIDController controller = new PIDController(1, 0, 0); // TODO Tune
+  private PIDController controller = new PIDController(100, 0, 0); // TODO Tune
 
   private double setpoint;
 
   @Override
   public void updateInputs(HangIOInputs inputs) {
-    motor.set(controller.calculate(getPosition(), setpoint));
+    var x = controller.calculate(getPosition(), setpoint);
+    // System.out.println(x + " set: " + setpoint + " pos: " + getPosition());
+    motor.set(x);
 
     armSim.setInput(motor.get() * RobotController.getBatteryVoltage());
 
-    armSim.update(0.02);
+    armSim.update(Constants.LOOP_PERIOD_SECONDS);
 
-    encoderSim.setDistance(armSim.getAngleRads());
+    var a = armSim.getAngleRads();
+    encoderSim.setDistance(a);
 
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(armSim.getCurrentDrawAmps()));
