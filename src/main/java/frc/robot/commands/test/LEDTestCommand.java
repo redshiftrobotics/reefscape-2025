@@ -14,7 +14,8 @@ public class LEDTestCommand extends Command {
 
   /**
    * @param led LED subsystem object to use
-   * @param time Time in robot updates to wait between changes (each update is 20ms, so 50 updates is 1 second)
+   * @param time Time in robot updates to wait between changes (each update is 20ms, so 50 updates
+   *     is 1 second)
    */
   public LEDTestCommand(LEDSubsystem led, int time) {
     ledSystem = led;
@@ -29,10 +30,9 @@ public class LEDTestCommand extends Command {
 
   @Override
   public void execute() {
-    if (ticker++ < delay)
-      return;
+    if (ticker++ < delay) return;
 
-    //0.02 is the difference between each state, so we go down the list of all possible colors
+    // 0.02 is the difference between each state, so we go down the list of all possible colors
     currentPattern -= 0.02;
     ledSystem.applyPatternToAll(currentPattern);
   }
