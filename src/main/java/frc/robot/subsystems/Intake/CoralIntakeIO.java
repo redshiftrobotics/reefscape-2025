@@ -15,7 +15,7 @@ public class CoralIntakeIO extends SubsystemBase {
     this.rightMotor = rightMotor;
   }
 
-  //motor stuff
+  // motor stuff
 
   public void moveLeftMotor(double Speed) {
     leftMotor.set(MathUtil.clamp(Speed, -0.5, 0.5));
@@ -30,5 +30,5 @@ public class CoralIntakeIO extends SubsystemBase {
     rightMotor.stopMotor();
   }
 
-  //TODO add the sensor stuff
+  // TODO add the sensor stuff
 }

@@ -1,19 +1,18 @@
 package frc.robot.subsystems.Intake;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CoralIntake extends SubsystemBase {
 
   // !! SENSORS NOT IMPLMENTED !! \\
-//no bindings
+  // no bindings
   private CoralIntakeIO io;
 
   public CoralIntake(CoralIntakeIO io) {
     this.io = io;
   }
 
-    public void moveLeftMotor(double Speed) {
+  public void moveLeftMotor(double Speed) {
     io.moveLeftMotor(Speed);
   }
 
@@ -22,6 +21,6 @@ public class CoralIntake extends SubsystemBase {
   }
 
   public void stop() {
-  io.stop();
+    io.stop();
   }
 }
