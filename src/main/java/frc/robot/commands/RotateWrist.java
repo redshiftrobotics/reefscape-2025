@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.wrist.Wrist;
+import frc.robot.subsystems.wrist.WristConstants;
 
 public class RotateWrist extends Command {
   private Wrist wrist;
@@ -15,8 +16,7 @@ public class RotateWrist extends Command {
    * @param initialTarget The initial target to move to when executed
    */
   public RotateWrist(Wrist wristSystem, Rotation2d initialTarget) {
-    wrist = wristSystem;
-    currentRotation = wrist.getRotation();
+    initWristAndCurrentRotation(wristSystem);
     targetRotation = initialTarget;
   }
 
@@ -25,7 +25,13 @@ public class RotateWrist extends Command {
    * @apiNote Sets initial target to current wrist rotation
    */
   public RotateWrist(Wrist wristSystem) {
-    this(wristSystem, wristSystem.getRotation());
+    initWristAndCurrentRotation(wristSystem);
+    targetRotation = wrist.getRotation();
+  }
+
+  private void initWristAndCurrentRotation(Wrist wristSystem) {
+    wrist = wristSystem;
+    currentRotation = wrist.getRotation();
   }
 
   /**
@@ -33,7 +39,9 @@ public class RotateWrist extends Command {
    * @apiNote Cancels execution if called while command is in progress
    */
   public void setTarget(Rotation2d target) {
-    if (inProgress && !isFinished()) cancel();
+    if (inProgress && !isFinished()) {
+      cancel();
+    }
     targetRotation = target;
   }
 
@@ -52,11 +60,14 @@ public class RotateWrist extends Command {
 
   @Override
   public boolean isFinished() {
-    return currentRotation.getRotations() == targetRotation.getRotations();
+    double rotInRad = currentRotation.getRotations();
+    return targetRotation.getRotations() > (rotInRad - WristConstants.WRIST_MOVE_DONE_THRESHOLD)
+        && targetRotation.getRotations() < (rotInRad + WristConstants.WRIST_MOVE_DONE_THRESHOLD);
   }
 
   @Override
   public void end(boolean interrupted) {
     inProgress = false;
+    wrist.stop();
   }
 }

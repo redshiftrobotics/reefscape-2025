@@ -25,16 +25,16 @@ public class WristIOSparkMax implements WristIO {
     pid = motor.getClosedLoopController();
 
     // Configure motor
-    SparkMaxConfig cfg = new SparkMaxConfig();
-    cfg.inverted(WristConstants.WRIST_CONFIG.motorInverted()).idleMode(IdleMode.kBrake);
-    motor.configure(cfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.inverted(WristConstants.WRIST_CONFIG.motorInverted()).idleMode(IdleMode.kBrake);
+    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   @Override
   public void configurePID(double p, double i, double d) {
-    SparkMaxConfig cfg = new SparkMaxConfig();
-    cfg.closedLoop.pidf(p, i, d, 0);
-    motor.configure(cfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.closedLoop.pidf(p, i, d, 0);
+    motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   @Override

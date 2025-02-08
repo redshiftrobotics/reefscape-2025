@@ -10,8 +10,8 @@ public class Wrist extends SubsystemBase {
   private WristIOInputsAutoLogged inputs;
   private final ArmFeedforward feedforward;
 
-  public Wrist(WristIO wIO) {
-    io = wIO;
+  public Wrist(WristIO io) {
+    this.io = io;
     feedforward =
         new ArmFeedforward(
             WristConstants.FEED_FORWARD_CONFIG.s(),
@@ -30,6 +30,10 @@ public class Wrist extends SubsystemBase {
 
   public void setRotation(Rotation2d rot) {
     io.moveTo(rot.getRadians(), feedforward.calculate(rot.getRadians(), 0));
+  }
+
+  public void stop() {
+    io.stop();
   }
 
   @Override

@@ -33,4 +33,8 @@ public class WristConstants {
       };
 
   public static final float GEAR_RATIO = 1.0f;
+
+  // This is how many radians off from the target the arm is allowed to be for the move command to
+  // consider it done
+  public static final double WRIST_MOVE_DONE_THRESHOLD = 0.01f;
 }
