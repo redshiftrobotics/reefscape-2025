@@ -1,6 +1,7 @@
 package frc.robot.subsystems.wrist;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 
 // TODO Replace dummy values!
@@ -32,7 +33,8 @@ public class WristConstants {
         default -> new FeedForward(0, 0, 0, 0);
       };
 
-  public static final float GEAR_RATIO = 1.0f;
+  public static final double GEAR_RATIO = 1.0f;
+  public static final double ARM_LENGTH = Units.inchesToMeters(14);
 
   // This is how many radians off from the target the arm is allowed to be for the move command to
   // consider it done

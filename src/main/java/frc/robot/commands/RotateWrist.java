@@ -32,6 +32,7 @@ public class RotateWrist extends Command {
   private void initWristAndCurrentRotation(Wrist wristSystem) {
     wrist = wristSystem;
     currentRotation = wrist.getRotation();
+    addRequirements(wrist);
   }
 
   /**

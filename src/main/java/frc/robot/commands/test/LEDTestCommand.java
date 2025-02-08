@@ -20,6 +20,7 @@ public class LEDTestCommand extends Command {
   public LEDTestCommand(LEDSubsystem led, int time) {
     ledSystem = led;
     delay = time;
+    addRequirements(ledSystem);
   }
 
   @Override
