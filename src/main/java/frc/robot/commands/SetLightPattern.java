@@ -13,7 +13,7 @@ public class SetLightPattern extends Command {
   public SetLightPattern(LEDSubsystem led, int strip, double pattern) {
     if (strip < -1)
       throw new IllegalArgumentException(
-          "LED configuration commands may ONLY use -1 or higher for strip IDs!");
+          "LED configuration commands may ONLY use -1 (all strips) or higher for strip IDs!");
     ledSystem = led;
     this.pattern = pattern;
   }
