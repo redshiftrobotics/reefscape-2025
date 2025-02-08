@@ -29,10 +29,14 @@ public class Elevator extends SubsystemBase {
   private static final LoggedTunableNumber kI = factory.getNumber("kI", ElevatorConstants.pid.kI());
   private static final LoggedTunableNumber kD = factory.getNumber("kD", ElevatorConstants.pid.kD());
 
-  private static final LoggedTunableNumber kS = factory.getNumber("kS", ElevatorConstants.feedForward.kS());
-  private static final LoggedTunableNumber kG = factory.getNumber("kG", ElevatorConstants.feedForward.kG());
-  private static final LoggedTunableNumber kV = factory.getNumber("kV", ElevatorConstants.feedForward.kV());
-  private static final LoggedTunableNumber kA = factory.getNumber("kA", ElevatorConstants.feedForward.kA());
+  private static final LoggedTunableNumber kS =
+      factory.getNumber("kS", ElevatorConstants.feedForward.kS());
+  private static final LoggedTunableNumber kG =
+      factory.getNumber("kG", ElevatorConstants.feedForward.kG());
+  private static final LoggedTunableNumber kV =
+      factory.getNumber("kV", ElevatorConstants.feedForward.kV());
+  private static final LoggedTunableNumber kA =
+      factory.getNumber("kA", ElevatorConstants.feedForward.kA());
 
   private static final LoggedTunableNumber maxVelocity =
       factory.getNumber("MaxVelocity", ElevatorConstants.maxCarriageVelocity);
@@ -51,7 +55,6 @@ public class Elevator extends SubsystemBase {
   private final Alert motorDisconnectedAlert =
       new Alert("Elevator motor disconnected!", Alert.AlertType.kWarning);
 
-  private BooleanSupplier coastOverride = () -> false;
   private BooleanSupplier disabledOverride = () -> false;
 
   private boolean runningProfile = false;
@@ -75,6 +78,8 @@ public class Elevator extends SubsystemBase {
             ElevatorConstants.feedForward.kA());
 
     io.setPID(kP.get(), kI.get(), kD.get());
+
+    io.setBrakeMode(true);
   }
 
   @Override
@@ -99,12 +104,7 @@ public class Elevator extends SubsystemBase {
         maxAcceleration);
 
     final boolean shouldRunProfiled =
-        !disabledOverride.getAsBoolean()
-            && !runningProfile
-            && !coastOverride.getAsBoolean()
-            && DriverStation.isEnabled();
-
-    io.setBrakeMode(!coastOverride.getAsBoolean());
+        !disabledOverride.getAsBoolean() && !runningProfile && DriverStation.isEnabled();
 
     if (shouldRunProfiled) {
       State goal =
@@ -141,13 +141,9 @@ public class Elevator extends SubsystemBase {
     this.goalSupplier = goal;
   }
 
-  public void setGoal(State goal) {
-    setGoalSupplier(() -> goal);
-  }
-
   /** Sets the goal height of the elevator in meters */
   public void setGoalHeightMeters(double position) {
-    setGoal(new State(position, 0));
+    setGoalSupplier(() -> new State(position, 0));
   }
 
   /** Gets the goal height of the elevator in meters */
@@ -173,6 +169,18 @@ public class Elevator extends SubsystemBase {
 
   public State getSetpoint() {
     return setpoint;
+  }
+
+  public Command coast() {
+    return Commands.startEnd(
+        () -> {
+          io.setBrakeMode(false);
+          runningProfile = false;
+        },
+        () -> {
+          io.setBrakeMode(true);
+          runningProfile = true;
+        });
   }
 
   public Command staticCharacterization(double outputRampRate) {
