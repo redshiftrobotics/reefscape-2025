@@ -83,10 +83,9 @@ public class CameraIOPhotonVision implements CameraIO {
                 .toArray();
 
         targets[i] =
-            (Transform3d[])
-                estimateRobotPose.targetsUsed.stream()
-                    .map((target) -> target.bestCameraToTarget)
-                    .toArray();
+            estimateRobotPose.targetsUsed.stream()
+                .map((target) -> target.bestCameraToTarget)
+                .toArray(Transform3d[]::new);
         hasNewData[i] = true;
       } else {
         estimatedRobotPose[i] = Pose3d.kZero;
