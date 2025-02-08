@@ -10,12 +10,12 @@ import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 public class HangIOSim implements HangIO {
   private PWMSparkMax motor = new PWMSparkMax(0);
@@ -25,18 +25,18 @@ public class HangIOSim implements HangIO {
   // TODO: Get values from design
   private SingleJointedArmSim armSim =
       new SingleJointedArmSim(DCMotor.getNEO(1), 1, 1, Units.inchesToMeters(18), 0, 3, true, 0);
-  private Mechanism2d mech2d = new Mechanism2d(60, 60);
-  private MechanismRoot2d armPivot = mech2d.getRoot("ArmPivot", 30, 30);
-  private MechanismLigament2d arm =
+  private LoggedMechanism2d mech2d = new LoggedMechanism2d(60, 60);
+  private LoggedMechanismRoot2d armPivot = mech2d.getRoot("ArmPivot", 30, 30);
+  private LoggedMechanismLigament2d arm =
       armPivot.append(
-          new MechanismLigament2d(
+          new LoggedMechanismLigament2d(
               "Simulated Arm",
               30,
               Units.radiansToDegrees(armSim.getAngleRads()),
               6,
               new Color8Bit(Color.kYellow)));
 
-  private PIDController controller = new PIDController(0, 0, 0);
+  private PIDController controller = new PIDController(1, 0, 0); // TODO Tune
 
   private double setpoint;
 
@@ -55,7 +55,8 @@ public class HangIOSim implements HangIO {
 
     arm.setAngle(Units.radiansToDegrees(armSim.getAngleRads()));
 
-    SmartDashboard.putData(mech2d);
+    inputs.armSetpoint = setpoint;
+    Logger.recordOutput("Hang/Arm", mech2d);
   }
 
   @Override

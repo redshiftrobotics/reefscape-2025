@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -103,6 +104,7 @@ public class RobotContainer {
             new AprilTagVision(
                 new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA),
                 new CameraIOPhotonVision(VisionConstants.WOODV2_RIGHT_CAMERA));
+        hang = new Hang(new HangIO() {});
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -115,7 +117,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
-        hang = new Hang(new HangIO() {}); //TODO
+        hang = new Hang(new HangIO() {});
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -128,7 +130,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
-        
+        hang = new Hang(new HangIO() {});
         break;
 
       case SIM_BOT:
@@ -142,7 +144,7 @@ public class RobotContainer {
                 new ModuleIOSim(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision =
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
-        hang = new Hang(new HangIOSim()); //TODO
+        hang = new Hang(new HangIOSim());
         break;
 
       default:
@@ -154,7 +156,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        hang = new Hang(new HangIO() {}); // TODO
+        hang = new Hang(new HangIO() {});
         vision = new AprilTagVision();
         break;
     }
@@ -437,6 +439,10 @@ public class RobotContainer {
     } catch (ParseException e) {
       System.out.println("Failed to parse Choreo auto " + e.getMessage());
     }
+
+    // Testing autos :)
+    dashboardChooser.addOption(
+        "NOT-PROD HANG SIM TEST", new InstantCommand(() -> hang.setSetpoint(0.8)));
   }
 
   private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {

@@ -5,7 +5,8 @@ import org.littletonrobotics.junction.AutoLog;
 public interface HangIO {
   @AutoLog
   public static class HangIOInputs {
-    //
+    public double armSetpoint = 0.0;
+    public double armPosition = 0.0;
   }
 
   public default void updateInputs(HangIOInputs inputs) {}
