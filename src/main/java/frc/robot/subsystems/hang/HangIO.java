@@ -35,4 +35,6 @@ public interface HangIO {
   public default double getPosition() {
     return 0;
   }
+
+  public default void stop() {}
 }

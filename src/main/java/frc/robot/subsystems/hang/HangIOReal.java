@@ -33,4 +33,9 @@ public class HangIOReal implements HangIO {
   public double getPosition() {
     return wenchMotor.getAbsoluteEncoder().getPosition();
   }
+
+  @Override
+  public void stop() {
+    wenchMotor.stopMotor();
+  }
 }

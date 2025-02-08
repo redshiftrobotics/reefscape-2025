@@ -77,4 +77,9 @@ public class HangIOSim implements HangIO {
   public double getPosition() {
     return encoderSim.getDistance();
   }
+
+  @Override
+  public void stop() {
+    setpoint = getPosition();
+  }
 }

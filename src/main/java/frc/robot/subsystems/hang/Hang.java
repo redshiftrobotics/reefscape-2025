@@ -43,4 +43,9 @@ public class Hang extends SubsystemBase {
   public double getPosition() {
     return io.getPosition();
   }
+
+  /** Stop the arm from moving. */
+  public void stop() {
+    io.stop();
+  }
 }
