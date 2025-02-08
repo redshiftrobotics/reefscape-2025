@@ -3,7 +3,7 @@ package frc.robot.subsystems.wrist;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants;
 
-// EVERYTHING IN THIS CLASS IS DUMMY VALUES!!!!!!! DO NOT RELY ON THEM YET!!!!!!!!!
+// TODO Replace dummy values!
 public class WristConstants {
   public record WristConfig(int motorId, boolean motorInverted) {}
 
