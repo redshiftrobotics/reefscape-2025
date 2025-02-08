@@ -1,36 +1,40 @@
 package frc.robot.subsystems.wrist;
 
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 public class Wrist extends SubsystemBase {
-  private SparkMax motor;
-  private RelativeEncoder encoder;
-  private SparkClosedLoopController pid;
+  private WristIO io;
+  private WristIOInputsAutoLogged inputs;
+  private final ArmFeedforward feedforward;
 
-  public Wrist(int motorID, double p, double i, double d) {
-    motor = new SparkMax(motorID, MotorType.kBrushless);
-    encoder = motor.getEncoder();
-    pid = motor.getClosedLoopController();
+  public Wrist(WristIO wIO) {
+    io = wIO;
+    feedforward =
+        new ArmFeedforward(
+            WristConstants.FEED_FORWARD_CONFIG.s(),
+            WristConstants.FEED_FORWARD_CONFIG.v(),
+            WristConstants.FEED_FORWARD_CONFIG.g(),
+            WristConstants.FEED_FORWARD_CONFIG.a());
+    io.configurePID(
+        WristConstants.PID_CONFIG.p(),
+        WristConstants.PID_CONFIG.i(),
+        WristConstants.PID_CONFIG.d());
   }
 
   public Rotation2d getRotation() {
-    return Rotation2d.fromRotations(encoder.getPosition());
+    return Rotation2d.fromRadians(inputs.positionRad);
   }
 
   public void setRotation(Rotation2d rot) {
-    pid.setReference(rot.getRotations(), ControlType.kPosition);
+    io.moveTo(rot.getRadians(), feedforward.calculate(rot.getRadians(), 0));
   }
 
   @Override
   public void periodic() {
-    super.periodic();
-    SmartDashboard.putNumber("Wrist Current Rotation", getRotation().getDegrees());
+    io.updateInputs(inputs);
+    Logger.processInputs("Wrist", inputs);
   }
 }

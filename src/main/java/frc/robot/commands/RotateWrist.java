@@ -8,6 +8,7 @@ import frc.robot.subsystems.wrist.Wrist;
 public class RotateWrist extends Command {
   private Wrist wrist;
   private Rotation2d currentRotation, targetRotation;
+  private boolean inProgress;
 
   /**
    * @param wristSystem The wrist subsystem to use
@@ -32,14 +33,15 @@ public class RotateWrist extends Command {
    * @apiNote Cancels execution if called while command is in progress
    */
   public void setTarget(Rotation2d target) {
-    if (!isFinished()) cancel();
+    if (inProgress && !isFinished()) cancel();
     targetRotation = target;
   }
 
   @Override
   public void initialize() {
-    SmartDashboard.putNumber("Wrist Rotation Target", targetRotation.getDegrees());
+    SmartDashboard.putNumber("Wrist Rotation Target", targetRotation.getRadians());
     currentRotation = wrist.getRotation();
+    inProgress = true;
   }
 
   @Override
@@ -54,5 +56,7 @@ public class RotateWrist extends Command {
   }
 
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    inProgress = false;
+  }
 }

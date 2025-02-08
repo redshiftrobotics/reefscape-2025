@@ -45,5 +45,6 @@ public class LEDTestCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     currentPattern = LEDConstants.LEDPatterns.BLACK;
+    ledSystem.applyPatternToAll(currentPattern);
   }
 }
