@@ -3,11 +3,11 @@
     {
       "x": -8,
       "y": -8,
-      "width": 2560,
-      "height": 1400,
+      "width": 2576,
+      "height": 1416,
       "state": {
         "sidebar": {
-          "width": 324,
+          "width": 327,
           "expanded": [
             "/RealOutputs"
           ]
@@ -81,7 +81,7 @@
                     "type": "ghost",
                     "logKey": "/RealOutputs/AutoAlignGoal",
                     "logType": "Pose2d[]",
-                    "visible": false,
+                    "visible": true,
                     "options": {
                       "model": "demo_8032",
                       "color": "#00ff00"
@@ -98,17 +98,17 @@
                     "type": "ghost",
                     "logKey": "/RealOutputs/Vision/robotPosesAccepted",
                     "logType": "Pose3d[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "model": "demo_8032",
-                      "color": "#00ffff"
+                      "color": "#ff00ff"
                     }
                   },
                   {
                     "type": "ghost",
                     "logKey": "/RealOutputs/Vision/robotPosesRejected",
                     "logType": "Pose3d[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "model": "demo_8032",
                       "color": "#ffff00"
@@ -337,6 +337,112 @@
               "controllerUUID": "3esvyp3n3ghxuqx96bd8k4i1hfbxlyq7",
               "renderer": null,
               "controlsHeight": 0
+            },
+            {
+              "type": 10,
+              "title": "Mechanism",
+              "controller": [
+                {
+                  "type": "mechanism",
+                  "logKey": "/RealOutputs/Mechanism2d/Goal",
+                  "logType": "Mechanism2d",
+                  "visible": false,
+                  "options": {}
+                },
+                {
+                  "type": "mechanism",
+                  "logKey": "/RealOutputs/Mechanism2d/Measured",
+                  "logType": "Mechanism2d",
+                  "visible": true,
+                  "options": {}
+                },
+                {
+                  "type": "mechanism",
+                  "logKey": "/RealOutputs/Mechanism2d/Setpoint",
+                  "logType": "Mechanism2d",
+                  "visible": false,
+                  "options": {}
+                }
+              ],
+              "controllerUUID": "sv1ytpleg99acygvzwsjh7o2rtxtovg6",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 1,
+              "title": "Elevator",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "/RealOutputs/Elevator/Profile/GoalPositionMeters",
+                    "logType": "Number",
+                    "visible": false,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "/RealOutputs/Elevator/Profile/SetpointPositionMeters",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "/RealOutputs/Elevator/measuredHeightMeters",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "/Elevator/AppliedVolts/0",
+                    "logType": "Number",
+                    "visible": false,
+                    "options": {
+                      "color": "#e48b32",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "discreteSources": [
+                  {
+                    "type": "stripes",
+                    "logKey": "/RealOutputs/Elevator/Profile/ShouldRunProfiled",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#80588e"
+                    }
+                  }
+                ],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "cjz4g7b4713p1ebbn8kcih8lamivgjjr",
+              "renderer": null,
+              "controlsHeight": 200
             },
             {
               "type": 1,

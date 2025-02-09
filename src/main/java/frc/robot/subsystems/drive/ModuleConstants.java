@@ -107,7 +107,7 @@ public class ModuleConstants {
       case SIM_BOT:
         DRIVE_MOTOR = DCMotor.getNEO(1);
         DRIVE_FEEDBACK = new PIDConstants(1.3, 0.0, 0.0);
-        DRIVE_FEED_FORWARD = new FeedForwardConstants(0.0, 0, 0);
+        DRIVE_FEED_FORWARD = new FeedForwardConstants(0.0, 0.0, 0.0);
         DRIVE_MOTOR_CURRENT_LIMIT = 50;
         DRIVE_REDUCTION = Mk4iReductions.L3.reduction;
 

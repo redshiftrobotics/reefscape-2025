@@ -29,10 +29,14 @@ public class Elevator extends SubsystemBase {
   private static final LoggedTunableNumber kI = factory.getNumber("kI", ElevatorConstants.pid.kI());
   private static final LoggedTunableNumber kD = factory.getNumber("kD", ElevatorConstants.pid.kD());
 
-  private static final LoggedTunableNumber kS = factory.getNumber("kS", ElevatorConstants.feedForward.kS());
-  private static final LoggedTunableNumber kG = factory.getNumber("kG", ElevatorConstants.feedForward.kG());
-  private static final LoggedTunableNumber kV = factory.getNumber("kV", ElevatorConstants.feedForward.kV());
-  private static final LoggedTunableNumber kA = factory.getNumber("kA", ElevatorConstants.feedForward.kA());
+  private static final LoggedTunableNumber kS =
+      factory.getNumber("kS", ElevatorConstants.feedForward.kS());
+  private static final LoggedTunableNumber kG =
+      factory.getNumber("kG", ElevatorConstants.feedForward.kG());
+  private static final LoggedTunableNumber kV =
+      factory.getNumber("kV", ElevatorConstants.feedForward.kV());
+  private static final LoggedTunableNumber kA =
+      factory.getNumber("kA", ElevatorConstants.feedForward.kA());
 
   private static final LoggedTunableNumber maxVelocity =
       factory.getNumber("MaxVelocity", ElevatorConstants.maxCarriageVelocity);

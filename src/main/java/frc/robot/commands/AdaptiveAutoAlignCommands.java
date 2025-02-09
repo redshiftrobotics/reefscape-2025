@@ -45,7 +45,7 @@ public class AdaptiveAutoAlignCommands {
     return Commands.defer(
         () -> {
           Pose2d pose = getPose(offset);
-          return DriveCommands.pathfindToPoseCommand(drive, pose, 1, 0)
+          return DriveCommands.pathfindToPoseCommand(drive, pose, 0.25, 0)
               .andThen(DriveCommands.driveToPosePrecise(drive, pose))
               .beforeStarting(() -> Logger.recordOutput("AutoAlignGoal", new Pose2d[] {pose}))
               .finallyDo(() -> Logger.recordOutput("AutoAlignGoal", new Pose2d[] {}));

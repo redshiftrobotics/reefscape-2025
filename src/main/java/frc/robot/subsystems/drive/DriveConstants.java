@@ -97,9 +97,9 @@ public class DriveConstants {
 
   // --- Pathplanner Config ---
 
-  public static final double robotMassKg = 74.088;
+  public static final double robotMassKg = 65;
   public static final double robotMOI = 6.883;
-  public static final double wheelCOF = 1.2;
+  public static final double wheelCOF = 0.8;
   public static final Translation2d[] moduleTranslations = {
     DriveConstants.FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER,
     DriveConstants.FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER,

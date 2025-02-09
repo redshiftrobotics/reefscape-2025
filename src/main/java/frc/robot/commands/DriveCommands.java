@@ -107,7 +107,8 @@ public class DriveCommands {
             })
         .beforeStarting(
             () -> {
-              controller.setGoal(drive.getRobotPose().getRotation().getRadians());
+              controller.setGoal(
+                  AllianceFlipUtil.apply(drive.getRobotPose().getRotation()).getRadians());
               controller.reset(
                   drive.getRobotPose().getRotation().getRadians(),
                   drive.getRobotSpeeds().omegaRadiansPerSecond);
@@ -170,7 +171,7 @@ public class DriveCommands {
   public static Command pathfindToPoseCommand(
       Drive drive, Pose2d desiredPose, double speedMultiplier, double goalEndVelocity) {
     return AutoBuilder.pathfindToPose(
-        desiredPose, DRIVE_CONFIG.getPathConstraints(), goalEndVelocity);
+        desiredPose, DRIVE_CONFIG.getPathConstraints(speedMultiplier), goalEndVelocity);
   }
 
   /** Estimated feed forward Ks and Kv by driving robot forward, control motors by voltage */
