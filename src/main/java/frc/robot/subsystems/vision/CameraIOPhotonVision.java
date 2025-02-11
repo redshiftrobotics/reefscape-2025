@@ -99,6 +99,7 @@ public class CameraIOPhotonVision implements CameraIO {
     inputs.estimatedRobotPose = estimatedRobotPose;
     inputs.timestampSecondFPGA = timestampSecondFPGA;
     inputs.tagsUsed = tagsUsed;
+    inputs.tagTransforms = targets;
     inputs.hasNewData = hasNewData;
     inputs.connected = camera.isConnected();
   }

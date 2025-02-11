@@ -116,7 +116,7 @@ public class Camera {
       Pose3d[] tagPositionsOnField = getTagPositionsOnField(inputs.tagsUsed[i]);
 
       if (inputs.hasNewData[i]) {
-        // Full field localization result
+        // Multi-tag localization result
         results[i] =
             new VisionResult(
                 true,
@@ -134,9 +134,14 @@ public class Camera {
                         lastRobotPoseSupplier.get()));
 
         // Single tag processing
+
+        if (inputs.tagTransforms == null) {
+          singleTagResults[i] = new VisionResult();
+          continue;
+        }
         boolean singleTagFound = false;
         Transform3d tagTransform = new Transform3d();
-        for (int j = 0; j < inputs.tagsUsed[i].length; j++) {
+        for (int j = 0; j < inputs.tagTransforms[i].length; j++) {
           if (inputs.tagsUsed[i][j] == singleTagId) {
             tagTransform = inputs.tagTransforms[i][j];
             singleTagFound = true;
@@ -151,7 +156,7 @@ public class Camera {
             PhotonUtils.estimateFieldToRobotAprilTag(
                 tagTransform,
                 VisionConstants.FIELD.getTagPose(singleTagId).get(),
-                io.getRobotToCamera());
+                io.getRobotToCamera().inverse());
         Pose3d tagPose = VisionConstants.FIELD.getTagPose(singleTagId).get();
 
         // Single tag localization result
@@ -167,7 +172,6 @@ public class Camera {
                 lastRobotPoseSupplier == null
                     ? getStatus(estPose, new int[] {singleTagId})
                     : getStatus(estPose, new int[] {singleTagId}, lastRobotPoseSupplier.get()));
-
       } else {
         results[i] = new VisionResult();
         singleTagResults[i] = new VisionResult(true);
