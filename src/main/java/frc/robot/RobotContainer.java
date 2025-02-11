@@ -53,7 +53,6 @@ import frc.robot.subsystems.vision.CameraIOSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
-
 import java.io.IOException;
 import java.util.Arrays;
 import org.json.simple.parser.ParseException;
@@ -338,7 +337,7 @@ public class RobotContainer {
 
         driverXbox
             .rightTrigger()
-            .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Drive to reef"))
+            .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Algin Reef"))
             .onFalse(reefAlignmentCommands.stop(drive));
 
         driverXbox
@@ -346,16 +345,14 @@ public class RobotContainer {
             .and(driverXbox.leftBumper())
             .onTrue(
                 CustomCommands.reInitCommand(
-                    reefAlignmentCommands.driveToNext(drive).withName("Drive to next reef")));
+                    reefAlignmentCommands.driveToNext(drive).withName("Algin Reef -1")));
 
         driverXbox
             .rightTrigger()
             .and(driverXbox.rightBumper())
             .onTrue(
                 CustomCommands.reInitCommand(
-                    reefAlignmentCommands
-                        .driveToPrevious(drive)
-                        .withName("Drive to previous reef")));
+                    reefAlignmentCommands.driveToPrevious(drive).withName("Algin Reef +1")));
 
         // Align to intake
 
@@ -369,7 +366,7 @@ public class RobotContainer {
 
         driverXbox
             .leftTrigger()
-            .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Drive to intake"))
+            .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Align Intake"))
             .onFalse(intakeAlignmentCommands.stop(drive));
 
         driverXbox
@@ -377,16 +374,14 @@ public class RobotContainer {
             .and(driverXbox.leftBumper())
             .onTrue(
                 CustomCommands.reInitCommand(
-                    intakeAlignmentCommands.driveToNext(drive).withName("Drive to next intake")));
+                    intakeAlignmentCommands.driveToNext(drive).withName("Align Intake +1")));
 
         driverXbox
             .leftTrigger()
             .and(driverXbox.rightBumper())
             .onTrue(
                 CustomCommands.reInitCommand(
-                    intakeAlignmentCommands
-                        .driveToPrevious(drive)
-                        .withName("Drive to previous intake")));
+                    intakeAlignmentCommands.driveToPrevious(drive).withName("Align Intake -1")));
       }
     } else if (driverController instanceof CommandJoystick) {
       final CommandJoystick driverJoystick = (CommandJoystick) driverController;

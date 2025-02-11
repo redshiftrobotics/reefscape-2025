@@ -68,6 +68,6 @@ public class AdaptiveAutoAlignCommands {
   }
 
   public Command stop(Drive drive) {
-    return Commands.run(drive::stop);
+    return drive.runOnce(drive::stop);
   }
 }
