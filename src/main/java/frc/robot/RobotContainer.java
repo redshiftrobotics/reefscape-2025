@@ -44,7 +44,9 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.hang.Hang;
+import frc.robot.subsystems.hang.HangConstants;
 import frc.robot.subsystems.hang.HangIO;
+import frc.robot.subsystems.hang.HangIOReal;
 import frc.robot.subsystems.hang.HangIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
@@ -104,7 +106,7 @@ public class RobotContainer {
             new AprilTagVision(
                 new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA),
                 new CameraIOPhotonVision(VisionConstants.WOODV2_RIGHT_CAMERA));
-        hang = new Hang(new HangIO() {});
+        hang = new Hang(new HangIOReal(HangConstants.WOOD_BOT_TWO_CAN_ID));
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -117,7 +119,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
-        hang = new Hang(new HangIO() {});
+        hang = new Hang(new HangIOReal(HangConstants.T_SHIRT_CANNON_CAN_ID));
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -130,7 +132,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
-        hang = new Hang(new HangIO() {});
+        hang = new Hang(new HangIOReal(HangConstants.CRESCENDO_2024_CAN_ID)); // What hang arm??
         break;
 
       case SIM_BOT:
