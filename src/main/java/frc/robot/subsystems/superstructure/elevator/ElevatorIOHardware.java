@@ -74,7 +74,7 @@ public class ElevatorIOHardware implements ElevatorIO {
   @Override
   public void setGoalPosition(double positionRad, double feedforward) {
     control.setReference(
-        Units.radiansToRotations(feedforward),
+        Units.radiansToRotations(positionRad),
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
         feedforward,
