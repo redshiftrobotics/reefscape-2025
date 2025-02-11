@@ -22,7 +22,7 @@ public class CoralIntake extends SubsystemBase {
 
   @Override
   public void periodic() {
-   intakeSensor = io.checkSensor();
+    intakeSensor = io.checkSensor();
   }
 
   public void stop() {

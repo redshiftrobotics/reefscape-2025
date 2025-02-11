@@ -1,8 +1,7 @@
 package frc.robot.subsystems.Intake;
 
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-
+import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,12 +33,11 @@ public class CoralIntakeIO extends SubsystemBase {
   }
 
   public boolean checkSensor() {
-    
-    SmartDashboard.putNumber("0",analogInput.getValue());
-    
+
+    SmartDashboard.putNumber("0", analogInput.getValue());
+
     return true;
   }
-
 
   public void stop() {
     leftMotor.stopMotor();

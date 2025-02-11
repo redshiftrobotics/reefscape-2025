@@ -33,6 +33,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.subsystems.Intake.CoralIntake;
+import frc.robot.subsystems.Intake.CoralIntakeIO;
 import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -101,6 +102,7 @@ public class RobotContainer {
             new AprilTagVision(
                 new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA),
                 new CameraIOPhotonVision(VisionConstants.WOODV2_RIGHT_CAMERA));
+        coralIntake = new CoralIntake(new CoralIntakeIO(0, 1, 0));
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
