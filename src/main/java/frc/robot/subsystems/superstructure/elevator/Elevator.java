@@ -56,8 +56,9 @@ public class Elevator extends SubsystemBase {
       new Alert("Elevator motor disconnected!", Alert.AlertType.kWarning);
 
   private BooleanSupplier disabledOverride = () -> false;
+  private BooleanSupplier coastOverride = () -> false;
 
-  private boolean runningProfile = false;
+  private boolean stoppedProfile = false;
 
   private State setpoint = new State();
   private Supplier<State> goalSupplier = State::new;
@@ -103,10 +104,13 @@ public class Elevator extends SubsystemBase {
         maxVelocity,
         maxAcceleration);
 
-    final boolean shouldRunProfiled =
-        !disabledOverride.getAsBoolean() && !runningProfile && DriverStation.isEnabled();
+    io.setBrakeMode(!coastOverride.getAsBoolean());
 
-    if (shouldRunProfiled) {
+    final boolean shouldRunProfile =
+        !(stoppedProfile || disabledOverride.getAsBoolean() || coastOverride.getAsBoolean())
+            && DriverStation.isEnabled();
+
+    if (shouldRunProfile) {
       State goal =
           new State(
               MathUtil.clamp(goalSupplier.get().position, 0.0, ElevatorConstants.carriageMaxHeight),
@@ -132,7 +136,7 @@ public class Elevator extends SubsystemBase {
       Logger.recordOutput("Elevator/Profile/GoalVelocityMetersPerSec", 0.0);
     }
 
-    Logger.recordOutput("Elevator/Profile/ShouldRunProfiled", shouldRunProfiled);
+    Logger.recordOutput("Elevator/Profile/ShouldRunProfiled", shouldRunProfile);
 
     motorDisconnectedAlert.set(!inputs.motorConnected);
   }
@@ -175,22 +179,18 @@ public class Elevator extends SubsystemBase {
     return Commands.startEnd(
         () -> {
           io.setBrakeMode(false);
-          runningProfile = false;
+          stoppedProfile = false;
         },
         () -> {
           io.setBrakeMode(true);
-          runningProfile = true;
+          stoppedProfile = true;
         });
   }
 
   public Command staticCharacterization(double outputRampRate) {
     final StaticCharacterizationState state = new StaticCharacterizationState();
-    Timer timer = new Timer();
-    return Commands.startRun(
-            () -> {
-              runningProfile = true;
-              timer.restart();
-            },
+    final Timer timer = new Timer();
+    return Commands.run(
             () -> {
               state.characterizationOutput = outputRampRate * timer.get();
               io.runOpenLoop(state.characterizationOutput);
@@ -198,9 +198,14 @@ public class Elevator extends SubsystemBase {
                   "Elevator/StaticCharacterizationOutput", state.characterizationOutput);
             })
         .until(() -> inputs.velocityRadPerSec >= staticCharacterizationVelocityThresh.get())
+        .beforeStarting(
+            () -> {
+              stoppedProfile = true;
+              timer.restart();
+            })
         .finallyDo(
             () -> {
-              runningProfile = false;
+              stoppedProfile = false;
               timer.stop();
               Logger.recordOutput("Elevator/CharacterizationOutput", state.characterizationOutput);
             });
