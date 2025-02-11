@@ -19,7 +19,7 @@ public class CoralIntakeIO extends SubsystemBase {
     this.leftMotor = new SparkMax(leftMotor, MotorType.kBrushless);
     this.rightMotor = new SparkMax(rightMotor, MotorType.kBrushless);
 
-    this.;
+    this.analogInput = new AnalogInput(analogInput);
   }
 
   // motor stuff
