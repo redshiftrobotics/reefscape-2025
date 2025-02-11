@@ -53,5 +53,7 @@ public class WristIOSim implements WristIO {
     sim.update(0.02);
 
     inputs.positionRad = sim.getAngleRads();
+    inputs.setpointRad = pid.getSetpoint();
+    inputs.appliedVolts = appliedVolts;
   }
 }

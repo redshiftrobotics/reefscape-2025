@@ -6,6 +6,8 @@ public interface WristIO {
   @AutoLog
   public static class WristIOInputs {
     public double positionRad;
+    public double setpointRad;
+    public double appliedVolts;
   }
 
   /** Updates the set of loggable inputs. */

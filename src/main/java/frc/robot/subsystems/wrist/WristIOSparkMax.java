@@ -17,12 +17,14 @@ public class WristIOSparkMax implements WristIO {
   private final SparkMax motor;
   private final RelativeEncoder encoder;
   private final SparkClosedLoopController pid;
+  private double setpoint;
 
   public WristIOSparkMax() {
     // Create motor and get associated objects
     motor = new SparkMax(WristConstants.WRIST_CONFIG.motorId(), MotorType.kBrushless);
     encoder = motor.getEncoder();
     pid = motor.getClosedLoopController();
+    setpoint = 0;
 
     // Configure motor
     SparkMaxConfig config = new SparkMaxConfig();
@@ -50,11 +52,14 @@ public class WristIOSparkMax implements WristIO {
         ClosedLoopSlot.kSlot0,
         feedforward,
         ArbFFUnits.kVoltage);
+    setpoint = pos;
   }
 
   @Override
   public void updateInputs(WristIOInputs inputs) {
     inputs.positionRad =
         Units.rotationsToRadians(encoder.getPosition() / WristConstants.GEAR_RATIO);
+    inputs.setpointRad = setpoint;
+    inputs.appliedVolts = motor.getAppliedOutput() * motor.getBusVoltage();
   }
 }

@@ -2,6 +2,7 @@ package frc.robot.subsystems.wrist;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -9,6 +10,8 @@ public class Wrist extends SubsystemBase {
   private WristIO io;
   private WristIOInputsAutoLogged inputs;
   private final ArmFeedforward feedforward;
+
+  private final WristVisualizer measuredVisualizer, setpointVisualizer;
 
   public Wrist(WristIO io) {
     this.io = io;
@@ -22,6 +25,10 @@ public class Wrist extends SubsystemBase {
         WristConstants.PID_CONFIG.p(),
         WristConstants.PID_CONFIG.i(),
         WristConstants.PID_CONFIG.d());
+    inputs = new WristIOInputsAutoLogged();
+
+    measuredVisualizer = new WristVisualizer("Measured", Color.kLavender);
+    setpointVisualizer = new WristVisualizer("Setpoint", Color.kAqua);
   }
 
   public Rotation2d getRotation() {
@@ -40,5 +47,7 @@ public class Wrist extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Wrist", inputs);
+    measuredVisualizer.update(getRotation());
+    setpointVisualizer.update(Rotation2d.fromRadians(inputs.setpointRad));
   }
 }
