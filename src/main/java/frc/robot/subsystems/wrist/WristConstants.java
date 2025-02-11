@@ -14,9 +14,9 @@ public class WristConstants {
       };
 
   public static class WristPositions {
-    public static final Rotation2d ROBOT_START = Rotation2d.fromRotations(0);
-    public static final Rotation2d CORAL_INTAKE = Rotation2d.fromRotations(0);
-    public static final Rotation2d CORAL_DEPOSIT = Rotation2d.fromRotations(0);
+    public static final Rotation2d ROBOT_START = Rotation2d.fromDegrees(0);
+    public static final Rotation2d CORAL_INTAKE = Rotation2d.fromDegrees(0);
+    public static final Rotation2d CORAL_DEPOSIT = Rotation2d.fromDegrees(0);
   }
 
   public record PID(double p, double i, double d) {}
@@ -30,7 +30,7 @@ public class WristConstants {
 
   public static final FeedForward FEED_FORWARD_CONFIG =
       switch (Constants.getRobot()) {
-        default -> new FeedForward(0, 0, 0, 0);
+        default -> new FeedForward(0, 263.63, 0.01, 9.56);
       };
 
   public static final double GEAR_RATIO = 1.0f;
