@@ -43,16 +43,13 @@ public class HangIOSim implements HangIO {
 
   @Override
   public void updateInputs(HangIOInputs inputs) {
-    var x = controller.calculate(getPosition(), setpoint);
-    // System.out.println(x + " set: " + setpoint + " pos: " + getPosition());
-    motor.set(x);
+    motor.set(controller.calculate(getPosition(), setpoint));
 
     armSim.setInput(motor.get() * RobotController.getBatteryVoltage());
 
     armSim.update(Constants.LOOP_PERIOD_SECONDS);
 
-    var a = armSim.getAngleRads();
-    encoderSim.setDistance(a);
+    encoderSim.setDistance(armSim.getAngleRads());
 
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(armSim.getCurrentDrawAmps()));
