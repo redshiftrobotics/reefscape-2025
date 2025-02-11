@@ -53,6 +53,7 @@ import frc.robot.subsystems.vision.CameraIOSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
+
 import java.io.IOException;
 import java.util.Arrays;
 import org.json.simple.parser.ParseException;
@@ -273,7 +274,7 @@ public class RobotContainer {
       final SpeedLevelController level =
           new SpeedLevelController(SpeedLevelController.SpeedLevel.NO_LEVEL);
 
-      // Default command
+      // Default command, normal joystick drive
       drive.setDefaultCommand(
           DriveCommands.joystickDrive(
                   drive,
@@ -283,8 +284,21 @@ public class RobotContainer {
                   useFieldRelative::getAsBoolean)
               .withName("Default Drive"));
 
-      // Cause the robot to resist movement by forming an X shape with the swerve
-      // modules
+      // Secondary drive command, angle controlled drive
+      driverXbox
+          .rightBumper()
+          .and(driverXbox.leftTrigger().negate())
+          .and(driverXbox.rightTrigger().negate())
+          .whileTrue(
+              DriveCommands.joystickHeadingDrive(
+                      drive,
+                      input::getTranslationMetersPerSecond,
+                      input::getHeadingDirection,
+                      level::getCurrentSpeedLevel,
+                      useFieldRelative::getAsBoolean)
+                  .withName("Heading Drive"));
+
+      // Cause the robot to resist movement by forming an X shape with the swerve modules
       // Helps prevent getting pushed around
       driverXbox
           .x()
@@ -308,21 +322,12 @@ public class RobotContainer {
                       () ->
                           drive.resetPose(
                               new Pose2d(drive.getRobotPose().getTranslation(), Rotation2d.kZero)))
+                  .ignoringDisable(true)
                   .withName("Reset Gyro Heading"));
-
-      driverXbox
-          .rightBumper()
-          .whileTrue(
-              DriveCommands.joystickHeadingDrive(
-                      drive,
-                      input::getTranslationMetersPerSecond,
-                      input::getHeadingDirection,
-                      level::getCurrentSpeedLevel,
-                      useFieldRelative::getAsBoolean)
-                  .withName("Heading Drive"));
 
       if (includeAutoAlign) {
         // Align to reef
+
         final AdaptiveAutoAlignCommands reefAlignmentCommands =
             new AdaptiveAutoAlignCommands(
                 Arrays.asList(FieldConstants.Reef.alignmentFaces),
@@ -333,7 +338,8 @@ public class RobotContainer {
 
         driverXbox
             .rightTrigger()
-            .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Drive to reef"));
+            .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Drive to reef"))
+            .onFalse(reefAlignmentCommands.stop(drive));
 
         driverXbox
             .rightTrigger()
@@ -351,8 +357,6 @@ public class RobotContainer {
                         .driveToPrevious(drive)
                         .withName("Drive to previous reef")));
 
-        driverXbox.rightTrigger(0.1).onFalse(drive.runOnce(drive::stop));
-
         // Align to intake
 
         final AdaptiveAutoAlignCommands intakeAlignmentCommands =
@@ -365,7 +369,8 @@ public class RobotContainer {
 
         driverXbox
             .leftTrigger()
-            .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Drive to intake"));
+            .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Drive to intake"))
+            .onFalse(intakeAlignmentCommands.stop(drive));
 
         driverXbox
             .leftTrigger()
@@ -382,8 +387,6 @@ public class RobotContainer {
                     intakeAlignmentCommands
                         .driveToPrevious(drive)
                         .withName("Drive to previous intake")));
-
-        driverXbox.leftTrigger(0.1).onFalse(drive.runOnce(drive::stop));
       }
     } else if (driverController instanceof CommandJoystick) {
       final CommandJoystick driverJoystick = (CommandJoystick) driverController;

@@ -66,4 +66,8 @@ public class AdaptiveAutoAlignCommands {
     return align(drive)
         .beforeStarting(() -> this.offset = (this.offset - 1 + poses.size()) % poses.size());
   }
+
+  public Command stop(Drive drive) {
+    return Commands.run(drive::stop);
+  }
 }
