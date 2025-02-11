@@ -25,6 +25,43 @@ public class VisionConstants {
               new Translation3d(Units.inchesToMeters(27.5 / 2.0 + 1.0), 0, Units.inchesToMeters(6)),
               new Rotation3d(0, Units.degreesToRadians(0), 0)));
 
+  public static final CameraConfig COMP_FRONT_LEFT_CAMERA =
+      new CameraConfig(
+          "frontLeftCam",
+          new Transform3d(
+              new Translation3d(
+                  Units.inchesToMeters((27.5 - 2.5) / 2.0 - 3.0),
+                  Units.inchesToMeters((27.5 - 2.5) / 2.0),
+                  Units.inchesToMeters(9)),
+              new Rotation3d(0, Units.degreesToRadians(-10), Units.degreesToRadians(-30))));
+  public static final CameraConfig COMP_FRONT_RIGHT_CAMERA =
+      new CameraConfig(
+          "frontRightCam",
+          new Transform3d(
+              new Translation3d(
+                  Units.inchesToMeters((27.5 - 3) / 2.0 - 3.0),
+                  -Units.inchesToMeters((27.5 - 3) / 2.0),
+                  Units.inchesToMeters(9)),
+              new Rotation3d(0, Units.degreesToRadians(-10), Units.degreesToRadians(30))));
+  public static final CameraConfig COMP_BACK_LEFT_CAMERA =
+      new CameraConfig(
+          "backLeftCam",
+          new Transform3d(
+              new Translation3d(
+                  -Units.inchesToMeters((27.5 - 3) / 2.0),
+                  Units.inchesToMeters((27.5 - 3) / 2.0),
+                  Units.inchesToMeters(9)),
+              new Rotation3d(0, Units.degreesToRadians(-20), Units.degreesToRadians(135))));
+  public static final CameraConfig COMP_BACK_RIGHT_CAMERA =
+      new CameraConfig(
+          "backRightCam",
+          new Transform3d(
+              new Translation3d(
+                  -Units.inchesToMeters((27.5 - 3) / 2.0),
+                  -Units.inchesToMeters((27.5 - 3) / 2.0),
+                  Units.inchesToMeters(9)),
+              new Rotation3d(0, Units.degreesToRadians(-20), Units.degreesToRadians(-135))));
+
   public static final CameraConfig WOODV2_LEFT_CAMERA =
       new CameraConfig(
           "leftCamera",
