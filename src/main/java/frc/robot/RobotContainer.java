@@ -299,6 +299,17 @@ public class RobotContainer {
           .or(RobotModeTriggers.disabled())
           .onTrue(drive.runOnce(drive::stop).withName("Stop and Cancel"));
 
+      // Reset the gyro heading
+      driverXbox
+          .start()
+          .onTrue(
+              drive
+                  .runOnce(
+                      () ->
+                          drive.resetPose(
+                              new Pose2d(drive.getRobotPose().getTranslation(), Rotation2d.kZero)))
+                  .withName("Reset Gyro Heading"));
+
       driverXbox
           .rightBumper()
           .whileTrue(
@@ -468,6 +479,16 @@ public class RobotContainer {
   }
 
   private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {
+
+    SmartDashboard.putData(
+        "Simple Feed Forward Characterization", DriveCommands.feedforwardCharacterization(drive));
+    SmartDashboard.putData(
+        "Simple Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+
+    SmartDashboard.putData(
+        "Elevator Static Characterization", elevator.staticCharacterization(0.2));
+    SmartDashboard.putData("Elevator Coast", elevator.coast());
+
     // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/introduction.html
     dashboardChooser.addOption(
         "Drive SysId (Quasistatic Forward)",
