@@ -1,8 +1,8 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.hang.Hang;
+import frc.robot.subsystems.hang.HangConstants;
 
 public class SetHangArmPosition extends Command {
   private Hang hang;
@@ -22,11 +22,9 @@ public class SetHangArmPosition extends Command {
 
   @Override
   public boolean isFinished() {
-    final double deadband = 1; // TODO
+    double i = Math.abs(hang.getPosition());
 
-    // if within deadband range make value 0
-    // therefore when value is 0 we are within finished range
-    return MathUtil.applyDeadband(hang.getPosition(), deadband) == 0;
+    return i > (i - HangConstants.TOLERANCE) && i < (i + HangConstants.TOLERANCE);
   }
 
   @Override

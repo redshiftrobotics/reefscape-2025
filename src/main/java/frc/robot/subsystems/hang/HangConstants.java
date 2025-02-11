@@ -17,4 +17,6 @@ public class HangConstants {
   public static final int WOOD_BOT_TWO_CAN_ID = 000;
   public static final int T_SHIRT_CANNON_CAN_ID = 0;
   public static final int CRESCENDO_2024_CAN_ID = 0;
+
+  public static final double TOLERANCE = 3;
 }
