@@ -7,8 +7,8 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.PIDController;
 
 public class HangIOReal implements HangIO {
-  SparkMax wenchMotor; // TODO CAN ID
-  PIDController controller;
+  private final SparkMax wenchMotor;
+  private final PIDController controller;
 
   double setpoint = 0.0;
 
