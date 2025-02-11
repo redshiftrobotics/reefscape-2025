@@ -1,6 +1,7 @@
 package frc.robot.subsystems.hang;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
@@ -11,12 +12,7 @@ import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 public class HangIOSim implements HangIO {
   private PWMSparkMax motor = new PWMSparkMax(0);
@@ -26,18 +22,14 @@ public class HangIOSim implements HangIO {
   // TODO: Get values from design
   private SingleJointedArmSim armSim =
       new SingleJointedArmSim(DCMotor.getNEO(1), 1, 1, Units.inchesToMeters(18), 0, 3, false, 0);
-  private LoggedMechanism2d mech2d = new LoggedMechanism2d(60, 60);
-  private LoggedMechanismRoot2d armPivot = mech2d.getRoot("ArmPivot", 30, 30);
-  private LoggedMechanismLigament2d arm =
-      armPivot.append(
-          new LoggedMechanismLigament2d(
-              "Simulated Arm",
-              30,
-              Units.radiansToDegrees(armSim.getAngleRads()),
-              6,
-              new Color8Bit(Color.kYellow)));
+  private HangVisualization currentArm =
+      new HangVisualization("Hang/Arm", 32, 32, 16, getPosition(), Color.kGreen);
+  private HangVisualization setpointArm =
+      new HangVisualization("Hang/Setpoint", 32, 32, 16, getPosition(), Color.kOrange);
 
-  private PIDController controller = new PIDController(100, 0, 0); // TODO Tune
+  private PIDController controller =
+      new PIDController(
+          HangConstants.SIM_HANG_ARM_P, HangConstants.SIM_HANG_ARM_I, HangConstants.SIM_HANG_ARM_D);
 
   private double setpoint;
 
@@ -54,15 +46,15 @@ public class HangIOSim implements HangIO {
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(armSim.getCurrentDrawAmps()));
 
-    arm.setAngle(Units.radiansToDegrees(armSim.getAngleRads()));
+    currentArm.setAngle(Rotation2d.fromRadians(armSim.getAngleRads()));
 
     inputs.armSetpoint = setpoint;
-    Logger.recordOutput("Hang/Arm", mech2d);
   }
 
   @Override
   public void setSetpoint(double setpoint) {
     this.setpoint = setpoint;
+    setpointArm.setAngle(Rotation2d.fromRotations(setpoint));
   }
 
   @Override
