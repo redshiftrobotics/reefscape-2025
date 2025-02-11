@@ -44,9 +44,10 @@ public final class Constants {
 
   public static Mode getMode() {
     return switch (getRobot()) {
-      case COMP_BOT_2025, WOOD_BOT_TWO_2025, T_SHIRT_CANNON_CHASSIS, CRESCENDO_CHASSIS_2024 -> RobotBase.isReal()
-          ? Mode.REAL
-          : Mode.REPLAY;
+      case COMP_BOT_2025,
+          WOOD_BOT_TWO_2025,
+          T_SHIRT_CANNON_CHASSIS,
+          CRESCENDO_CHASSIS_2024 -> RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
       case SIM_BOT -> Mode.SIM;
     };
   }

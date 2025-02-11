@@ -105,7 +105,6 @@ public class RobotContainer {
   public RobotContainer() {
 
     switch (Constants.getRobot()) {
-
       case COMP_BOT_2025:
         // Real robot (Wood bot test chassis), instantiate hardware IO implementations
         drive =
@@ -115,8 +114,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
-        vision =
-            new AprilTagVision();
+        vision = new AprilTagVision();
         elevator = new Elevator(new ElevatorIO() {});
         break;
 
