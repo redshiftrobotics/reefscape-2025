@@ -31,6 +31,13 @@ public class ModuleConstants {
         BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
         BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
         break;
+      
+      case COMP_BOT_2025:
+        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        break;
 
       case T_SHIRT_CANNON_CHASSIS:
         FRONT_LEFT_MODULE_CONFIG =
@@ -119,6 +126,7 @@ public class ModuleConstants {
 
       case WOOD_BOT_TWO_2025:
       case T_SHIRT_CANNON_CHASSIS:
+      case COMP_BOT_2025:
       default:
         DRIVE_MOTOR = DCMotor.getNEO(1);
         DRIVE_FEEDBACK = new PIDConstants(0.0001, 0.0, 0.0);

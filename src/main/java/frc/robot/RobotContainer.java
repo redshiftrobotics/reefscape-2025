@@ -77,23 +77,49 @@ public class RobotContainer {
   private final CommandGenericHID driverController = new CommandXboxController(0);
   private final CommandGenericHID operatorController = new CommandXboxController(1);
 
+  private final Alert driverDisconnected =
+      new Alert(
+          String.format(
+              "Driver xbox controller disconnected (port %s).",
+              driverController.getHID().getPort()),
+          AlertType.kWarning);
+  private final Alert operatorDisconnected =
+      new Alert(
+          String.format(
+              "Operator xbox controller disconnected (port %s).",
+              operatorController.getHID().getPort()),
+          AlertType.kWarning);
+
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
   // Alerts
-  private final Alert fmsAndNotCompBotAlert =
+  private final Alert notPrimaryBotAlert =
       new Alert(
-          "FMS attached and bot is not comp bot, are you sure this is correct?",
-          AlertType.kWarning);
+          "Robot type is not the primary robot type. Be careful you are not using the wrong robot.",
+          AlertType.kInfo);
   private final Alert tuningModeActiveAlert =
       new Alert("Tuning mode active, do not use in competition.", AlertType.kWarning);
-  private final Alert onBlockMode =
-      new Alert("On block mode active, do not use in competition.", AlertType.kWarning);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
     switch (Constants.getRobot()) {
+
+      case COMP_BOT_2025:
+        // Real robot (Wood bot test chassis), instantiate hardware IO implementations
+        drive =
+            new Drive(
+                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+        vision =
+            new AprilTagVision();
+        elevator = new Elevator(new ElevatorIO() {});
+        break;
+
       case WOOD_BOT_TWO_2025:
         // Real robot (Wood bot test chassis), instantiate hardware IO implementations
         drive =
@@ -195,12 +221,8 @@ public class RobotContainer {
     if (Constants.TUNING_MODE) {
       tuningModeActiveAlert.set(true);
     }
-    if (Constants.ON_BLOCKS_TEST_MODE) {
-      onBlockMode.set(true);
-    }
-    if (DriverStation.isFMSAttached()
-        && Constants.getRobot() != Constants.RobotType.WOOD_BOT_TWO_2025) {
-      fmsAndNotCompBotAlert.set(true);
+    if (Constants.getRobot() != Constants.PRIMARY_ROBOT_TYPE) {
+      notPrimaryBotAlert.set(true);
     }
 
     // Hide controller missing warnings for sim
@@ -243,6 +265,16 @@ public class RobotContainer {
                     new Transform2d(
                         DRIVE_CONFIG.bumperCornerToCorner().getX() / 2, 0, Rotation2d.kPi))),
         true);
+  }
+
+  public void updateAlerts() {
+    // Controller disconnected alerts
+    driverDisconnected.set(
+        !DriverStation.isJoystickConnected(driverController.getHID().getPort())
+            || !DriverStation.getJoystickIsXbox(driverController.getHID().getPort()));
+    operatorDisconnected.set(
+        !DriverStation.isJoystickConnected(operatorController.getHID().getPort())
+            || !DriverStation.getJoystickIsXbox(operatorController.getHID().getPort()));
   }
 
   /** Define button->command mappings. */

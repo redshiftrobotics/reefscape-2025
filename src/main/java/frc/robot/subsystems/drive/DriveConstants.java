@@ -56,6 +56,11 @@ public class DriveConstants {
 
   public static final DriveConfig DRIVE_CONFIG =
       switch (Constants.getRobot()) {
+        case COMP_BOT_2025 -> new DriveConfig(
+            new Translation2d(Units.inchesToMeters(22.729226), Units.inchesToMeters(22.729226)),
+            new Translation2d(Units.inchesToMeters(27.5), Units.inchesToMeters(27.5)),
+            5.05968,
+            14.5);
         case T_SHIRT_CANNON_CHASSIS -> new DriveConfig(
             new Translation2d(Units.inchesToMeters(22.729226), Units.inchesToMeters(22.729226)),
             new Translation2d(Units.inchesToMeters(25.729226), Units.inchesToMeters(25.729226)),
@@ -89,6 +94,7 @@ public class DriveConstants {
 
   public static final int GYRO_CAN_ID =
       switch (Constants.getRobot()) {
+        case COMP_BOT_2025 -> 40;
         case CRESCENDO_CHASSIS_2024 -> 40;
         case T_SHIRT_CANNON_CHASSIS -> 40;
         case WOOD_BOT_TWO_2025 -> 40;

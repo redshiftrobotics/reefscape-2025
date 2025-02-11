@@ -226,7 +226,7 @@ public class Drive extends SubsystemBase {
       }
 
       // Update gyro angle
-      if (gyroInputs.connected && !Constants.ON_BLOCKS_TEST_MODE) {
+      if (gyroInputs.connected) {
         // Use the real gyro angle
         rawGyroRotation = gyroInputs.odometryYawPositions[i];
       } else {
