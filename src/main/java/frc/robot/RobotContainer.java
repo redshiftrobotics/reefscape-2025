@@ -135,7 +135,12 @@ public class RobotContainer {
                 new ModuleIOSim(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSim(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision =
-            new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
+            new AprilTagVision(
+                new CameraIOSim(VisionConstants.COMP_FRONT_LEFT_CAMERA, drive::getRobotPose),
+                new CameraIOSim(VisionConstants.COMP_FRONT_RIGHT_CAMERA, drive::getRobotPose),
+                new CameraIOSim(VisionConstants.COMP_BACK_LEFT_CAMERA, drive::getRobotPose),
+                new CameraIOSim(VisionConstants.COMP_BACK_RIGHT_CAMERA, drive::getRobotPose));
+
         break;
 
       default:
@@ -155,7 +160,7 @@ public class RobotContainer {
 
     vision.addVisionEstimateConsumer(
         (estimate) -> {
-          if (estimate.status().isSuccess() && Constants.getMode() != Mode.SIM) {
+          if (estimate.status().isSuccess()) {
             drive.addVisionMeasurement(
                 estimate.robotPose().toPose2d(),
                 estimate.timestampSeconds(),
