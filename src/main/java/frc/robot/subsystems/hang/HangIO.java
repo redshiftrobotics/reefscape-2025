@@ -27,6 +27,10 @@ public interface HangIO {
     return 0;
   }
 
+  public default boolean atSetpoint() {
+    return true;
+  }
+
   /**
    * Get the current position of the arm.
    *

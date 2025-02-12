@@ -15,6 +15,7 @@ public class HangIOReal implements HangIO {
   public HangIOReal(int deviceId) {
     wenchMotor = new SparkMax(deviceId, MotorType.kBrushless);
     controller = new PIDController(REAL_HANG_ARM_P, REAL_HANG_ARM_I, REAL_HANG_ARM_D);
+    controller.setTolerance(TOLERANCE);
   }
 
   @Override
@@ -38,6 +39,11 @@ public class HangIOReal implements HangIO {
   @Override
   public double getPosition() {
     return wenchMotor.getAbsoluteEncoder().getPosition();
+  }
+
+  @Override
+  public boolean atSetpoint() {
+    return controller.atSetpoint();
   }
 
   @Override
