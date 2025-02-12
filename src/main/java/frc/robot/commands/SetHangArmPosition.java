@@ -22,9 +22,7 @@ public class SetHangArmPosition extends Command {
 
   @Override
   public boolean isFinished() {
-    double i = Math.abs(hang.getPosition());
-
-    return i > (i - HangConstants.TOLERANCE) && i < (i + HangConstants.TOLERANCE);
+    return hang.atSetpoint();
   }
 
   @Override
