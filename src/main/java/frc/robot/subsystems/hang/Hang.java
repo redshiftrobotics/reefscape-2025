@@ -35,6 +35,10 @@ public class Hang extends SubsystemBase {
     return io.getSetpoint();
   }
 
+  public boolean atSetpoint() {
+    return io.atSetpoint();
+  }
+
   /**
    * Get the current position of the arm.
    *
