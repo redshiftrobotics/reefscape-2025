@@ -59,6 +59,16 @@
                     }
                   },
                   {
+                    "type": "vision",
+                    "logKey": "/RealOutputs/Vision/tagPoses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
                     "type": "trajectory",
                     "logKey": "/RealOutputs/Odometry/Trajectory",
                     "logType": "Pose2d[]",
@@ -72,9 +82,39 @@
                     "type": "ghost",
                     "logKey": "/RealOutputs/Odometry/TrajectorySetpoint",
                     "logType": "Pose2d",
+                    "visible": false,
+                    "options": {
+                      "model": "demo_8032",
+                      "color": "#00ff00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/Vision/robotPosesAccepted",
+                    "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
-                      "model": "2025 KitBot",
+                      "model": "demo_8032",
+                      "color": "#ff00ff"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/Vision/robotPosesRejected",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "model": "demo_8032",
+                      "color": "#ffff00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/AutoAlignGoal",
+                    "logType": "Pose2d[]",
+                    "visible": true,
+                    "options": {
+                      "model": "demo_8032",
                       "color": "#00ff00"
                     }
                   },
@@ -432,6 +472,18 @@
       }
     }
   ],
-  "satellites": [],
+  "satellites": [
+    {
+      "x": 316,
+      "y": 180,
+      "width": 967,
+      "height": 475,
+      "state": {
+        "type": 2,
+        "visualizer": null
+      },
+      "uuid": "rdy54xgxb86v999c510rijuebtpjrgc5"
+    }
+  ],
   "version": "4.1.0"
 }
