@@ -14,6 +14,7 @@ public class FlywheelConstants {
         case WOOD_BOT_TWO_2025 -> new FlywheelConfig(0, 1, false, false);
         case T_SHIRT_CANNON_CHASSIS -> new FlywheelConfig(0, 1, false, false);
         case CRESCENDO_CHASSIS_2024 -> new FlywheelConfig(0, 1, false, false);
+        case COMP_BOT_2025 -> new FlywheelConfig(0, 1, false, false);
         case SIM_BOT -> new FlywheelConfig(0, 1, false, false);
       };
 

@@ -64,7 +64,13 @@ public class ModuleConstants {
         BACK_RIGHT_MODULE_CONFIG =
             new ModuleConfig(11, 10, 38, Rotation2d.fromRotations(-0.8935546875), true);
         break;
-
+      case COMP_BOT_2025:
+        // TODO get encoder offsets
+        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(19, 18, 37, null, false);
+        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(2, 1, 36, null, false);
+        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(10, 11, 39, null, false);
+        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(8, 9, 38, null, false);
+        break;
       default:
         FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);
         FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.fromRotations(0), false);

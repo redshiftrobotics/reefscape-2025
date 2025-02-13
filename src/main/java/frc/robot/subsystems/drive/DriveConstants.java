@@ -69,6 +69,7 @@ public class DriveConstants {
             14.5);
         case CRESCENDO_CHASSIS_2024 -> new DriveConfig(
             new Translation2d(0.885, 0.885), new Translation2d(0.9612, 0.9612), 3.81, 14.5);
+        case COMP_BOT_2025 -> new DriveConfig(null, null, 0, 0); // TODO get values
         case SIM_BOT -> new DriveConfig(
             new Translation2d(0.885, 0.885), new Translation2d(0.9612, 0.9612), 5.05968, 14.5);
       };

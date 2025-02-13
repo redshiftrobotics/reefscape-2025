@@ -44,9 +44,10 @@ public final class Constants {
 
   public static Mode getMode() {
     return switch (getRobot()) {
-      case WOOD_BOT_TWO_2025, T_SHIRT_CANNON_CHASSIS, CRESCENDO_CHASSIS_2024 -> RobotBase.isReal()
-          ? Mode.REAL
-          : Mode.REPLAY;
+      case WOOD_BOT_TWO_2025,
+          T_SHIRT_CANNON_CHASSIS,
+          CRESCENDO_CHASSIS_2024,
+          COMP_BOT_2025 -> RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
       case SIM_BOT -> Mode.SIM;
     };
   }
@@ -67,6 +68,7 @@ public final class Constants {
     T_SHIRT_CANNON_CHASSIS,
     CRESCENDO_CHASSIS_2024,
     WOOD_BOT_TWO_2025,
+    COMP_BOT_2025
   }
 
   private static RobotType determineRobotType() {
@@ -78,6 +80,7 @@ public final class Constants {
           return RobotType.T_SHIRT_CANNON_CHASSIS;
         case "032D216B":
           return RobotType.WOOD_BOT_TWO_2025;
+          // TODO add COMP_BOT_2025 serial
       }
     } else if (RobotBase.isSimulation()) {
       return RobotType.SIM_BOT;
