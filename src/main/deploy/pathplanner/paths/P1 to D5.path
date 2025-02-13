@@ -8,7 +8,7 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9129879494234905,
+        "x": 1.9129879494234907,
         "y": 6.199750410683426
       },
       "isLocked": false,
@@ -49,7 +49,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -1.481301510519294
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "Paths A",
