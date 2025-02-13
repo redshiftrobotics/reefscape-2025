@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -43,6 +44,11 @@ import frc.robot.subsystems.drive.ModuleConstants;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
+import frc.robot.subsystems.hang.Hang;
+import frc.robot.subsystems.hang.HangConstants;
+import frc.robot.subsystems.hang.HangIO;
+import frc.robot.subsystems.hang.HangIOReal;
+import frc.robot.subsystems.hang.HangIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
@@ -68,6 +74,7 @@ public class RobotContainer {
 
   // Subsystems
   private final Drive drive;
+  private final Hang hang;
   private final AprilTagVision vision;
   private final Wrist wrist;
 
@@ -106,6 +113,7 @@ public class RobotContainer {
                 new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA),
                 new CameraIOPhotonVision(VisionConstants.WOODV2_RIGHT_CAMERA));
         wrist = new Wrist(new WristIOSparkMax());
+        hang = new Hang(new HangIOReal(HangConstants.WOOD_BOT_TWO_CAN_ID));
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -119,6 +127,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
         wrist = new Wrist(new WristIOSparkMax());
+        hang = new Hang(new HangIOReal(HangConstants.T_SHIRT_CANNON_CAN_ID));
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -132,6 +141,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
         wrist = new Wrist(new WristIOSparkMax());
+        hang = new Hang(new HangIOReal(HangConstants.CRESCENDO_2024_CAN_ID)); // What hang arm??
         break;
 
       case SIM_BOT:
@@ -146,6 +156,7 @@ public class RobotContainer {
         vision =
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         wrist = new Wrist(new WristIOSim());
+        hang = new Hang(new HangIOSim());
         break;
 
       default:
@@ -157,6 +168,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        hang = new Hang(new HangIO() {});
         vision = new AprilTagVision();
         wrist = new Wrist(new WristIO() {});
         break;
@@ -443,6 +455,10 @@ public class RobotContainer {
     } catch (ParseException e) {
       System.out.println("Failed to parse Choreo auto " + e.getMessage());
     }
+
+    // Testing autos :)
+    dashboardChooser.addOption(
+        "NOT-PROD HANG SIM TEST", new InstantCommand(() -> hang.setSetpoint(0.8)));
   }
 
   private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {
