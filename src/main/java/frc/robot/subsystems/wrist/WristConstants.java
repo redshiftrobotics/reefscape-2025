@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 
-// TODO Replace dummy values!
+// TODO Replace the dummy values before running on the real bot!
 public class WristConstants {
   public record WristConfig(int motorId, boolean motorInverted) {}
 
