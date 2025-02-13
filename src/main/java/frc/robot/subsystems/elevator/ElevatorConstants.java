@@ -16,5 +16,6 @@ public class ElevatorConstants {
   public static final double GEAR_RATIO = 1.0 / 1.0;
 
   // Motor ID value is a placeholder
-  public static final int motorID = 1;
+  public static final int motor1ID = 1;
+  public static final int motor2ID = 2;
 }

@@ -2,15 +2,19 @@ package frc.robot.subsystems.elevator;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkMax;
-
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.robot.Constants;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 
 public class ElevatorIOSparkMax implements ElevatorIO {
-  private final SparkMax motor;
+  private final SparkMax leader;
+  private final SparkMax follower;
   private final RelativeEncoder encoder;
   private boolean closedLoop = false;
   private TrapezoidProfile.Constraints constraints;
@@ -18,20 +22,36 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   private ElevatorFeedforward feedforward;
 
   public ElevatorIOSparkMax() {
-    motor = new SparkMax(ElevatorConstants.motorID, MotorType.kBrushless);
-    encoder = motor.getEncoder();
+    leader = new SparkMax(ElevatorConstants.motor1ID, MotorType.kBrushless);
+    follower = new SparkMax(ElevatorConstants.motor2ID, MotorType.kBrushless);
+    encoder = leader.getEncoder();
+
+    SparkMaxConfig leaderConfig = new SparkMaxConfig();
+    leaderConfig
+        .voltageCompensation(12.0)
+        .smartCurrentLimit(40)
+        .idleMode(IdleMode.kCoast);
+    SparkMaxConfig followerConfig = new SparkMaxConfig();
+    followerConfig
+        .voltageCompensation(12.0)
+        .smartCurrentLimit(40)
+        .idleMode(IdleMode.kCoast)
+        .follow(leader, true);
+    leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    follower.configure(
+        followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   public void setGoalHeight(double targetHeight) {}
 
   public void setVoltage(double volts) {
-    motor.setVoltage(volts);
+    leader.setVoltage(volts);
   }
 
   public void updateMotors() {
     if (closedLoop) {
       double pidVal = controller.calculate(encoder.getPosition());
-      motor.setVoltage(pidVal + feedforward.calculate(controller.getSetpoint().velocity));
+      leader.setVoltage(pidVal + feedforward.calculate(controller.getSetpoint().velocity));
     }
   }
 
@@ -50,6 +70,6 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   }
 
   public void stop() {
-    motor.stopMotor();
+    leader.stopMotor();
   }
 }

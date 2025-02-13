@@ -51,7 +51,7 @@ public class FlywheelIOSparkMax implements FlywheelIO {
         .smartCurrentLimit(30)
         .idleMode(IdleMode.kCoast)
         .follow(leader, FLYWHEEL_CONFIG.followerInverted());
-
+    
     leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     follower.configure(
         followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
