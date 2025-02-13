@@ -33,6 +33,8 @@ import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
+import frc.robot.subsystems.Intake.CoralIntake;
+import frc.robot.subsystems.Intake.CoralIntakeIO;
 import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -48,16 +50,14 @@ import frc.robot.subsystems.hang.HangConstants;
 import frc.robot.subsystems.hang.HangIO;
 import frc.robot.subsystems.hang.HangIOReal;
 import frc.robot.subsystems.hang.HangIOSim;
-import frc.robot.subsystems.vision.AprilTagVision;
-import frc.robot.subsystems.vision.CameraIOPhotonVision;
-import frc.robot.subsystems.vision.CameraIOSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.utility.OverrideSwitch;
-import frc.robot.utility.commands.CustomCommands;
 import java.io.IOException;
 import java.util.Arrays;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import frc.robot.subsystems.vision.AprilTagVision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -71,6 +71,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Hang hang;
   private final AprilTagVision vision;
+  private final CoralIntake coralIntake;
 
   // Controller
   private final CommandGenericHID driverController = new CommandXboxController(0);
@@ -107,6 +108,12 @@ public class RobotContainer {
                 new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA),
                 new CameraIOPhotonVision(VisionConstants.WOODV2_RIGHT_CAMERA));
         hang = new Hang(new HangIOReal(HangConstants.WOOD_BOT_TWO_CAN_ID));
+        coralIntake =
+            new CoralIntake(
+                new CoralIntakeIO(
+                    IntakeConstants.LeftMotorID,
+                    IntakeConstants.RightMotorID,
+                    IntakeConstants.SensorID));
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
