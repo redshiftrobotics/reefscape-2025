@@ -12,7 +12,7 @@ public class FlywheelIOSim implements FlywheelIO {
   private static final DCMotor MOTOR = DCMotor.getNEO(1);
   private FlywheelSim sim =
       new FlywheelSim(LinearSystemId.createFlywheelSystem(MOTOR, 0.004, GEAR_RATIO), MOTOR);
-  private PIDController pid = new PIDController(0.0, 0.0, 0.0);
+  private PIDController pid = new PIDController(0.1, 0.0, 0.0);
 
   private boolean closedLoop = false;
   private double ffVolts = 0.0;
