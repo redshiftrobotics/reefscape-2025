@@ -35,6 +35,7 @@ import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.subsystems.Intake.CoralIntake;
 import frc.robot.subsystems.Intake.CoralIntakeIO;
+import frc.robot.subsystems.Intake.IntakeConstants;
 import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -50,14 +51,13 @@ import frc.robot.subsystems.hang.HangConstants;
 import frc.robot.subsystems.hang.HangIO;
 import frc.robot.subsystems.hang.HangIOReal;
 import frc.robot.subsystems.hang.HangIOSim;
+import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.utility.OverrideSwitch;
 import java.io.IOException;
 import java.util.Arrays;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import frc.robot.subsystems.vision.AprilTagVision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
