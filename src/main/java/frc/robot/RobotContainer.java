@@ -192,7 +192,7 @@ public class RobotContainer {
     superstructure = new Superstructure(elevator);
 
     // Vision setup
-    vision.setLastRobotPoseSupplier(drive::getRobotPose);
+    // vision.setLastRobotPoseSupplier(drive::getRobotPose);
     vision.addVisionEstimateConsumer(
         (estimate) -> {
           if (estimate.status().isSuccess() && Constants.getMode() != Mode.SIM) {
@@ -359,11 +359,9 @@ public class RobotContainer {
 
         final AdaptiveAutoAlignCommands reefAlignmentCommands =
             new AdaptiveAutoAlignCommands(
-                Arrays.asList(FieldConstants.Reef.alignmentFaces),
+                Arrays.asList(FieldConstants.Reef.centerFaces),
                 new Transform2d(
-                    DRIVE_CONFIG.bumperCornerToCorner().getX() / 2 + Units.inchesToMeters(3),
-                    0,
-                    Rotation2d.kPi));
+                    DRIVE_CONFIG.bumperCornerToCorner().getX() / 2 + 1, 0, Rotation2d.kPi));
 
         driverXbox
             .rightTrigger()
