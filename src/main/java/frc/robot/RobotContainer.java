@@ -52,8 +52,12 @@ import frc.robot.subsystems.hang.HangIO;
 import frc.robot.subsystems.hang.HangIOReal;
 import frc.robot.subsystems.hang.HangIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
+import frc.robot.subsystems.vision.CameraIOPhotonVision;
+import frc.robot.subsystems.vision.CameraIOSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.utility.OverrideSwitch;
+import frc.robot.utility.commands.CustomCommands;
+
 import java.io.IOException;
 import java.util.Arrays;
 import org.json.simple.parser.ParseException;
@@ -127,6 +131,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
         hang = new Hang(new HangIOReal(HangConstants.T_SHIRT_CANNON_CAN_ID));
+        coralIntake = null;
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -140,6 +145,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
         hang = new Hang(new HangIOReal(HangConstants.CRESCENDO_2024_CAN_ID)); // What hang arm??
+        coralIntake = null;
         break;
 
       case SIM_BOT:
@@ -154,6 +160,7 @@ public class RobotContainer {
         vision =
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         hang = new Hang(new HangIOSim());
+        coralIntake = null;
         break;
 
       default:
@@ -167,6 +174,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         hang = new Hang(new HangIO() {});
         vision = new AprilTagVision();
+        coralIntake = null;
         break;
     }
 
