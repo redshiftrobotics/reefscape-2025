@@ -179,11 +179,11 @@ public class Elevator extends SubsystemBase {
     return Commands.startEnd(
         () -> {
           io.setBrakeMode(false);
-          stoppedProfile = false;
+          stoppedProfile = true;
         },
         () -> {
           io.setBrakeMode(true);
-          stoppedProfile = true;
+          stoppedProfile = false;
         });
   }
 
