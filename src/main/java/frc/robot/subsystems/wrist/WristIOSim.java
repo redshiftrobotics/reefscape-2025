@@ -19,7 +19,11 @@ public class WristIOSim implements WristIO {
           Units.degreesToRadians(45),
           true,
           0);
-  private PIDController pid = new PIDController(0.0, 0.0, 0.0);
+  private PIDController pid =
+      new PIDController(
+          WristConstants.PID_CONFIG.p(),
+          WristConstants.PID_CONFIG.i(),
+          WristConstants.PID_CONFIG.d());
 
   private double feedforwardVolts = 0.0;
   private double appliedVolts = 0.0;
@@ -43,11 +47,7 @@ public class WristIOSim implements WristIO {
   @Override
   public void updateInputs(WristIOInputs inputs) {
     appliedVolts =
-        MathUtil.clamp(
-            pid.calculate(sim.getVelocityRadPerSec() / WristConstants.ARM_LENGTH)
-                + feedforwardVolts,
-            -12.0f,
-            12.0f);
+        MathUtil.clamp(pid.calculate(sim.getVelocityRadPerSec()) + feedforwardVolts, -12.0f, 12.0f);
     sim.setInputVoltage(appliedVolts);
 
     sim.update(0.02);
@@ -55,5 +55,6 @@ public class WristIOSim implements WristIO {
     inputs.positionRad = sim.getAngleRads();
     inputs.setpointRad = pid.getSetpoint();
     inputs.appliedVolts = appliedVolts;
+    inputs.angularVelocity = sim.getVelocityRadPerSec();
   }
 }

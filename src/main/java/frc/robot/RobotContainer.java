@@ -29,8 +29,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.AdaptiveAutoAlignCommands;
+import frc.robot.commands.AdjustWrist;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.RotateWrist;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.subsystems.dashboard.DriverDashboard;
@@ -358,12 +358,8 @@ public class RobotContainer {
 
         driverXbox.leftTrigger(0.1).onFalse(drive.runOnce(drive::stop));
 
-        driverXbox
-            .back()
-            .onTrue(new RotateWrist(wrist, wrist.getRotation().minus(Rotation2d.fromDegrees(5))));
-        driverXbox
-            .start()
-            .onTrue(new RotateWrist(wrist, wrist.getRotation().plus(Rotation2d.fromDegrees(5))));
+        driverXbox.back().onTrue(new AdjustWrist(wrist, Rotation2d.fromDegrees(-5)));
+        driverXbox.start().onTrue(new AdjustWrist(wrist, Rotation2d.fromDegrees(5)));
       }
     } else if (driverController instanceof CommandJoystick) {
       final CommandJoystick driverJoystick = (CommandJoystick) driverController;

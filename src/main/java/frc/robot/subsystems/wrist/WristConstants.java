@@ -25,12 +25,12 @@ public class WristConstants {
 
   public static final PID PID_CONFIG =
       switch (Constants.getRobot()) {
-        default -> new PID(5, 0, 1);
+        default -> new PID(0, 0, 0);
       };
 
   public static final FeedForward FEED_FORWARD_CONFIG =
       switch (Constants.getRobot()) {
-        default -> new FeedForward(0, 1.75, 1.95, 0);
+        default -> new FeedForward(0, 0.58, 0.1, 0);
       };
 
   public static final double GEAR_RATIO = 1.0f;

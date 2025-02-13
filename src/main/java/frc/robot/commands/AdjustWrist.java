@@ -6,50 +6,28 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristConstants;
 
-public class RotateWrist extends Command {
+public class AdjustWrist extends Command {
   private Wrist wrist;
-  private Rotation2d currentRotation, targetRotation;
-  private boolean inProgress;
+  private Rotation2d currentRotation, adjustment, targetRotation;
 
   /**
    * @param wristSystem The wrist subsystem to use
    * @param initialTarget The initial target to move to when executed
    */
-  public RotateWrist(Wrist wristSystem, Rotation2d initialTarget) {
-    initWristAndCurrentRotation(wristSystem);
-    targetRotation = initialTarget;
-  }
-  /**
-   * @param wristSystem The wrist subsystem to use
-   * @apiNote Sets initial target to current wrist rotation
-   */
-  public RotateWrist(Wrist wristSystem) {
-    initWristAndCurrentRotation(wristSystem);
-    targetRotation = wrist.getRotation();
-  }
-
-  private void initWristAndCurrentRotation(Wrist wristSystem) {
+  public AdjustWrist(Wrist wristSystem, Rotation2d adjustmentAmount) {
     wrist = wristSystem;
     currentRotation = wrist.getRotation();
+    adjustment = adjustmentAmount;
+    targetRotation = Rotation2d.kZero;
     addRequirements(wrist);
-  }
-
-  /**
-   * @param target The new target
-   * @apiNote Cancels execution if called while command is in progress
-   */
-  public void setTarget(Rotation2d target) {
-    if (inProgress && !isFinished()) {
-      cancel();
-    }
-    targetRotation = target;
   }
 
   @Override
   public void initialize() {
-    SmartDashboard.putNumber("Wrist Rotation Target", targetRotation.getRadians());
     currentRotation = wrist.getRotation();
-    inProgress = true;
+    targetRotation =
+        Rotation2d.fromRadians(wrist.getTargetRotation().getRadians() + adjustment.getRadians());
+    SmartDashboard.putNumber("Wrist Rotation Target", targetRotation.getRadians());
   }
 
   @Override
@@ -67,7 +45,6 @@ public class RotateWrist extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    inProgress = false;
     wrist.stop();
   }
 }

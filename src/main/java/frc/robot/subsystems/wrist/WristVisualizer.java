@@ -14,13 +14,13 @@ public class WristVisualizer {
 
   private final LoggedMechanism2d mech =
       new LoggedMechanism2d(
-          WristConstants.ARM_LENGTH, Units.inchesToMeters(50), new Color8Bit(Color.kBlack));
+          Units.inchesToMeters(50), Units.inchesToMeters(50), new Color8Bit(Color.kBlack));
   private final LoggedMechanismLigament2d wrist;
 
   public WristVisualizer(String name, Color color) {
     this.name = name;
 
-    LoggedMechanismRoot2d root = mech.getRoot(name + " Root", 0.1, 0.06);
+    LoggedMechanismRoot2d root = mech.getRoot(name + " Root", 0.1, 0.5);
 
     wrist =
         root.append(

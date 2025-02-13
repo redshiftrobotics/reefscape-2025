@@ -9,30 +9,33 @@ import org.littletonrobotics.junction.Logger;
 public class Wrist extends SubsystemBase {
   private WristIO io;
   private WristIOInputsAutoLogged inputs;
-  private final ArmFeedforward feedforward;
+  private final ArmFeedforward feedforward =
+      new ArmFeedforward(
+          WristConstants.FEED_FORWARD_CONFIG.s(),
+          WristConstants.FEED_FORWARD_CONFIG.v(),
+          WristConstants.FEED_FORWARD_CONFIG.g(),
+          WristConstants.FEED_FORWARD_CONFIG.a());
 
   private final WristVisualizer measuredVisualizer, setpointVisualizer;
 
   public Wrist(WristIO io) {
     this.io = io;
-    feedforward =
-        new ArmFeedforward(
-            WristConstants.FEED_FORWARD_CONFIG.s(),
-            WristConstants.FEED_FORWARD_CONFIG.v(),
-            WristConstants.FEED_FORWARD_CONFIG.g(),
-            WristConstants.FEED_FORWARD_CONFIG.a());
     io.configurePID(
         WristConstants.PID_CONFIG.p(),
         WristConstants.PID_CONFIG.i(),
         WristConstants.PID_CONFIG.d());
     inputs = new WristIOInputsAutoLogged();
 
-    measuredVisualizer = new WristVisualizer("Measured", Color.kLavender);
+    measuredVisualizer = new WristVisualizer("Measured", Color.kWhite);
     setpointVisualizer = new WristVisualizer("Setpoint", Color.kAqua);
   }
 
   public Rotation2d getRotation() {
     return Rotation2d.fromRadians(inputs.positionRad);
+  }
+
+  public Rotation2d getTargetRotation() {
+    return Rotation2d.fromRadians(inputs.setpointRad);
   }
 
   public void setRotation(Rotation2d rot) {

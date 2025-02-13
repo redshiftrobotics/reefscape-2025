@@ -8,6 +8,7 @@ public interface WristIO {
     public double positionRad;
     public double setpointRad;
     public double appliedVolts;
+    public double angularVelocity;
   }
 
   /** Updates the set of loggable inputs. */
