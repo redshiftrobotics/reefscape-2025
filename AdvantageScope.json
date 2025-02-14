@@ -3,12 +3,16 @@
     {
       "x": -8,
       "y": -8,
+      "width": 2560,
+      "height": 1400,
       "width": 2576,
       "height": 1416,
       "state": {
         "sidebar": {
+          "width": 324,
           "width": 327,
           "expanded": [
+            "/RealOutputs"
             "/RealOutputs"
           ]
         },
@@ -42,6 +46,7 @@
                     "logKey": "/RealOutputs/SwerveStates/DesiredWheelSpeeds",
                     "logType": "SwerveModuleState[]",
                     "visible": false,
+                    "visible": false,
                     "options": {
                       "color": "#ff0000",
                       "arrangement": "0,1,2,3"
@@ -51,6 +56,7 @@
                     "type": "vision",
                     "logKey": "/RealOutputs/Vision/tagPoses",
                     "logType": "Pose3d[]",
+                    "visible": false,
                     "visible": false,
                     "options": {
                       "color": "#00ff00",
@@ -105,13 +111,20 @@
                     }
                   },
                   {
+                    "type": "axes",
+                    "logKey": "/RealOutputs/Vision/tagPoses",
+                    "logType": "Pose3d[]",
+                    "visible": false,
+                    "options": {}
+                  },
+                  {
                     "type": "ghost",
-                    "logKey": "/RealOutputs/Vision/robotPosesRejected",
+                    "logKey": "/RealOutputs/Vision/robotPosesAccepted",
                     "logType": "Pose3d[]",
                     "visible": false,
                     "options": {
                       "model": "demo_8032",
-                      "color": "#ffff00"
+                      "color": "#00ffff"
                     }
                   }
                 ],
@@ -121,13 +134,20 @@
               "controllerUUID": "e8hgomb1yslv0cwpvfxkohzvzsz5j7n2",
               "renderer": {
                 "cameraIndex": -3,
+                "cameraIndex": -3,
                 "orbitFov": 50,
                 "cameraPosition": [
                   10.28116,
                   1.5748000000000002,
                   6.295394842760901e-16
+                  10.28116,
+                  1.5748000000000002,
+                  6.295394842760901e-16
                 ],
                 "cameraTarget": [
+                  0,
+                  0.5,
+                  0
                   0,
                   0.5,
                   0
@@ -161,8 +181,22 @@
                     "type": "arrow",
                     "logKey": "/RealOutputs/AutoAlignGoal",
                     "logType": "Pose2d[]",
+                    "type": "trajectory",
+                    "logKey": "/RealOutputs/Odometry/Trajectory",
+                    "logType": "Pose2d[]",
                     "visible": true,
                     "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "arrow",
+                    "logKey": "/RealOutputs/AutoAlignGoal",
+                    "logType": "Pose2d[]",
+                    "visible": true,
+                    "options": {
+                      "position": "center"
                       "position": "center"
                     }
                   },
@@ -171,8 +205,18 @@
                     "logKey": "/RealOutputs/Vision/robotPosesAccepted",
                     "logType": "Pose3d[]",
                     "visible": false,
+                    "visible": false,
                     "options": {
                       "color": "#ff00ff"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/Vision/robotPosesRejected",
+                    "logType": "Pose3d[]",
+                    "visible": false,
+                    "options": {
+                      "color": "#ffff00"
                     }
                   },
                   {
@@ -188,6 +232,7 @@
                 "game": "2025 Field",
                 "bumpers": "auto",
                 "origin": "blue",
+                "orientation": 1,
                 "orientation": 1,
                 "size": 30
               },
@@ -320,6 +365,7 @@
               "title": "Joysticks",
               "controller": [
                 "Xbox Controller (White)",
+                "None",
                 "None",
                 "None",
                 "None",
@@ -566,6 +612,8 @@
       }
     }
   ],
+  "satellites": [],
+  "version": "4.1.1"
   "satellites": [],
   "version": "4.1.1"
 }
