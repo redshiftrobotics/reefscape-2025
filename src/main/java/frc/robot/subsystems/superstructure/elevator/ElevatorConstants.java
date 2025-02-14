@@ -36,7 +36,7 @@ public class ElevatorConstants {
 
   public static final PIDConstants pid =
       switch (Constants.getRobot()) {
-        // case SIM_BOT -> new PIDConstants(0.004, 0.0, 0.0);
+          // case SIM_BOT -> new PIDConstants(0.004, 0.0, 0.0);
         default -> new PIDConstants(1.0, 0.0, 0.0);
       };
 

@@ -83,6 +83,7 @@
     "Choreo",
     "deadband",
     "Debouncer",
+    "dtheta",
     "Feedforward",
     "Holonomic",
     "leds",
