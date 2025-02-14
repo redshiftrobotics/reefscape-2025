@@ -357,7 +357,7 @@ public class RobotContainer {
 
         final AdaptiveAutoAlignCommands reefAlignmentCommands =
             new AdaptiveAutoAlignCommands(
-                Arrays.asList(FieldConstants.Reef.centerFaces),
+                Arrays.asList(FieldConstants.Reef.alignmentFaces),
                 new Transform2d(
                     DRIVE_CONFIG.bumperCornerToCorner().getX() / 2 + Units.inchesToMeters(6),
                     0,

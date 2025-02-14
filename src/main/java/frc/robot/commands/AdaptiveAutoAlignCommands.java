@@ -53,7 +53,7 @@ public class AdaptiveAutoAlignCommands {
   private Command align(Drive drive) {
     return Commands.defer(
         () -> {
-          Pose2d pose = getPose(0);
+          Pose2d pose = getPose(offset);
           return DriveCommands.pathfindToPoseCommand(
                   drive,
                   pose.plus(
