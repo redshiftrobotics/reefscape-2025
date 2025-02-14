@@ -17,7 +17,7 @@ public final class Constants {
 
   public static final double LOOP_PERIOD_SECONDS = Robot.defaultPeriodSecs; // 0.02
 
-  private static final RobotType DEFAULT_ROBOT_TYPE = RobotType.WOOD_BOT_TWO_2025;
+  private static final RobotType DEFAULT_ROBOT_TYPE = RobotType.Tank_Drive;
   private static RobotType robotType = null;
 
   public static final boolean TUNING_MODE = false;
@@ -67,6 +67,7 @@ public final class Constants {
     T_SHIRT_CANNON_CHASSIS,
     CRESCENDO_CHASSIS_2024,
     WOOD_BOT_TWO_2025,
+    Tank_Drive
   }
 
   private static RobotType determineRobotType() {
