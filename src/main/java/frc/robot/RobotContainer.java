@@ -33,6 +33,9 @@ import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
+import frc.robot.subsystems.Intake.CoralIntake;
+import frc.robot.subsystems.Intake.CoralIntakeIO;
+import frc.robot.subsystems.Intake.IntakeConstants;
 import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -71,6 +74,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Hang hang;
   private final AprilTagVision vision;
+  private final CoralIntake coralIntake;
 
   // Controller
   private final CommandGenericHID driverController = new CommandXboxController(0);
@@ -107,6 +111,12 @@ public class RobotContainer {
                 new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA),
                 new CameraIOPhotonVision(VisionConstants.WOODV2_RIGHT_CAMERA));
         hang = new Hang(new HangIOReal(HangConstants.WOOD_BOT_TWO_CAN_ID));
+        coralIntake =
+            new CoralIntake(
+                new CoralIntakeIO(
+                    IntakeConstants.LeftMotorID,
+                    IntakeConstants.RightMotorID,
+                    IntakeConstants.SensorID));
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -120,6 +130,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
         hang = new Hang(new HangIOReal(HangConstants.T_SHIRT_CANNON_CAN_ID));
+        coralIntake = null;
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -133,6 +144,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
         hang = new Hang(new HangIOReal(HangConstants.CRESCENDO_2024_CAN_ID)); // What hang arm??
+        coralIntake = null;
         break;
 
       case SIM_BOT:
@@ -147,6 +159,7 @@ public class RobotContainer {
         vision =
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         hang = new Hang(new HangIOSim());
+        coralIntake = null;
         break;
 
       default:
@@ -160,6 +173,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         hang = new Hang(new HangIO() {});
         vision = new AprilTagVision();
+        coralIntake = null;
         break;
     }
 
