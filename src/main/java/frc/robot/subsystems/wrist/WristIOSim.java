@@ -46,7 +46,7 @@ public class WristIOSim implements WristIO {
   @Override
   public void updateInputs(WristIOInputs inputs) {
     appliedVolts =
-        MathUtil.clamp(pid.calculate(sim.getVelocityRadPerSec()) + feedforwardVolts, -12.0f, 12.0f);
+        MathUtil.clamp(pid.calculate(sim.getAngleRads()) + feedforwardVolts, -12.0f, 12.0f);
     sim.setInputVoltage(appliedVolts);
 
     sim.update(0.02);
