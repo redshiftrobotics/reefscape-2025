@@ -14,23 +14,25 @@ public class WristConstants {
       };
 
   public static class WristPositions {
-    public static final Rotation2d ROBOT_START = Rotation2d.fromDegrees(0);
-    public static final Rotation2d CORAL_INTAKE = Rotation2d.fromDegrees(0);
-    public static final Rotation2d CORAL_DEPOSIT = Rotation2d.fromDegrees(0);
+    public static final Rotation2d ROBOT_START = Rotation2d.fromRadians(0);
+    public static final Rotation2d CORAL_INTAKE = Rotation2d.fromRadians(0);
+    public static final Rotation2d CORAL_DEPOSIT = Rotation2d.fromRadians(0);
   }
 
   public record PID(double p, double i, double d) {}
 
   public record FeedForward(double s, double g, double v, double a) {}
 
+  // THIS IS NOT TUNED
   public static final PID PID_CONFIG =
       switch (Constants.getRobot()) {
         default -> new PID(0, 0, 0);
       };
 
+  // THIS IS NOT TUNED`
   public static final FeedForward FEED_FORWARD_CONFIG =
       switch (Constants.getRobot()) {
-        default -> new FeedForward(0, 0.58, 0.1, 0);
+        default -> new FeedForward(0, 2, 0.05, 0);
       };
 
   public static final double GEAR_RATIO = 1.0f;
