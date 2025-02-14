@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -48,6 +49,11 @@ import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOHardware;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
+import frc.robot.subsystems.hang.Hang;
+import frc.robot.subsystems.hang.HangConstants;
+import frc.robot.subsystems.hang.HangIO;
+import frc.robot.subsystems.hang.HangIOReal;
+import frc.robot.subsystems.hang.HangIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
@@ -69,6 +75,7 @@ public class RobotContainer {
 
   // Subsystems
   private final Drive drive;
+  private final Hang hang;
   private final AprilTagVision vision;
 
   private final Elevator elevator;
@@ -130,6 +137,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
         elevator = new Elevator(new ElevatorIO() {});
+        hang = new Hang(new HangIOReal(HangConstants.WOOD_BOT_TWO_CAN_ID));
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -142,6 +150,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
+        hang = new Hang(new HangIOReal(HangConstants.T_SHIRT_CANNON_CAN_ID));
         elevator = new Elevator(new ElevatorIO() {});
         break;
 
@@ -155,6 +164,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
+        hang = new Hang(new HangIOReal(HangConstants.CRESCENDO_2024_CAN_ID)); // What hang arm??
         elevator = new Elevator(new ElevatorIO() {});
         break;
 
@@ -169,6 +179,7 @@ public class RobotContainer {
                 new ModuleIOSim(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision =
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
+        hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
         break;
 
@@ -181,6 +192,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        hang = new Hang(new HangIO() {});
         vision = new AprilTagVision();
         elevator = new Elevator(new ElevatorIO() {});
         break;
@@ -502,6 +514,10 @@ public class RobotContainer {
     } catch (ParseException e) {
       System.out.println("Failed to parse Choreo auto " + e.getMessage());
     }
+
+    // Testing autos :)
+    dashboardChooser.addOption(
+        "NOT-PROD HANG SIM TEST", new InstantCommand(() -> hang.setSetpoint(0.8)));
   }
 
   private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {
