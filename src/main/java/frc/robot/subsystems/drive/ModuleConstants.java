@@ -94,7 +94,11 @@ public class ModuleConstants {
   public static final int TURN_MOTOR_CURRENT_LIMIT;
   public static final double TURN_REDUCTION;
 
-  public static final double WHEEL_RADIUS = Units.inchesToMeters(2.000);
+  public static final double WHEEL_RADIUS =
+      switch (Constants.getRobot()) {
+        case WOOD_BOT_TWO_2025 -> Units.inchesToMeters(2.032);
+        default -> Units.inchesToMeters(2.000);
+      };
 
   static {
     switch (Constants.getRobot()) {

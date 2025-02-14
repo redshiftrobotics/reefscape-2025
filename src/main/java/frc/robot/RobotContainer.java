@@ -506,14 +506,14 @@ public class RobotContainer {
 
   private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {
 
-    SmartDashboard.putData(
+    dashboardChooser.addOption(
         "Simple Feed Forward Characterization", DriveCommands.feedforwardCharacterization(drive));
-    SmartDashboard.putData(
+    dashboardChooser.addOption(
         "Simple Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
 
-    SmartDashboard.putData(
+    dashboardChooser.addOption(
         "Elevator Static Characterization", elevator.staticCharacterization(0.2));
-    SmartDashboard.putData("Elevator Coast", elevator.coast());
+    dashboardChooser.addOption("Elevator Coast", elevator.coast());
 
     // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/introduction.html
     dashboardChooser.addOption(
