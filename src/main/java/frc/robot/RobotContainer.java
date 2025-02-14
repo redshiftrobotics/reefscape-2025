@@ -57,7 +57,6 @@ import frc.robot.subsystems.vision.CameraIOSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
-
 import java.io.IOException;
 import java.util.Arrays;
 import org.json.simple.parser.ParseException;

@@ -33,10 +33,11 @@ public class CoralIntakeIO extends SubsystemBase {
   }
 
   public boolean checkSensor() {
+    double sensorState = analogInput.getValue();
+    SmartDashboard.putNumber("input", sensorState);
 
-    SmartDashboard.putNumber("0", analogInput.getValue());
-
-    return true;
+    if (sensorState == 5) return true;
+    else return false;
   }
 
   public void stop() {

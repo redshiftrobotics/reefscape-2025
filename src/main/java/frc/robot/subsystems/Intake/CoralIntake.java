@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Intake;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CoralIntake extends SubsystemBase {
@@ -23,6 +24,7 @@ public class CoralIntake extends SubsystemBase {
   @Override
   public void periodic() {
     intakeSensor = io.checkSensor();
+    SmartDashboard.putBoolean("boolean intake", intakeSensor);
   }
 
   public void stop() {
