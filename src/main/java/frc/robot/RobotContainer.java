@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -22,8 +21,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -59,6 +56,7 @@ import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -79,8 +77,8 @@ public class RobotContainer {
   private final Superstructure superstructure;
 
   // Controller
-  private final CommandGenericHID driverController = new CommandXboxController(0);
-  private final CommandGenericHID operatorController = new CommandXboxController(1);
+  private final CommandXboxController driverController = new CommandXboxController(0);
+  private final CommandXboxController operatorController = new CommandXboxController(1);
 
   private final Alert driverDisconnected =
       new Alert(
@@ -254,6 +252,8 @@ public class RobotContainer {
     dashboard.setRobotSupplier(drive::getRobotSpeeds);
     dashboard.setFieldRelativeSupplier(() -> false);
 
+    dashboard.setAutoAlignPoseSupplier(AdaptiveAutoAlignCommands::getCurrentAutoAlignGoal);
+
     dashboard.setHasVisionEstimate(vision::hasVisionEstimate);
 
     dashboard.addCommand("Reset Pose", () -> drive.resetPose(new Pose2d()), true);
@@ -294,188 +294,186 @@ public class RobotContainer {
   }
 
   private void configureDriverControllerBindings(boolean includeAutoAlign) {
-    if (driverController instanceof CommandXboxController) {
-      final CommandXboxController driverXbox = (CommandXboxController) driverController;
+    final CommandXboxController driverXbox = (CommandXboxController) driverController;
 
-      final Trigger useFieldRelative =
-          new Trigger(new OverrideSwitch(driverXbox.y(), OverrideSwitch.Mode.TOGGLE, true));
+    final Trigger useFieldRelative =
+        new Trigger(new OverrideSwitch(driverXbox.y(), OverrideSwitch.Mode.TOGGLE, true));
 
-      DriverDashboard.getInstance().setFieldRelativeSupplier(useFieldRelative);
+    DriverDashboard.getInstance().setFieldRelativeSupplier(useFieldRelative);
 
-      final JoystickInputController input =
-          new JoystickInputController(
-              drive,
-              () -> -driverXbox.getLeftY(),
-              () -> -driverXbox.getLeftX(),
-              () -> -driverXbox.getRightY(),
-              () -> -driverXbox.getRightX());
+    final JoystickInputController input =
+        new JoystickInputController(
+            drive,
+            () -> -driverXbox.getLeftY(),
+            () -> -driverXbox.getLeftX(),
+            () -> -driverXbox.getRightY(),
+            () -> -driverXbox.getRightX());
 
-      final SpeedLevelController level =
-          new SpeedLevelController(SpeedLevelController.SpeedLevel.NO_LEVEL);
+    final SpeedLevelController level =
+        new SpeedLevelController(SpeedLevelController.SpeedLevel.NO_LEVEL);
 
-      // Default command, normal joystick drive
-      drive.setDefaultCommand(
-          DriveCommands.joystickDrive(
-                  drive,
-                  input::getTranslationMetersPerSecond,
-                  input::getOmegaRadiansPerSecond,
-                  level::getCurrentSpeedLevel,
-                  useFieldRelative::getAsBoolean)
-              .withName("Default Drive"));
+    // Default command, normal joystick drive
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+                drive,
+                input::getTranslationMetersPerSecond,
+                input::getOmegaRadiansPerSecond,
+                level::getCurrentSpeedLevel,
+                useFieldRelative::getAsBoolean)
+            .withName("DEFAULT Drive"));
 
-      // Secondary drive command, angle controlled drive
+    // Secondary drive command, angle controlled drive
+    driverXbox
+        .rightBumper()
+        .and(driverXbox.leftTrigger().negate())
+        .and(driverXbox.rightTrigger().negate())
+        .whileTrue(
+            DriveCommands.joystickHeadingDrive(
+                    drive,
+                    input::getTranslationMetersPerSecond,
+                    input::getHeadingDirection,
+                    level::getCurrentSpeedLevel,
+                    useFieldRelative::getAsBoolean)
+                .withName("HEADING Drive"));
+
+    // Cause the robot to resist movement by forming an X shape with the swerve modules
+    // Helps prevent getting pushed around
+    driverXbox
+        .x()
+        .whileTrue(
+            drive
+                .startEnd(drive::stopUsingBrakeArrangement, drive::stopUsingForwardArrangement)
+                .withName("RESIST Movement With X"));
+
+    // Stop the robot and cancel any running commands
+    driverXbox
+        .b()
+        .or(RobotModeTriggers.disabled())
+        .onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
+
+    // Reset the gyro heading
+    driverXbox
+        .start()
+        .debounce(0.3)
+        .onTrue(
+            drive
+                .runOnce(
+                    () ->
+                        drive.resetPose(
+                            new Pose2d(drive.getRobotPose().getTranslation(), Rotation2d.kZero)))
+                .andThen(rumbleController(driverXbox, 0.3).withTimeout(0.25))
+                .ignoringDisable(true)
+                .withName("Reset Gyro Heading"));
+
+    if (includeAutoAlign) {
+      // Align to reef
+
+      final AdaptiveAutoAlignCommands reefAlignmentCommands =
+          new AdaptiveAutoAlignCommands(
+              Arrays.asList(FieldConstants.Reef.alignmentFaces),
+              new Transform2d(
+                  DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
+              new Transform2d(0, 0, Rotation2d.kZero),
+              new Translation2d(Units.inchesToMeters(10), 0));
+
+      Supplier<Command> endRumble = () -> rumbleController(driverXbox, 0.3).withTimeout(0.1);
+
       driverXbox
-          .rightBumper()
-          .and(driverXbox.leftTrigger().negate())
-          .and(driverXbox.rightTrigger().negate())
-          .whileTrue(
-              DriveCommands.joystickHeadingDrive(
-                      drive,
-                      input::getTranslationMetersPerSecond,
-                      input::getHeadingDirection,
-                      level::getCurrentSpeedLevel,
-                      useFieldRelative::getAsBoolean)
-                  .withName("Heading Drive"));
-
-      // Cause the robot to resist movement by forming an X shape with the swerve modules
-      // Helps prevent getting pushed around
-      driverXbox
-          .x()
-          .whileTrue(
-              drive
-                  .startEnd(drive::stopUsingBrakeArrangement, drive::stopUsingForwardArrangement)
-                  .withName("Resist Movement With X"));
-
-      // Stop the robot and cancel any running commands
-      driverXbox
-          .b()
-          .or(RobotModeTriggers.disabled())
-          .onTrue(drive.runOnce(drive::stop).withName("Stop and Cancel"));
-
-      // Reset the gyro heading
-      driverXbox
-          .start()
+          .rightTrigger()
           .onTrue(
-              drive
-                  .runOnce(
-                      () ->
-                          drive.resetPose(
-                              new Pose2d(drive.getRobotPose().getTranslation(), Rotation2d.kZero)))
-                  .ignoringDisable(true)
-                  .withName("Reset Gyro Heading"));
+              reefAlignmentCommands
+                  .driveToClosest(drive)
+                  .andThen(endRumble.get())
+                  .withName("Algin REEF"))
+          .onFalse(reefAlignmentCommands.stop(drive));
 
-      if (includeAutoAlign) {
-        // Align to reef
+      driverXbox
+          .rightTrigger()
+          .and(driverXbox.leftBumper())
+          .onTrue(
+              CustomCommands.reInitCommand(
+                  reefAlignmentCommands
+                      .driveToNext(drive)
+                      .andThen(endRumble.get())
+                      .withName("Algin REEF -1")));
 
-        final AdaptiveAutoAlignCommands reefAlignmentCommands =
-            new AdaptiveAutoAlignCommands(
-                Arrays.asList(FieldConstants.Reef.alignmentFaces),
-                new Transform2d(
-                    DRIVE_CONFIG.bumperCornerToCorner().getX() / 2 + Units.inchesToMeters(6),
-                    0,
-                    Rotation2d.kPi));
+      driverXbox
+          .rightTrigger()
+          .and(driverXbox.rightBumper())
+          .onTrue(
+              CustomCommands.reInitCommand(
+                  reefAlignmentCommands
+                      .driveToPrevious(drive)
+                      .andThen(endRumble.get())
+                      .withName("Algin REEF +1")));
 
-        driverXbox
-            .rightTrigger()
-            .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Algin Reef"))
-            .onFalse(reefAlignmentCommands.stop(drive));
+      // Align to intake
 
-        driverXbox
-            .rightTrigger()
-            .and(driverXbox.leftBumper())
-            .onTrue(
-                CustomCommands.reInitCommand(
-                    reefAlignmentCommands.driveToNext(drive).withName("Algin Reef -1")));
+      final AdaptiveAutoAlignCommands intakeAlignmentCommands =
+          new AdaptiveAutoAlignCommands(
+              Arrays.asList(FieldConstants.CoralStation.alignmentFaces),
+              new Transform2d(
+                  DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
+              new Transform2d(0, 0, Rotation2d.kZero),
+              new Translation2d(Units.inchesToMeters(10), 0));
 
-        driverXbox
-            .rightTrigger()
-            .and(driverXbox.rightBumper())
-            .onTrue(
-                CustomCommands.reInitCommand(
-                    reefAlignmentCommands.driveToPrevious(drive).withName("Algin Reef +1")));
+      driverXbox
+          .leftTrigger()
+          .onTrue(
+              intakeAlignmentCommands
+                  .driveToClosest(drive)
+                  .andThen(endRumble.get())
+                  .withName("Align INTAKE"))
+          .onFalse(intakeAlignmentCommands.stop(drive));
 
-        // Align to intake
+      driverXbox
+          .leftTrigger()
+          .and(driverXbox.leftBumper())
+          .onTrue(
+              CustomCommands.reInitCommand(
+                  intakeAlignmentCommands
+                      .driveToNext(drive)
+                      .andThen(endRumble.get())
+                      .withName("Align INTAKE +1")));
 
-        final AdaptiveAutoAlignCommands intakeAlignmentCommands =
-            new AdaptiveAutoAlignCommands(
-                Arrays.asList(FieldConstants.CoralStation.alignmentFaces),
-                new Transform2d(
-                    DRIVE_CONFIG.bumperCornerToCorner().getX() / 2 + Units.inchesToMeters(3),
-                    0,
-                    Rotation2d.kPi));
-
-        driverXbox
-            .leftTrigger()
-            .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Align Intake"))
-            .onFalse(intakeAlignmentCommands.stop(drive));
-
-        driverXbox
-            .leftTrigger()
-            .and(driverXbox.leftBumper())
-            .onTrue(
-                CustomCommands.reInitCommand(
-                    intakeAlignmentCommands.driveToNext(drive).withName("Align Intake +1")));
-
-        driverXbox
-            .leftTrigger()
-            .and(driverXbox.rightBumper())
-            .onTrue(
-                CustomCommands.reInitCommand(
-                    intakeAlignmentCommands.driveToPrevious(drive).withName("Align Intake -1")));
-      }
-    } else if (driverController instanceof CommandJoystick) {
-      final CommandJoystick driverJoystick = (CommandJoystick) driverController;
-
-      JoystickInputController driverController =
-          new JoystickInputController(
-              drive,
-              () -> -driverJoystick.getY(),
-              () -> -driverJoystick.getX(),
-              () -> -driverJoystick.getTwist(),
-              () -> 0.0);
-
-      drive.setDefaultCommand(
-          drive
-              .run(
-                  () -> {
-                    Translation2d translation = driverController.getTranslationMetersPerSecond();
-                    double omega = driverController.getOmegaRadiansPerSecond();
-                    drive.setRobotSpeeds(
-                        new ChassisSpeeds(translation.getX(), translation.getY(), omega));
-                  })
-              .finallyDo(drive::stop)
-              .withName("Default Drive"));
+      driverXbox
+          .leftTrigger()
+          .and(driverXbox.rightBumper())
+          .onTrue(
+              CustomCommands.reInitCommand(
+                  intakeAlignmentCommands
+                      .driveToPrevious(drive)
+                      .andThen(endRumble.get())
+                      .withName("Align INTAKE -1")));
     }
   }
 
   private void configureOperatorControllerBindings() {
-    if (operatorController instanceof CommandXboxController) {
-      final CommandXboxController operatorXbox = (CommandXboxController) operatorController;
+    final CommandXboxController operatorXbox = (CommandXboxController) operatorController;
 
-      operatorXbox.b().onTrue(Commands.idle(drive).withName("Operator Idle Drive"));
+    operatorXbox.b().onTrue(Commands.idle(drive).withName("Operator Idle Drive"));
 
-      operatorXbox.povDown().onTrue(elevator.runOnce(() -> elevator.setGoalHeightMeters(0.0)));
-      operatorXbox.povRight().onTrue(elevator.runOnce(() -> elevator.setGoalHeightMeters(0.2)));
-      operatorXbox.povLeft().onTrue(elevator.runOnce(() -> elevator.setGoalHeightMeters(0.4)));
-      operatorXbox
-          .povUp()
-          .onTrue(
-              elevator.runOnce(
-                  () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)));
-    }
+    operatorXbox.povDown().onTrue(elevator.runOnce(() -> elevator.setGoalHeightMeters(0.0)));
+    operatorXbox.povRight().onTrue(elevator.runOnce(() -> elevator.setGoalHeightMeters(0.2)));
+    operatorXbox.povLeft().onTrue(elevator.runOnce(() -> elevator.setGoalHeightMeters(0.4)));
+    operatorXbox
+        .povUp()
+        .onTrue(
+            elevator.runOnce(
+                () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)));
+  }
+
+  private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
+    return Commands.startEnd(
+            () -> controller.setRumble(RumbleType.kBothRumble, rumbleIntensity),
+            () -> controller.setRumble(RumbleType.kBothRumble, 0))
+        .withName("RumbleController");
   }
 
   private Command rumbleControllers(double rumbleIntensity) {
-    return Commands.startEnd(
-            () -> {
-              driverController.setRumble(RumbleType.kBothRumble, rumbleIntensity);
-              operatorController.setRumble(RumbleType.kBothRumble, rumbleIntensity);
-            },
-            () -> {
-              driverController.setRumble(RumbleType.kBothRumble, 0);
-              operatorController.setRumble(RumbleType.kBothRumble, 0);
-            })
-        .withName("RumbleController");
+    return Commands.parallel(
+        rumbleController((CommandXboxController) driverController, rumbleIntensity),
+        rumbleController((CommandXboxController) operatorController, rumbleIntensity));
   }
 
   private void configureAlertTriggers() {
