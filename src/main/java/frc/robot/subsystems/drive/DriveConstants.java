@@ -105,7 +105,7 @@ public class DriveConstants {
 
   public static final double robotMassKg = 65;
   public static final double robotMOI = 6.883;
-  public static final double wheelCOF = 0.0; // placeholder
+  public static final double wheelCOF = 1.0; // placeholder
   public static final Translation2d[] moduleTranslations = {
     DriveConstants.FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER,
     DriveConstants.FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER,
@@ -124,9 +124,9 @@ public class DriveConstants {
   // --- Movement Controller Config ---
 
   public static final PIDConstants TRANSLATION_CONTROLLER_CONSTANTS_TRAJECTORY =
-      new PIDConstants(5.0, 0.0, 0.0);
+      new PIDConstants(0.0, 0.0, 0.0);
   public static final PIDConstants ROTATION_CONTROLLER_CONSTANTS_TRAJECTORY =
-      new PIDConstants(5.0, 0, 0.4);
+      new PIDConstants(0.0, 0, 0.4);
 
   public static final PIDConstants TRANSLATION_CONTROLLER_CONSTANTS =
       new PIDConstants(5.0, 0.0, 0.0);

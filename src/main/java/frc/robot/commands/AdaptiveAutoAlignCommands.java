@@ -2,8 +2,6 @@ package frc.robot.commands;
 
 import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -55,22 +53,16 @@ public class AdaptiveAutoAlignCommands {
   private Command align(Drive drive) {
     return Commands.defer(
         () -> {
-          Pose2d pose = getPose(offset);
-          // return DriveCommands.pathfindToPoseCommand(
-          //         drive,
-          //         pose.plus(
-          //             new Transform2d(
-          //                 new Translation2d(Units.inchesToMeters(-12), 0), Rotation2d.kZero)),
-          //         0.25,
-          //         0)
-          System.out.println(pose);
-          return AutoBuilder.pathfindToPose(
-                  pose,
-                  new PathConstraints(
-                      3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720)),
+          Pose2d pose = getPose(0);
+          return DriveCommands.pathfindToPoseCommand(
+                  drive,
+                  pose.plus(
+                      new Transform2d(
+                          new Translation2d(0, Units.inchesToMeters(-12)), Rotation2d.kZero)),
+                  0.25,
                   0)
               .andThen(Commands.runOnce(drive::stop))
-              // .andThen(DriveCommands.driveToPosePrecise(drive, pose))
+              .andThen(DriveCommands.driveToPosePrecise(drive, pose))
               .beforeStarting(() -> Logger.recordOutput("AutoAlignGoal", new Pose2d[] {pose}))
               .finallyDo(() -> Logger.recordOutput("AutoAlignGoal", new Pose2d[] {}));
         },
