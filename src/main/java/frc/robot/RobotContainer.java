@@ -165,15 +165,15 @@ public class RobotContainer {
 
       case Tank_Drive:
       drive =
-      new Drive(
-        new GyroIO() {},
-        new ModuleIO() {},
-        new ModuleIO() {},
-        new ModuleIO() {},
-        new ModuleIO() {});
-        hang = new Hang(new HangIO() {});
+            new Drive(
+                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
-        coralIntake = new CoralIntake(new CoralIntakeIO(1, 2, 0));
+        hang = new Hang(new HangIOReal(HangConstants.T_SHIRT_CANNON_CAN_ID));
+      coralIntake = new CoralIntake(new CoralIntakeIO(1, 2, 0));
       break;
 
       default:
