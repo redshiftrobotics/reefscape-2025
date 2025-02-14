@@ -3,17 +3,16 @@ package frc.robot.subsystems.wrist;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class WristIOSim implements WristIO {
-  private static final DCMotor motor = DCMotor.getNEO(1);
+  private static final DCMotor motor = DCMotor.getNeo550(1);
   private SingleJointedArmSim sim =
       new SingleJointedArmSim(
-          LinearSystemId.createSingleJointedArmSystem(motor, 0.00025, WristConstants.GEAR_RATIO),
           motor,
           WristConstants.GEAR_RATIO,
+          SingleJointedArmSim.estimateMOI(WristConstants.ARM_LENGTH, WristConstants.ARM_MASS),
           WristConstants.ARM_LENGTH,
           Units.degreesToRadians(-45),
           Units.degreesToRadians(45),

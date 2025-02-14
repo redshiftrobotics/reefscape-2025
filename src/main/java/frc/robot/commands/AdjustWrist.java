@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.wrist.Wrist;
-import frc.robot.subsystems.wrist.WristConstants;
 
 public class AdjustWrist extends Command {
   private Wrist wrist;
@@ -36,15 +35,19 @@ public class AdjustWrist extends Command {
     wrist.setRotation(targetRotation);
   }
 
+  // TODO: Uncomment the commented stuff below when the wrist is working. This is just here to make
+  // testing it more flexible while it isn't working.
+
   @Override
   public boolean isFinished() {
-    double rotInRad = currentRotation.getRotations();
+    /*double rotInRad = currentRotation.getRotations();
     return targetRotation.getRotations() > (rotInRad - WristConstants.WRIST_MOVE_DONE_THRESHOLD)
-        && targetRotation.getRotations() < (rotInRad + WristConstants.WRIST_MOVE_DONE_THRESHOLD);
+        && targetRotation.getRotations() < (rotInRad + WristConstants.WRIST_MOVE_DONE_THRESHOLD);*/
+    return true;
   }
 
   @Override
   public void end(boolean interrupted) {
-    wrist.stop();
+    // wrist.stop();
   }
 }

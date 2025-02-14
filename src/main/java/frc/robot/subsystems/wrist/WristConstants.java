@@ -32,11 +32,12 @@ public class WristConstants {
   // THIS IS NOT TUNED`
   public static final FeedForward FEED_FORWARD_CONFIG =
       switch (Constants.getRobot()) {
-        default -> new FeedForward(0, 2, 0.05, 0);
+        default -> new FeedForward(0, 2000, 1.3, 0);
       };
 
   public static final double GEAR_RATIO = 1.0f;
   public static final double ARM_LENGTH = Units.inchesToMeters(14);
+  public static final double ARM_MASS = Units.lbsToKilograms(10);
 
   // This is how many radians off from the target the arm is allowed to be for the move command to
   // consider it done
