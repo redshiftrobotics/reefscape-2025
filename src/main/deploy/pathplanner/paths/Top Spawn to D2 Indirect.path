@@ -1,0 +1,77 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.053,
+        "y": 7.25
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.682903682249709,
+        "y": 6.5237949087311975
+      },
+      "isLocked": false,
+      "linkedName": "Top Spawn"
+    },
+    {
+      "anchor": {
+        "x": 6.133460190716911,
+        "y": 6.16124303481158
+      },
+      "prevControl": {
+        "x": 6.355248687653938,
+        "y": 6.491757566784852
+      },
+      "nextControl": {
+        "x": 5.815347726206376,
+        "y": 5.687184218531238
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.0,
+        "y": 3.85
+      },
+      "prevControl": {
+        "x": 6.133715901366809,
+        "y": 4.482448516487483
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "D2"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "placeCoralL3",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "Paths B",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

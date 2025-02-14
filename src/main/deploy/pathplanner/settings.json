@@ -3,9 +3,13 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "New Folder"
+    "Paths B",
+    "Paths A"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "Algae Clear",
+    "No Algae Clear"
+  ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
@@ -14,9 +18,9 @@
   "robotMass": 74.088,
   "robotMOI": 6.883,
   "robotTrackwidth": 0.546,
-  "driveWheelRadius": 0.0508,
-  "driveGearing": 6.122448979591837,
-  "maxDriveSpeed": 5.05968,
+  "driveWheelRadius": 0.048,
+  "driveGearing": 8.14,
+  "maxDriveSpeed": 3.72,
   "driveMotorType": "NEO",
   "driveCurrentLimit": 50.0,
   "wheelCOF": 1.2,
