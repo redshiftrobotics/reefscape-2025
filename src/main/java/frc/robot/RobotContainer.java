@@ -43,17 +43,14 @@ import frc.robot.subsystems.drive.ModuleConstants;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
+import frc.robot.subsystems.hang.Hang;
+import frc.robot.subsystems.hang.HangIO;
+import frc.robot.subsystems.hang.HangIOSim;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
-import frc.robot.subsystems.superstructure.elevator.ElevatorIOHardware;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
-import frc.robot.subsystems.hang.Hang;
-import frc.robot.subsystems.hang.HangConstants;
-import frc.robot.subsystems.hang.HangIO;
-import frc.robot.subsystems.hang.HangIOReal;
-import frc.robot.subsystems.hang.HangIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
@@ -123,7 +120,10 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
-        elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
+        // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
+        elevator = new Elevator(new ElevatorIO() {});
+        // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
+        hang = new Hang(new HangIO() {});
         break;
 
       case WOOD_BOT_TWO_2025:
@@ -137,7 +137,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
         elevator = new Elevator(new ElevatorIO() {});
-        hang = new Hang(new HangIOReal(HangConstants.WOOD_BOT_TWO_CAN_ID));
+        hang = new Hang(new HangIO() {});
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -150,7 +150,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
-        hang = new Hang(new HangIOReal(HangConstants.T_SHIRT_CANNON_CAN_ID));
+        hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
         break;
 
@@ -164,7 +164,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
-        hang = new Hang(new HangIOReal(HangConstants.CRESCENDO_2024_CAN_ID)); // What hang arm??
+        hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
         break;
 
