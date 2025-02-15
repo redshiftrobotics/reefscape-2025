@@ -44,7 +44,9 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.hang.Hang;
+import frc.robot.subsystems.hang.HangConstants;
 import frc.robot.subsystems.hang.HangIO;
+import frc.robot.subsystems.hang.HangIOReal;
 import frc.robot.subsystems.hang.HangIOSim;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
@@ -77,7 +79,6 @@ public class RobotContainer {
   private final AprilTagVision vision;
   private final CoralIntake coralIntake;
 
-  private final Elevator elevator;
   private final Superstructure superstructure;
 
   // Controller
