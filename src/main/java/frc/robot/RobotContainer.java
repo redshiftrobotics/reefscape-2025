@@ -116,7 +116,7 @@ public class RobotContainer {
   public RobotContainer() {
     switch (Constants.getRobot()) {
       case COMP_BOT_2025:
-        // Real robot (Wood bot test chassis), instantiate hardware IO implementations
+        // THE robot. Instantiate hardware IO implementations.
         drive =
             new Drive(
                 new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
@@ -128,8 +128,8 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
 
-        algaeIntake = new AlgaeIntake(new IntakeIOHardware(0, 0)); // TODO!
-        coralIntake = new CoralIntake(new IntakeIOHardware(0, 0)); // TODO
+        algaeIntake = new AlgaeIntake(new IntakeIOHardware(0, 0, 0)); // TODO!
+        coralIntake = new CoralIntake(new IntakeIOHardware(0, 0, 0)); // TODO
         break;
 
       case WOOD_BOT_TWO_2025:
@@ -145,8 +145,8 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
 
-        algaeIntake = new AlgaeIntake(new IntakeIOHardware(0, 0)); // TODO find ids
-        coralIntake = new CoralIntake(new IntakeIOHardware(0, 0)); // TODO
+        algaeIntake = new AlgaeIntake(new IntakeIOHardware(0, 0, 0)); // TODO find ids
+        coralIntake = new CoralIntake(new IntakeIOHardware(0, 0, 0)); // TODO
         break;
 
       case T_SHIRT_CANNON_CHASSIS:

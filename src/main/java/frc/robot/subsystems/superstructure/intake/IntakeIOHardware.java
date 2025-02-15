@@ -2,15 +2,19 @@ package frc.robot.subsystems.superstructure.intake;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Hardware implementation of the TemplateIO. */
 public class IntakeIOHardware implements IntakeIO {
   private SparkMax leftMotor;
   private SparkMax rightMotor;
+  private AnalogInput analogInput;
 
-  public IntakeIOHardware(int motorIdLeft, int motorIdRight) {
+  public IntakeIOHardware(int motorIdLeft, int motorIdRight, int analogInputId) {
     leftMotor = new SparkMax(motorIdLeft, MotorType.kBrushless);
     rightMotor = new SparkMax(motorIdRight, MotorType.kBrushless);
+    analogInput = new AnalogInput(analogInputId);
   }
 
   @Override
@@ -31,8 +35,15 @@ public class IntakeIOHardware implements IntakeIO {
 
   @Override
   public boolean isOccupied() {
-    // TODO Auto-generated method stub
-    return IntakeIO.super.isOccupied();
+    double sensorState = analogInput.getValue();
+    SmartDashboard.putNumber("input", sensorState);
+
+    //TODO check if 5 or 4 is on because it alternates between 5 and 4 volts
+    if (sensorState == 5) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @Override
