@@ -21,7 +21,8 @@ public class IntakeCoral extends Command {
 
   @Override
   public boolean isFinished() {
-    return true;
+    //TODO: use whlie true button in bindings
+    return false;
   }
 
   @Override
