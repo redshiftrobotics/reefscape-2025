@@ -3,13 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 6.0
+        "x": 8.053,
+        "y": 5.05
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0,
-        "y": 5.5
+        "x": 7.169766772253811,
+        "y": 4.426661509535252
+      },
+      "isLocked": false,
+      "linkedName": "Low Spawn"
+    },
+    {
+      "anchor": {
+        "x": 4.5318256578947365,
+        "y": 2.3796875
+      },
+      "prevControl": {
+        "x": 5.528936177301429,
+        "y": 2.5608254775817088
+      },
+      "nextControl": {
+        "x": 3.812663277401848,
+        "y": 2.2490423843182983
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.3579769736842104,
+        "y": 2.822286184210526
+      },
+      "prevControl": {
+        "x": 3.5534316230012966,
+        "y": 2.666409694449129
+      },
+      "nextControl": {
+        "x": 3.003020614376682,
+        "y": 3.1053664358221513
       },
       "isLocked": false,
       "linkedName": null
@@ -17,74 +49,28 @@
     {
       "anchor": {
         "x": 3.0,
-        "y": 5.0
+        "y": 4.0
       },
       "prevControl": {
-        "x": 2.5,
-        "y": 5.0
-      },
-      "nextControl": {
-        "x": 3.5,
-        "y": 5.0
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 4.0,
-        "y": 6.0
-      },
-      "prevControl": {
-        "x": 4.0,
-        "y": 5.5
-      },
-      "nextControl": {
-        "x": 4.0,
-        "y": 6.5
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 3.0,
-        "y": 7.0
-      },
-      "prevControl": {
-        "x": 3.5,
-        "y": 7.0
-      },
-      "nextControl": {
-        "x": 2.5,
-        "y": 7.0
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.0,
-        "y": 6.0
-      },
-      "prevControl": {
-        "x": 2.0,
-        "y": 6.598898052314396
+        "x": 3.1210183131318607,
+        "y": 3.7812431306525007
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Farthest Coral Drop"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 2,
-      "rotationDegrees": 180.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "placeCoralL1",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -98,10 +84,10 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "New Folder",
+  "folder": "Paths A",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }
