@@ -9,4 +9,6 @@ public interface IntakeIO {
 
   /** Updates the set of loggable inputs. */
   default void updateInputs(IntakeIOInputs inputs) {}
+
+  default void setMotorSpeed(double speed) {}
 }
