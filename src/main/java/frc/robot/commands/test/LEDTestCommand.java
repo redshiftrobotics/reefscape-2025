@@ -20,6 +20,7 @@ public class LEDTestCommand extends Command {
   public LEDTestCommand(LEDSubsystem led, int time) {
     ledSystem = led;
     delay = time;
+    addRequirements(ledSystem);
   }
 
   @Override
@@ -45,5 +46,6 @@ public class LEDTestCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     currentPattern = LEDConstants.LEDPatterns.BLACK;
+    ledSystem.applyPatternToAll(currentPattern);
   }
 }

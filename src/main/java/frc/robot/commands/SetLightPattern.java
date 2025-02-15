@@ -16,6 +16,7 @@ public class SetLightPattern extends Command {
           "LED configuration commands may ONLY use -1 (all strips) or higher for strip IDs!");
     ledSystem = led;
     this.pattern = pattern;
+    addRequirements(ledSystem);
   }
 
   public SetLightPattern(LEDSubsystem led, double pattern) {

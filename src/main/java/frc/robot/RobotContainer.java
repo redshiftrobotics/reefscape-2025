@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.AdaptiveAutoAlignCommands;
+import frc.robot.commands.AdjustWrist;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
@@ -52,6 +53,10 @@ import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.wrist.Wrist;
+import frc.robot.subsystems.wrist.WristIO;
+import frc.robot.subsystems.wrist.WristIOSim;
+import frc.robot.subsystems.wrist.WristIOSparkMax;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
 import java.io.IOException;
@@ -71,6 +76,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Hang hang;
   private final AprilTagVision vision;
+  private final Wrist wrist;
 
   // Controller
   private final CommandGenericHID driverController = new CommandXboxController(0);
@@ -106,6 +112,7 @@ public class RobotContainer {
             new AprilTagVision(
                 new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA),
                 new CameraIOPhotonVision(VisionConstants.WOODV2_RIGHT_CAMERA));
+        wrist = new Wrist(new WristIOSparkMax());
         hang = new Hang(new HangIOReal(HangConstants.WOOD_BOT_TWO_CAN_ID));
         break;
 
@@ -119,6 +126,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
+        wrist = new Wrist(new WristIOSparkMax());
         hang = new Hang(new HangIOReal(HangConstants.T_SHIRT_CANNON_CAN_ID));
         break;
 
@@ -132,6 +140,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
+        wrist = new Wrist(new WristIOSparkMax());
         hang = new Hang(new HangIOReal(HangConstants.CRESCENDO_2024_CAN_ID)); // What hang arm??
         break;
 
@@ -146,6 +155,7 @@ public class RobotContainer {
                 new ModuleIOSim(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision =
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
+        wrist = new Wrist(new WristIOSim());
         hang = new Hang(new HangIOSim());
         break;
 
@@ -160,6 +170,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         hang = new Hang(new HangIO() {});
         vision = new AprilTagVision();
+        wrist = new Wrist(new WristIO() {});
         break;
     }
 
@@ -358,6 +369,9 @@ public class RobotContainer {
                         .withName("Drive to previous intake")));
 
         driverXbox.leftTrigger(0.1).onFalse(drive.runOnce(drive::stop));
+
+        driverXbox.back().onTrue(new AdjustWrist(wrist, Rotation2d.fromDegrees(-5)));
+        driverXbox.start().onTrue(new AdjustWrist(wrist, Rotation2d.fromDegrees(5)));
       }
     } else if (driverController instanceof CommandJoystick) {
       final CommandJoystick driverJoystick = (CommandJoystick) driverController;
