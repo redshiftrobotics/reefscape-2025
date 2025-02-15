@@ -37,9 +37,9 @@ public class HeadingController {
 
     headingControllerRadians =
         new ProfiledPIDController(
-            HEADING_CONTROLLER_CONFIG.pid().Kp(),
-            HEADING_CONTROLLER_CONFIG.pid().Ki(),
-            HEADING_CONTROLLER_CONFIG.pid().Kd(),
+            HEADING_CONTROLLER_CONFIG.pid().kP(),
+            HEADING_CONTROLLER_CONFIG.pid().kI(),
+            HEADING_CONTROLLER_CONFIG.pid().kD(),
             new TrapezoidProfile.Constraints(
                 DRIVE_CONFIG.maxAngularVelocity(), DRIVE_CONFIG.maxAngularAcceleration()),
             Constants.LOOP_PERIOD_SECONDS);
