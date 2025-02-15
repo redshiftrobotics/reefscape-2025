@@ -43,6 +43,11 @@ import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.hang.HangIO;
 import frc.robot.subsystems.hang.HangIOSim;
+import frc.robot.subsystems.superstructure.Superstructure;
+import frc.robot.subsystems.superstructure.elevator.Elevator;
+import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
@@ -67,6 +72,9 @@ public class RobotContainer {
   private final Drive drive;
   private final Hang hang;
   private final AprilTagVision vision;
+
+  private final Elevator elevator;
+  private final Superstructure superstructure;
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -111,6 +119,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
         // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
+        elevator = new Elevator(new ElevatorIO() {});
         // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
         hang = new Hang(new HangIO() {});
         break;
@@ -125,6 +134,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
+        elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
         break;
 
@@ -139,6 +149,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
         hang = new Hang(new HangIO() {});
+        elevator = new Elevator(new ElevatorIO() {});
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -152,6 +163,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
         hang = new Hang(new HangIO() {});
+        elevator = new Elevator(new ElevatorIO() {});
         break;
 
       case SIM_BOT:
@@ -166,6 +178,7 @@ public class RobotContainer {
         vision =
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         hang = new Hang(new HangIOSim());
+        elevator = new Elevator(new ElevatorIOSim());
         break;
 
       default:
@@ -179,8 +192,12 @@ public class RobotContainer {
                 new ModuleIO() {});
         hang = new Hang(new HangIO() {});
         vision = new AprilTagVision();
+        elevator = new Elevator(new ElevatorIO() {});
         break;
     }
+
+    // Superstructure
+    superstructure = new Superstructure(elevator);
 
     // Vision setup
     // vision.setLastRobotPoseSupplier(drive::getRobotPose);
@@ -435,6 +452,15 @@ public class RobotContainer {
     final CommandXboxController operatorXbox = (CommandXboxController) operatorController;
 
     operatorXbox.b().onTrue(Commands.idle(drive).withName("Operator Idle Drive"));
+
+    operatorXbox.povDown().onTrue(elevator.runOnce(() -> elevator.setGoalHeightMeters(0.0)));
+    operatorXbox.povRight().onTrue(elevator.runOnce(() -> elevator.setGoalHeightMeters(0.2)));
+    operatorXbox.povLeft().onTrue(elevator.runOnce(() -> elevator.setGoalHeightMeters(0.4)));
+    operatorXbox
+        .povUp()
+        .onTrue(
+            elevator.runOnce(
+                () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)));
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
