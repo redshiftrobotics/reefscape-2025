@@ -35,6 +35,7 @@ import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.subsystems.Intake.CoralIntake;
 import frc.robot.subsystems.Intake.CoralIntakeIO;
+import frc.robot.subsystems.Intake.CoralIntakeRealIO;
 import frc.robot.subsystems.Intake.IntakeConstants;
 import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
@@ -113,7 +114,7 @@ public class RobotContainer {
         hang = new Hang(new HangIOReal(HangConstants.WOOD_BOT_TWO_CAN_ID));
         coralIntake =
             new CoralIntake(
-                new CoralIntakeIO(
+                new CoralIntakeRealIO(
                     IntakeConstants.LeftMotorID,
                     IntakeConstants.RightMotorID,
                     IntakeConstants.SensorID));
