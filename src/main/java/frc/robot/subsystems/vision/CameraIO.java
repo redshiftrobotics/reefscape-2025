@@ -19,13 +19,13 @@ public interface CameraIO {
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(CameraIOInputs inputs) {}
+  default void updateInputs(CameraIOInputs inputs) {}
 
   /** Get name of io camera */
-  public default String getCameraName() {
+  default String getCameraName() {
     return "Camera";
   }
 
   /** Set april tag field layout to use */
-  public default void setAprilTagFieldLayout(AprilTagFieldLayout layout) {}
+  default void setAprilTagFieldLayout(AprilTagFieldLayout layout) {}
 }

@@ -45,12 +45,15 @@ public class SparkUtil {
   }
 
   /** Processes a value from a Spark only if the value is valid. */
-  public static void ifOk(
-      SparkBase spark, DoubleSupplier[] suppliers, Consumer<double[]> consumer) {
+  public static void ifOkMulti(
+      SparkBase[] spark, DoubleSupplier[] suppliers, Consumer<double[]> consumer) {
+    if (spark.length != suppliers.length) {
+      throw new IllegalArgumentException("Arrays must be the same length.");
+    }
     double[] values = new double[suppliers.length];
-    for (int i = 0; i < suppliers.length; i++) {
+    for (int i = 0; i < spark.length; i++) {
       values[i] = suppliers[i].getAsDouble();
-      if (spark.getLastError() != REVLibError.kOk) {
+      if (spark[i].getLastError() != REVLibError.kOk) {
         sparkStickyFault = true;
         return;
       }

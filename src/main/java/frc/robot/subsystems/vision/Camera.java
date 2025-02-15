@@ -26,9 +26,9 @@ public class Camera {
       new LoggedTunableNumberFactory("VisionResultsStatus");
 
   private static final LoggedTunableNumber xyStdDevCoefficient =
-      group.getNumber("xyStdDevCoefficient", 0.075);
+      group.getNumber("xyStdDevCoefficient", 0.075 * 10);
   private static final LoggedTunableNumber thetaStdDevCoefficient =
-      group.getNumber("thetaStdDevCoefficient", 0.085);
+      group.getNumber("thetaStdDevCoefficient", 0.085 * 10);
 
   private static final LoggedTunableNumber zHeightToleranceMeters =
       group.getNumber("zHeightToleranceMeters", 0.6);
@@ -36,9 +36,9 @@ public class Camera {
       group.getNumber("pitchToleranceDegrees", 10.0);
 
   private static final LoggedTunableNumber maxValidDistanceAwayFromCurrentEstimateMeters =
-      group.getNumber("MaxValidDistanceFromCurrentEstimateMeters", 30.0);
+      group.getNumber("maxValidDistanceFromCurrentEstimateMeters", 30.0);
   private static final LoggedTunableNumber maxValidDistanceAwayFromCurrentHeadingDegrees =
-      group.getNumber("GyroFilteringToleranceDegrees", 30.0);
+      group.getNumber("gyroFilteringToleranceDegrees", 30.0);
 
   private final CameraIO io;
   private final CameraIOInputsAutoLogged inputs = new CameraIOInputsAutoLogged();

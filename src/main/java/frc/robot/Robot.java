@@ -1,8 +1,17 @@
 package frc.robot;
 
+import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.hal.can.CANStatus;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Threads;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.RobotType;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -17,8 +26,29 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
-  private Command autonomousCommand;
   private RobotContainer robotContainer;
+
+  // Seconds till alerts
+  private static final double canErrorTimeThreshold = 0.5;
+  private final Timer canErrorTimer = new Timer();
+  private final Alert canErrorAlert =
+      new Alert("CAN errors detected, robot may not be controllable.", AlertType.kError);
+
+  // Autonomous command
+  private Command autonomousCommand;
+  private double autoStart;
+  private boolean autoMessagePrinted;
+
+  // Low battery alerts
+
+  private static final double lowBatteryVoltage = 11.8;
+  private final Timer disabledTimer = new Timer();
+
+  private static final double lowBatteryDisabledTime = 1.5;
+  private final Alert lowBatteryAlert =
+      new Alert(
+          "Battery voltage is very low, consider turning off the robot or replacing the battery.",
+          AlertType.kWarning);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -68,8 +98,18 @@ public class Robot extends LoggedRobot {
     // Start AdvantageKit logger
     Logger.start();
 
+    // Restart timers
+    disabledTimer.restart();
+    canErrorTimer.restart();
+
     // Set the voltage the roboRIO will brownout and disable all outputs. (Only works on roboRIO 2s)
     RobotController.setBrownoutVoltage(6.0);
+
+    // Configure DriverStation for sim
+    if (Constants.getRobot() == RobotType.SIM_BOT) {
+      DriverStationSim.setAllianceStationId(AllianceStationID.Blue2);
+      DriverStationSim.notifyNewData();
+    }
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
@@ -79,12 +119,51 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
+    // Switch thread to high priority to improve loop timing (idk with this actually does anything)
+    Threads.setCurrentThreadPriority(true, 99);
+
     // Runs the Scheduler. This is responsible for polling buttons, adding
     // newly-scheduled commands, running already-scheduled commands, removing
     // finished or interrupted commands, and running subsystem periodic() methods.
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
+    // Print auto duration
+    if (autonomousCommand != null) {
+      if (!autonomousCommand.isScheduled() && !autoMessagePrinted) {
+        if (DriverStation.isAutonomousEnabled()) {
+          System.out.printf(
+              "*** Auto finished in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
+        } else {
+          System.out.printf(
+              "*** Auto cancelled in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
+        }
+        autoMessagePrinted = true;
+      }
+    }
+
+    // Low battery alert
+    if (DriverStation.isEnabled()) {
+      disabledTimer.reset();
+    }
+    if (RobotController.getBatteryVoltage() <= lowBatteryVoltage
+        && disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
+      lowBatteryAlert.set(true);
+    }
+
+    // Check CAN status
+    CANStatus canStatus = RobotController.getCANStatus();
+    if (canStatus.transmitErrorCount > 0 || canStatus.receiveErrorCount > 0) {
+      canErrorTimer.restart();
+    }
+    canErrorAlert.set(!canErrorTimer.hasElapsed(canErrorTimeThreshold));
+
+    // RobotContainer updates
+    robotContainer.updateAlerts();
+
+    // Return to normal thread priority
+    Threads.setCurrentThreadPriority(false, 10);
   }
 
   /** This function is called once when the robot is disabled. */
@@ -99,6 +178,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     autonomousCommand = robotContainer.getAutonomousCommand();
+    autoStart = Timer.getFPGATimestamp();
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {

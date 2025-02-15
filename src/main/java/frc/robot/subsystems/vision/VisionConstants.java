@@ -29,8 +29,8 @@ public class VisionConstants {
       new CameraConfig(
           "leftCamera",
           new Transform3d(
-              new Translation3d(0, Units.inchesToMeters(27.5 / 2.0 + 1.0), Units.inchesToMeters(3)),
-              new Rotation3d(0, Units.degreesToRadians(3.5), Units.degreesToRadians(90))));
+              new Translation3d(0, Units.inchesToMeters(27.5 / 2.0 - 0.5), 0),
+              new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(90))));
 
   public static final CameraConfig WOODV2_RIGHT_CAMERA =
       new CameraConfig(

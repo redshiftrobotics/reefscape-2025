@@ -28,31 +28,31 @@ public interface ModuleIO {
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(ModuleIOInputs inputs) {}
+  default void updateInputs(ModuleIOInputs inputs) {}
 
   /** Run the drive motor at the specified voltage. */
-  public default void setDriveVoltage(double volts) {}
+  default void setDriveVoltage(double volts) {}
 
   /** Run the turn motor at the specified voltage. */
-  public default void setTurnVoltage(double volts) {}
+  default void setTurnVoltage(double volts) {}
 
   /** Run to drive velocity setpoint with feedforward */
-  public default void setDriveVelocity(double velocityRadsPerSec, double feedForward) {}
+  default void setDriveVelocity(double velocityRadsPerSec, double feedForward) {}
 
   /** Run to turn position setpoint */
-  public default void setTurnPosition(double angleRads) {}
+  default void setTurnPosition(double angleRads) {}
 
   /** Configure drive PID */
-  public default void setDrivePID(double kP, double kI, double kD) {}
+  default void setDrivePID(double kP, double kI, double kD) {}
 
   /** Configure turn PID */
-  public default void setTurnPID(double kP, double kI, double kD) {}
+  default void setTurnPID(double kP, double kI, double kD) {}
 
   /** Enable or disable brake mode on the drive motor. */
-  public default void setDriveBrakeMode(boolean enable) {}
+  default void setDriveBrakeMode(boolean enable) {}
 
   /** Enable or disable brake mode on the turn motor. */
-  public default void setTurnBrakeMode(boolean enable) {}
+  default void setTurnBrakeMode(boolean enable) {}
 
   /** Disable output to brake and turn motor */
   default void stop() {}

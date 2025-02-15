@@ -3,6 +3,7 @@ package frc.robot.robots;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import org.littletonrobotics.junction.LoggedRobot;
 
 public class RobotTypeChecker extends LoggedRobot {
@@ -15,6 +16,8 @@ public class RobotTypeChecker extends LoggedRobot {
     } else {
       SmartDashboard.putString("Robot Type", "Unknown");
     }
+
+    SmartDashboard.putString("Code Robot Name", Constants.getRobot().toString());
 
     SmartDashboard.putNumber("Team Number", RobotController.getTeamNumber());
     SmartDashboard.putString("Serial Number", RobotController.getSerialNumber());
