@@ -30,6 +30,8 @@ public interface IntakeIO {
   /**
    * Get if the beam is currently broken according to the beam sensor, AKA if the intake is
    * occupied.
+   *
+   * @return True when there is a game element in the intake.
    */
   default boolean isOccupied() {
     return false;
