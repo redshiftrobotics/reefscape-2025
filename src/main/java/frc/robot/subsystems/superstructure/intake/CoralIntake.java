@@ -5,11 +5,11 @@ import org.littletonrobotics.junction.Logger;
 
 /** Wheels for subsystem */
 public class CoralIntake extends SubsystemBase {
-  private final IntakeIO io;
+  private final CoralIntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
   /** Creates a new Template. */
-  public CoralIntake(IntakeIO io) {
+  public CoralIntake(CoralIntakeIO io) {
     this.io = io;
   }
 

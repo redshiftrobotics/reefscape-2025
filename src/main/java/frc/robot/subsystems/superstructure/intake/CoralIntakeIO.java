@@ -3,7 +3,7 @@ package frc.robot.subsystems.superstructure.intake;
 import org.littletonrobotics.junction.AutoLog;
 
 /** Interface for the IO layers of the Template subsystem. */
-public interface IntakeIO {
+public interface CoralIntakeIO {
   @AutoLog
   public static class IntakeIOInputs {}
 
