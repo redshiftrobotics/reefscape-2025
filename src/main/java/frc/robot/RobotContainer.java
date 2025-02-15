@@ -435,7 +435,6 @@ public class RobotContainer {
     final CommandXboxController operatorXbox = (CommandXboxController) operatorController;
 
     operatorXbox.b().onTrue(Commands.idle(drive).withName("Operator Idle Drive"));
-
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
@@ -499,10 +498,6 @@ public class RobotContainer {
         "Simple Feed Forward Characterization", DriveCommands.feedforwardCharacterization(drive));
     dashboardChooser.addOption(
         "Simple Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-
-    dashboardChooser.addOption(
-        "Elevator Static Characterization", elevator.staticCharacterization(0.2));
-    dashboardChooser.addOption("Elevator Coast", elevator.coast());
 
     // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/introduction.html
     dashboardChooser.addOption(
