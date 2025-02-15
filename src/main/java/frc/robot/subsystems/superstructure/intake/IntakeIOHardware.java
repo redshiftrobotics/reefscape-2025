@@ -13,13 +13,4 @@ public class IntakeIOHardware implements IntakeIO {
       motor1 = new SparkMax(motorId1, MotorType.kBrushless);
       motor2 = new SparkMax(motorId2, MotorType.kBrushless);
   }
-
-  @Override
-  public void updateInputs(IntakeIOInputs inputs) {}
-
-  @Override
-  public void setMotorSpeed(double speed) {
-    // TODO Auto-generated method stub
-    IntakeIO.super.setMotorSpeed(speed);
-  }
 }

@@ -19,6 +19,7 @@ public interface IntakeIO {
 
   /**
    * Set both motor's speed.
+   *
    * @param speed The speed to set both motors to.
    */
   default void setMotors(double speed) {
@@ -26,8 +27,13 @@ public interface IntakeIO {
     setRightMotor(speed);
   }
 
-  /** Get if the beam is currently broken according to the beam sensor, AKA if the intake is occupied. */
-  default boolean isOccupied() {return false;}
+  /**
+   * Get if the beam is currently broken according to the beam sensor, AKA if the intake is
+   * occupied.
+   */
+  default boolean isOccupied() {
+    return false;
+  }
 
-  default void stopMotors(){  }
+  default void stopMotors() {}
 }
