@@ -26,4 +26,8 @@ public class CoralIntake extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("CoralIntake", inputs);
   }
+
+  public void stopMotor(){
+    io.stopMotors();
+  }
 }
