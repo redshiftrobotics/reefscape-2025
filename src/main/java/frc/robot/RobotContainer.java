@@ -45,7 +45,6 @@ import frc.robot.subsystems.hang.HangIO;
 import frc.robot.subsystems.hang.HangIOSim;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
-import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
@@ -70,11 +69,12 @@ public class RobotContainer {
 
   // Subsystems
   private final Drive drive;
-  private final Hang hang;
   private final AprilTagVision vision;
 
   private final Elevator elevator;
   private final Superstructure superstructure;
+
+  private final Hang hang;
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -451,16 +451,14 @@ public class RobotContainer {
   private void configureOperatorControllerBindings() {
     final CommandXboxController operatorXbox = (CommandXboxController) operatorController;
 
-    operatorXbox.b().onTrue(Commands.idle(drive).withName("Operator Idle Drive"));
+    operatorXbox.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
-    operatorXbox.povDown().onTrue(elevator.runOnce(() -> elevator.setGoalHeightMeters(0.0)));
-    operatorXbox.povRight().onTrue(elevator.runOnce(() -> elevator.setGoalHeightMeters(0.2)));
-    operatorXbox.povLeft().onTrue(elevator.runOnce(() -> elevator.setGoalHeightMeters(0.4)));
-    operatorXbox
-        .povUp()
-        .onTrue(
-            elevator.runOnce(
-                () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)));
+    driverController.y().onTrue(superstructure.scoreL1());
+    driverController.x().onTrue(superstructure.scoreL2());
+    driverController.a().onTrue(superstructure.scoreL3());
+    driverController.povUp().onTrue(superstructure.scoreL4());
+
+    driverController.povDown().onTrue(superstructure.stow());
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
