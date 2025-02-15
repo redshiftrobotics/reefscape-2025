@@ -6,7 +6,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class CoralIntakeRealIO implements CoralIntakeIO{
+public class CoralIntakeRealIO implements CoralIntakeIO {
 
   private SparkMax leftMotor;
   private SparkMax rightMotor;
@@ -31,7 +31,7 @@ public class CoralIntakeRealIO implements CoralIntakeIO{
     rightMotor.set(MathUtil.clamp(Speed, -0.5, 0.5));
   }
 
-  //sensor stuff
+  // sensor stuff
   public boolean checkSensor() {
     double sensorState = analogInput.getValue();
     SmartDashboard.putNumber("input", sensorState);

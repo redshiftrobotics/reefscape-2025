@@ -138,8 +138,8 @@ public class Drive extends SubsystemBase {
         AllianceFlipUtil::shouldFlip,
         this);
 
-    Pathfinding.setPathfinder(
-        new LocalADStarAK()); // https://pathplanner.dev/pplib-pathfinding.html#advantagekit-compatibility
+    // https://pathplanner.dev/pplib-pathfinding.html#advantagekit-compatibility
+    Pathfinding.setPathfinder(new LocalADStarAK());
 
     PathfindingCommand.warmupCommand();
 
@@ -226,7 +226,7 @@ public class Drive extends SubsystemBase {
       }
 
       // Update gyro angle
-      if (gyroInputs.connected && !Constants.ON_BLOCKS_TEST_MODE) {
+      if (gyroInputs.connected) {
         // Use the real gyro angle
         rawGyroRotation = gyroInputs.odometryYawPositions[i];
       } else {
@@ -494,20 +494,12 @@ public class Drive extends SubsystemBase {
 
   /** Returns the position of each module in radians. */
   public double[] getWheelRadiusCharacterizationPositions() {
-    double[] values = new double[4];
-    for (int i = 0; i < 4; i++) {
-      values[i] = modules[i].getWheelRadiusCharacterizationPosition();
-    }
-    return values;
+    return modules().mapToDouble(Module::getWheelRadiusCharacterizationPosition).toArray();
   }
 
   /** Returns the average velocity of the modules in rotations/sec (Phoenix native units). */
   public double getFFCharacterizationVelocity() {
-    double output = 0.0;
-    for (int i = 0; i < 4; i++) {
-      output += modules[i].getFFCharacterizationVelocity() / 4.0;
-    }
-    return output;
+    return modules().mapToDouble(Module::getFFCharacterizationVelocity).average().orElse(0.0);
   }
 
   // --- Module Util ---

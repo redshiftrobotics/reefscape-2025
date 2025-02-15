@@ -6,9 +6,9 @@ public interface CoralIntakeIO {
 
   public void moveRightMotor(double Speed);
 
-  //sensor
+  // sensor
   public boolean checkSensor();
-  
-  //stops motor
+
+  // stops motor
   public void stop();
 }
