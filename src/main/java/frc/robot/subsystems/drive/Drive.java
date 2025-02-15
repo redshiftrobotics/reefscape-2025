@@ -138,8 +138,8 @@ public class Drive extends SubsystemBase {
         AllianceFlipUtil::shouldFlip,
         this);
 
-    Pathfinding.setPathfinder(new LocalADStarAK()); //
     // https://pathplanner.dev/pplib-pathfinding.html#advantagekit-compatibility
+    Pathfinding.setPathfinder(new LocalADStarAK());
 
     PathfindingCommand.warmupCommand();
 
