@@ -15,7 +15,7 @@ public class ScoreCoral2 extends Command {
 
   @Override
   public void execute() {
-    //score on not l1
+    // score on not l1
     coralIntake.moveRightMotor(0.3);
     coralIntake.moveLeftMotor(0.3);
   }
