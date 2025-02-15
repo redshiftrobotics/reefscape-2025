@@ -11,12 +11,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class IntakeIOHardware implements IntakeIO {
   private SparkMax leftMotor;
   private SparkMax rightMotor;
-  private AnalogInput analogInput;
+  private AnalogInput sensor;
 
   public IntakeIOHardware(int motorIdLeft, int motorIdRight, int analogInputId) {
     leftMotor = new SparkMax(motorIdLeft, MotorType.kBrushless);
     rightMotor = new SparkMax(motorIdRight, MotorType.kBrushless);
-    analogInput = new AnalogInput(analogInputId);
+    sensor = new AnalogInput(analogInputId);
   }
 
   @Override
@@ -37,7 +37,7 @@ public class IntakeIOHardware implements IntakeIO {
 
   @Override
   public boolean isOccupied() {
-    double sensorState = analogInput.getValue();
+    double sensorState = sensor.getValue();
     SmartDashboard.putNumber("input", sensorState);
 
     // TODO check if 5 or 4 is on because it alternates between 5 and 4 volts
