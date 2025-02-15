@@ -374,7 +374,7 @@ public class RobotContainer {
               new Transform2d(
                   DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
               new Transform2d(0, 0, Rotation2d.kZero),
-              new Translation2d(Units.inchesToMeters(10), 0));
+              new Translation2d(Units.inchesToMeters(24), 0));
 
       Supplier<Command> endRumble = () -> rumbleController(driverXbox, 0.3).withTimeout(0.1);
 

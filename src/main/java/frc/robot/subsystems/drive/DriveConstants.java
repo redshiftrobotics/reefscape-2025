@@ -68,9 +68,9 @@ public class DriveConstants {
             14.5);
         case WOOD_BOT_TWO_2025 -> new DriveConfig(
             new Translation2d(Units.inchesToMeters(22.729226), Units.inchesToMeters(22.729226)),
-            new Translation2d(Units.inchesToMeters(27.5), Units.inchesToMeters(27.5)),
+            new Translation2d(Units.inchesToMeters(35.5), Units.inchesToMeters(35.5)),
             5.05968,
-            14.5);
+            10);
         case CRESCENDO_CHASSIS_2024 -> new DriveConfig(
             new Translation2d(0.885, 0.885), new Translation2d(0.9612, 0.9612), 3.81, 14.5);
         case SIM_BOT -> new DriveConfig(
@@ -126,9 +126,9 @@ public class DriveConstants {
   // --- Movement Controller Config ---
 
   public static final PIDConstants TRANSLATION_CONTROLLER_CONSTANTS_TRAJECTORY =
-      new PIDConstants(0.0, 0.0, 0.0);
+      new PIDConstants(1.0, 0.0, 0.0);
   public static final PIDConstants ROTATION_CONTROLLER_CONSTANTS_TRAJECTORY =
-      new PIDConstants(0.0, 0, 0.4);
+      new PIDConstants(1.0, 0, 0.4);
 
   public static final PIDConstants TRANSLATION_CONTROLLER_CONSTANTS =
       new PIDConstants(5.0, 0.0, 0.0);

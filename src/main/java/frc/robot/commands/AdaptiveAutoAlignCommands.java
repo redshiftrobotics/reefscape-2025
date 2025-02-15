@@ -23,10 +23,12 @@ public class AdaptiveAutoAlignCommands {
 
   private final List<Pose2d> poses;
 
+  private final Transform2d robotVisionSystemOffset;
+
   private final Transform2d mechanismOffset;
   private final Transform2d roughLineupOffset;
 
-  private int offset = 0;
+  private int poseIndex = 0;
 
   public AdaptiveAutoAlignCommands(
       List<Pose2d> poses,
@@ -37,16 +39,13 @@ public class AdaptiveAutoAlignCommands {
     this.mechanismOffset = mechanismOffset;
     this.roughLineupOffset = new Transform2d(roughLineupOffset, Rotation2d.kZero);
 
-    final Transform2d robotOffset =
+    robotVisionSystemOffset =
         switch (Constants.getRobot()) {
           case WOOD_BOT_TWO_2025 -> new Transform2d(Translation2d.kZero, Rotation2d.kCW_90deg);
           default -> Transform2d.kZero;
         };
 
-    this.poses =
-        poses.stream()
-            .map(pose -> pose.transformBy(robotOffset).transformBy(positionOffset))
-            .toList();
+    this.poses = poses.stream().map(pose -> pose.transformBy(positionOffset)).toList();
   }
 
   public static Pose2d getCurrentAutoAlignGoal() {
@@ -79,11 +78,18 @@ public class AdaptiveAutoAlignCommands {
   private Command align(Drive drive) {
     return Commands.defer(
         () -> {
-          Pose2d pose = getPose(offset);
+          Pose2d pose = getPose(0);
           return DriveCommands.pathfindToPoseCommand(
-                  drive, pose.plus(roughLineupOffset.inverse()).plus(mechanismOffset), 0.25, 0)
+                  drive,
+                  pose.plus(roughLineupOffset.inverse())
+                      .plus(mechanismOffset)
+                      .plus(robotVisionSystemOffset),
+                  1,
+                  1)
               .andThen(Commands.runOnce(drive::stop))
-              .andThen(DriveCommands.driveToPosePrecise(drive, pose.plus(mechanismOffset)))
+              .andThen(
+                  DriveCommands.driveToPosePrecise(
+                      drive, pose.plus(mechanismOffset).plus(robotVisionSystemOffset)))
               .beforeStarting(() -> setCurrentAutoAlignGoal(pose))
               .finallyDo(() -> setCurrentAutoAlignGoal(null));
         },
@@ -91,17 +97,17 @@ public class AdaptiveAutoAlignCommands {
   }
 
   public Command driveToClosest(Drive drive) {
-    return align(drive).beforeStarting(() -> this.offset = getClosestPoseIndex(drive));
+    return align(drive).beforeStarting(() -> this.poseIndex = getClosestPoseIndex(drive));
   }
 
   public Command driveToNext(Drive drive) {
     return align(drive)
-        .beforeStarting(() -> this.offset = (this.offset + 1 + poses.size()) % poses.size());
+        .beforeStarting(() -> this.poseIndex = (this.poseIndex + 1 + poses.size()) % poses.size());
   }
 
   public Command driveToPrevious(Drive drive) {
     return align(drive)
-        .beforeStarting(() -> this.offset = (this.offset - 1 + poses.size()) % poses.size());
+        .beforeStarting(() -> this.poseIndex = (this.poseIndex - 1 + poses.size()) % poses.size());
   }
 
   public Command stop(Drive drive) {

@@ -169,9 +169,9 @@ public class DriveCommands {
 
   /** Pathfind to a pose with pathplanner, only gets you roughly to target pose. */
   public static Command pathfindToPoseCommand(
-      Drive drive, Pose2d desiredPose, double speedMultiplier, double goalEndVelocity) {
+      Drive drive, Pose2d desiredPose, double speedMultiplier, double goalEndSpeed) {
     return AutoBuilder.pathfindToPose(
-        desiredPose, DRIVE_CONFIG.getPathConstraints(speedMultiplier), goalEndVelocity);
+        desiredPose, DRIVE_CONFIG.getPathConstraints(speedMultiplier), goalEndSpeed);
   }
 
   /** Estimated feed forward Ks and Kv by driving robot forward, control motors by voltage */
