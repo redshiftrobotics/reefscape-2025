@@ -21,8 +21,7 @@ public class CoralIntake extends SubsystemBase {
     io.setRightMotor(speed);
   }
 
-  public void setMotors(double speed)
-  {
+  public void setMotors(double speed) {
     io.setMotors(speed);
   }
 
@@ -32,7 +31,7 @@ public class CoralIntake extends SubsystemBase {
     Logger.processInputs("CoralIntake", inputs);
   }
 
-  public void stopMotor(){
+  public void stopMotors() {
     io.stopMotors();
   }
 }
