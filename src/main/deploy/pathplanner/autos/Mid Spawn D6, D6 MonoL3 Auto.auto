@@ -7,25 +7,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Circle Forward"
+            "pathName": "Top Spawn to D6"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 4.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Circle 180"
+            "pathName": "D6 to P1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.5
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Circle Face In"
+            "pathName": "P1 to D6 C2"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Algae Clear",
   "choreoAuto": false
 }

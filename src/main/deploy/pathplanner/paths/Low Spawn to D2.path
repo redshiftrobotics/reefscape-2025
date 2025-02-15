@@ -3,60 +3,50 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 6.0
+<<<<<<<< HEAD:src/main/deploy/pathplanner/paths/Low Spawn to D2.path
+        "x": 8.053,
+        "y": 5.05
       },
       "prevControl": null,
       "nextControl": {
+        "x": 7.110689614877236,
+        "y": 4.589242455484748
+========
         "x": 2.0,
-        "y": 5.5
+        "y": 7.0
       },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 3.0,
-        "y": 5.0
-      },
-      "prevControl": {
-        "x": 2.5,
-        "y": 5.0
-      },
+      "prevControl": null,
       "nextControl": {
-        "x": 3.5,
-        "y": 5.0
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 4.0,
-        "y": 6.0
-      },
-      "prevControl": {
-        "x": 4.0,
-        "y": 5.5
-      },
-      "nextControl": {
-        "x": 4.0,
-        "y": 6.5
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
         "x": 3.0,
         "y": 7.0
+>>>>>>>> main:src/main/deploy/pathplanner/paths/Rotate.path
+      },
+      "isLocked": false,
+      "linkedName": "Low Spawn"
+    },
+    {
+      "anchor": {
+<<<<<<<< HEAD:src/main/deploy/pathplanner/paths/Low Spawn to D2.path
+        "x": 6.0,
+        "y": 3.85
       },
       "prevControl": {
-        "x": 3.5,
+        "x": 6.4307326145236035,
+        "y": 4.0596457584528345
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "D2"
+========
+        "x": 5.0,
+        "y": 7.0
+      },
+      "prevControl": {
+        "x": 4.749999999999999,
         "y": 7.0
       },
       "nextControl": {
-        "x": 2.5,
+        "x": 5.539271035817229,
         "y": 7.0
       },
       "isLocked": false,
@@ -65,15 +55,22 @@
     {
       "anchor": {
         "x": 2.0,
-        "y": 6.0
+        "y": 7.0
       },
       "prevControl": {
-        "x": 2.0,
-        "y": 6.598898052314396
+        "x": 1.0,
+        "y": 7.0
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 180.0
+>>>>>>>> main:src/main/deploy/pathplanner/paths/Rotate.path
     }
   ],
   "rotationTargets": [],
@@ -93,10 +90,14 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "New Folder",
+<<<<<<<< HEAD:src/main/deploy/pathplanner/paths/Low Spawn to D2.path
+  "folder": "Paths B",
+========
+  "folder": null,
+>>>>>>>> main:src/main/deploy/pathplanner/paths/Rotate.path
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }
