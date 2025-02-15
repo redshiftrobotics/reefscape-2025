@@ -1,0 +1,77 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.625,
+        "y": 5.275
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.1339471134608727,
+        "y": 4.794891369268705
+      },
+      "isLocked": false,
+      "linkedName": "D6 C2"
+    },
+    {
+      "anchor": {
+        "x": 1.8385716869212954,
+        "y": 3.969796006944444
+      },
+      "prevControl": {
+        "x": 1.9397321097623155,
+        "y": 4.361247110252878
+      },
+      "nextControl": {
+        "x": 1.3961644589835938,
+        "y": 2.2578538004552167
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.318174342105263,
+        "y": 1.1096217105263155
+      },
+      "prevControl": {
+        "x": 1.568033592086659,
+        "y": 2.601888330871841
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Coral Pickup 2"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "getCoral",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -125.00000000000001
+  },
+  "reversed": false,
+  "folder": "Paths B",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -59.99999999999999
+  },
+  "useDefaultConstraints": true
+}
