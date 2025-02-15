@@ -50,6 +50,7 @@ import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
 import frc.robot.subsystems.superstructure.intake.AlgaeIntake;
 import frc.robot.subsystems.superstructure.intake.CoralIntake;
+import frc.robot.subsystems.superstructure.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.intake.IntakeIO;
 import frc.robot.subsystems.superstructure.intake.IntakeIOHardware;
 import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
@@ -128,8 +129,18 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
 
-        algaeIntake = new AlgaeIntake(new IntakeIOHardware(0, 0, 0)); // TODO!
-        coralIntake = new CoralIntake(new IntakeIOHardware(0, 0, 0)); // TODO
+        algaeIntake =
+            new AlgaeIntake(
+                new IntakeIOHardware(
+                    IntakeConstants.ALGAE_INTAKE_LEFT_MOTOR_ID,
+                    IntakeConstants.ALGAE_INTAKE_RIGHT_MOTOR_ID,
+                    IntakeConstants.ALGAE_INTAKE_SENSOR_ID));
+        coralIntake =
+            new CoralIntake(
+                new IntakeIOHardware(
+                    IntakeConstants.CORAL_INTAKE_LEFT_MOTOR_ID,
+                    IntakeConstants.CORAL_INTAKE_RIGHT_MOTOR_ID,
+                    IntakeConstants.CORAL_INTAKE_SENSOR_ID));
         break;
 
       case WOOD_BOT_TWO_2025:
@@ -145,8 +156,18 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
 
-        algaeIntake = new AlgaeIntake(new IntakeIOHardware(0, 0, 0)); // TODO find ids
-        coralIntake = new CoralIntake(new IntakeIOHardware(0, 0, 0)); // TODO
+        algaeIntake =
+            new AlgaeIntake(
+                new IntakeIOHardware(
+                    IntakeConstants.ALGAE_INTAKE_LEFT_MOTOR_ID,
+                    IntakeConstants.ALGAE_INTAKE_RIGHT_MOTOR_ID,
+                    IntakeConstants.ALGAE_INTAKE_SENSOR_ID));
+        coralIntake =
+            new CoralIntake(
+                new IntakeIOHardware(
+                    IntakeConstants.CORAL_INTAKE_LEFT_MOTOR_ID,
+                    IntakeConstants.CORAL_INTAKE_RIGHT_MOTOR_ID,
+                    IntakeConstants.CORAL_INTAKE_SENSOR_ID));
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
