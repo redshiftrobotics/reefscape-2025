@@ -23,13 +23,13 @@ public class Module {
       new LoggedTunableNumberFactory("Drive/Module");
 
   private static final LoggedTunableNumber driveKp =
-      driveFeedbackFactory.getNumber("DriveKp", ModuleConstants.DRIVE_FEEDBACK.Kp());
+      driveFeedbackFactory.getNumber("DriveKp", ModuleConstants.DRIVE_FEEDBACK.kP());
   private static final LoggedTunableNumber driveKd =
-      driveFeedbackFactory.getNumber("DriveKd", ModuleConstants.DRIVE_FEEDBACK.Kd());
+      driveFeedbackFactory.getNumber("DriveKd", ModuleConstants.DRIVE_FEEDBACK.kD());
   private static final LoggedTunableNumber turnKp =
-      driveFeedbackFactory.getNumber("TurnKp", ModuleConstants.TURN_FEEDBACK.Kp());
+      driveFeedbackFactory.getNumber("TurnKp", ModuleConstants.TURN_FEEDBACK.kP());
   private static final LoggedTunableNumber turnKd =
-      driveFeedbackFactory.getNumber("TurnKd", ModuleConstants.TURN_FEEDBACK.Kd());
+      driveFeedbackFactory.getNumber("TurnKd", ModuleConstants.TURN_FEEDBACK.kD());
 
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
@@ -55,9 +55,9 @@ public class Module {
 
     driveFeedforward =
         new SimpleMotorFeedforward(
-            ModuleConstants.DRIVE_FEED_FORWARD.Ks(),
-            ModuleConstants.DRIVE_FEED_FORWARD.Kv(),
-            ModuleConstants.DRIVE_FEED_FORWARD.Ka(),
+            ModuleConstants.DRIVE_FEED_FORWARD.kS(),
+            ModuleConstants.DRIVE_FEED_FORWARD.kV(),
+            ModuleConstants.DRIVE_FEED_FORWARD.kA(),
             Constants.LOOP_PERIOD_SECONDS);
 
     io.setDrivePID(driveKp.get(), 0, driveKd.get());

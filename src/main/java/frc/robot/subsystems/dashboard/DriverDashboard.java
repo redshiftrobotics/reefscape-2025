@@ -1,9 +1,13 @@
 package frc.robot.subsystems.dashboard;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -22,6 +26,7 @@ public class DriverDashboard extends SubsystemBase {
   private DriverDashboard() {
     SmartDashboard.putString("RobotName", Constants.getRobot().toString());
     SmartDashboard.putString("RobotRoboRioSerialNumber", RobotController.getSerialNumber());
+    SmartDashboard.putData("Field", field);
   }
 
   public static DriverDashboard getInstance() {
@@ -31,10 +36,15 @@ public class DriverDashboard extends SubsystemBase {
 
   // --- Fields ---
 
+  private final Debouncer debouncer = new Debouncer(0.1, DebounceType.kFalling);
+
   private Supplier<Pose2d> poseSupplier;
+  private Supplier<Pose2d> autoAlginPoseSupplier;
   private Supplier<ChassisSpeeds> speedsSupplier;
   private BooleanSupplier fieldRelativeSupplier;
   private BooleanSupplier hasVisionEstimate;
+
+  private final Field2d field = new Field2d();
 
   // --- Setters ---
 
@@ -58,6 +68,10 @@ public class DriverDashboard extends SubsystemBase {
     this.poseSupplier = robotPoseSupplier;
   }
 
+  public void setAutoAlignPoseSupplier(Supplier<Pose2d> autoAlignPoseSupplier) {
+    this.autoAlginPoseSupplier = autoAlignPoseSupplier;
+  }
+
   public void setRobotSupplier(Supplier<ChassisSpeeds> robotSpeedsSupplier) {
     this.speedsSupplier = robotSpeedsSupplier;
   }
@@ -73,11 +87,19 @@ public class DriverDashboard extends SubsystemBase {
   @Override
   public void periodic() {
 
-    SmartDashboard.putNumber("Game Time", Timer.getMatchTime());
+    SmartDashboard.putNumber("Game Time", DriverStation.getMatchTime());
 
     if (poseSupplier != null) {
       Pose2d pose = poseSupplier.get();
       SmartDashboard.putNumber("Heading Degrees", -pose.getRotation().getDegrees());
+      field.setRobotPose(pose);
+    }
+
+    if (autoAlginPoseSupplier != null) {
+      Pose2d pose = autoAlginPoseSupplier.get();
+      field
+          .getObject("Auto Align Pose")
+          .setPose(pose == null ? new Pose2d(-100, -100, Rotation2d.k180deg) : pose);
     }
 
     if (speedsSupplier != null) {
@@ -92,7 +114,8 @@ public class DriverDashboard extends SubsystemBase {
     }
 
     if (hasVisionEstimate != null) {
-      SmartDashboard.putBoolean("Vision", hasVisionEstimate.getAsBoolean());
+      SmartDashboard.putBoolean(
+          "Has Vision", debouncer.calculate(hasVisionEstimate.getAsBoolean()));
     }
   }
 }
