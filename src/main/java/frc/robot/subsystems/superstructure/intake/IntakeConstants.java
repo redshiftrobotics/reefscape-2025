@@ -9,6 +9,7 @@ public class IntakeConstants {
   public static final int CORAL_INTAKE_LEFT_MOTOR_ID = 0;
   public static final int CORAL_INTAKE_RIGHT_MOTOR_ID = 0;
   public static final int CORAL_INTAKE_SENSOR_ID = 0;
+  public static final double CORAL_INTAKE_MOTOR_SPEED = 0.3;
 
   // TODO
   public static final int ALGAE_INTAKE_LEFT_MOTOR_ID = 0;
