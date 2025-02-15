@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Intake;
+package frc.robot.subsystems.intake;
 
 public class CoralIntakeIOSim implements CoralIntakeIO {
   public void moveLeftMotor(double Speed) {}
