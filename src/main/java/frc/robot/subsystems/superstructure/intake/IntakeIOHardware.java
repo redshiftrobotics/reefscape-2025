@@ -39,11 +39,7 @@ public class IntakeIOHardware implements IntakeIO {
     SmartDashboard.putNumber("input", sensorState);
 
     //TODO check if 5 or 4 is on because it alternates between 5 and 4 volts
-    if (sensorState == 5) {
-      return true;
-    } else {
-      return false;
-    }
+    return sensorState == 5;
   }
 
   @Override
