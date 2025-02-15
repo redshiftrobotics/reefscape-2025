@@ -24,7 +24,7 @@ public class CoralIntake extends SubsystemBase {
   @Override
   public void periodic() {
     intakeSensor = io.checkSensor();
-    SmartDashboard.putBoolean("boolean intake", intakeSensor);
+    SmartDashboard.putBoolean("CoralIntakeOccupied", intakeSensor);
   }
 
   public void stop() {
