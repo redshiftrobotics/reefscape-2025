@@ -23,12 +23,12 @@ public class CoralIntakeRealIO implements CoralIntakeIO {
 
   // motor stuff
 
-  public void moveLeftMotor(double Speed) {
-    leftMotor.set(MathUtil.clamp(Speed, -0.5, 0.5));
+  public void moveLeftMotor(double speed) {
+    leftMotor.set(MathUtil.clamp(speed, -0.5, 0.5));
   }
 
-  public void moveRightMotor(double Speed) {
-    rightMotor.set(MathUtil.clamp(Speed, -0.5, 0.5));
+  public void moveRightMotor(double speed) {
+    rightMotor.set(MathUtil.clamp(speed, -0.5, 0.5));
   }
 
   // sensor stuff

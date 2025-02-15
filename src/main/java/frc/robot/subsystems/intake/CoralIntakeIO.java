@@ -2,9 +2,9 @@ package frc.robot.subsystems.intake;
 
 public interface CoralIntakeIO {
 
-  public void moveLeftMotor(double Speed);
+  public void moveLeftMotor(double speed);
 
-  public void moveRightMotor(double Speed);
+  public void moveRightMotor(double speed);
 
   // sensor
   public boolean checkSensor();

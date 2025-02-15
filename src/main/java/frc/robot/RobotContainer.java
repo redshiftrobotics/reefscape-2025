@@ -131,9 +131,9 @@ public class RobotContainer {
         coralIntake =
             new CoralIntake(
                 new CoralIntakeRealIO(
-                    IntakeConstants.LeftMotorID,
-                    IntakeConstants.RightMotorID,
-                    IntakeConstants.SensorID));
+                    IntakeConstants.LEFT_MOTOR_ID,
+                    IntakeConstants.RIGHT_MOTOR_ID,
+                    IntakeConstants.Sensor_ID));
         break;
 
       case WOOD_BOT_TWO_2025:
@@ -151,9 +151,9 @@ public class RobotContainer {
         coralIntake =
             new CoralIntake(
                 new CoralIntakeRealIO(
-                    IntakeConstants.LeftMotorID,
-                    IntakeConstants.RightMotorID,
-                    IntakeConstants.SensorID));
+                    IntakeConstants.LEFT_MOTOR_ID,
+                    IntakeConstants.RIGHT_MOTOR_ID,
+                    IntakeConstants.Sensor_ID));
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -171,9 +171,9 @@ public class RobotContainer {
         coralIntake =
             new CoralIntake(
                 new CoralIntakeRealIO(
-                    IntakeConstants.LeftMotorID,
-                    IntakeConstants.RightMotorID,
-                    IntakeConstants.SensorID));
+                    IntakeConstants.LEFT_MOTOR_ID,
+                    IntakeConstants.RIGHT_MOTOR_ID,
+                    IntakeConstants.Sensor_ID));
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -191,9 +191,9 @@ public class RobotContainer {
         coralIntake =
             new CoralIntake(
                 new CoralIntakeRealIO(
-                    IntakeConstants.LeftMotorID,
-                    IntakeConstants.RightMotorID,
-                    IntakeConstants.SensorID));
+                    IntakeConstants.LEFT_MOTOR_ID,
+                    IntakeConstants.RIGHT_MOTOR_ID,
+                    IntakeConstants.Sensor_ID));
         break;
 
       case SIM_BOT:

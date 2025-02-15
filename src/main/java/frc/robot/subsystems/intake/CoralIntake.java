@@ -12,12 +12,12 @@ public class CoralIntake extends SubsystemBase {
     this.io = io;
   }
 
-  public void moveLeftMotor(double Speed) {
-    io.moveLeftMotor(Speed);
+  public void moveLeftMotor(double speed) {
+    io.moveLeftMotor(speed);
   }
 
-  public void moveRightMotor(double Speed) {
-    io.moveRightMotor(Speed);
+  public void moveRightMotor(double speed) {
+    io.moveRightMotor(speed);
   }
 
   @Override
