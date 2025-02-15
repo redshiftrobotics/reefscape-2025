@@ -126,9 +126,9 @@ public class DriveConstants {
   // --- Movement Controller Config ---
 
   public static final PIDConstants TRANSLATION_CONTROLLER_CONSTANTS_TRAJECTORY =
-      new PIDConstants(0.0, 0.0, 0.0);
+      new PIDConstants(5.0, 0.0, 0.0);
   public static final PIDConstants ROTATION_CONTROLLER_CONSTANTS_TRAJECTORY =
-      new PIDConstants(0.0, 0, 0.4);
+      new PIDConstants(5.0, 0, 0.4);
 
   public static final PIDConstants TRANSLATION_CONTROLLER_CONSTANTS =
       new PIDConstants(5.0, 0.0, 0.0);
