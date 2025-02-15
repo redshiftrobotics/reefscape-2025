@@ -30,6 +30,7 @@ import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
+import frc.robot.commands.intake.IntakeCoral;
 import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -44,6 +45,7 @@ import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.hang.HangIO;
 import frc.robot.subsystems.hang.HangIOSim;
 import frc.robot.subsystems.intake.CoralIntake;
+import frc.robot.subsystems.intake.CoralIntakeIOSim;
 import frc.robot.subsystems.intake.CoralIntakeRealIO;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.Superstructure;
@@ -75,6 +77,8 @@ public class RobotContainer {
   private final Drive drive;
   private final Hang hang;
   private final AprilTagVision vision;
+
+  private final CoralIntake coralIntake;
 
   private final Elevator elevator;
   private final Superstructure superstructure;
@@ -125,6 +129,7 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
         // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
         hang = new Hang(new HangIO() {});
+        coralIntake = new CoralIntake(new CoralIntakeRealIO(IntakeConstants.LeftMotorID,IntakeConstants.RightMotorID,IntakeConstants.SensorID));
         break;
 
       case WOOD_BOT_TWO_2025:
@@ -139,6 +144,7 @@ public class RobotContainer {
         vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
         elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
+        coralIntake = new CoralIntake(new CoralIntakeRealIO(IntakeConstants.LeftMotorID,IntakeConstants.RightMotorID,IntakeConstants.SensorID));
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -153,6 +159,7 @@ public class RobotContainer {
         vision = new AprilTagVision();
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
+        coralIntake = new CoralIntake(new CoralIntakeRealIO(IntakeConstants.LeftMotorID,IntakeConstants.RightMotorID,IntakeConstants.SensorID));
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -167,6 +174,7 @@ public class RobotContainer {
         vision = new AprilTagVision();
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
+        coralIntake = new CoralIntake(new CoralIntakeRealIO(IntakeConstants.LeftMotorID,IntakeConstants.RightMotorID,IntakeConstants.SensorID));
         break;
 
       case SIM_BOT:
@@ -182,6 +190,7 @@ public class RobotContainer {
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
+        coralIntake = new CoralIntake(new CoralIntakeIOSim());
         break;
 
       default:
@@ -196,6 +205,7 @@ public class RobotContainer {
         hang = new Hang(new HangIO() {});
         vision = new AprilTagVision();
         elevator = new Elevator(new ElevatorIO() {});
+        coralIntake = new CoralIntake(new CoralIntakeIOSim());
         break;
     }
 
