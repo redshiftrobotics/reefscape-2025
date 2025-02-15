@@ -1,5 +1,7 @@
 package frc.robot.subsystems.hang;
 
+import edu.wpi.first.math.util.Units;
+
 public class HangConstants {
   private HangConstants() {}
 
@@ -19,5 +21,5 @@ public class HangConstants {
   public static final int T_SHIRT_CANNON_CAN_ID = 0;
   public static final int CRESCENDO_2024_CAN_ID = 0;
 
-  public static final double TOLERANCE = 3;
+  public static final double TOLERANCE = Units.degreesToRotations(0.3);
 }
