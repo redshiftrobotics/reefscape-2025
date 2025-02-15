@@ -43,15 +43,16 @@ import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.hang.HangIO;
 import frc.robot.subsystems.hang.HangIOSim;
-import frc.robot.subsystems.intake.CoralIntake;
-import frc.robot.subsystems.intake.CoralIntakeIOSim;
-import frc.robot.subsystems.intake.CoralIntakeRealIO;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
+import frc.robot.subsystems.superstructure.intake.AlgaeIntake;
+import frc.robot.subsystems.superstructure.intake.CoralIntake;
+import frc.robot.subsystems.superstructure.intake.IntakeIO;
+import frc.robot.subsystems.superstructure.intake.IntakeIOHardware;
+import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
@@ -77,6 +78,7 @@ public class RobotContainer {
   private final Hang hang;
   private final AprilTagVision vision;
 
+  private final AlgaeIntake algaeIntake;
   private final CoralIntake coralIntake;
 
   private final Elevator elevator;
@@ -112,7 +114,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
     switch (Constants.getRobot()) {
       case COMP_BOT_2025:
         // Real robot (Wood bot test chassis), instantiate hardware IO implementations
@@ -124,16 +125,11 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
-        // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
         elevator = new Elevator(new ElevatorIO() {});
-        // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
         hang = new Hang(new HangIO() {});
-        coralIntake =
-            new CoralIntake(
-                new CoralIntakeRealIO(
-                    IntakeConstants.LEFT_MOTOR_ID,
-                    IntakeConstants.RIGHT_MOTOR_ID,
-                    IntakeConstants.Sensor_ID));
+
+        algaeIntake = new AlgaeIntake(new IntakeIOHardware(0, 0)); // TODO!
+        coralIntake = new CoralIntake(new IntakeIOHardware(0, 0)); // TODO
         break;
 
       case WOOD_BOT_TWO_2025:
@@ -148,12 +144,9 @@ public class RobotContainer {
         vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
         elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
-        coralIntake =
-            new CoralIntake(
-                new CoralIntakeRealIO(
-                    IntakeConstants.LEFT_MOTOR_ID,
-                    IntakeConstants.RIGHT_MOTOR_ID,
-                    IntakeConstants.Sensor_ID));
+
+        algaeIntake = new AlgaeIntake(new IntakeIOHardware(0, 0)); // TODO find ids
+        coralIntake = new CoralIntake(new IntakeIOHardware(0, 0)); // TODO
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -168,12 +161,9 @@ public class RobotContainer {
         vision = new AprilTagVision();
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
-        coralIntake =
-            new CoralIntake(
-                new CoralIntakeRealIO(
-                    IntakeConstants.LEFT_MOTOR_ID,
-                    IntakeConstants.RIGHT_MOTOR_ID,
-                    IntakeConstants.Sensor_ID));
+
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -188,12 +178,9 @@ public class RobotContainer {
         vision = new AprilTagVision();
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
-        coralIntake =
-            new CoralIntake(
-                new CoralIntakeRealIO(
-                    IntakeConstants.LEFT_MOTOR_ID,
-                    IntakeConstants.RIGHT_MOTOR_ID,
-                    IntakeConstants.Sensor_ID));
+
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
         break;
 
       case SIM_BOT:
@@ -209,7 +196,9 @@ public class RobotContainer {
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
-        coralIntake = new CoralIntake(new CoralIntakeIOSim());
+
+        algaeIntake = new AlgaeIntake(new IntakeIOSim());
+        coralIntake = new CoralIntake(new IntakeIOSim());
         break;
 
       default:
@@ -224,7 +213,9 @@ public class RobotContainer {
         hang = new Hang(new HangIO() {});
         vision = new AprilTagVision();
         elevator = new Elevator(new ElevatorIO() {});
-        coralIntake = new CoralIntake(new CoralIntakeIOSim());
+
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
         break;
     }
 
