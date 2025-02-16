@@ -7,6 +7,7 @@ public interface WristIO {
   @AutoLog
   public static class WristIOInputs {
     public double setpoint;
+    public double position;
   }
 
   /** Updates the set of loggable inputs. */
@@ -15,5 +16,7 @@ public interface WristIO {
   /** Set the setpoint in revolutions. */
   default void goTo(double setpoint) {}
 
-  default boolean atSetpoint() {return false;}
+  default boolean atSetpoint() {
+    return false;
+  }
 }
