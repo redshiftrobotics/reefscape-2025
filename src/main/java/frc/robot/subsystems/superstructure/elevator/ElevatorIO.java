@@ -18,7 +18,7 @@ public interface ElevatorIO {
   /** Updates the set of loggable inputs. */
   default void updateInputs(ElevatorIOInputs inputs) {}
 
-  default void setGoalPosition(double positionRad, double feedforward) {}
+  default void runPosition(double positionRad, double feedforward) {}
 
   default void runOpenLoop(double output) {}
 

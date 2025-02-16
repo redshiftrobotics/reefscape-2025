@@ -18,10 +18,10 @@ public class ElevatorConstants {
       };
 
   public static final int currentLimit = 35;
-  public static final double drumGearReduction = 9.0;
+  public static final double gearReduction = 9.0;
 
-  public static final double carriageHeight = Units.inchesToMeters(4);
-  public static final double elevatorHeight = Units.inchesToMeters(40.8);
+  public static final double carriageHeight = Units.inchesToMeters(8.5);
+  public static final double elevatorHeight = Units.inchesToMeters(50);
 
   public static final double carriageMaxHeight = elevatorHeight - carriageHeight;
 
@@ -36,7 +36,6 @@ public class ElevatorConstants {
 
   public static final PIDConstants pid =
       switch (Constants.getRobot()) {
-          // case SIM_BOT -> new PIDConstants(0.004, 0.0, 0.0);
         default -> new PIDConstants(1.0, 0.0, 0.0);
       };
 

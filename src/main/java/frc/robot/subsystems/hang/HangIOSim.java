@@ -1,74 +1,89 @@
 package frc.robot.subsystems.hang;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants;
 
 public class HangIOSim implements HangIO {
-  private PWMSparkMax motor = new PWMSparkMax(0);
-  private Encoder encoder = new Encoder(0, 1);
-  private EncoderSim encoderSim = new EncoderSim(encoder);
+  private final PWMSparkMax motor = new PWMSparkMax(0);
+  private final Encoder encoder = new Encoder(0, 1);
+  private final EncoderSim encoderSim = new EncoderSim(encoder);
 
-  // TODO: Get values from design
-  private SingleJointedArmSim armSim =
-      new SingleJointedArmSim(DCMotor.getNEO(1), 1, 1, Units.inchesToMeters(18), 0, 3, false, 0);
-  private HangVisualization currentArm =
-      new HangVisualization("Hang/Arm", 32, 32, 16, getPosition(), Color.kGreen);
-  private HangVisualization setpointArm =
-      new HangVisualization("Hang/Setpoint", 32, 32, 16, getPosition(), Color.kOrange);
+  private final SingleJointedArmSim arm =
+      new SingleJointedArmSim(
+          DCMotor.getNEO(1),
+          HangConstants.GEAR_REDUCTION,
+          1,
+          Units.inchesToMeters(18),
+          0,
+          3,
+          false,
+          0);
 
-  private PIDController controller =
-      new PIDController(
-          HangConstants.SIM_HANG_ARM_P, HangConstants.SIM_HANG_ARM_I, HangConstants.SIM_HANG_ARM_D);
+  private double appliedVolts = 0.0;
 
-  private double setpoint;
+  private final PIDController controller = new PIDController(0.0, 0.0, 0.0);
+  private boolean runClosedLoop = false;
+  private double feedForwardVolts = 0.0;
 
   @Override
   public void updateInputs(HangIOInputs inputs) {
-    motor.set(controller.calculate(getPosition(), setpoint));
 
-    armSim.setInput(motor.get() * RobotController.getBatteryVoltage());
+    if (runClosedLoop) {
+      appliedVolts = controller.calculate(inputs.positionRotations) + feedForwardVolts;
+    }
 
-    armSim.update(Constants.LOOP_PERIOD_SECONDS);
+    motor.set(appliedVolts);
 
-    encoderSim.setDistance(armSim.getAngleRads());
+    arm.setInputVoltage(motor.get());
+
+    arm.update(Constants.LOOP_PERIOD_SECONDS);
+
+    encoderSim.setDistance(arm.getAngleRads());
 
     RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(armSim.getCurrentDrawAmps()));
+        BatterySim.calculateDefaultBatteryLoadedVoltage(arm.getCurrentDrawAmps()));
 
-    currentArm.setAngle(Rotation2d.fromRadians(armSim.getAngleRads()));
+    inputs.positionRotations = Units.radiansToRotations(arm.getAngleRads());
+    inputs.velocityRPM = Units.radiansPerSecondToRotationsPerMinute(arm.getVelocityRadPerSec());
 
-    inputs.armSetpoint = setpoint;
+    inputs.appliedVolts = new double[] {motor.getVoltage()};
+    inputs.supplyCurrentAmps = new double[] {arm.getCurrentDrawAmps()};
   }
 
   @Override
-  public void setSetpoint(double setpoint) {
-    this.setpoint = setpoint;
-    setpointArm.setAngle(Rotation2d.fromRotations(setpoint));
+  public void runPosition(double positionRotations) {
+    controller.setSetpoint(positionRotations);
+    feedForwardVolts = 0;
+    runClosedLoop = true;
   }
 
   @Override
-  public double getSetpoint() {
-    return setpoint;
+  public void runOpenLoop(double output) {
+    runVolts(MathUtil.inverseInterpolate(-12.0, 12.0, output));
   }
 
   @Override
-  public double getPosition() {
-    return encoderSim.getDistance();
+  public void runVolts(double volts) {
+    appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+    runClosedLoop = false;
   }
 
   @Override
   public void stop() {
-    setpoint = getPosition();
+    runOpenLoop(0);
+  }
+
+  @Override
+  public void setPID(double kP, double kI, double kD) {
+    controller.setPID(kP, kI, kD);
   }
 }

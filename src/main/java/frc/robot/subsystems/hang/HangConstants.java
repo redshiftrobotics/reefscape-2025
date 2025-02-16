@@ -1,23 +1,27 @@
 package frc.robot.subsystems.hang;
 
+import frc.robot.Constants;
+import frc.robot.utility.records.PIDConstants;
+
 public class HangConstants {
   private HangConstants() {}
 
-  // TODO
-  public static final double REAL_HANG_ARM_P = 0;
-  public static final double REAL_HANG_ARM_I = 0;
-  public static final double REAL_HANG_ARM_D = 0;
+  public static record HangConfig(int motorId, int cancoderId) {}
 
-  // TODO
-  public static final double SIM_HANG_ARM_P = 100;
-  public static final double SIM_HANG_ARM_I = 0;
-  public static final double SIM_HANG_ARM_D = 0;
+  public static final HangConfig ELEVATOR_CONFIG =
+      switch (Constants.getRobot()) {
+        case COMP_BOT_2025 -> new HangConfig(2, 3);
+        default -> new HangConfig(0, 0);
+      };
 
-  // TODO
-  public static final int COMP_BOT_2025_CAN_ID = 0;
-  public static final int WOOD_BOT_TWO_CAN_ID = 0;
-  public static final int T_SHIRT_CANNON_CAN_ID = 0;
-  public static final int CRESCENDO_2024_CAN_ID = 0;
+  public static final PIDConstants FEEDBACK =
+      switch (Constants.getRobot()) {
+        default -> new PIDConstants(1.0, 0.0, 0.0);
+      };
 
-  public static final double TOLERANCE = 3;
+  public static final int MOTOR_CURRENT_LIMIT = 30;
+  public static final double GEAR_REDUCTION = Math.pow(5, 3);
+
+  public static final double STOWED_POSITION_ROTATIONS = 0.0;
+  public static final double DEPLOY_POSITION_ROTATIONS = 0.0;
 }

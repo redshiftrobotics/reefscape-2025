@@ -18,7 +18,7 @@ public class ElevatorIOSim implements ElevatorIO {
               MOTOR,
               ElevatorConstants.carriageMassKg,
               ElevatorConstants.drumRadius,
-              ElevatorConstants.drumGearReduction),
+              ElevatorConstants.gearReduction),
           MOTOR,
           0.0,
           ElevatorConstants.carriageMaxHeight,
@@ -52,7 +52,7 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
-  public void setGoalPosition(double positionRad, double feedforward) {
+  public void runPosition(double positionRad, double feedforward) {
     controller.setSetpoint(positionRad);
     feedForwardVolts = feedforward;
     runClosedLoop = true;
@@ -60,12 +60,12 @@ public class ElevatorIOSim implements ElevatorIO {
 
   @Override
   public void runOpenLoop(double output) {
-    appliedVolts = MathUtil.inverseInterpolate(-12.0, 12.0, output);
+    runVolts(MathUtil.inverseInterpolate(-12.0, +12.0, output));
   }
 
   @Override
   public void runVolts(double volts) {
-    appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+    appliedVolts = MathUtil.clamp(volts, -12.0, +12.0);
     runClosedLoop = false;
   }
 

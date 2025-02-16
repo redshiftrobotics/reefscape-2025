@@ -25,11 +25,7 @@ public class SuperstructureVisualizer {
     elevatorMechanism =
         root.append(
             new LoggedMechanismLigament2d(
-                name + " Elevator",
-                Units.inchesToMeters(26.0),
-                90,
-                4.0,
-                new Color8Bit(color)));
+                name + " Elevator", Units.inchesToMeters(26.0), 90, 4.0, new Color8Bit(color)));
   }
 
   public void update(double carriageHeight) {

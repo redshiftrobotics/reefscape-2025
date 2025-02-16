@@ -1,9 +1,9 @@
 package frc.robot.subsystems.superstructure;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.FieldConstants;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 
 public class Superstructure extends SubsystemBase {
@@ -23,25 +23,25 @@ public class Superstructure extends SubsystemBase {
 
   public Command scoreL1() {
     return elevator.runEnd(
-        () -> elevator.setGoalHeightMeters(FieldConstants.ReefHeight.L1.height),
+        () -> elevator.setGoalHeightMeters(Units.inchesToMeters(18)),
         () -> elevator.setGoalHeightMeters(0));
   }
 
   public Command scoreL2() {
     return elevator.runEnd(
-        () -> elevator.setGoalHeightMeters(FieldConstants.ReefHeight.L2.height),
+        () -> elevator.setGoalHeightMeters(Units.inchesToMeters(31.875)),
         () -> elevator.setGoalHeightMeters(0));
   }
 
   public Command scoreL3() {
     return elevator.runEnd(
-        () -> elevator.setGoalHeightMeters(FieldConstants.ReefHeight.L3.height),
+        () -> elevator.setGoalHeightMeters(Units.inchesToMeters(47.625)),
         () -> elevator.setGoalHeightMeters(0));
   }
 
   public Command scoreL4() {
     return elevator.runEnd(
-        () -> elevator.setGoalHeightMeters(FieldConstants.ReefHeight.L4.height),
+        () -> elevator.setGoalHeightMeters(Units.inchesToMeters(72)),
         () -> elevator.setGoalHeightMeters(0));
   }
 

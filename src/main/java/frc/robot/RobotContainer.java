@@ -20,11 +20,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
@@ -110,13 +108,20 @@ public class RobotContainer {
     switch (Constants.getRobot()) {
       case COMP_BOT_2025:
         // Real robot (Wood bot test chassis), instantiate hardware IO implementations
+        // drive =
+        //     new Drive(
+        //         new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
+        //         new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+        //         new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+        //         new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+        //         new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         drive =
             new Drive(
                 new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim());
         vision = new AprilTagVision();
         // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
         elevator = new Elevator(new ElevatorIO() {});
@@ -171,10 +176,10 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIO() {},
-                new ModuleIOSim(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSim(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSim(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSim(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim());
         vision =
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         hang = new Hang(new HangIOSim());
@@ -453,12 +458,12 @@ public class RobotContainer {
 
     operatorXbox.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
-    driverController.y().onTrue(superstructure.scoreL1());
-    driverController.x().onTrue(superstructure.scoreL2());
-    driverController.a().onTrue(superstructure.scoreL3());
-    driverController.povUp().onTrue(superstructure.scoreL4());
+    operatorController.y().onTrue(superstructure.scoreL4());
+    operatorController.x().onTrue(superstructure.scoreL3());
+    operatorController.a().onTrue(superstructure.scoreL2());
+    operatorController.povUp().onTrue(superstructure.scoreL1());
 
-    driverController.povDown().onTrue(superstructure.stow());
+    operatorXbox.povDown().onTrue(superstructure.stow());
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
@@ -510,30 +515,32 @@ public class RobotContainer {
     } catch (ParseException e) {
       System.out.println("Failed to parse Choreo auto " + e.getMessage());
     }
-
-    // Testing autos :)
-    dashboardChooser.addOption(
-        "NOT-PROD HANG SIM TEST", new InstantCommand(() -> hang.setSetpoint(0.8)));
   }
 
   private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {
+
+    dashboardChooser.addOption("Elevator Coast", elevator.coast());
+    dashboardChooser.addOption("Elevator Static", elevator.staticCharacterization(0.02));
+
+    dashboardChooser.addOption("Hang Coast", hang.coast());
 
     dashboardChooser.addOption(
         "Simple Feed Forward Characterization", DriveCommands.feedforwardCharacterization(drive));
     dashboardChooser.addOption(
         "Simple Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
 
+    // //
     // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/introduction.html
-    dashboardChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    dashboardChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    dashboardChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    dashboardChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // dashboardChooser.addOption(
+    //     "Drive SysId (Quasistatic Forward)",
+    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // dashboardChooser.addOption(
+    //     "Drive SysId (Quasistatic Reverse)",
+    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // dashboardChooser.addOption(
+    //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // dashboardChooser.addOption(
+    //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**

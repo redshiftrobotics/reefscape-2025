@@ -118,7 +118,7 @@ public class Elevator extends SubsystemBase {
 
       setpoint = profile.calculate(Constants.LOOP_PERIOD_SECONDS, setpoint, goal);
 
-      io.setGoalPosition(
+      io.runPosition(
           setpoint.position / ElevatorConstants.drumRadius,
           feedforward.calculate(setpoint.velocity));
 
@@ -178,6 +178,7 @@ public class Elevator extends SubsystemBase {
   public Command coast() {
     return Commands.startEnd(
         () -> {
+          io.stop();
           io.setBrakeMode(false);
           stoppedProfile = true;
         },

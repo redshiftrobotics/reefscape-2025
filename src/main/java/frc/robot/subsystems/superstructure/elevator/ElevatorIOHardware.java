@@ -51,8 +51,8 @@ public class ElevatorIOHardware implements ElevatorIO {
         .voltageCompensation(12);
     motorConfig
         .encoder
-        .positionConversionFactor(1 / ElevatorConstants.drumGearReduction)
-        .velocityConversionFactor(1 / ElevatorConstants.drumGearReduction);
+        .positionConversionFactor(1 / ElevatorConstants.gearReduction)
+        .velocityConversionFactor(1 / ElevatorConstants.gearReduction);
     motorConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(0, 0, 0, 0);
 
     tryUntilOk(
@@ -70,6 +70,8 @@ public class ElevatorIOHardware implements ElevatorIO {
                 motorConfig.follow(leader, config.inverted()),
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters));
+
+    tryUntilOk(leader, 5, () -> encoder.setPosition(0.0));
   }
 
   @Override
@@ -101,7 +103,7 @@ public class ElevatorIOHardware implements ElevatorIO {
   }
 
   @Override
-  public void setGoalPosition(double positionRad, double feedforward) {
+  public void runPosition(double positionRad, double feedforward) {
     control.setReference(
         Units.radiansToRotations(positionRad),
         ControlType.kPosition,
