@@ -107,21 +107,14 @@ public class RobotContainer {
 
     switch (Constants.getRobot()) {
       case COMP_BOT_2025:
-        // Real robot (Wood bot test chassis), instantiate hardware IO implementations
-        // drive =
-        //     new Drive(
-        //         new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-        //         new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-        //         new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-        //         new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-        //         new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+        // Real robot (Competition bot with mechanisms), instantiate hardware IO implementations
         drive =
             new Drive(
                 new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim());
+                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
         // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
         elevator = new Elevator(new ElevatorIO() {});
