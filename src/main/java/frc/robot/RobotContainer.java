@@ -145,7 +145,7 @@ public class RobotContainer {
         vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
         elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
-        wrist = new Wrist(new WristIORelativeEncoder(WristConstants.MOTOR_ID));
+        wrist = new Wrist(new WristIO() {});
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -160,7 +160,7 @@ public class RobotContainer {
         vision = new AprilTagVision();
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
-        wrist = new Wrist(new WristIORelativeEncoder(WristConstants.MOTOR_ID));
+        wrist = new Wrist(new WristIO() {});
         break;
 
       case CRESCENDO_CHASSIS_2024:
