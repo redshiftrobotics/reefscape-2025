@@ -2,11 +2,16 @@ package frc.robot.subsystems.superstructure.wrist;
 
 import org.littletonrobotics.junction.AutoLog;
 
-/** Interface for the IO layers of the Template subsystem. */
+/** Interface for the IO layers of the CORAL wrist subsystem. */
 public interface WristIO {
   @AutoLog
-  public static class WristIOInputs {}
+  public static class WristIOInputs {
+    public double setpoint;
+  }
 
   /** Updates the set of loggable inputs. */
   default void updateInputs(WristIOInputs inputs) {}
+
+  /** Set the setpoint in revolutions. */
+  default void setSetpoint(double setpoint) {}
 }
