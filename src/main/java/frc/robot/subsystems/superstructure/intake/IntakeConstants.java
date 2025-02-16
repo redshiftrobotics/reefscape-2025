@@ -4,6 +4,7 @@ package frc.robot.subsystems.superstructure.intake;
 public class IntakeConstants {
   // TODO Check if this is 5 or 4.
   public static final int SIGNAL_SENSOR_OCCUPIED = 5;
+  public static final double SENSOR_VOLTAGE_TOLERANCE = .3; // this is fine, righte?
 
   // TODO
   public static final int CORAL_INTAKE_LEFT_MOTOR_ID = 0;
