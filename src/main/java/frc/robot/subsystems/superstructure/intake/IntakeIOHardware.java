@@ -23,6 +23,16 @@ public class IntakeIOHardware implements IntakeIO {
   public void updateInputs(IntakeIOInputs inputs) {
     inputs.speedLeft = leftMotor.get();
     inputs.speedRight = rightMotor.get();
+
+    // maybe we coulda had 4 vars but i just did what the example had
+    inputs.appliedVolts = new double[] {
+        leftMotor.getAppliedOutput() * leftMotor.getBusVoltage(),
+        rightMotor.getAppliedOutput() * rightMotor.getBusVoltage()
+    };
+    
+    inputs.supplyCurrentAmps = new double[] {
+        leftMotor.getOutputCurrent(), rightMotor.getOutputCurrent()
+    };
   }
 
   @Override
