@@ -63,13 +63,13 @@ public class ModuleConstants {
 
       case WOOD_BOT_TWO_2025:
         FRONT_LEFT_MODULE_CONFIG =
-            new ModuleConfig(2, 1, 37, Rotation2d.fromRotations(-0.880126953125), true);
+            new ModuleConfig(2, 1, 37, Rotation2d.fromRotations(-0.87841796875), true);
         FRONT_RIGHT_MODULE_CONFIG =
-            new ModuleConfig(19, 18, 36, Rotation2d.fromRotations(-0.29833984375), true);
+            new ModuleConfig(19, 18, 36, Rotation2d.fromRotations(-0.294189453125), true);
         BACK_LEFT_MODULE_CONFIG =
-            new ModuleConfig(8, 9, 39, Rotation2d.fromRotations(-0.32373046875), true);
+            new ModuleConfig(8, 9, 39, Rotation2d.fromRotations(-0.323486328125), true);
         BACK_RIGHT_MODULE_CONFIG =
-            new ModuleConfig(11, 10, 38, Rotation2d.fromRotations(-0.8935546875), true);
+            new ModuleConfig(11, 10, 38, Rotation2d.fromRotations(-0.890380859375), true);
         break;
 
       default:
