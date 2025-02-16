@@ -5,15 +5,19 @@ import static frc.robot.subsystems.superstructure.wrist.WristConstants.*;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-/** Hardware implementation of the TemplateIO. */
+import edu.wpi.first.math.MathUtil;
+
+/** Wrist implementation using the built-in relative encoder. */
 public class WristIORelativeEncoder implements WristIO {
   private final SparkMax motor;
   private final SparkClosedLoopController pidController;
+  private final RelativeEncoder encoder;
 
   private double setpoint;
 
@@ -25,6 +29,8 @@ public class WristIORelativeEncoder implements WristIO {
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     pidController = motor.getClosedLoopController();
+
+    encoder = motor.getEncoder();
   }
 
   @Override
@@ -37,5 +43,10 @@ public class WristIORelativeEncoder implements WristIO {
   @Override
   public void goTo(double setpoint) {
     this.setpoint = setpoint;
+  }
+
+  @Override
+  public boolean atSetpoint() {
+    return MathUtil.isNear(setpoint, encoder.getPosition(), TOLERANCE);
   }
 }

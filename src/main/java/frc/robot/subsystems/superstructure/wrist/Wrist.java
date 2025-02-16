@@ -22,4 +22,8 @@ public class Wrist extends SubsystemBase {
   public void goTo(double setpoint) {
     io.goTo(setpoint);
   }
+
+  public boolean atSetpoint() {
+    return io.atSetpoint();
+  }
 }

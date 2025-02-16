@@ -14,4 +14,6 @@ public interface WristIO {
 
   /** Set the setpoint in revolutions. */
   default void goTo(double setpoint) {}
+
+  default boolean atSetpoint() {return false;}
 }
