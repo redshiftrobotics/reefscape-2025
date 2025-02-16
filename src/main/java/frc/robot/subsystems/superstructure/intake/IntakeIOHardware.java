@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.MathUtil;
 
 /** Hardware implementation of the TemplateIO. */
 public class IntakeIOHardware implements IntakeIO {
@@ -50,9 +51,7 @@ public class IntakeIOHardware implements IntakeIO {
     double sensorState = sensor.getValue();
     SmartDashboard.putNumber("input", sensorState);
 
-    // TODO check if 5 or 4 is on because it alternates between 5 and 4 volts
-    // this might be wrong because it might alternate when changed idk never been tested
-    return sensorState == SIGNAL_SENSOR_OCCUPIED;
+    return MathUtil.isNear(sensorState, SIGNAL_SENSOR_OCCUPIED, SENSOR_VOLTAGE_TOLERANCE);
   }
 
   @Override
