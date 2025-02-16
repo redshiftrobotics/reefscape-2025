@@ -2,6 +2,8 @@ package frc.robot.subsystems.hang;
 
 import frc.robot.Constants;
 import frc.robot.utility.records.PIDConstants;
+import edu.wpi.first.math.util.Units;
+
 
 public class HangConstants {
   private HangConstants() {}
@@ -24,4 +26,5 @@ public class HangConstants {
 
   public static final double STOWED_POSITION_ROTATIONS = 0.0;
   public static final double DEPLOY_POSITION_ROTATIONS = 0.0;
+  public static final double TOLERANCE = Units.degreesToRotations(0.3);
 }
