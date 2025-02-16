@@ -2,6 +2,8 @@ package frc.robot.subsystems.superstructure.elevator;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -14,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -55,8 +56,16 @@ public class Elevator extends SubsystemBase {
   private final Alert motorDisconnectedAlert =
       new Alert("Elevator motor disconnected!", Alert.AlertType.kWarning);
 
-  private BooleanSupplier disabledOverride = () -> false;
-  private BooleanSupplier coastOverride = () -> false;
+  private Debouncer disabledDebouncer = new Debouncer(3, DebounceType.kRising);
+
+  enum IdleModeControl {
+    BRAKE,
+    AUTO,
+    COAST
+  }
+
+  private IdleModeControl coastMode = IdleModeControl.AUTO;
+  private boolean brakeModeEnabled = false;
 
   private boolean stoppedProfile = false;
 
@@ -104,13 +113,20 @@ public class Elevator extends SubsystemBase {
         maxVelocity,
         maxAcceleration);
 
-    io.setBrakeMode(!coastOverride.getAsBoolean());
+    brakeModeEnabled =
+        switch (coastMode) {
+          case BRAKE -> true;
+          case AUTO -> !disabledDebouncer.calculate(DriverStation.isDisabled());
+          case COAST -> false;
+        };
 
-    final boolean shouldRunProfile =
-        !(stoppedProfile || disabledOverride.getAsBoolean() || coastOverride.getAsBoolean())
-            && DriverStation.isEnabled();
+    io.setBrakeMode(brakeModeEnabled);
 
-    if (shouldRunProfile) {
+    Logger.recordOutput("Profile/BreakModeEnabled", brakeModeEnabled);
+
+    if (!stoppedProfile && !brakeModeEnabled && DriverStation.isEnabled()) {
+      Logger.recordOutput("Profile/ShouldRunProfiled", true);
+
       State goal =
           new State(
               MathUtil.clamp(goalSupplier.get().position, 0.0, ElevatorConstants.carriageMaxHeight),
@@ -122,21 +138,19 @@ public class Elevator extends SubsystemBase {
           setpoint.position / ElevatorConstants.drumRadius,
           feedforward.calculate(setpoint.velocity));
 
-      // Log state
       Logger.recordOutput("Elevator/Profile/SetpointPositionMeters", setpoint.position);
       Logger.recordOutput("Elevator/Profile/SetpointVelocityMetersPerSec", setpoint.velocity);
       Logger.recordOutput("Elevator/Profile/GoalPositionMeters", goal.position);
       Logger.recordOutput("Elevator/Profile/GoalVelocityMetersPerSec", goal.velocity);
 
     } else {
-      // Log state
+      Logger.recordOutput("Profile/ShouldRunProfiled", false);
+
       Logger.recordOutput("Elevator/Profile/SetpointPositionMeters", 0.0);
       Logger.recordOutput("Elevator/Profile/SetpointVelocityMetersPerSec", 0.0);
       Logger.recordOutput("Elevator/Profile/GoalPositionMeters", 0.0);
       Logger.recordOutput("Elevator/Profile/GoalVelocityMetersPerSec", 0.0);
     }
-
-    Logger.recordOutput("Elevator/Profile/ShouldRunProfiled", shouldRunProfile);
 
     motorDisconnectedAlert.set(!inputs.motorConnected);
   }
@@ -175,16 +189,18 @@ public class Elevator extends SubsystemBase {
     return setpoint;
   }
 
+  public void setCoastMode(IdleModeControl coastMode) {
+    this.coastMode = coastMode;
+  }
+
   public Command coast() {
     return Commands.startEnd(
         () -> {
           io.stop();
-          io.setBrakeMode(false);
-          stoppedProfile = true;
+          setCoastMode(IdleModeControl.COAST);
         },
         () -> {
-          io.setBrakeMode(true);
-          stoppedProfile = false;
+          setCoastMode(IdleModeControl.AUTO);
         });
   }
 
@@ -208,6 +224,7 @@ public class Elevator extends SubsystemBase {
             () -> {
               stoppedProfile = false;
               timer.stop();
+              System.out.println("CharacterizationOutput: " + state.characterizationOutput);
               Logger.recordOutput("Elevator/CharacterizationOutput", state.characterizationOutput);
             });
   }

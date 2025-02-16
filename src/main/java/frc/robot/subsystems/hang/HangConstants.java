@@ -1,9 +1,8 @@
 package frc.robot.subsystems.hang;
 
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.utility.records.PIDConstants;
-import edu.wpi.first.math.util.Units;
-
 
 public class HangConstants {
   private HangConstants() {}

@@ -12,7 +12,7 @@ public class ElevatorConstants {
 
   public static final ElevatorConfig ELEVATOR_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new ElevatorConfig(0, 0, true); // left is leader, right is follower
+        case COMP_BOT_2025 -> new ElevatorConfig(3, 17, true); // left is leader, right is follower
         case SIM_BOT -> new ElevatorConfig(0, 0, false);
         default -> new ElevatorConfig(0, 1, false);
       };
@@ -27,7 +27,7 @@ public class ElevatorConstants {
 
   public static final double carriageMassKg = 2.26796; // 5 lbs
 
-  public static final double drumRadius = Units.inchesToMeters(1.0);
+  public static final double drumRadius = Units.inchesToMeters(2.0);
 
   public static final double maxCarriageVelocity = 3.0;
   public static final double maxCarriageAcceleration = 3.5;
@@ -42,6 +42,7 @@ public class ElevatorConstants {
   public static final ElevatorFeedForwardConstants feedForward =
       switch (Constants.getRobot()) {
         case SIM_BOT -> new ElevatorFeedForwardConstants(0.001, 0.26056, 0.76, 10);
+        case COMP_BOT_2025 -> new ElevatorFeedForwardConstants(0.031600659999, 0, 0, 0);
         default -> new ElevatorFeedForwardConstants(0.0, 0.0, 0.0, 0.0);
       };
 }

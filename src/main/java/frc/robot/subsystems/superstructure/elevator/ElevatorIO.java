@@ -11,6 +11,9 @@ public interface ElevatorIO {
     public double positionRad = 0.0;
     public double velocityRadPerSec = 0.0;
 
+    public boolean breakMode = true;
+
+    public double[] dutyCycle = new double[0];
     public double[] appliedVolts = new double[0];
     public double[] supplyCurrentAmps = new double[0];
   }

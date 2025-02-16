@@ -44,9 +44,12 @@ public class ElevatorIOSim implements ElevatorIO {
 
     inputs.positionRad = sim.getPositionMeters() / ElevatorConstants.drumRadius;
     inputs.velocityRadPerSec = sim.getVelocityMetersPerSecond() / ElevatorConstants.drumRadius;
+
+    inputs.dutyCycle = new double[] {appliedVolts / 12.0};
+    inputs.appliedVolts = new double[] {appliedVolts};
     inputs.supplyCurrentAmps = new double[] {sim.getCurrentDrawAmps()};
 
-    inputs.appliedVolts = new double[] {appliedVolts};
+    inputs.breakMode = false;
 
     inputs.motorConnected = true;
   }

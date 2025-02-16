@@ -43,7 +43,9 @@ import frc.robot.subsystems.hang.HangIO;
 import frc.robot.subsystems.hang.HangIOSim;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
+import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIOHardware;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
@@ -108,16 +110,23 @@ public class RobotContainer {
     switch (Constants.getRobot()) {
       case COMP_BOT_2025:
         // Real robot (Competition bot with mechanisms), instantiate hardware IO implementations
+        // drive =
+        //     new Drive(
+        //         new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
+        //         new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+        //         new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+        //         new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+        //         new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         drive =
             new Drive(
-                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
         vision = new AprilTagVision();
         // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
-        elevator = new Elevator(new ElevatorIO() {});
+        elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
         // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
         hang = new Hang(new HangIO() {});
         break;
@@ -230,7 +239,7 @@ public class RobotContainer {
     }
 
     // Hide controller missing warnings for sim
-    if (Constants.getMode() != Mode.REAL) {
+    if (Constants.getMode() != Mode.REAL || true) {
       DriverStation.silenceJoystickConnectionWarning(true);
     }
 
