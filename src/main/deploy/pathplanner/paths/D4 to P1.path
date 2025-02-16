@@ -3,67 +3,58 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 6.0
+        "x": 3.6,
+        "y": 2.775
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.90630778703665,
-        "y": 6.422618261740699
+        "x": 2.9764073235452564,
+        "y": 3.2103287454832503
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "D4"
     },
     {
       "anchor": {
-        "x": 4.0,
-        "y": 7.0
+        "x": 1.9223676215277765,
+        "y": 3.897355324074074
       },
       "prevControl": {
-        "x": 4.0,
-        "y": 6.75
+        "x": 3.1217989572636604,
+        "y": 2.8597740408294223
       },
       "nextControl": {
-        "x": 4.0,
-        "y": 7.25
+        "x": 1.6136783309729759,
+        "y": 4.164390393673306
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.0,
-        "y": 5.0
+        "x": 1.337,
+        "y": 6.988
       },
       "prevControl": {
-        "x": 4.0,
-        "y": 4.75
-      },
-      "nextControl": {
-        "x": 4.0,
-        "y": 5.25
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.0,
-        "y": 6.0
-      },
-      "prevControl": {
-        "x": 2.90630778703665,
-        "y": 5.577381738259301
+        "x": 1.349662973086471,
+        "y": 6.738320907738331
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Coral Pickup 1"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "getCoral",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -74,13 +65,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 125.00000000000001
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Paths B",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 59.99999999999999
   },
   "useDefaultConstraints": true
 }
