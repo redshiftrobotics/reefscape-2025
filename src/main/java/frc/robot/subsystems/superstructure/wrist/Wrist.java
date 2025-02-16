@@ -18,4 +18,8 @@ public class Wrist extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Wrist", inputs);
   }
+
+  public void goTo(double setpoint) {
+    io.goTo(setpoint);
+  }
 }

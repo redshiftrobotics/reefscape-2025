@@ -13,5 +13,5 @@ public interface WristIO {
   default void updateInputs(WristIOInputs inputs) {}
 
   /** Set the setpoint in revolutions. */
-  default void setSetpoint(double setpoint) {}
+  default void goTo(double setpoint) {}
 }
