@@ -4,9 +4,9 @@ import static frc.robot.subsystems.superstructure.intake.IntakeConstants.*;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.MathUtil;
 
 /** Hardware implementation of the TemplateIO. */
 public class IntakeIOHardware implements IntakeIO {
@@ -26,14 +26,14 @@ public class IntakeIOHardware implements IntakeIO {
     inputs.speedRight = rightMotor.get();
 
     // maybe we coulda had 4 vars but i just did what the example had
-    inputs.appliedVolts = new double[] {
-        leftMotor.getAppliedOutput() * leftMotor.getBusVoltage(),
-        rightMotor.getAppliedOutput() * rightMotor.getBusVoltage()
-    };
-    
-    inputs.supplyCurrentAmps = new double[] {
-        leftMotor.getOutputCurrent(), rightMotor.getOutputCurrent()
-    };
+    inputs.appliedVolts =
+        new double[] {
+          leftMotor.getAppliedOutput() * leftMotor.getBusVoltage(),
+          rightMotor.getAppliedOutput() * rightMotor.getBusVoltage()
+        };
+
+    inputs.supplyCurrentAmps =
+        new double[] {leftMotor.getOutputCurrent(), rightMotor.getOutputCurrent()};
   }
 
   @Override

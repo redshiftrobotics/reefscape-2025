@@ -8,7 +8,7 @@ public interface IntakeIO {
   public static class IntakeIOInputs {
     public double speedLeft;
     public double speedRight;
-    
+
     public double[] appliedVolts = new double[] {};
     public double[] supplyCurrentAmps = new double[] {};
   }
