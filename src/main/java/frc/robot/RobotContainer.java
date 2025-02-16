@@ -48,6 +48,12 @@ import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
+import frc.robot.subsystems.superstructure.wrist.Wrist;
+import frc.robot.subsystems.superstructure.wrist.WristConstants;
+import frc.robot.subsystems.superstructure.wrist.WristIORelativeEncoder;
+import frc.robot.subsystems.superstructure.wrist.WristIOSim;
+import frc.robot.subsystems.superstructure.wrist.WristIOSim;
+import frc.robot.subsystems.superstructure.wrist.WristIO;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
@@ -75,6 +81,8 @@ public class RobotContainer {
 
   private final Elevator elevator;
   private final Superstructure superstructure;
+
+  private final Wrist wrist;
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -104,7 +112,7 @@ public class RobotContainer {
   private final Alert tuningModeActiveAlert =
       new Alert("Tuning mode active, do not use in competition.", AlertType.kWarning);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /** The container for the robot. Contains subsystems, IO devices, and commands. */
   public RobotContainer() {
 
     switch (Constants.getRobot()) {
@@ -122,6 +130,7 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
         // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
         hang = new Hang(new HangIO() {});
+        wrist = new Wrist(new WristIORelativeEncoder(WristConstants.MOTOR_ID));
         break;
 
       case WOOD_BOT_TWO_2025:
@@ -136,6 +145,7 @@ public class RobotContainer {
         vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
         elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
+        wrist = new Wrist(new WristIORelativeEncoder(WristConstants.MOTOR_ID));
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -150,6 +160,7 @@ public class RobotContainer {
         vision = new AprilTagVision();
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
+        wrist = new Wrist(new WristIORelativeEncoder(WristConstants.MOTOR_ID));
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -164,6 +175,7 @@ public class RobotContainer {
         vision = new AprilTagVision();
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
+        wrist = new Wrist(new WristIO() {});
         break;
 
       case SIM_BOT:
@@ -179,6 +191,7 @@ public class RobotContainer {
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
+        wrist = new Wrist(new WristIOSim());
         break;
 
       default:
@@ -193,6 +206,7 @@ public class RobotContainer {
         hang = new Hang(new HangIO() {});
         vision = new AprilTagVision();
         elevator = new Elevator(new ElevatorIO() {});
+        wrist = new Wrist(new WristIO() {});
         break;
     }
 

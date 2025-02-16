@@ -15,4 +15,6 @@ public class WristConstants {
   public static final double WRIST_FF = 0;
 
   public static final double TOLERANCE = 0.1;
+
+  public static final int MOTOR_ID = 0;
 }
