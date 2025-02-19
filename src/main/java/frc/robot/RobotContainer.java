@@ -456,16 +456,14 @@ public class RobotContainer {
   }
 
   private void configureOperatorControllerBindings() {
-    final CommandXboxController operatorXbox = (CommandXboxController) operatorController;
-
-    operatorXbox.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
+    operatorController.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
     operatorController.y().onTrue(superstructure.scoreL4());
     operatorController.x().onTrue(superstructure.scoreL3());
     operatorController.a().onTrue(superstructure.scoreL2());
     operatorController.povUp().onTrue(superstructure.scoreL1());
 
-    operatorXbox.povDown().onTrue(superstructure.stow());
+    operatorController.povDown().onTrue(superstructure.stow());
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
