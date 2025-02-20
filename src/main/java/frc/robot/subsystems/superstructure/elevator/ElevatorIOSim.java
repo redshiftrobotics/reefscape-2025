@@ -52,6 +52,7 @@ public class ElevatorIOSim implements ElevatorIO {
     inputs.breakMode = false;
 
     inputs.motorConnected = true;
+    inputs.followerMotorFollowing = true;
   }
 
   @Override

@@ -7,6 +7,7 @@ public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
     public boolean motorConnected = false;
+    public boolean followerMotorFollowing = false;
 
     public double positionRad = 0.0;
     public double velocityRadPerSec = 0.0;

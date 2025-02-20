@@ -16,6 +16,8 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants.ElevatorConfig;
@@ -23,59 +25,74 @@ import frc.robot.utility.SparkUtil;
 import java.util.function.DoubleSupplier;
 
 /** Hardware implementation of the TemplateIO. */
-public class ElevatorIOHardwareFollow implements ElevatorIO {
+public class ElevatorIOHardwarePID implements ElevatorIO {
 
-  private final SparkMax leader;
-  private final SparkMax follower;
+  private final SparkMax primary;
+  private final SparkMax secondary;
 
   private final RelativeEncoder encoder;
   private final SparkClosedLoopController control;
+
+  private final RelativeEncoder secondaryEncoder;
+  private final SparkClosedLoopController secondaryControl;
 
   private final Debouncer connectDebounce = new Debouncer(0.5);
 
   private boolean breakMode = true;
 
-  public ElevatorIOHardwareFollow(ElevatorConfig config) {
+  public ElevatorIOHardwarePID(ElevatorConfig config) {
 
-    leader = new SparkMax(config.leaderCanId(), MotorType.kBrushless);
-    follower = new SparkMax(config.followerCanId(), MotorType.kBrushless);
+    primary = new SparkMax(config.leaderCanId(), MotorType.kBrushless);
+    secondary = new SparkMax(config.followerCanId(), MotorType.kBrushless);
 
-    encoder = leader.getEncoder();
-    control = leader.getClosedLoopController();
+    encoder = primary.getEncoder();
+    control = primary.getClosedLoopController();
 
-    SparkMaxConfig leaderConfig = new SparkMaxConfig();
-    leaderConfig
+    secondaryEncoder = secondary.getEncoder();
+    secondaryControl = secondary.getClosedLoopController();
+
+    SparkMaxConfig primaryConfig = new SparkMaxConfig();
+    primaryConfig
+        .inverted(false)
         .idleMode(breakMode ? IdleMode.kBrake : IdleMode.kCoast)
         .smartCurrentLimit(ElevatorConstants.currentLimit)
         .voltageCompensation(12);
-    leaderConfig
+    primaryConfig
         .encoder
         .positionConversionFactor(1 / ElevatorConstants.gearReduction)
         .velocityConversionFactor(1 / ElevatorConstants.gearReduction);
-    leaderConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(0, 0, 0, 0);
+    primaryConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(0, 0, 0, 0);
 
-    tryUntilOk(
-        leader,
-        5,
-        () ->
-            leader.configure(
-                leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
-
-    SparkMaxConfig followerConfig = new SparkMaxConfig();
-    followerConfig
+    SparkMaxConfig secondaryConfig = new SparkMaxConfig();
+    secondaryConfig
+        .inverted(config.inverted())
         .idleMode(breakMode ? IdleMode.kBrake : IdleMode.kCoast)
         .smartCurrentLimit(ElevatorConstants.currentLimit)
-        .voltageCompensation(12)
-        .follow(leader, config.inverted());
+        .voltageCompensation(12);
+    secondaryConfig
+        .encoder
+        .positionConversionFactor(1 / ElevatorConstants.gearReduction)
+        .velocityConversionFactor(1 / ElevatorConstants.gearReduction);
+    secondaryConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(0, 0, 0, 0);
 
     tryUntilOk(
-        follower,
+        primary,
         5,
         () ->
-            follower.configure(
-                followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+            primary.configure(
+                primaryConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
-    tryUntilOk(leader, 5, () -> encoder.setPosition(0.0));
+    tryUntilOk(
+        secondary,
+        5,
+        () ->
+            secondary.configure(
+                secondaryConfig.inverted(config.inverted()),
+                ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters));
+
+    tryUntilOk(primary, 5, () -> encoder.setPosition(0.0));
+    tryUntilOk(secondary, 5, () -> secondaryEncoder.setPosition(0.0));
   }
 
   @Override
@@ -83,32 +100,32 @@ public class ElevatorIOHardwareFollow implements ElevatorIO {
 
     SparkUtil.clearStickyFault();
     ifOk(
-        leader,
+        primary,
         encoder::getPosition,
         value -> inputs.positionRad = Units.rotationsToRadians(value));
     ifOk(
-        leader,
+        primary,
         encoder::getVelocity,
         value -> inputs.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(value));
 
     ifOkMulti(
-        new SparkMax[] {leader, follower},
-        new DoubleSupplier[] {leader::getAppliedOutput, follower::getAppliedOutput},
+        new SparkMax[] {primary, secondary},
+        new DoubleSupplier[] {primary::getAppliedOutput, secondary::getAppliedOutput},
         values -> inputs.dutyCycle = values);
     ifOkMulti(
-        new SparkMax[] {leader, follower},
+        new SparkMax[] {primary, secondary},
         new DoubleSupplier[] {
-          () -> leader.getAppliedOutput() * leader.getBusVoltage(),
-          () -> follower.getAppliedOutput() * follower.getBusVoltage()
+          () -> primary.getAppliedOutput() * primary.getBusVoltage(),
+          () -> secondary.getAppliedOutput() * secondary.getBusVoltage()
         },
         values -> inputs.appliedVolts = values);
     ifOkMulti(
-        new SparkMax[] {leader, follower},
-        new DoubleSupplier[] {leader::getOutputCurrent, follower::getOutputCurrent},
+        new SparkMax[] {primary, secondary},
+        new DoubleSupplier[] {primary::getOutputCurrent, secondary::getOutputCurrent},
         values -> inputs.supplyCurrentAmps = values);
 
     inputs.motorConnected = connectDebounce.calculate(!SparkUtil.hasStickyFault());
-    inputs.followerMotorFollowing = follower.isFollower();
+    inputs.followerMotorFollowing = MathUtil.isNear(encoder.getPosition(), secondaryEncoder.getPosition(), 0.1);
 
     inputs.breakMode = breakMode;
   }
@@ -121,21 +138,30 @@ public class ElevatorIOHardwareFollow implements ElevatorIO {
         ClosedLoopSlot.kSlot0,
         feedforward,
         ArbFFUnits.kVoltage);
+    secondaryControl.setReference(
+        Units.radiansToRotations(positionRad),
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0,
+        feedforward,
+        ArbFFUnits.kVoltage);
   }
 
   @Override
   public void runOpenLoop(double output) {
-    leader.set(output);
+    primary.set(output);
+    secondary.set(output);
   }
 
   @Override
   public void runVolts(double volts) {
-    leader.setVoltage(volts);
+    primary.setVoltage(volts);
+    secondary.setVoltage(volts);
   }
 
   @Override
   public void stop() {
-    leader.stopMotor();
+    primary.stopMotor();
+    secondary.stopMotor();
   }
 
   @Override
@@ -143,16 +169,16 @@ public class ElevatorIOHardwareFollow implements ElevatorIO {
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     motorConfig.closedLoop.pidf(kP, kI, kD, 0);
     tryUntilOk(
-        leader,
+        primary,
         5,
         () ->
-            leader.configure(
+            primary.configure(
                 motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
     tryUntilOk(
-        follower,
+        secondary,
         5,
         () ->
-            follower.configure(
+            secondary.configure(
                 motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
   }
 
@@ -163,16 +189,16 @@ public class ElevatorIOHardwareFollow implements ElevatorIO {
       SparkMaxConfig motorConfig = new SparkMaxConfig();
       motorConfig.idleMode(breakMode ? IdleMode.kBrake : IdleMode.kCoast);
       tryUntilOk(
-          leader,
+          primary,
           5,
           () ->
-              leader.configure(
+              primary.configure(
                   motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
       tryUntilOk(
-          follower,
+          secondary,
           5,
           () ->
-              follower.configure(
+              secondary.configure(
                   motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
     }
   }

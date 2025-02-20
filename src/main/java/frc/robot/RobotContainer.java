@@ -45,7 +45,7 @@ import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
-import frc.robot.subsystems.superstructure.elevator.ElevatorIOHardware;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIOHardwarePID;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
@@ -126,7 +126,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new AprilTagVision();
         // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
-        elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
+        elevator = new Elevator(new ElevatorIOHardwarePID(ElevatorConstants.ELEVATOR_CONFIG));
         // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
         hang = new Hang(new HangIO() {});
         break;
@@ -519,7 +519,6 @@ public class RobotContainer {
 
   private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {
 
-    dashboardChooser.addOption("Elevator Coast", elevator.coast());
     dashboardChooser.addOption("Elevator Static", elevator.staticCharacterization(0.02));
 
     dashboardChooser.addOption("Hang Coast", hang.coast());

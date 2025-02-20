@@ -55,6 +55,9 @@ public class Elevator extends SubsystemBase {
 
   private final Alert motorDisconnectedAlert =
       new Alert("Elevator motor disconnected!", Alert.AlertType.kWarning);
+  
+  private final Alert followMotorFollowingAlert =
+      new Alert("Elevator follower not following!", Alert.AlertType.kWarning);
 
   private Debouncer disabledDebouncer = new Debouncer(3, DebounceType.kRising);
 
@@ -153,6 +156,7 @@ public class Elevator extends SubsystemBase {
     }
 
     motorDisconnectedAlert.set(!inputs.motorConnected);
+    followMotorFollowingAlert.set(!inputs.followerMotorFollowing);
   }
 
   public void setGoalSupplier(Supplier<State> goal) {
@@ -191,17 +195,6 @@ public class Elevator extends SubsystemBase {
 
   public void setCoastMode(IdleModeControl coastMode) {
     this.coastMode = coastMode;
-  }
-
-  public Command coast() {
-    return Commands.startEnd(
-        () -> {
-          io.stop();
-          setCoastMode(IdleModeControl.COAST);
-        },
-        () -> {
-          setCoastMode(IdleModeControl.AUTO);
-        });
   }
 
   public Command staticCharacterization(double outputRampRate) {
