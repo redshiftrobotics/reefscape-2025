@@ -47,15 +47,15 @@ import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOHardwareFollow;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
+import frc.robot.subsystems.superstructure.intake.AlgaeIntake;
+import frc.robot.subsystems.superstructure.intake.CoralIntake;
+import frc.robot.subsystems.superstructure.intake.IntakeIO;
+import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
 import frc.robot.subsystems.superstructure.wrist.WristConstants;
 import frc.robot.subsystems.superstructure.wrist.WristIO;
 import frc.robot.subsystems.superstructure.wrist.WristIORelativeEncoder;
 import frc.robot.subsystems.superstructure.wrist.WristIOSim;
-import frc.robot.subsystems.superstructure.intake.AlgaeIntake;
-import frc.robot.subsystems.superstructure.intake.CoralIntake;
-import frc.robot.subsystems.superstructure.intake.IntakeIO;
-import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
@@ -82,10 +82,10 @@ public class RobotContainer {
 
   private final AlgaeIntake algaeIntake;
   private final CoralIntake coralIntake;
-  
+
   private final Wrist wrist;
   private final Hang hang;
-  
+
   private final Elevator elevator;
   private final Superstructure superstructure;
 
@@ -122,20 +122,13 @@ public class RobotContainer {
     switch (Constants.getRobot()) {
       case COMP_BOT_2025:
         // Real robot (Competition bot with mechanisms), instantiate hardware IO implementations
-        // drive =
-        //     new Drive(
-        //         new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-        //         new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-        //         new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-        //         new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-        //         new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         drive =
             new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
+                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
 
         vision = new AprilTagVision();
 
@@ -146,7 +139,6 @@ public class RobotContainer {
         hang = new Hang(new HangIO() {});
 
         wrist = new Wrist(new WristIORelativeEncoder(WristConstants.MOTOR_ID));
-
 
         // algaeIntake =
         //     new AlgaeIntake(
@@ -181,7 +173,6 @@ public class RobotContainer {
 
         wrist = new Wrist(new WristIO() {});
 
-
         algaeIntake = new AlgaeIntake(new IntakeIO() {});
         coralIntake = new CoralIntake(new IntakeIO() {});
 
@@ -201,7 +192,6 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
 
         wrist = new Wrist(new WristIO() {});
-
 
         algaeIntake = new AlgaeIntake(new IntakeIO() {});
         coralIntake = new CoralIntake(new IntakeIO() {});
@@ -241,12 +231,9 @@ public class RobotContainer {
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
-
         wrist = new Wrist(new WristIOSim());
-
         algaeIntake = new AlgaeIntake(new IntakeIOSim());
         coralIntake = new CoralIntake(new IntakeIOSim());
-
         break;
 
       default:
@@ -533,10 +520,10 @@ public class RobotContainer {
 
     operatorController.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
-    operatorController.y().onTrue(superstructure.scoreL4()).onTrue(Commands.print("Score L4"));
-    operatorController.x().onTrue(superstructure.scoreL3()).onTrue(Commands.print("Score L3"));
-    operatorController.a().onTrue(superstructure.scoreL2()).onTrue(Commands.print("Score L2"));
-    operatorController.povUp().onTrue(superstructure.scoreL1()).onTrue(Commands.print("Score L1"));
+    operatorController.y().onTrue(superstructure.scoreL4());
+    operatorController.x().onTrue(superstructure.scoreL3());
+    operatorController.a().onTrue(superstructure.scoreL2());
+    operatorController.povUp().onTrue(superstructure.scoreL1());
 
     operatorController.povDown().onTrue(superstructure.stow());
   }

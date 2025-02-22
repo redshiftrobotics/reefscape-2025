@@ -10,7 +10,6 @@ import static frc.robot.subsystems.superstructure.wrist.WristConstants.SIM_MOMEN
 import static frc.robot.subsystems.superstructure.wrist.WristConstants.TOLERANCE;
 
 import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.MathUtil;
@@ -47,7 +46,6 @@ public class WristIOSim implements WristIO {
   private final DCMotor wristGearbox = DCMotor.getNeo550(1);
   private final SparkMax sparkMax = new SparkMax(MOTOR_ID, MotorType.kBrushless);
   private final SparkMaxSim motorSim = new SparkMaxSim(sparkMax, wristGearbox);
-  private final SparkClosedLoopController pidController = sparkMax.getClosedLoopController();
 
   // The wrist is basically a single jointed arm, so:
   private final SingleJointedArmSim wristSim =

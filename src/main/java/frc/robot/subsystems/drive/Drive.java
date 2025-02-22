@@ -10,6 +10,8 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -49,6 +51,8 @@ public class Drive extends SubsystemBase {
       new Alert("Disconnected gyro, using kinematics as fallback.", Alert.AlertType.kError);
 
   private final Module[] modules; // FL, FR, BL, BR
+
+  private Debouncer disabledDebouncer = new Debouncer(3, DebounceType.kRising);
 
   @AutoLogOutput(key = "Drive/BrakeModeEnabled")
   private boolean brakeModeEnabled = true;
@@ -165,7 +169,7 @@ public class Drive extends SubsystemBase {
                 (voltage) -> runCharacterization(voltage.in(Units.Volts)), null, this));
 
     // --- Break mode ---
-    setMotorBrakeMode(true);
+    setMotorBrakeMode(brakeModeEnabled);
   }
 
   // --- Robot Pose ---
@@ -190,6 +194,9 @@ public class Drive extends SubsystemBase {
     if (DriverStation.isDisabled()) {
       stop();
     }
+
+    brakeModeEnabled = !disabledDebouncer.calculate(DriverStation.isDisabled());
+    setMotorBrakeMode(brakeModeEnabled);
 
     // Log current wheel speeds
     Logger.recordOutput("SwerveStates/MeasuredWheelSpeeds", getWheelSpeeds());
