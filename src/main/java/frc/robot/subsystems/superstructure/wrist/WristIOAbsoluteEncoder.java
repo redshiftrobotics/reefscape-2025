@@ -1,0 +1,54 @@
+package frc.robot.subsystems.superstructure.wrist;
+
+import static frc.robot.subsystems.superstructure.wrist.WristConstants.TOLERANCE;
+import static frc.robot.subsystems.superstructure.wrist.WristConstants.WRIST_D;
+import static frc.robot.subsystems.superstructure.wrist.WristConstants.WRIST_FF;
+import static frc.robot.subsystems.superstructure.wrist.WristConstants.WRIST_I;
+import static frc.robot.subsystems.superstructure.wrist.WristConstants.WRIST_P;
+
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.MathUtil;
+
+public class WristIOAbsoluteEncoder implements WristIO {
+  private final SparkMax motor;
+  private final SparkClosedLoopController pidController;
+  private final AbsoluteEncoder encoder;
+
+  private double setpoint;
+
+  public WristIOAbsoluteEncoder(int motorId) {
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.closedLoop.pidf(WRIST_P, WRIST_I, WRIST_D, WRIST_FF);
+
+    motor = new SparkMax(motorId, MotorType.kBrushless);
+    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    pidController = motor.getClosedLoopController();
+
+    encoder = motor.getAbsoluteEncoder();
+  }
+
+  @Override
+  public void updateInputs(WristIOInputs inputs) {
+    inputs.setpoint = setpoint;
+  }
+
+  @Override
+  public void goTo(double setpoint) {
+    this.setpoint = setpoint;
+
+    pidController.setReference(setpoint, ControlType.kPosition);
+  }
+
+  @Override
+  public boolean atSetpoint() {
+    return MathUtil.isNear(setpoint, encoder.getPosition(), TOLERANCE);
+  }
+}
