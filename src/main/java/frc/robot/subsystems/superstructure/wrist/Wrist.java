@@ -37,4 +37,14 @@ public class Wrist extends SubsystemBase {
   public boolean atSetpoint() {
     return io.atSetpoint();
   }
+
+  /** Get position in rotations */
+  public double getPosition() {
+    return inputs.position;
+  }
+
+  /** Get setpoint in rotations */
+  public double getSetpoint() {
+    return inputs.setpoint;
+  }
 }

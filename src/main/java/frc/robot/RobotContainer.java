@@ -274,7 +274,7 @@ public class RobotContainer {
     }
 
     // Superstructure
-    superstructure = new Superstructure(elevator);
+    superstructure = new Superstructure(elevator, wrist);
 
     // Vision setup
     // vision.setLastRobotPoseSupplier(drive::getRobotPose);
