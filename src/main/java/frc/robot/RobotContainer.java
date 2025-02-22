@@ -456,12 +456,17 @@ public class RobotContainer {
   }
 
   private void configureOperatorControllerBindings() {
+
+    for (int i = 0; i < 10; i++) {
+      System.out.println("CODE HAS RAN !!!!");
+    }
+
     operatorController.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
-    operatorController.y().onTrue(superstructure.scoreL4());
-    operatorController.x().onTrue(superstructure.scoreL3());
-    operatorController.a().onTrue(superstructure.scoreL2());
-    operatorController.povUp().onTrue(superstructure.scoreL1());
+    operatorController.y().onTrue(superstructure.scoreL4()).onTrue(Commands.print("Score L4"));
+    operatorController.x().onTrue(superstructure.scoreL3()).onTrue(Commands.print("Score L3"));
+    operatorController.a().onTrue(superstructure.scoreL2()).onTrue(Commands.print("Score L2"));
+    operatorController.povUp().onTrue(superstructure.scoreL1()).onTrue(Commands.print("Score L1"));
 
     operatorController.povDown().onTrue(superstructure.stow());
   }
