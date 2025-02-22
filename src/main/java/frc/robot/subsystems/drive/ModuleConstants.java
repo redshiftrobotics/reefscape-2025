@@ -26,17 +26,17 @@ public class ModuleConstants {
   static {
     switch (Constants.getRobot()) {
       case SIM_BOT:
-        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.kZero, false);
+        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.kZero, false);
+        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.kZero, false);
+        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.kZero, false);
         break;
 
       case COMP_BOT_2025:
-        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(19, 18, 37, Rotation2d.fromRotations(0), false);
+        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(2, 1, 36, Rotation2d.fromRotations(0), false);
+        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(10, 11, 39, Rotation2d.fromRotations(0), false);
+        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(8, 9, 38, Rotation2d.fromRotations(0), false);
         break;
 
       case T_SHIRT_CANNON_CHASSIS:

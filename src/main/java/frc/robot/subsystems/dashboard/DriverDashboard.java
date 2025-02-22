@@ -38,10 +38,12 @@ public class DriverDashboard extends SubsystemBase {
 
   private final Debouncer debouncer = new Debouncer(0.1, DebounceType.kFalling);
 
+  private BooleanSupplier fieldRelativeSupplier;
+  private BooleanSupplier headingControlledSupplier;
+
   private Supplier<Pose2d> poseSupplier;
   private Supplier<Pose2d> autoAlginPoseSupplier;
   private Supplier<ChassisSpeeds> speedsSupplier;
-  private BooleanSupplier fieldRelativeSupplier;
   private BooleanSupplier hasVisionEstimate;
 
   private final Field2d field = new Field2d();
@@ -80,6 +82,10 @@ public class DriverDashboard extends SubsystemBase {
     this.fieldRelativeSupplier = fieldRelativeSupplier;
   }
 
+  public void setHeadingControlledSupplier(BooleanSupplier headingControlledSupplier) {
+    this.headingControlledSupplier = headingControlledSupplier;
+  }
+
   public void setHasVisionEstimate(BooleanSupplier hasVisionEstimate) {
     this.hasVisionEstimate = hasVisionEstimate;
   }
@@ -111,6 +117,10 @@ public class DriverDashboard extends SubsystemBase {
 
     if (fieldRelativeSupplier != null) {
       SmartDashboard.putBoolean("Field Relative", fieldRelativeSupplier.getAsBoolean());
+    }
+
+    if (headingControlledSupplier != null) {
+      SmartDashboard.putBoolean("Heading Controlled", headingControlledSupplier.getAsBoolean());
     }
 
     if (hasVisionEstimate != null) {

@@ -20,11 +20,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
@@ -47,12 +45,17 @@ import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIOHardwareFollow;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
 import frc.robot.subsystems.superstructure.wrist.WristConstants;
 import frc.robot.subsystems.superstructure.wrist.WristIO;
 import frc.robot.subsystems.superstructure.wrist.WristIORelativeEncoder;
 import frc.robot.subsystems.superstructure.wrist.WristIOSim;
+import frc.robot.subsystems.superstructure.intake.AlgaeIntake;
+import frc.robot.subsystems.superstructure.intake.CoralIntake;
+import frc.robot.subsystems.superstructure.intake.IntakeIO;
+import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
@@ -75,13 +78,16 @@ public class RobotContainer {
 
   // Subsystems
   private final Drive drive;
-  private final Hang hang;
   private final AprilTagVision vision;
 
+  private final AlgaeIntake algaeIntake;
+  private final CoralIntake coralIntake;
+  
+  private final Wrist wrist;
+  private final Hang hang;
+  
   private final Elevator elevator;
   private final Superstructure superstructure;
-
-  private final Wrist wrist;
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -113,23 +119,51 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, IO devices, and commands. */
   public RobotContainer() {
-
     switch (Constants.getRobot()) {
       case COMP_BOT_2025:
-        // Real robot (Wood bot test chassis), instantiate hardware IO implementations
+        // Real robot (Competition bot with mechanisms), instantiate hardware IO implementations
+        // drive =
+        //     new Drive(
+        //         new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
+        //         new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+        //         new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+        //         new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+        //         new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         drive =
             new Drive(
-                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
+
         vision = new AprilTagVision();
+
         // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
-        elevator = new Elevator(new ElevatorIO() {});
+        elevator = new Elevator(new ElevatorIOHardwareFollow(ElevatorConstants.ELEVATOR_CONFIG));
+
         // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
         hang = new Hang(new HangIO() {});
+
         wrist = new Wrist(new WristIORelativeEncoder(WristConstants.MOTOR_ID));
+
+
+        // algaeIntake =
+        //     new AlgaeIntake(
+        //         new IntakeIOHardware(
+        //             IntakeConstants.ALGAE_INTAKE_LEFT_MOTOR_ID,
+        //             IntakeConstants.ALGAE_INTAKE_RIGHT_MOTOR_ID,
+        //             IntakeConstants.ALGAE_INTAKE_SENSOR_ID));
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+
+        // coralIntake =
+        //     new CoralIntake(
+        //         new IntakeIOHardware(
+        //             IntakeConstants.CORAL_INTAKE_LEFT_MOTOR_ID,
+        //             IntakeConstants.CORAL_INTAKE_RIGHT_MOTOR_ID,
+        //             IntakeConstants.CORAL_INTAKE_SENSOR_ID));
+        coralIntake = new CoralIntake(new IntakeIO() {});
+
         break;
 
       case WOOD_BOT_TWO_2025:
@@ -144,7 +178,13 @@ public class RobotContainer {
         vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
         elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
+
         wrist = new Wrist(new WristIO() {});
+
+
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
+
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -159,7 +199,13 @@ public class RobotContainer {
         vision = new AprilTagVision();
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
+
         wrist = new Wrist(new WristIO() {});
+
+
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
+
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -174,7 +220,13 @@ public class RobotContainer {
         vision = new AprilTagVision();
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
+// <<<<<<< elms-wrist
         wrist = new Wrist(new WristIO() {});
+// =======
+
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
+// >>>>>>> main
         break;
 
       case SIM_BOT:
@@ -182,15 +234,21 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIO() {},
-                new ModuleIOSim(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSim(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSim(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSim(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim());
         vision =
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
+// <<<<<<< elms-wrist
         wrist = new Wrist(new WristIOSim());
+// =======
+
+        algaeIntake = new AlgaeIntake(new IntakeIOSim());
+        coralIntake = new CoralIntake(new IntakeIOSim());
+// >>>>>>> main
         break;
 
       default:
@@ -205,7 +263,13 @@ public class RobotContainer {
         hang = new Hang(new HangIO() {});
         vision = new AprilTagVision();
         elevator = new Elevator(new ElevatorIO() {});
+// <<<<<<< elms-wrist
         wrist = new Wrist(new WristIO() {});
+// =======
+
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
+// >>>>>>> main
         break;
     }
 
@@ -245,7 +309,7 @@ public class RobotContainer {
     }
 
     // Hide controller missing warnings for sim
-    if (Constants.getMode() != Mode.REAL) {
+    if (Constants.getMode() != Mode.REAL || true) {
       DriverStation.silenceJoystickConnectionWarning(true);
     }
 
@@ -312,7 +376,18 @@ public class RobotContainer {
     final Trigger useFieldRelative =
         new Trigger(new OverrideSwitch(driverXbox.y(), OverrideSwitch.Mode.TOGGLE, true));
 
+    final Trigger useHeadingControlled =
+        new Trigger(
+            new OverrideSwitch(
+                driverXbox
+                    .rightBumper()
+                    .and(driverXbox.leftTrigger().negate())
+                    .and(driverXbox.rightTrigger().negate()),
+                OverrideSwitch.Mode.HOLD,
+                false));
+
     DriverDashboard.getInstance().setFieldRelativeSupplier(useFieldRelative);
+    DriverDashboard.getInstance().setHeadingControlledSupplier(useHeadingControlled);
 
     final JoystickInputController input =
         new JoystickInputController(
@@ -336,18 +411,14 @@ public class RobotContainer {
             .withName("DEFAULT Drive"));
 
     // Secondary drive command, angle controlled drive
-    driverXbox
-        .rightBumper()
-        .and(driverXbox.leftTrigger().negate())
-        .and(driverXbox.rightTrigger().negate())
-        .whileTrue(
-            DriveCommands.joystickHeadingDrive(
-                    drive,
-                    input::getTranslationMetersPerSecond,
-                    input::getHeadingDirection,
-                    level::getCurrentSpeedLevel,
-                    useFieldRelative::getAsBoolean)
-                .withName("HEADING Drive"));
+    useHeadingControlled.whileTrue(
+        DriveCommands.joystickHeadingDrive(
+                drive,
+                input::getTranslationMetersPerSecond,
+                input::getHeadingDirection,
+                level::getCurrentSpeedLevel,
+                useFieldRelative::getAsBoolean)
+            .withName("HEADING Drive"));
 
     // Cause the robot to resist movement by forming an X shape with the swerve modules
     // Helps prevent getting pushed around
@@ -387,7 +458,7 @@ public class RobotContainer {
               new Transform2d(
                   DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
               new Transform2d(0, 0, Rotation2d.kZero),
-              new Translation2d(Units.inchesToMeters(10), 0));
+              new Translation2d(Units.inchesToMeters(24), 0));
 
       Supplier<Command> endRumble = () -> rumbleController(driverXbox, 0.3).withTimeout(0.1);
 
@@ -462,18 +533,15 @@ public class RobotContainer {
   }
 
   private void configureOperatorControllerBindings() {
-    final CommandXboxController operatorXbox = (CommandXboxController) operatorController;
 
-    operatorXbox.b().onTrue(Commands.idle(drive).withName("Operator Idle Drive"));
+    operatorController.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
-    operatorXbox.povDown().onTrue(elevator.runOnce(() -> elevator.setGoalHeightMeters(0.0)));
-    operatorXbox.povRight().onTrue(elevator.runOnce(() -> elevator.setGoalHeightMeters(0.2)));
-    operatorXbox.povLeft().onTrue(elevator.runOnce(() -> elevator.setGoalHeightMeters(0.4)));
-    operatorXbox
-        .povUp()
-        .onTrue(
-            elevator.runOnce(
-                () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)));
+    operatorController.y().onTrue(superstructure.scoreL4()).onTrue(Commands.print("Score L4"));
+    operatorController.x().onTrue(superstructure.scoreL3()).onTrue(Commands.print("Score L3"));
+    operatorController.a().onTrue(superstructure.scoreL2()).onTrue(Commands.print("Score L2"));
+    operatorController.povUp().onTrue(superstructure.scoreL1()).onTrue(Commands.print("Score L1"));
+
+    operatorController.povDown().onTrue(superstructure.stow());
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
@@ -525,30 +593,31 @@ public class RobotContainer {
     } catch (ParseException e) {
       System.out.println("Failed to parse Choreo auto " + e.getMessage());
     }
-
-    // Testing autos :)
-    dashboardChooser.addOption(
-        "NOT-PROD HANG SIM TEST", new InstantCommand(() -> hang.setSetpoint(0.8)));
   }
 
   private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {
+
+    dashboardChooser.addOption("Elevator Static", elevator.staticCharacterization(0.02));
+
+    dashboardChooser.addOption("Hang Coast", hang.coast());
 
     dashboardChooser.addOption(
         "Simple Feed Forward Characterization", DriveCommands.feedforwardCharacterization(drive));
     dashboardChooser.addOption(
         "Simple Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
 
+    // //
     // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/introduction.html
-    dashboardChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    dashboardChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    dashboardChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    dashboardChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // dashboardChooser.addOption(
+    //     "Drive SysId (Quasistatic Forward)",
+    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // dashboardChooser.addOption(
+    //     "Drive SysId (Quasistatic Reverse)",
+    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // dashboardChooser.addOption(
+    //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // dashboardChooser.addOption(
+    //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**

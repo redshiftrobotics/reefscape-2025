@@ -7,10 +7,14 @@ public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
     public boolean motorConnected = false;
+    public boolean followerMotorFollowing = false;
 
     public double positionRad = 0.0;
     public double velocityRadPerSec = 0.0;
 
+    public boolean breakMode = true;
+
+    public double[] dutyCycle = new double[0];
     public double[] appliedVolts = new double[0];
     public double[] supplyCurrentAmps = new double[0];
   }
@@ -18,7 +22,7 @@ public interface ElevatorIO {
   /** Updates the set of loggable inputs. */
   default void updateInputs(ElevatorIOInputs inputs) {}
 
-  default void setGoalPosition(double positionRad, double feedforward) {}
+  default void runPosition(double positionRad, double feedforward) {}
 
   default void runOpenLoop(double output) {}
 

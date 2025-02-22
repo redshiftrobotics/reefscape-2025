@@ -18,7 +18,7 @@ public class ElevatorIOSim implements ElevatorIO {
               MOTOR,
               ElevatorConstants.carriageMassKg,
               ElevatorConstants.drumRadius,
-              ElevatorConstants.drumGearReduction),
+              ElevatorConstants.gearReduction),
           MOTOR,
           0.0,
           ElevatorConstants.carriageMaxHeight,
@@ -26,6 +26,8 @@ public class ElevatorIOSim implements ElevatorIO {
           0);
 
   private double appliedVolts = 0.0;
+
+  private boolean breakMode = true;
 
   private final PIDController controller = new PIDController(0.0, 0.0, 0.0);
   private boolean runClosedLoop = false;
@@ -44,15 +46,19 @@ public class ElevatorIOSim implements ElevatorIO {
 
     inputs.positionRad = sim.getPositionMeters() / ElevatorConstants.drumRadius;
     inputs.velocityRadPerSec = sim.getVelocityMetersPerSecond() / ElevatorConstants.drumRadius;
+
+    inputs.dutyCycle = new double[] {appliedVolts / 12.0};
+    inputs.appliedVolts = new double[] {appliedVolts};
     inputs.supplyCurrentAmps = new double[] {sim.getCurrentDrawAmps()};
 
-    inputs.appliedVolts = new double[] {appliedVolts};
+    inputs.breakMode = breakMode;
 
     inputs.motorConnected = true;
+    inputs.followerMotorFollowing = true;
   }
 
   @Override
-  public void setGoalPosition(double positionRad, double feedforward) {
+  public void runPosition(double positionRad, double feedforward) {
     controller.setSetpoint(positionRad);
     feedForwardVolts = feedforward;
     runClosedLoop = true;
@@ -60,12 +66,12 @@ public class ElevatorIOSim implements ElevatorIO {
 
   @Override
   public void runOpenLoop(double output) {
-    appliedVolts = MathUtil.inverseInterpolate(-12.0, 12.0, output);
+    runVolts(MathUtil.inverseInterpolate(-12.0, +12.0, output));
   }
 
   @Override
   public void runVolts(double volts) {
-    appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+    appliedVolts = MathUtil.clamp(volts, -12.0, +12.0);
     runClosedLoop = false;
   }
 
@@ -77,5 +83,10 @@ public class ElevatorIOSim implements ElevatorIO {
   @Override
   public void setPID(double kP, double kI, double kD) {
     controller.setPID(kP, kI, kD);
+  }
+
+  @Override
+  public void setBrakeMode(boolean enable) {
+    breakMode = enable;
   }
 }

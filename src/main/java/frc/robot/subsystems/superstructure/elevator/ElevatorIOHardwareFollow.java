@@ -23,7 +23,7 @@ import frc.robot.utility.SparkUtil;
 import java.util.function.DoubleSupplier;
 
 /** Hardware implementation of the TemplateIO. */
-public class ElevatorIOHardware implements ElevatorIO {
+public class ElevatorIOHardwareFollow implements ElevatorIO {
 
   private final SparkMax leader;
   private final SparkMax follower;
@@ -35,7 +35,7 @@ public class ElevatorIOHardware implements ElevatorIO {
 
   private boolean breakMode = true;
 
-  public ElevatorIOHardware(ElevatorConfig config) {
+  public ElevatorIOHardwareFollow(ElevatorConfig config) {
 
     leader = new SparkMax(config.leaderCanId(), MotorType.kBrushless);
     follower = new SparkMax(config.followerCanId(), MotorType.kBrushless);
@@ -43,33 +43,39 @@ public class ElevatorIOHardware implements ElevatorIO {
     encoder = leader.getEncoder();
     control = leader.getClosedLoopController();
 
-    SparkMaxConfig motorConfig = new SparkMaxConfig();
-    motorConfig
-        .inverted(false)
+    SparkMaxConfig leaderConfig = new SparkMaxConfig();
+    leaderConfig
         .idleMode(breakMode ? IdleMode.kBrake : IdleMode.kCoast)
         .smartCurrentLimit(ElevatorConstants.currentLimit)
         .voltageCompensation(12);
-    motorConfig
+    leaderConfig
         .encoder
-        .positionConversionFactor(1 / ElevatorConstants.drumGearReduction)
-        .velocityConversionFactor(1 / ElevatorConstants.drumGearReduction);
-    motorConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(0, 0, 0, 0);
+        .positionConversionFactor(1 / ElevatorConstants.gearReduction)
+        .velocityConversionFactor(1 / ElevatorConstants.gearReduction);
+    leaderConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(0, 0, 0, 0);
 
     tryUntilOk(
         leader,
         5,
         () ->
             leader.configure(
-                motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+                leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+
+    SparkMaxConfig followerConfig = new SparkMaxConfig();
+    followerConfig
+        .idleMode(breakMode ? IdleMode.kBrake : IdleMode.kCoast)
+        .smartCurrentLimit(ElevatorConstants.currentLimit)
+        .voltageCompensation(12)
+        .follow(leader, config.inverted());
 
     tryUntilOk(
         follower,
         5,
         () ->
             follower.configure(
-                motorConfig.follow(leader, config.inverted()),
-                ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters));
+                followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+
+    tryUntilOk(leader, 5, () -> encoder.setPosition(0.0));
   }
 
   @Override
@@ -87,6 +93,10 @@ public class ElevatorIOHardware implements ElevatorIO {
 
     ifOkMulti(
         new SparkMax[] {leader, follower},
+        new DoubleSupplier[] {leader::getAppliedOutput, follower::getAppliedOutput},
+        values -> inputs.dutyCycle = values);
+    ifOkMulti(
+        new SparkMax[] {leader, follower},
         new DoubleSupplier[] {
           () -> leader.getAppliedOutput() * leader.getBusVoltage(),
           () -> follower.getAppliedOutput() * follower.getBusVoltage()
@@ -98,10 +108,13 @@ public class ElevatorIOHardware implements ElevatorIO {
         values -> inputs.supplyCurrentAmps = values);
 
     inputs.motorConnected = connectDebounce.calculate(!SparkUtil.hasStickyFault());
+    inputs.followerMotorFollowing = follower.isFollower();
+
+    inputs.breakMode = breakMode;
   }
 
   @Override
-  public void setGoalPosition(double positionRad, double feedforward) {
+  public void runPosition(double positionRad, double feedforward) {
     control.setReference(
         Units.radiansToRotations(positionRad),
         ControlType.kPosition,
@@ -134,7 +147,13 @@ public class ElevatorIOHardware implements ElevatorIO {
         5,
         () ->
             leader.configure(
-                motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
+                motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
+    tryUntilOk(
+        follower,
+        5,
+        () ->
+            follower.configure(
+                motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
   }
 
   @Override
@@ -148,6 +167,12 @@ public class ElevatorIOHardware implements ElevatorIO {
           5,
           () ->
               leader.configure(
+                  motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
+      tryUntilOk(
+          follower,
+          5,
+          () ->
+              follower.configure(
                   motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
     }
   }
