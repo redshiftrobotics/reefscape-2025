@@ -28,6 +28,8 @@ import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
+import frc.robot.commands.intake.SetIntakeSpeed;
+import frc.robot.commands.wrist.SetWrist;
 import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -47,15 +49,15 @@ import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOHardwareFollow;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
+import frc.robot.subsystems.superstructure.intake.AlgaeIntake;
+import frc.robot.subsystems.superstructure.intake.CoralIntake;
+import frc.robot.subsystems.superstructure.intake.IntakeIO;
+import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
 import frc.robot.subsystems.superstructure.wrist.WristConstants;
 import frc.robot.subsystems.superstructure.wrist.WristIO;
 import frc.robot.subsystems.superstructure.wrist.WristIORelativeEncoder;
 import frc.robot.subsystems.superstructure.wrist.WristIOSim;
-import frc.robot.subsystems.superstructure.intake.AlgaeIntake;
-import frc.robot.subsystems.superstructure.intake.CoralIntake;
-import frc.robot.subsystems.superstructure.intake.IntakeIO;
-import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
@@ -82,10 +84,10 @@ public class RobotContainer {
 
   private final AlgaeIntake algaeIntake;
   private final CoralIntake coralIntake;
-  
+
   private final Wrist wrist;
   private final Hang hang;
-  
+
   private final Elevator elevator;
   private final Superstructure superstructure;
 
@@ -116,6 +118,10 @@ public class RobotContainer {
           AlertType.kInfo);
   private final Alert tuningModeActiveAlert =
       new Alert("Tuning mode active, do not use in competition.", AlertType.kWarning);
+  private static final Alert testPlansAvaliable =
+      new Alert(
+          "Running with test plans enabled, ensure you are using the correct auto.",
+          Alert.AlertType.kWarning);
 
   /** The container for the robot. Contains subsystems, IO devices, and commands. */
   public RobotContainer() {
@@ -146,7 +152,6 @@ public class RobotContainer {
         hang = new Hang(new HangIO() {});
 
         wrist = new Wrist(new WristIORelativeEncoder(WristConstants.MOTOR_ID));
-
 
         // algaeIntake =
         //     new AlgaeIntake(
@@ -181,7 +186,6 @@ public class RobotContainer {
 
         wrist = new Wrist(new WristIO() {});
 
-
         algaeIntake = new AlgaeIntake(new IntakeIO() {});
         coralIntake = new CoralIntake(new IntakeIO() {});
 
@@ -201,7 +205,6 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
 
         wrist = new Wrist(new WristIO() {});
-
 
         algaeIntake = new AlgaeIntake(new IntakeIO() {});
         coralIntake = new CoralIntake(new IntakeIO() {});
@@ -304,6 +307,8 @@ public class RobotContainer {
     if (Constants.getRobot() != Constants.PRIMARY_ROBOT_TYPE) {
       notPrimaryBotAlert.set(true);
     }
+
+    testPlansAvaliable.set(Constants.RUNNING_TEST_PLANS);
 
     // Hide controller missing warnings for sim
     if (Constants.getMode() != Mode.REAL || true) {
@@ -589,6 +594,28 @@ public class RobotContainer {
       System.out.println("Failed to load Choreo auto " + e.getMessage());
     } catch (ParseException e) {
       System.out.println("Failed to parse Choreo auto " + e.getMessage());
+    }
+
+    if (Constants.RUNNING_TEST_PLANS) {
+      dashboardChooser.addOption(
+          "[TEST] Rotate Wrist",
+          Commands.sequence(
+              new SetWrist(wrist, 0),
+              new SetWrist(wrist, 0.25),
+              Commands.waitSeconds(1),
+              new SetWrist(wrist, 0)));
+      dashboardChooser.addOption(
+          "[TEST] Activate Algae Intake",
+          Commands.sequence(
+              new SetIntakeSpeed(algaeIntake, 1),
+              Commands.waitSeconds(1),
+              new SetIntakeSpeed(algaeIntake, 0)));
+      dashboardChooser.addOption(
+          "[TEST] Activate Coral Intake",
+          Commands.sequence(
+              new SetIntakeSpeed(coralIntake, 1),
+              Commands.waitSeconds(1),
+              new SetIntakeSpeed(coralIntake, 0)));
     }
   }
 
