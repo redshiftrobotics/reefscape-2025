@@ -457,10 +457,6 @@ public class RobotContainer {
 
   private void configureOperatorControllerBindings() {
 
-    for (int i = 0; i < 10; i++) {
-      System.out.println("CODE HAS RAN !!!!");
-    }
-
     operatorController.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
     operatorController.y().onTrue(superstructure.scoreL4()).onTrue(Commands.print("Score L4"));
