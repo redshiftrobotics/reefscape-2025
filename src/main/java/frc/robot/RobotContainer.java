@@ -47,6 +47,12 @@ import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOHardwarePID;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
+import frc.robot.subsystems.superstructure.intake.AlgaeIntake;
+import frc.robot.subsystems.superstructure.intake.CoralIntake;
+import frc.robot.subsystems.superstructure.intake.IntakeConstants;
+import frc.robot.subsystems.superstructure.intake.IntakeIO;
+import frc.robot.subsystems.superstructure.intake.IntakeIOHardware;
+import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
@@ -70,6 +76,9 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final AprilTagVision vision;
+
+  private final AlgaeIntake algaeIntake;
+  private final CoralIntake coralIntake;
 
   private final Elevator elevator;
   private final Superstructure superstructure;
@@ -106,7 +115,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
     switch (Constants.getRobot()) {
       case COMP_BOT_2025:
         // Real robot (Competition bot with mechanisms), instantiate hardware IO implementations
@@ -129,6 +137,19 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIOHardwarePID(ElevatorConstants.ELEVATOR_CONFIG));
         // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
         hang = new Hang(new HangIO() {});
+
+        algaeIntake =
+            new AlgaeIntake(
+                new IntakeIOHardware(
+                    IntakeConstants.ALGAE_INTAKE_LEFT_MOTOR_ID,
+                    IntakeConstants.ALGAE_INTAKE_RIGHT_MOTOR_ID,
+                    IntakeConstants.ALGAE_INTAKE_SENSOR_ID));
+        coralIntake =
+            new CoralIntake(
+                new IntakeIOHardware(
+                    IntakeConstants.CORAL_INTAKE_LEFT_MOTOR_ID,
+                    IntakeConstants.CORAL_INTAKE_RIGHT_MOTOR_ID,
+                    IntakeConstants.CORAL_INTAKE_SENSOR_ID));
         break;
 
       case WOOD_BOT_TWO_2025:
@@ -143,6 +164,9 @@ public class RobotContainer {
         vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
         elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
+
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -157,6 +181,9 @@ public class RobotContainer {
         vision = new AprilTagVision();
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
+
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -171,6 +198,9 @@ public class RobotContainer {
         vision = new AprilTagVision();
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
+
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
         break;
 
       case SIM_BOT:
@@ -186,6 +216,9 @@ public class RobotContainer {
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
+
+        algaeIntake = new AlgaeIntake(new IntakeIOSim());
+        coralIntake = new CoralIntake(new IntakeIOSim());
         break;
 
       default:
@@ -200,6 +233,9 @@ public class RobotContainer {
         hang = new Hang(new HangIO() {});
         vision = new AprilTagVision();
         elevator = new Elevator(new ElevatorIO() {});
+
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
         break;
     }
 
