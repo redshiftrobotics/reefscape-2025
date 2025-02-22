@@ -78,7 +78,7 @@ public class Elevator extends SubsystemBase {
   private TrapezoidProfile profile;
   private ElevatorFeedforward feedforward;
 
-  /** Creates a new Template. */
+  /** Creates a new Elevator. */
   public Elevator(ElevatorIO io) {
     this.io = io;
 
