@@ -6,6 +6,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface WristIO {
   @AutoLog
   public static class WristIOInputs {
+    // Rotations, probabaly
     public double setpoint;
     public double position;
   }

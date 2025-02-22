@@ -17,4 +17,17 @@ public class WristConstants {
   public static final double TOLERANCE = 0.1;
 
   public static final int MOTOR_ID = 0;
+
+  /** Gearing or something, higher numbers are reductions. */
+  public static final double SIM_GEARING = 0;
+  /** Calculate from OnShape */
+  public static final double SIM_MOMENT_OF_INERTIA = 0;
+  /** In metres. */
+  public static final double SIM_ARM_LENGTH = 0;
+  /** In radians. */
+  public static final double SIM_ARM_MIN_ANGLE = 0;
+  /** In radians. */
+  public static final double SIM_ARM_MAX_ANGLE = 0;
+  /** In radians. */
+  public static final double SIM_ARM_INIT_ANGLE = 0;
 }
