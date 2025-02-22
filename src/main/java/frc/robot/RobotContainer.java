@@ -156,18 +156,8 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
 
-        algaeIntake =
-            new AlgaeIntake(
-                new IntakeIOHardware(
-                    IntakeConstants.ALGAE_INTAKE_LEFT_MOTOR_ID,
-                    IntakeConstants.ALGAE_INTAKE_RIGHT_MOTOR_ID,
-                    IntakeConstants.ALGAE_INTAKE_SENSOR_ID));
-        coralIntake =
-            new CoralIntake(
-                new IntakeIOHardware(
-                    IntakeConstants.CORAL_INTAKE_LEFT_MOTOR_ID,
-                    IntakeConstants.CORAL_INTAKE_RIGHT_MOTOR_ID,
-                    IntakeConstants.CORAL_INTAKE_SENSOR_ID));
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
