@@ -55,7 +55,7 @@ public class Elevator extends SubsystemBase {
 
   private final Alert motorDisconnectedAlert =
       new Alert("Elevator motor disconnected!", Alert.AlertType.kWarning);
-  
+
   private final Alert followMotorFollowingAlert =
       new Alert("Elevator follower not following!", Alert.AlertType.kWarning);
 
@@ -125,10 +125,10 @@ public class Elevator extends SubsystemBase {
 
     io.setBrakeMode(brakeModeEnabled);
 
-    Logger.recordOutput("Profile/BreakModeEnabled", brakeModeEnabled);
+    Logger.recordOutput("Elevator/breakModeEnabled", brakeModeEnabled);
 
-    if (!stoppedProfile && !brakeModeEnabled && DriverStation.isEnabled()) {
-      Logger.recordOutput("Profile/ShouldRunProfiled", true);
+    if (!stoppedProfile && brakeModeEnabled && DriverStation.isEnabled()) {
+      Logger.recordOutput("Elevator/shouldRunProfiled", true);
 
       State goal =
           new State(

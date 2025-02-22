@@ -27,6 +27,8 @@ public class ElevatorIOSim implements ElevatorIO {
 
   private double appliedVolts = 0.0;
 
+  private boolean breakMode = true;
+
   private final PIDController controller = new PIDController(0.0, 0.0, 0.0);
   private boolean runClosedLoop = false;
   private double feedForwardVolts = 0.0;
@@ -49,7 +51,7 @@ public class ElevatorIOSim implements ElevatorIO {
     inputs.appliedVolts = new double[] {appliedVolts};
     inputs.supplyCurrentAmps = new double[] {sim.getCurrentDrawAmps()};
 
-    inputs.breakMode = false;
+    inputs.breakMode = breakMode;
 
     inputs.motorConnected = true;
     inputs.followerMotorFollowing = true;
@@ -81,5 +83,10 @@ public class ElevatorIOSim implements ElevatorIO {
   @Override
   public void setPID(double kP, double kI, double kD) {
     controller.setPID(kP, kI, kD);
+  }
+
+  @Override
+  public void setBrakeMode(boolean enable) {
+    breakMode = enable;
   }
 }

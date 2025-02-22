@@ -16,7 +16,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.util.Units;
@@ -112,7 +111,8 @@ public class ElevatorIOHardwareCopy implements ElevatorIO {
         values -> inputs.supplyCurrentAmps = values);
 
     inputs.motorConnected = connectDebounce.calculate(!SparkUtil.hasStickyFault());
-    inputs.followerMotorFollowing = MathUtil.isNear(leader.getAppliedOutput(), follower.getAppliedOutput(), 0.1);
+    inputs.followerMotorFollowing =
+        MathUtil.isNear(leader.getAppliedOutput(), follower.getAppliedOutput(), 0.1);
 
     inputs.breakMode = breakMode;
   }

@@ -45,13 +45,11 @@ import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
-import frc.robot.subsystems.superstructure.elevator.ElevatorIOHardwarePID;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIOHardwareFollow;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
 import frc.robot.subsystems.superstructure.intake.AlgaeIntake;
 import frc.robot.subsystems.superstructure.intake.CoralIntake;
-import frc.robot.subsystems.superstructure.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.intake.IntakeIO;
-import frc.robot.subsystems.superstructure.intake.IntakeIOHardware;
 import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
@@ -132,24 +130,31 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+
         vision = new AprilTagVision();
+
         // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
-        elevator = new Elevator(new ElevatorIOHardwarePID(ElevatorConstants.ELEVATOR_CONFIG));
+        elevator = new Elevator(new ElevatorIOHardwareFollow(ElevatorConstants.ELEVATOR_CONFIG));
+
         // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
         hang = new Hang(new HangIO() {});
 
-        algaeIntake =
-            new AlgaeIntake(
-                new IntakeIOHardware(
-                    IntakeConstants.ALGAE_INTAKE_LEFT_MOTOR_ID,
-                    IntakeConstants.ALGAE_INTAKE_RIGHT_MOTOR_ID,
-                    IntakeConstants.ALGAE_INTAKE_SENSOR_ID));
-        coralIntake =
-            new CoralIntake(
-                new IntakeIOHardware(
-                    IntakeConstants.CORAL_INTAKE_LEFT_MOTOR_ID,
-                    IntakeConstants.CORAL_INTAKE_RIGHT_MOTOR_ID,
-                    IntakeConstants.CORAL_INTAKE_SENSOR_ID));
+        // algaeIntake =
+        //     new AlgaeIntake(
+        //         new IntakeIOHardware(
+        //             IntakeConstants.ALGAE_INTAKE_LEFT_MOTOR_ID,
+        //             IntakeConstants.ALGAE_INTAKE_RIGHT_MOTOR_ID,
+        //             IntakeConstants.ALGAE_INTAKE_SENSOR_ID));
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+
+        // coralIntake =
+        //     new CoralIntake(
+        //         new IntakeIOHardware(
+        //             IntakeConstants.CORAL_INTAKE_LEFT_MOTOR_ID,
+        //             IntakeConstants.CORAL_INTAKE_RIGHT_MOTOR_ID,
+        //             IntakeConstants.CORAL_INTAKE_SENSOR_ID));
+        coralIntake = new CoralIntake(new IntakeIO() {});
+
         break;
 
       case WOOD_BOT_TWO_2025:
@@ -499,12 +504,13 @@ public class RobotContainer {
   }
 
   private void configureOperatorControllerBindings() {
+
     operatorController.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
-    operatorController.y().onTrue(superstructure.scoreL4());
-    operatorController.x().onTrue(superstructure.scoreL3());
-    operatorController.a().onTrue(superstructure.scoreL2());
-    operatorController.povUp().onTrue(superstructure.scoreL1());
+    operatorController.y().onTrue(superstructure.scoreL4()).onTrue(Commands.print("Score L4"));
+    operatorController.x().onTrue(superstructure.scoreL3()).onTrue(Commands.print("Score L3"));
+    operatorController.a().onTrue(superstructure.scoreL2()).onTrue(Commands.print("Score L2"));
+    operatorController.povUp().onTrue(superstructure.scoreL1()).onTrue(Commands.print("Score L1"));
 
     operatorController.povDown().onTrue(superstructure.stow());
   }
