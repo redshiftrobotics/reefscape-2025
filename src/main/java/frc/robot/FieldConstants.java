@@ -216,9 +216,9 @@ public class FieldConstants {
     L2(Units.inchesToMeters(31.875), -35),
     L1(Units.inchesToMeters(18), 0);
 
-    ReefHeight(double height, double pitch) {
+    ReefHeight(double height, double pitchDegrees) {
       this.height = height;
-      this.pitch = pitch; // in degrees
+      this.pitch = pitchDegrees; // in degrees
     }
 
     public final double height;

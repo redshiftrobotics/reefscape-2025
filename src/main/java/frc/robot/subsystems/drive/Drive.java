@@ -401,6 +401,12 @@ public class Drive extends SubsystemBase {
     return modules().map(Module::getPosition).toArray(SwerveModulePosition[]::new);
   }
 
+  // --- Extra getters ---
+
+  public Rotation2d getRawGyroRotation() {
+    return rawGyroRotation;
+  }
+
   // --- Stops ---
 
   /**
