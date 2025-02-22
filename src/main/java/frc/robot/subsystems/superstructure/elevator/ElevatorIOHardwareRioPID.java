@@ -5,18 +5,15 @@ import static frc.robot.utility.SparkUtil.ifOkMulti;
 import static frc.robot.utility.SparkUtil.tryUntilOk;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants.ElevatorConfig;
@@ -24,25 +21,26 @@ import frc.robot.utility.SparkUtil;
 import java.util.function.DoubleSupplier;
 
 /** Hardware implementation of the TemplateIO. */
-public class ElevatorIOHardwareCopy implements ElevatorIO {
+public class ElevatorIOHardwareRioPID implements ElevatorIO {
 
   private final SparkMax leader;
   private final SparkMax follower;
 
   private final RelativeEncoder encoder;
-  private final SparkClosedLoopController control;
+
+  private final PIDController control;
 
   private final Debouncer connectDebounce = new Debouncer(0.5);
 
   private boolean breakMode = true;
 
-  public ElevatorIOHardwareCopy(ElevatorConfig config) {
+  public ElevatorIOHardwareRioPID(ElevatorConfig config) {
 
     leader = new SparkMax(config.leaderCanId(), MotorType.kBrushless);
     follower = new SparkMax(config.followerCanId(), MotorType.kBrushless);
 
     encoder = leader.getEncoder();
-    control = leader.getClosedLoopController();
+    control = new PIDController(0, 0, 0);
 
     SparkMaxConfig leaderConfig = new SparkMaxConfig();
     leaderConfig
@@ -82,7 +80,9 @@ public class ElevatorIOHardwareCopy implements ElevatorIO {
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
 
-    follower.set(leader.getAppliedOutput());
+    double speed = control.calculate(encoder.getPosition());
+    leader.set(speed);
+    follower.set(speed);
 
     SparkUtil.clearStickyFault();
     ifOk(
@@ -119,12 +119,7 @@ public class ElevatorIOHardwareCopy implements ElevatorIO {
 
   @Override
   public void runPosition(double positionRad, double feedforward) {
-    control.setReference(
-        Units.radiansToRotations(positionRad),
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0,
-        feedforward,
-        ArbFFUnits.kVoltage);
+    control.setSetpoint(Units.radiansToRotations(positionRad));
   }
 
   @Override
@@ -144,20 +139,7 @@ public class ElevatorIOHardwareCopy implements ElevatorIO {
 
   @Override
   public void setPID(double kP, double kI, double kD) {
-    SparkMaxConfig motorConfig = new SparkMaxConfig();
-    motorConfig.closedLoop.pidf(kP, kI, kD, 0);
-    tryUntilOk(
-        leader,
-        5,
-        () ->
-            leader.configure(
-                motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
-    tryUntilOk(
-        follower,
-        5,
-        () ->
-            follower.configure(
-                motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
+    control.setPID(kP, kI, kD);
   }
 
   @Override
