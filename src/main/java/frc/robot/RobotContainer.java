@@ -47,6 +47,11 @@ import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOHardwareFollow;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
+import frc.robot.subsystems.superstructure.wrist.Wrist;
+import frc.robot.subsystems.superstructure.wrist.WristConstants;
+import frc.robot.subsystems.superstructure.wrist.WristIO;
+import frc.robot.subsystems.superstructure.wrist.WristIORelativeEncoder;
+import frc.robot.subsystems.superstructure.wrist.WristIOSim;
 import frc.robot.subsystems.superstructure.intake.AlgaeIntake;
 import frc.robot.subsystems.superstructure.intake.CoralIntake;
 import frc.robot.subsystems.superstructure.intake.IntakeIO;
@@ -77,11 +82,12 @@ public class RobotContainer {
 
   private final AlgaeIntake algaeIntake;
   private final CoralIntake coralIntake;
-
+  
+  private final Wrist wrist;
+  private final Hang hang;
+  
   private final Elevator elevator;
   private final Superstructure superstructure;
-
-  private final Hang hang;
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -111,7 +117,7 @@ public class RobotContainer {
   private final Alert tuningModeActiveAlert =
       new Alert("Tuning mode active, do not use in competition.", AlertType.kWarning);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /** The container for the robot. Contains subsystems, IO devices, and commands. */
   public RobotContainer() {
     switch (Constants.getRobot()) {
       case COMP_BOT_2025:
@@ -138,6 +144,9 @@ public class RobotContainer {
 
         // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
         hang = new Hang(new HangIO() {});
+
+        wrist = new Wrist(new WristIORelativeEncoder(WristConstants.MOTOR_ID));
+
 
         // algaeIntake =
         //     new AlgaeIntake(
@@ -170,8 +179,12 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
 
+        wrist = new Wrist(new WristIO() {});
+
+
         algaeIntake = new AlgaeIntake(new IntakeIO() {});
         coralIntake = new CoralIntake(new IntakeIO() {});
+
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -187,8 +200,12 @@ public class RobotContainer {
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
 
+        wrist = new Wrist(new WristIO() {});
+
+
         algaeIntake = new AlgaeIntake(new IntakeIO() {});
         coralIntake = new CoralIntake(new IntakeIO() {});
+
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -204,8 +221,11 @@ public class RobotContainer {
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
 
+        wrist = new Wrist(new WristIO() {});
+
         algaeIntake = new AlgaeIntake(new IntakeIO() {});
         coralIntake = new CoralIntake(new IntakeIO() {});
+
         break;
 
       case SIM_BOT:
@@ -222,8 +242,11 @@ public class RobotContainer {
         hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
 
+        wrist = new Wrist(new WristIOSim());
+
         algaeIntake = new AlgaeIntake(new IntakeIOSim());
         coralIntake = new CoralIntake(new IntakeIOSim());
+
         break;
 
       default:
@@ -239,8 +262,11 @@ public class RobotContainer {
         vision = new AprilTagVision();
         elevator = new Elevator(new ElevatorIO() {});
 
+        wrist = new Wrist(new WristIO() {});
+
         algaeIntake = new AlgaeIntake(new IntakeIO() {});
         coralIntake = new CoralIntake(new IntakeIO() {});
+
         break;
     }
 
