@@ -59,8 +59,7 @@ public class WristIOSim implements WristIO {
           SIM_ARM_MIN_ANGLE,
           SIM_ARM_MAX_ANGLE,
           true,
-          SIM_ARM_INIT_ANGLE,
-          null);
+          SIM_ARM_INIT_ANGLE);
 
   private double setpoint;
 

@@ -18,10 +18,11 @@ public class WristConstants {
 
   public static final int MOTOR_ID = 0;
 
+  // placeholders are one to prevent crashes
   /** Gearing or something, higher numbers are reductions. */
-  public static final double SIM_GEARING = 0;
+  public static final double SIM_GEARING = 1;
   /** Calculate from OnShape */
-  public static final double SIM_MOMENT_OF_INERTIA = 0;
+  public static final double SIM_MOMENT_OF_INERTIA = 1;
   /** In metres. */
   public static final double SIM_ARM_LENGTH = 0;
   /** In radians. */

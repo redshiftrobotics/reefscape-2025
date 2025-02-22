@@ -40,7 +40,7 @@ public class WristIORelativeEncoder implements WristIO {
   @Override
   public void goTo(double setpoint) {
     this.setpoint = setpoint;
-    
+
     pidController.setReference(setpoint, ControlType.kPosition);
   }
 
