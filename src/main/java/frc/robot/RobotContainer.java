@@ -220,13 +220,12 @@ public class RobotContainer {
         vision = new AprilTagVision();
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
-// <<<<<<< elms-wrist
+
         wrist = new Wrist(new WristIO() {});
-// =======
 
         algaeIntake = new AlgaeIntake(new IntakeIO() {});
         coralIntake = new CoralIntake(new IntakeIO() {});
-// >>>>>>> main
+
         break;
 
       case SIM_BOT:
@@ -242,13 +241,12 @@ public class RobotContainer {
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
-// <<<<<<< elms-wrist
+
         wrist = new Wrist(new WristIOSim());
-// =======
 
         algaeIntake = new AlgaeIntake(new IntakeIOSim());
         coralIntake = new CoralIntake(new IntakeIOSim());
-// >>>>>>> main
+
         break;
 
       default:
@@ -263,13 +261,12 @@ public class RobotContainer {
         hang = new Hang(new HangIO() {});
         vision = new AprilTagVision();
         elevator = new Elevator(new ElevatorIO() {});
-// <<<<<<< elms-wrist
+
         wrist = new Wrist(new WristIO() {});
-// =======
 
         algaeIntake = new AlgaeIntake(new IntakeIO() {});
         coralIntake = new CoralIntake(new IntakeIO() {});
-// >>>>>>> main
+
         break;
     }
 
