@@ -16,7 +16,7 @@ public class ScoreCoral1 extends Command {
   }
 
   @Override
-  public void execute() {
+  public void initialize() {
     // scores on l1
     coralIntake.setRightMotor(IntakeConstants.CORAL_INTAKE_MOTOR_SPEED);
   }

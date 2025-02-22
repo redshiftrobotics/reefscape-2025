@@ -16,7 +16,7 @@ public class IntakeCoral extends Command {
   }
 
   @Override
-  public void execute() {
+  public void initialize() {
     coralIntake.setMotors(-IntakeConstants.CORAL_INTAKE_MOTOR_SPEED);
   }
 

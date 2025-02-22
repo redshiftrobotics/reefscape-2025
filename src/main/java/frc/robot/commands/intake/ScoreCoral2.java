@@ -16,7 +16,7 @@ public class ScoreCoral2 extends Command {
   }
 
   @Override
-  public void execute() {
+  public void initialize() {
     // TODO: use whlie true button in bindings
     // score on not l1
     coralIntake.setMotors(IntakeConstants.CORAL_INTAKE_MOTOR_SPEED);
