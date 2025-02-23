@@ -47,4 +47,8 @@ public class Wrist extends SubsystemBase {
   public double getSetpoint() {
     return inputs.setpoint;
   }
+
+  public void setPid(double kP, double kI, double kD){
+    io.setPid(kP, kI, kD);
+  }
 }

@@ -1,19 +1,12 @@
 package frc.robot.subsystems.superstructure.wrist;
 
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.MOTOR_ID;
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.SIM_ARM_INIT_ANGLE;
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.SIM_ARM_LENGTH;
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.SIM_ARM_MAX_ANGLE;
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.SIM_ARM_MIN_ANGLE;
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.SIM_GEARING;
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.SIM_MOMENT_OF_INERTIA;
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.TOLERANCE;
+import static frc.robot.subsystems.superstructure.wrist.WristConstants.*;
 
 import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
@@ -47,7 +40,7 @@ public class WristIOSim implements WristIO {
   private final DCMotor wristGearbox = DCMotor.getNeo550(1);
   private final SparkMax sparkMax = new SparkMax(MOTOR_ID, MotorType.kBrushless);
   private final SparkMaxSim motorSim = new SparkMaxSim(sparkMax, wristGearbox);
-  private final SparkClosedLoopController pidController = sparkMax.getClosedLoopController();
+  private final PIDController pidController = new PIDController(SIM_P, SIM_I, SIM_D);
 
   // The wrist is basically a single jointed arm, so:
   private final SingleJointedArmSim wristSim =
@@ -73,7 +66,7 @@ public class WristIOSim implements WristIO {
 
     // Update motor
     motorSim.iterate(
-        Units.radiansPerSecondToRotationsPerMinute(wristSim.getVelocityRadPerSec()),
+        pidController.calculate(getPosition(), setpoint),
         RoboRioSim.getVInVoltage(),
         Constants.LOOP_PERIOD_SECONDS);
 
@@ -99,5 +92,10 @@ public class WristIOSim implements WristIO {
 
   private double getPosition() {
     return Units.radiansToRotations(wristSim.getAngleRads());
+  }
+
+  @Override
+  public void setPid(double kP, double kI, double kD) {
+    pidController.setPID(kP, kI, kD);
   }
 }
