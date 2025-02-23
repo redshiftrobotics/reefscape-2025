@@ -35,4 +35,8 @@ public class WristConstants {
   public static final double SIM_P = 0;
   public static final double SIM_I = 0;
   public static final double SIM_D = 0;
+
+  public static final double REAL_P = 0;
+  public static final double REAL_I = 0;
+  public static final double REAL_D = 0;
 }
