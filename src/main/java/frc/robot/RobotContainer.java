@@ -130,7 +130,12 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
 
-        vision = new AprilTagVision();
+        vision = new AprilTagVision(
+          new CameraIOPhotonVision(VisionConstants.COMP_FRONT_LEFT_CAMERA),
+          new CameraIOPhotonVision(VisionConstants.COMP_FRONT_RIGHT_CAMERA),
+          new CameraIOPhotonVision(VisionConstants.COMP_BACK_LEFT_CAMERA),
+          new CameraIOPhotonVision(VisionConstants.COMP_BACK_RIGHT_CAMERA)
+        );
 
         // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
         elevator = new Elevator(new ElevatorIOHardwareFollow(ElevatorConstants.ELEVATOR_CONFIG));
@@ -227,8 +232,12 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim());
-        vision =
-            new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
+        vision = new AprilTagVision(
+          new CameraIOSim(VisionConstants.COMP_FRONT_LEFT_CAMERA, drive::getRobotPose),
+          new CameraIOSim(VisionConstants.COMP_FRONT_RIGHT_CAMERA, drive::getRobotPose),
+          new CameraIOSim(VisionConstants.COMP_BACK_LEFT_CAMERA, drive::getRobotPose),
+          new CameraIOSim(VisionConstants.COMP_BACK_RIGHT_CAMERA, drive::getRobotPose)
+        );
         hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
         wrist = new Wrist(new WristIOSim());
