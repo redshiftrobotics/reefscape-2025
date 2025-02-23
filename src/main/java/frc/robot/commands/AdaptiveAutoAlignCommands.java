@@ -28,6 +28,8 @@ public class AdaptiveAutoAlignCommands {
 
   private int offset = 0;
 
+  private Command startCommand, finalAlignCommand, endCommand;
+
   public AdaptiveAutoAlignCommands(
       List<Pose2d> poses,
       Transform2d positionOffset,
@@ -47,6 +49,22 @@ public class AdaptiveAutoAlignCommands {
         poses.stream()
             .map(pose -> pose.transformBy(robotOffset).transformBy(positionOffset))
             .toList();
+
+    setStartCommand(Commands.none());
+    setFinalAlignCommand(Commands.none());
+    setEndCommand(Commands.none());
+  }
+
+  public void setStartCommand(Command startCommand) {
+    this.startCommand = startCommand;
+  }
+
+  public void setFinalAlignCommand(Command finalAlignCommand) {
+    this.finalAlignCommand = finalAlignCommand;
+  }
+
+  public void setEndCommand(Command endCommand) {
+    this.endCommand = endCommand;
   }
 
   public static Pose2d getCurrentAutoAlignGoal() {
@@ -80,10 +98,14 @@ public class AdaptiveAutoAlignCommands {
     return Commands.defer(
         () -> {
           Pose2d pose = getPose(offset);
-          return DriveCommands.pathfindToPoseCommand(
-                  drive, pose.plus(roughLineupOffset.inverse()).plus(mechanismOffset), 0.25, 0)
+          return startCommand
+              .andThen(
+                  DriveCommands.pathfindToPoseCommand(
+                      drive, pose.plus(roughLineupOffset.inverse()).plus(mechanismOffset), 0.25, 0))
               .andThen(Commands.runOnce(drive::stop))
+              .andThen(finalAlignCommand)
               .andThen(DriveCommands.driveToPosePrecise(drive, pose.plus(mechanismOffset)))
+              .andThen(endCommand)
               .beforeStarting(() -> setCurrentAutoAlignGoal(pose))
               .finallyDo(() -> setCurrentAutoAlignGoal(null));
         },
