@@ -48,7 +48,7 @@ public class WristIORelativeEncoder implements WristIO {
   public boolean atSetpoint() {
     return MathUtil.isNear(setpoint, encoder.getPosition(), TOLERANCE);
   }
-  
+
   @Override
   public void setPid(double kP, double kI, double kD) {
     SparkMaxConfig motorConfig = new SparkMaxConfig();

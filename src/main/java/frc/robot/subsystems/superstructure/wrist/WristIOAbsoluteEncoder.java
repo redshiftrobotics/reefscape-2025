@@ -6,11 +6,7 @@ import static frc.robot.subsystems.superstructure.wrist.WristConstants.WRIST_FF;
 import static frc.robot.subsystems.superstructure.wrist.WristConstants.WRIST_I;
 import static frc.robot.subsystems.superstructure.wrist.WristConstants.WRIST_P;
 
-import java.util.function.Supplier;
-
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -21,6 +17,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
+import java.util.function.Supplier;
 
 public class WristIOAbsoluteEncoder implements WristIO {
   private final SparkMax motor;
