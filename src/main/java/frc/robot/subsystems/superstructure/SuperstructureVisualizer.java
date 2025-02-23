@@ -17,6 +17,8 @@ public class SuperstructureVisualizer {
 
   private final LoggedMechanismLigament2d elevatorMechanism;
 
+  private final LoggedMechanismLigament2d wristLigament;
+
   public SuperstructureVisualizer(String name, Color color) {
     this.name = name;
 
@@ -26,10 +28,16 @@ public class SuperstructureVisualizer {
         root.append(
             new LoggedMechanismLigament2d(
                 name + " Elevator", Units.inchesToMeters(26.0), 90, 4.0, new Color8Bit(color)));
+
+    wristLigament =
+        elevatorMechanism.append(
+            new LoggedMechanismLigament2d(
+                name + " Wrist", Units.inchesToMeters(8), 0, 4.0, new Color8Bit(color)));
   }
 
-  public void update(double carriageHeight) {
+  public void update(double carriageHeight, double wristRotations) {
     elevatorMechanism.setLength(carriageHeight);
+    wristLigament.setAngle(Units.rotationsToDegrees(wristRotations));
 
     Logger.recordOutput("Mechanism2d/" + name, mechanism);
   }

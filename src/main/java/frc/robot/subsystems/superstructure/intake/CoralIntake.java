@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 /** Wheels for subsystem */
-public class CoralIntake extends SubsystemBase {
+public class CoralIntake extends SubsystemBase implements IntakeSubsystem {
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 

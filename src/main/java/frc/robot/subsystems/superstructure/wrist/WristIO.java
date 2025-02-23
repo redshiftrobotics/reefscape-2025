@@ -20,4 +20,6 @@ public interface WristIO {
   default boolean atSetpoint() {
     return false;
   }
+
+  default void setPid(double kP, double kI, double kD) {}
 }
