@@ -153,7 +153,7 @@ public class ModuleIOSparkMax implements ModuleIO {
             turnSpark.configure(
                 turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
-    turnRelativeEncoder.setPosition(turnAbsolutePosition.getValueAsDouble());
+    turnRelativeEncoder.setPosition(turnAbsolutePosition.refresh().getValueAsDouble());
 
     // Create odometry queues
     timestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
