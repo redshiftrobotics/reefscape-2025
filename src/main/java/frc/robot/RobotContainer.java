@@ -128,20 +128,13 @@ public class RobotContainer {
     switch (Constants.getRobot()) {
       case COMP_BOT_2025:
         // Real robot (Competition bot with mechanisms), instantiate hardware IO implementations
-        // drive =
-        //     new Drive(
-        //         new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-        //         new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-        //         new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-        //         new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-        //         new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         drive =
             new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
+                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
 
         vision = new AprilTagVision();
 
@@ -244,12 +237,9 @@ public class RobotContainer {
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
-
         wrist = new Wrist(new WristIOSim());
-
         algaeIntake = new AlgaeIntake(new IntakeIOSim());
         coralIntake = new CoralIntake(new IntakeIOSim());
-
         break;
 
       default:
@@ -538,10 +528,10 @@ public class RobotContainer {
 
     operatorController.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
-    operatorController.y().onTrue(superstructure.scoreL4()).onTrue(Commands.print("Score L4"));
-    operatorController.x().onTrue(superstructure.scoreL3()).onTrue(Commands.print("Score L3"));
-    operatorController.a().onTrue(superstructure.scoreL2()).onTrue(Commands.print("Score L2"));
-    operatorController.povUp().onTrue(superstructure.scoreL1()).onTrue(Commands.print("Score L1"));
+    operatorController.y().onTrue(superstructure.scoreL4());
+    operatorController.x().onTrue(superstructure.scoreL3());
+    operatorController.a().onTrue(superstructure.scoreL2());
+    operatorController.povUp().onTrue(superstructure.scoreL1());
 
     operatorController.povDown().onTrue(superstructure.stow());
   }

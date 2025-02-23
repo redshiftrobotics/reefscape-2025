@@ -20,8 +20,8 @@ public class ElevatorConstants {
   public static final int currentLimit = 35;
   public static final double gearReduction = 9.0;
 
+  public static final double elevatorHeight = 1.245 + Units.inchesToMeters(8.5);
   public static final double carriageHeight = Units.inchesToMeters(8.5);
-  public static final double elevatorHeight = Units.inchesToMeters(50);
 
   public static final double carriageMaxHeight = elevatorHeight - carriageHeight;
 

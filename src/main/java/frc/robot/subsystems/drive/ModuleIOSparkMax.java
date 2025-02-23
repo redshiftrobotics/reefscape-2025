@@ -58,6 +58,10 @@ public class ModuleIOSparkMax implements ModuleIO {
   // Absolute encoder signal
   private final StatusSignal<Angle> turnAbsolutePosition;
 
+  // Break
+  private boolean driveBreakMode = true;
+  private boolean turnBreakMode = true;
+
   // Connection debouncer
   private final Debouncer driveConnectedDebounce = new Debouncer(0.5);
   private final Debouncer turnConnectedDebounce = new Debouncer(0.5);
@@ -91,7 +95,7 @@ public class ModuleIOSparkMax implements ModuleIO {
     // Configure drive motor
     SparkMaxConfig driveConfig = new SparkMaxConfig();
     driveConfig
-        .idleMode(IdleMode.kBrake)
+        .idleMode(driveBreakMode ? IdleMode.kBrake : IdleMode.kCoast)
         .smartCurrentLimit(ModuleConstants.DRIVE_MOTOR_CURRENT_LIMIT)
         .voltageCompensation(12.0);
     driveConfig
@@ -122,7 +126,7 @@ public class ModuleIOSparkMax implements ModuleIO {
     SparkMaxConfig turnConfig = new SparkMaxConfig();
     turnConfig
         .inverted(config.turnMotorInverted())
-        .idleMode(IdleMode.kBrake)
+        .idleMode(turnBreakMode ? IdleMode.kBrake : IdleMode.kCoast)
         .smartCurrentLimit(ModuleConstants.TURN_MOTOR_CURRENT_LIMIT)
         .voltageCompensation(12.0);
     turnConfig
@@ -274,26 +278,32 @@ public class ModuleIOSparkMax implements ModuleIO {
 
   @Override
   public void setDriveBrakeMode(boolean enable) {
-    SparkMaxConfig driveConfig = new SparkMaxConfig();
-    driveConfig.idleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
-    tryUntilOk(
-        driveSpark,
-        5,
-        () ->
-            driveSpark.configure(
-                driveConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
+    if (driveBreakMode != enable) {
+      driveBreakMode = enable;
+      SparkMaxConfig driveConfig = new SparkMaxConfig();
+      driveConfig.idleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
+      tryUntilOk(
+          driveSpark,
+          5,
+          () ->
+              driveSpark.configure(
+                  driveConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
+    }
   }
 
   @Override
   public void setTurnBrakeMode(boolean enable) {
-    SparkMaxConfig turnConfig = new SparkMaxConfig();
-    turnConfig.idleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
-    tryUntilOk(
-        turnSpark,
-        5,
-        () ->
-            turnSpark.configure(
-                turnConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
+    if (turnBreakMode != enable) {
+      turnBreakMode = enable;
+      SparkMaxConfig turnConfig = new SparkMaxConfig();
+      turnConfig.idleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
+      tryUntilOk(
+          turnSpark,
+          5,
+          () ->
+              turnSpark.configure(
+                  turnConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
+    }
   }
 
   @Override
