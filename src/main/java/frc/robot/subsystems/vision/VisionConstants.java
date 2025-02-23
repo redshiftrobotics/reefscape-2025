@@ -58,28 +58,28 @@ public class VisionConstants {
 
   public static final CameraConfig COMP_FRONT_LEFT_CAMERA = 
       new CameraConfig(
-          "frontLeftCamera",
+          "FrontLeftCamera8032",
           new Transform3d(
               new Translation3d(+CAMERA_OFFSET_X, +CAMERA_OFFSET_Y, FRONT_CAMERA_OFFSET_Z),
               new Rotation3d(0, FRONT_CAMERA_PITCH, FRONT_CAMERA_YAW)));
 
   public static final CameraConfig COMP_FRONT_RIGHT_CAMERA = 
       new CameraConfig(
-          "frontRightCamera",
+          "FrontRightCamera8032",
           new Transform3d(
               new Translation3d(+CAMERA_OFFSET_X, -CAMERA_OFFSET_Y, FRONT_CAMERA_OFFSET_Z),
               new Rotation3d(0, FRONT_CAMERA_PITCH, FRONT_CAMERA_YAW)));
 
   public static final CameraConfig COMP_BACK_LEFT_CAMERA = 
       new CameraConfig(
-          "backLeftCamera",
+          "BackLeftCamera8032",
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, +CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
               new Rotation3d(0, BACK_CAMERA_PITCH, BACK_CAMERA_YAW)));
 
   public static final CameraConfig COMP_BACK_RIGHT_CAMERA = 
       new CameraConfig(
-          "backRightCamera",
+          "BackRightCamera8032",
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, -CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
               new Rotation3d(0, BACK_CAMERA_PITCH, BACK_CAMERA_YAW)));
