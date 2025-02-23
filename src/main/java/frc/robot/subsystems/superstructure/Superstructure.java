@@ -1,14 +1,26 @@
 package frc.robot.subsystems.superstructure;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
+import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 
 public class Superstructure extends SubsystemBase {
 
   private final Elevator elevator;
+
+  public static enum State {
+    STOW,
+    L1,
+    L2,
+    L3,
+    L4,
+    INTAKE,
+  }
+
+  private State goal = State.STOW;
 
   private final SuperstructureVisualizer measuredVisualizer =
       new SuperstructureVisualizer("Measured", Color.kYellow);
@@ -21,28 +33,47 @@ public class Superstructure extends SubsystemBase {
     this.elevator = elevator;
   }
 
-  public Command scoreL1() {
-    return elevator.runEnd(
-        () -> elevator.setGoalHeightMeters(Units.inchesToMeters(18)),
-        () -> elevator.setGoalHeightMeters(0));
+  public Command prepare() {
+    return elevator.defer(() -> runPrepare(goal));
   }
 
-  public Command scoreL2() {
-    return elevator.runEnd(
-        () -> elevator.setGoalHeightMeters(Units.inchesToMeters(31.875)),
-        () -> elevator.setGoalHeightMeters(0));
+  public Command setNextPrepare(State newGoal) {
+    return Commands.runOnce(() -> this.goal = newGoal);
   }
 
-  public Command scoreL3() {
-    return elevator.runEnd(
-        () -> elevator.setGoalHeightMeters(Units.inchesToMeters(47.625)),
-        () -> elevator.setGoalHeightMeters(0));
+  public Command runPrepare(State newGoal) {
+    return switch (newGoal) {
+      case STOW -> stow();
+      case L1 -> prepareL1();
+      case L2 -> prepareL2();
+      case L3 -> prepareL3();
+      case L4 -> prepareL4();
+      case INTAKE -> prepareIntake();
+    };
   }
 
-  public Command scoreL4() {
-    return elevator.runEnd(
-        () -> elevator.setGoalHeightMeters(Units.inchesToMeters(72)),
-        () -> elevator.setGoalHeightMeters(0));
+  public Command prepareL1() {
+    return elevator.runOnce(
+        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight * (1 / 4)));
+  }
+
+  public Command prepareL2() {
+    return elevator.runOnce(
+        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight * (1 / 2)));
+  }
+
+  public Command prepareL3() {
+    return elevator.runOnce(
+        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight * (3 / 4)));
+  }
+
+  public Command prepareL4() {
+    return elevator.runOnce(
+        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight * (4 / 4)));
+  }
+
+  public Command prepareIntake() {
+    return prepareL2();
   }
 
   public Command stow() {

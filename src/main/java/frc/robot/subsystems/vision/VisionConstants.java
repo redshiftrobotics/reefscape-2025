@@ -17,6 +17,7 @@ public class VisionConstants {
   // position. To find robotToCamera, measure the distance from the camera to the center of the
   // robot or use the robot's CAD model.
 
+
   // Docs: https://docs.photonvision.org/en/latest/docs/apriltag-pipelines/coordinate-systems.html
 
   public record CameraConfig(String cameraName, Transform3d robotToCamera) {}
@@ -55,12 +56,14 @@ public class VisionConstants {
   private static final double BACK_CAMERA_OFFSET_Z = Units.inchesToMeters(8.285);
 
   public static final CameraConfig COMP_FRONT_LEFT_CAMERA =
+  public static final CameraConfig COMP_FRONT_LEFT_CAMERA =
       new CameraConfig(
           "FrontLeftCamera8032",
           new Transform3d(
               new Translation3d(+CAMERA_OFFSET_X, +CAMERA_OFFSET_Y, FRONT_CAMERA_OFFSET_Z),
               new Rotation3d(0, FRONT_CAMERA_PITCH, +FRONT_CAMERA_YAW)));
 
+  public static final CameraConfig COMP_FRONT_RIGHT_CAMERA =
   public static final CameraConfig COMP_FRONT_RIGHT_CAMERA =
       new CameraConfig(
           "FrontRightCamera8032",
@@ -69,12 +72,14 @@ public class VisionConstants {
               new Rotation3d(0, FRONT_CAMERA_PITCH, -FRONT_CAMERA_YAW)));
 
   public static final CameraConfig COMP_BACK_LEFT_CAMERA =
+  public static final CameraConfig COMP_BACK_LEFT_CAMERA =
       new CameraConfig(
           "BackLeftCamera8032",
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, +CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
               new Rotation3d(0, BACK_CAMERA_PITCH, Units.degreesToRadians(180) - BACK_CAMERA_YAW)));
 
+  public static final CameraConfig COMP_BACK_RIGHT_CAMERA =
   public static final CameraConfig COMP_BACK_RIGHT_CAMERA =
       new CameraConfig(
           "BackRightCamera8032",

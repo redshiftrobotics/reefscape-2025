@@ -64,7 +64,6 @@ import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -452,15 +451,12 @@ public class RobotContainer {
               new Transform2d(0, 0, Rotation2d.kZero),
               new Translation2d(Units.inchesToMeters(24), 0));
 
-      Supplier<Command> endRumble = () -> rumbleController(driverXbox, 0.3).withTimeout(0.1);
+      reefAlignmentCommands.setFinalAlignCommand(superstructure.prepare());
+      reefAlignmentCommands.setEndCommand(rumbleController(driverXbox, 0.3).withTimeout(0.1));
 
       driverXbox
           .rightTrigger()
-          .onTrue(
-              reefAlignmentCommands
-                  .driveToClosest(drive)
-                  .andThen(endRumble.get())
-                  .withName("Algin REEF"))
+          .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Algin REEF"))
           .onFalse(reefAlignmentCommands.stop(drive));
 
       driverXbox
@@ -468,20 +464,14 @@ public class RobotContainer {
           .and(driverXbox.leftBumper())
           .onTrue(
               CustomCommands.reInitCommand(
-                  reefAlignmentCommands
-                      .driveToNext(drive)
-                      .andThen(endRumble.get())
-                      .withName("Algin REEF -1")));
+                  reefAlignmentCommands.driveToNext(drive).withName("Algin REEF -1")));
 
       driverXbox
           .rightTrigger()
           .and(driverXbox.rightBumper())
           .onTrue(
               CustomCommands.reInitCommand(
-                  reefAlignmentCommands
-                      .driveToPrevious(drive)
-                      .andThen(endRumble.get())
-                      .withName("Algin REEF +1")));
+                  reefAlignmentCommands.driveToPrevious(drive).withName("Algin REEF +1")));
 
       // Align to intake
 
@@ -493,13 +483,12 @@ public class RobotContainer {
               new Transform2d(0, 0, Rotation2d.kZero),
               new Translation2d(Units.inchesToMeters(10), 0));
 
+      intakeAlignmentCommands.setFinalAlignCommand(superstructure.prepareIntake());
+      intakeAlignmentCommands.setEndCommand(rumbleController(driverXbox, 0.3).withTimeout(0.1));
+
       driverXbox
           .leftTrigger()
-          .onTrue(
-              intakeAlignmentCommands
-                  .driveToClosest(drive)
-                  .andThen(endRumble.get())
-                  .withName("Align INTAKE"))
+          .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Align INTAKE"))
           .onFalse(intakeAlignmentCommands.stop(drive));
 
       driverXbox
@@ -507,20 +496,14 @@ public class RobotContainer {
           .and(driverXbox.leftBumper())
           .onTrue(
               CustomCommands.reInitCommand(
-                  intakeAlignmentCommands
-                      .driveToNext(drive)
-                      .andThen(endRumble.get())
-                      .withName("Align INTAKE +1")));
+                  intakeAlignmentCommands.driveToNext(drive).withName("Align INTAKE +1")));
 
       driverXbox
           .leftTrigger()
           .and(driverXbox.rightBumper())
           .onTrue(
               CustomCommands.reInitCommand(
-                  intakeAlignmentCommands
-                      .driveToPrevious(drive)
-                      .andThen(endRumble.get())
-                      .withName("Align INTAKE -1")));
+                  intakeAlignmentCommands.driveToPrevious(drive).withName("Align INTAKE -1")));
     }
   }
 
@@ -528,12 +511,18 @@ public class RobotContainer {
 
     operatorController.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
-    operatorController.y().onTrue(superstructure.scoreL4());
-    operatorController.x().onTrue(superstructure.scoreL3());
-    operatorController.a().onTrue(superstructure.scoreL2());
-    operatorController.povUp().onTrue(superstructure.scoreL1());
+    configureOperatorControllerBindingLevel(operatorController.y(), Superstructure.State.L4);
+    configureOperatorControllerBindingLevel(operatorController.x(), Superstructure.State.L3);
+    configureOperatorControllerBindingLevel(operatorController.a(), Superstructure.State.L2);
+    configureOperatorControllerBindingLevel(operatorController.povUp(), Superstructure.State.L1);
 
     operatorController.povDown().onTrue(superstructure.stow());
+  }
+
+  private void configureOperatorControllerBindingLevel(
+      Trigger trigger, Superstructure.State state) {
+    trigger.onTrue(superstructure.setNextPrepare(state));
+    trigger.and(operatorController.rightTrigger()).onTrue(superstructure.runPrepare(state));
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
