@@ -26,10 +26,21 @@ public class ModuleConstants {
   static {
     switch (Constants.getRobot()) {
       case SIM_BOT:
-        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
-        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, new Rotation2d(), false);
+        FRONT_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.kZero, false);
+        FRONT_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.kZero, false);
+        BACK_LEFT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.kZero, false);
+        BACK_RIGHT_MODULE_CONFIG = new ModuleConfig(0, 0, 0, Rotation2d.kZero, false);
+        break;
+
+      case COMP_BOT_2025:
+        FRONT_LEFT_MODULE_CONFIG =
+            new ModuleConfig(19, 18, 37, Rotation2d.fromRotations(-0.596435546875), true);
+        FRONT_RIGHT_MODULE_CONFIG =
+            new ModuleConfig(2, 1, 36, Rotation2d.fromRotations(-0.96826171875), true);
+        BACK_LEFT_MODULE_CONFIG =
+            new ModuleConfig(10, 11, 39, Rotation2d.fromRotations(-0.477294921875), true);
+        BACK_RIGHT_MODULE_CONFIG =
+            new ModuleConfig(8, 9, 38, Rotation2d.fromRotations(-0.530517578125), true);
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -87,7 +98,11 @@ public class ModuleConstants {
   public static final int TURN_MOTOR_CURRENT_LIMIT;
   public static final double TURN_REDUCTION;
 
-  public static final double WHEEL_RADIUS = Units.inchesToMeters(2.000);
+  public static final double WHEEL_RADIUS =
+      switch (Constants.getRobot()) {
+        case WOOD_BOT_TWO_2025 -> Units.inchesToMeters(2.032);
+        default -> Units.inchesToMeters(2.000);
+      };
 
   static {
     switch (Constants.getRobot()) {
@@ -107,7 +122,7 @@ public class ModuleConstants {
       case SIM_BOT:
         DRIVE_MOTOR = DCMotor.getNEO(1);
         DRIVE_FEEDBACK = new PIDConstants(1.3, 0.0, 0.0);
-        DRIVE_FEED_FORWARD = new FeedForwardConstants(0.0, 0, 0);
+        DRIVE_FEED_FORWARD = new FeedForwardConstants(0.0, 0.0, 0.0);
         DRIVE_MOTOR_CURRENT_LIMIT = 50;
         DRIVE_REDUCTION = Mk4iReductions.L3.reduction;
 
@@ -119,6 +134,7 @@ public class ModuleConstants {
 
       case WOOD_BOT_TWO_2025:
       case T_SHIRT_CANNON_CHASSIS:
+      case COMP_BOT_2025:
       default:
         DRIVE_MOTOR = DCMotor.getNEO(1);
         DRIVE_FEEDBACK = new PIDConstants(0.0001, 0.0, 0.0);

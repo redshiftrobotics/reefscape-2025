@@ -71,18 +71,18 @@ public class FieldConstants {
             Units.inchesToMeters(25.824),
             Rotation2d.fromDegrees(144.011 - 90));
 
-    public static final Pose2d[] alignmentFaces = new Pose2d[9 * 2];
+    private static final double[] offset = {Units.inchesToMeters(-14), 0, Units.inchesToMeters(14)};
+
+    public static final Pose2d[] alignmentFaces = new Pose2d[2 * offset.length];
 
     static {
-      final double offset = 8;
-
-      for (int i = -4; i < 5; i++) {
-        alignmentFaces[i + 4] =
-            leftCenterFace.plus(
-                new Transform2d(0, Units.inchesToMeters(i * offset), Rotation2d.kZero));
-        alignmentFaces[i + 13] =
-            rightCenterFace.plus(
-                new Transform2d(0, Units.inchesToMeters(i * offset), Rotation2d.kZero));
+      for (int i = 0; i < offset.length; i++) {
+        alignmentFaces[i] =
+            leftCenterFace.transformBy(new Transform2d(0, offset[i], Rotation2d.kZero));
+      }
+      for (int i = 0; i < offset.length; i++) {
+        alignmentFaces[i + offset.length] =
+            rightCenterFace.transformBy(new Transform2d(0, offset[i], Rotation2d.kZero));
       }
     }
   }
@@ -216,9 +216,9 @@ public class FieldConstants {
     L2(Units.inchesToMeters(31.875), -35),
     L1(Units.inchesToMeters(18), 0);
 
-    ReefHeight(double height, double pitch) {
+    ReefHeight(double height, double pitchDegrees) {
       this.height = height;
-      this.pitch = pitch; // in degrees
+      this.pitch = pitchDegrees; // in degrees
     }
 
     public final double height;

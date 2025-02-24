@@ -7,7 +7,6 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
-import frc.robot.subsystems.drive.ModuleConstants.ModuleConfig;
 
 /**
  * Physics sim implementation of module IO.
@@ -33,7 +32,7 @@ public class ModuleIOSim implements ModuleIO {
   private boolean turnClosedLoop = false;
   private double driveFFVolts = 0;
 
-  public ModuleIOSim(ModuleConfig config) {
+  public ModuleIOSim() {
     driveSim =
         new DCMotorSim(
             LinearSystemId.createDCMotorSystem(

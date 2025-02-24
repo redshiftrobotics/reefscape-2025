@@ -5,40 +5,26 @@ import org.littletonrobotics.junction.AutoLog;
 public interface HangIO {
   @AutoLog
   public static class HangIOInputs {
-    public double armSetpoint = 0.0;
-    public double armPosition = 0.0;
+    double positionRotations = 0.0;
+    double velocityRPM = 0.0;
+
+    double[] appliedVolts = new double[] {0.0};
+    double[] supplyCurrentAmps = new double[] {0.0};
   }
 
   public default void updateInputs(HangIOInputs inputs) {}
 
-  /**
-   * Set the desired angle for the arm to travel to.
-   *
-   * @param setpoint The desired angle for the arm to travel to.
-   */
-  public default void setSetpoint(double setpoint) {}
+  public default void periodic() {}
 
-  /**
-   * Get the desired angle for the arm to travel to.
-   *
-   * @return The angle the arm is currently traveling to.
-   */
-  public default double getSetpoint() {
-    return 0;
-  }
+  public default void runPosition(double positionRotations) {}
 
-  public default boolean atSetpoint() {
-    return true;
-  }
+  public default void runOpenLoop(double output) {}
 
-  /**
-   * Get the current position of the arm.
-   *
-   * @return The current position of the arm.
-   */
-  public default double getPosition() {
-    return 0;
-  }
+  public default void runVolts(double volts) {}
+
+  public default void setPID(double kP, double kI, double kD) {}
+
+  public default void setBrakeMode(boolean enable) {}
 
   public default void stop() {}
 }

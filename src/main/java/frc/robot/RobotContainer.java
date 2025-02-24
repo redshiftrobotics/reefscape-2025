@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -21,13 +20,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.AdjustWrist;
@@ -45,10 +40,23 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.hang.Hang;
-import frc.robot.subsystems.hang.HangConstants;
 import frc.robot.subsystems.hang.HangIO;
-import frc.robot.subsystems.hang.HangIOReal;
 import frc.robot.subsystems.hang.HangIOSim;
+import frc.robot.subsystems.superstructure.Superstructure;
+import frc.robot.subsystems.superstructure.elevator.Elevator;
+import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIOHardwareFollow;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
+import frc.robot.subsystems.superstructure.intake.AlgaeIntake;
+import frc.robot.subsystems.superstructure.intake.CoralIntake;
+import frc.robot.subsystems.superstructure.intake.IntakeIO;
+import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
+import frc.robot.subsystems.superstructure.wrist.Wrist;
+import frc.robot.subsystems.superstructure.wrist.WristConstants;
+import frc.robot.subsystems.superstructure.wrist.WristIO;
+import frc.robot.subsystems.superstructure.wrist.WristIORelativeEncoder;
+import frc.robot.subsystems.superstructure.wrist.WristIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
@@ -61,6 +69,7 @@ import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -74,31 +83,86 @@ public class RobotContainer {
 
   // Subsystems
   private final Drive drive;
-  private final Hang hang;
   private final AprilTagVision vision;
+
+  private final AlgaeIntake algaeIntake;
+  private final CoralIntake coralIntake;
+
   private final Wrist wrist;
+  private final Hang hang;
+
+  private final Elevator elevator;
+  private final Superstructure superstructure;
 
   // Controller
-  private final CommandGenericHID driverController = new CommandXboxController(0);
-  private final CommandGenericHID operatorController = new CommandXboxController(1);
+  private final CommandXboxController driverController = new CommandXboxController(0);
+  private final CommandXboxController operatorController = new CommandXboxController(1);
+
+  private final Alert driverDisconnected =
+      new Alert(
+          String.format(
+              "Driver xbox controller disconnected (port %s).",
+              driverController.getHID().getPort()),
+          AlertType.kWarning);
+  private final Alert operatorDisconnected =
+      new Alert(
+          String.format(
+              "Operator xbox controller disconnected (port %s).",
+              operatorController.getHID().getPort()),
+          AlertType.kWarning);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
   // Alerts
-  private final Alert fmsAndNotCompBotAlert =
+  private final Alert notPrimaryBotAlert =
       new Alert(
-          "FMS attached and bot is not comp bot, are you sure this is correct?",
-          AlertType.kWarning);
+          "Robot type is not the primary robot type. Be careful you are not using the wrong robot.",
+          AlertType.kInfo);
   private final Alert tuningModeActiveAlert =
       new Alert("Tuning mode active, do not use in competition.", AlertType.kWarning);
-  private final Alert onBlockMode =
-      new Alert("On block mode active, do not use in competition.", AlertType.kWarning);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /** The container for the robot. Contains subsystems, IO devices, and commands. */
   public RobotContainer() {
-
     switch (Constants.getRobot()) {
+      case COMP_BOT_2025:
+        // Real robot (Competition bot with mechanisms), instantiate hardware IO implementations
+        drive =
+            new Drive(
+                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+
+        vision = new AprilTagVision();
+
+        // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
+        elevator = new Elevator(new ElevatorIOHardwareFollow(ElevatorConstants.ELEVATOR_CONFIG));
+
+        // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
+        hang = new Hang(new HangIO() {});
+
+        wrist = new Wrist(new WristIORelativeEncoder(WristConstants.MOTOR_ID));
+
+        // algaeIntake =
+        //     new AlgaeIntake(
+        //         new IntakeIOHardware(
+        //             IntakeConstants.ALGAE_INTAKE_LEFT_MOTOR_ID,
+        //             IntakeConstants.ALGAE_INTAKE_RIGHT_MOTOR_ID,
+        //             IntakeConstants.ALGAE_INTAKE_SENSOR_ID));
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+
+        // coralIntake =
+        //     new CoralIntake(
+        //         new IntakeIOHardware(
+        //             IntakeConstants.CORAL_INTAKE_LEFT_MOTOR_ID,
+        //             IntakeConstants.CORAL_INTAKE_RIGHT_MOTOR_ID,
+        //             IntakeConstants.CORAL_INTAKE_SENSOR_ID));
+        coralIntake = new CoralIntake(new IntakeIO() {});
+
+        break;
+
       case WOOD_BOT_TWO_2025:
         // Real robot (Wood bot test chassis), instantiate hardware IO implementations
         drive =
@@ -108,12 +172,15 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
-        vision =
-            new AprilTagVision(
-                new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA),
-                new CameraIOPhotonVision(VisionConstants.WOODV2_RIGHT_CAMERA));
-        wrist = new Wrist(new WristIOSparkMax());
-        hang = new Hang(new HangIOReal(HangConstants.WOOD_BOT_TWO_CAN_ID));
+        vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
+        elevator = new Elevator(new ElevatorIO() {});
+        hang = new Hang(new HangIO() {});
+
+        wrist = new Wrist(new WristIO() {});
+
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
+
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -126,8 +193,14 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
-        wrist = new Wrist(new WristIOSparkMax());
-        hang = new Hang(new HangIOReal(HangConstants.T_SHIRT_CANNON_CAN_ID));
+        hang = new Hang(new HangIO() {});
+        elevator = new Elevator(new ElevatorIO() {});
+
+        wrist = new Wrist(new WristIO() {});
+
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
+
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -140,8 +213,14 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
         vision = new AprilTagVision();
-        wrist = new Wrist(new WristIOSparkMax());
-        hang = new Hang(new HangIOReal(HangConstants.CRESCENDO_2024_CAN_ID)); // What hang arm??
+        hang = new Hang(new HangIO() {});
+        elevator = new Elevator(new ElevatorIO() {});
+
+        wrist = new Wrist(new WristIO() {});
+
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
+
         break;
 
       case SIM_BOT:
@@ -149,14 +228,18 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIO() {},
-                new ModuleIOSim(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSim(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSim(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSim(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim());
         vision =
             new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
         wrist = new Wrist(new WristIOSim());
         hang = new Hang(new HangIOSim());
+        elevator = new Elevator(new ElevatorIOSim());
+        wrist = new Wrist(new WristIOSim());
+        algaeIntake = new AlgaeIntake(new IntakeIOSim());
+        coralIntake = new CoralIntake(new IntakeIOSim());
         break;
 
       default:
@@ -170,12 +253,21 @@ public class RobotContainer {
                 new ModuleIO() {});
         hang = new Hang(new HangIO() {});
         vision = new AprilTagVision();
+        elevator = new Elevator(new ElevatorIO() {});
+
         wrist = new Wrist(new WristIO() {});
+
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+        coralIntake = new CoralIntake(new IntakeIO() {});
+
         break;
     }
 
-    vision.setLastRobotPoseSupplier(drive::getRobotPose);
+    // Superstructure
+    superstructure = new Superstructure(elevator);
 
+    // Vision setup
+    // vision.setLastRobotPoseSupplier(drive::getRobotPose);
     vision.addVisionEstimateConsumer(
         (estimate) -> {
           if (estimate.status().isSuccess() && Constants.getMode() != Mode.SIM) {
@@ -202,16 +294,12 @@ public class RobotContainer {
     if (Constants.TUNING_MODE) {
       tuningModeActiveAlert.set(true);
     }
-    if (Constants.ON_BLOCKS_TEST_MODE) {
-      onBlockMode.set(true);
-    }
-    if (DriverStation.isFMSAttached()
-        && Constants.getRobot() != Constants.RobotType.WOOD_BOT_TWO_2025) {
-      fmsAndNotCompBotAlert.set(true);
+    if (Constants.getRobot() != Constants.PRIMARY_ROBOT_TYPE) {
+      notPrimaryBotAlert.set(true);
     }
 
     // Hide controller missing warnings for sim
-    if (Constants.getMode() != Mode.REAL) {
+    if (Constants.getMode() != Mode.REAL || true) {
       DriverStation.silenceJoystickConnectionWarning(true);
     }
 
@@ -230,6 +318,8 @@ public class RobotContainer {
     dashboard.setPoseSupplier(drive::getRobotPose);
     dashboard.setRobotSupplier(drive::getRobotSpeeds);
     dashboard.setFieldRelativeSupplier(() -> false);
+
+    dashboard.setAutoAlignPoseSupplier(AdaptiveAutoAlignCommands::getCurrentAutoAlignGoal);
 
     dashboard.setHasVisionEstimate(vision::hasVisionEstimate);
 
@@ -252,6 +342,16 @@ public class RobotContainer {
         true);
   }
 
+  public void updateAlerts() {
+    // Controller disconnected alerts
+    driverDisconnected.set(
+        !DriverStation.isJoystickConnected(driverController.getHID().getPort())
+            || !DriverStation.getJoystickIsXbox(driverController.getHID().getPort()));
+    operatorDisconnected.set(
+        !DriverStation.isJoystickConnected(operatorController.getHID().getPort())
+            || !DriverStation.getJoystickIsXbox(operatorController.getHID().getPort()));
+  }
+
   /** Define button->command mappings. */
   private void configureControllerBindings() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
@@ -261,162 +361,193 @@ public class RobotContainer {
   }
 
   private void configureDriverControllerBindings(boolean includeAutoAlign) {
-    if (driverController instanceof CommandXboxController) {
-      final CommandXboxController driverXbox = (CommandXboxController) driverController;
+    final CommandXboxController driverXbox = (CommandXboxController) driverController;
 
-      final Trigger useFieldRelative =
-          new Trigger(new OverrideSwitch(driverXbox.y(), OverrideSwitch.Mode.TOGGLE, true));
+    final Trigger useFieldRelative =
+        new Trigger(new OverrideSwitch(driverXbox.y(), OverrideSwitch.Mode.TOGGLE, true));
 
-      DriverDashboard.getInstance().setFieldRelativeSupplier(useFieldRelative);
+    final Trigger useHeadingControlled =
+        new Trigger(
+            new OverrideSwitch(
+                driverXbox
+                    .rightBumper()
+                    .and(driverXbox.leftTrigger().negate())
+                    .and(driverXbox.rightTrigger().negate()),
+                OverrideSwitch.Mode.HOLD,
+                false));
 
-      final JoystickInputController input =
-          new JoystickInputController(
-              drive,
-              () -> -driverXbox.getLeftY(),
-              () -> -driverXbox.getLeftX(),
-              () -> -driverXbox.getRightY(),
-              () -> -driverXbox.getRightX());
+    DriverDashboard.getInstance().setFieldRelativeSupplier(useFieldRelative);
+    DriverDashboard.getInstance().setHeadingControlledSupplier(useHeadingControlled);
 
-      final SpeedLevelController level =
-          new SpeedLevelController(SpeedLevelController.SpeedLevel.NO_LEVEL);
+    final JoystickInputController input =
+        new JoystickInputController(
+            drive,
+            () -> -driverXbox.getLeftY(),
+            () -> -driverXbox.getLeftX(),
+            () -> -driverXbox.getRightY(),
+            () -> -driverXbox.getRightX());
 
-      // Default command
-      drive.setDefaultCommand(
-          DriveCommands.joystickDrive(
-                  drive,
-                  input::getTranslationMetersPerSecond,
-                  input::getOmegaRadiansPerSecond,
-                  level::getCurrentSpeedLevel,
-                  useFieldRelative::getAsBoolean)
-              .withName("Default Drive"));
+    final SpeedLevelController level =
+        new SpeedLevelController(SpeedLevelController.SpeedLevel.NO_LEVEL);
 
-      // Cause the robot to resist movement by forming an X shape with the swerve
-      // modules
-      // Helps prevent getting pushed around
+    // Default command, normal joystick drive
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+                drive,
+                input::getTranslationMetersPerSecond,
+                input::getOmegaRadiansPerSecond,
+                level::getCurrentSpeedLevel,
+                useFieldRelative::getAsBoolean)
+            .withName("DEFAULT Drive"));
+
+    // Secondary drive command, angle controlled drive
+    useHeadingControlled.whileTrue(
+        DriveCommands.joystickHeadingDrive(
+                drive,
+                input::getTranslationMetersPerSecond,
+                input::getHeadingDirection,
+                level::getCurrentSpeedLevel,
+                useFieldRelative::getAsBoolean)
+            .withName("HEADING Drive"));
+
+    // Cause the robot to resist movement by forming an X shape with the swerve modules
+    // Helps prevent getting pushed around
+    driverXbox
+        .x()
+        .whileTrue(
+            drive
+                .startEnd(drive::stopUsingBrakeArrangement, drive::stopUsingForwardArrangement)
+                .withName("RESIST Movement With X"));
+
+    // Stop the robot and cancel any running commands
+    driverXbox
+        .b()
+        .or(RobotModeTriggers.disabled())
+        .onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
+
+    // Reset the gyro heading
+    driverXbox
+        .start()
+        .debounce(0.3)
+        .onTrue(
+            drive
+                .runOnce(
+                    () ->
+                        drive.resetPose(
+                            new Pose2d(drive.getRobotPose().getTranslation(), Rotation2d.kZero)))
+                .andThen(rumbleController(driverXbox, 0.3).withTimeout(0.25))
+                .ignoringDisable(true)
+                .withName("Reset Gyro Heading"));
+
+    if (includeAutoAlign) {
+      // Align to reef
+
+      final AdaptiveAutoAlignCommands reefAlignmentCommands =
+          new AdaptiveAutoAlignCommands(
+              Arrays.asList(FieldConstants.Reef.alignmentFaces),
+              new Transform2d(
+                  DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
+              new Transform2d(0, 0, Rotation2d.kZero),
+              new Translation2d(Units.inchesToMeters(24), 0));
+
+      Supplier<Command> endRumble = () -> rumbleController(driverXbox, 0.3).withTimeout(0.1);
+
       driverXbox
-          .x()
-          .whileTrue(
-              drive
-                  .startEnd(drive::stopUsingBrakeArrangement, drive::stopUsingForwardArrangement)
-                  .withName("Resist Movement With X"));
+          .rightTrigger()
+          .onTrue(
+              reefAlignmentCommands
+                  .driveToClosest(drive)
+                  .andThen(endRumble.get())
+                  .withName("Algin REEF"))
+          .onFalse(reefAlignmentCommands.stop(drive));
 
-      // Stop the robot and cancel any running commands
       driverXbox
-          .b()
-          .or(RobotModeTriggers.disabled())
-          .onTrue(drive.runOnce(drive::stop).withName("Stop and Cancel"));
+          .rightTrigger()
+          .and(driverXbox.leftBumper())
+          .onTrue(
+              CustomCommands.reInitCommand(
+                  reefAlignmentCommands
+                      .driveToNext(drive)
+                      .andThen(endRumble.get())
+                      .withName("Algin REEF -1")));
 
-      if (includeAutoAlign) {
-        // Align to reef
-        final AdaptiveAutoAlignCommands reefAlignmentCommands =
-            new AdaptiveAutoAlignCommands(
-                Arrays.asList(FieldConstants.Reef.alignmentFaces),
-                new Transform2d(
-                    DRIVE_CONFIG.bumperCornerToCorner().getX() / 2 + Units.inchesToMeters(3),
-                    0,
-                    Rotation2d.kPi));
+      driverXbox
+          .rightTrigger()
+          .and(driverXbox.rightBumper())
+          .onTrue(
+              CustomCommands.reInitCommand(
+                  reefAlignmentCommands
+                      .driveToPrevious(drive)
+                      .andThen(endRumble.get())
+                      .withName("Algin REEF +1")));
 
-        driverXbox
-            .rightTrigger()
-            .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Drive to reef"));
+      // Align to intake
 
-        driverXbox
-            .rightTrigger()
-            .and(driverXbox.leftBumper())
-            .onTrue(
-                CustomCommands.reInitCommand(
-                    reefAlignmentCommands.driveToNext(drive).withName("Drive to next reef")));
+      final AdaptiveAutoAlignCommands intakeAlignmentCommands =
+          new AdaptiveAutoAlignCommands(
+              Arrays.asList(FieldConstants.CoralStation.alignmentFaces),
+              new Transform2d(
+                  DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
+              new Transform2d(0, 0, Rotation2d.kZero),
+              new Translation2d(Units.inchesToMeters(10), 0));
 
-        driverXbox
-            .rightTrigger()
-            .and(driverXbox.rightBumper())
-            .onTrue(
-                CustomCommands.reInitCommand(
-                    reefAlignmentCommands
-                        .driveToPrevious(drive)
-                        .withName("Drive to previous reef")));
+      driverXbox
+          .leftTrigger()
+          .onTrue(
+              intakeAlignmentCommands
+                  .driveToClosest(drive)
+                  .andThen(endRumble.get())
+                  .withName("Align INTAKE"))
+          .onFalse(intakeAlignmentCommands.stop(drive));
 
-        driverXbox.rightTrigger(0.1).onFalse(drive.runOnce(drive::stop));
+      driverXbox
+          .leftTrigger()
+          .and(driverXbox.leftBumper())
+          .onTrue(
+              CustomCommands.reInitCommand(
+                  intakeAlignmentCommands
+                      .driveToNext(drive)
+                      .andThen(endRumble.get())
+                      .withName("Align INTAKE +1")));
 
-        // Align to intake
-
-        final AdaptiveAutoAlignCommands intakeAlignmentCommands =
-            new AdaptiveAutoAlignCommands(
-                Arrays.asList(FieldConstants.CoralStation.alignmentFaces),
-                new Transform2d(
-                    DRIVE_CONFIG.bumperCornerToCorner().getX() / 2 + Units.inchesToMeters(3),
-                    0,
-                    Rotation2d.kPi));
-
-        driverXbox
-            .leftTrigger()
-            .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Drive to intake"));
-
-        driverXbox
-            .leftTrigger()
-            .and(driverXbox.leftBumper())
-            .onTrue(
-                CustomCommands.reInitCommand(
-                    intakeAlignmentCommands.driveToNext(drive).withName("Drive to next intake")));
-
-        driverXbox
-            .leftTrigger()
-            .and(driverXbox.rightBumper())
-            .onTrue(
-                CustomCommands.reInitCommand(
-                    intakeAlignmentCommands
-                        .driveToPrevious(drive)
-                        .withName("Drive to previous intake")));
-
-        driverXbox.leftTrigger(0.1).onFalse(drive.runOnce(drive::stop));
-
-        driverXbox.back().onTrue(new AdjustWrist(wrist, Rotation2d.fromDegrees(-5)));
-        driverXbox.start().onTrue(new AdjustWrist(wrist, Rotation2d.fromDegrees(5)));
-      }
-    } else if (driverController instanceof CommandJoystick) {
-      final CommandJoystick driverJoystick = (CommandJoystick) driverController;
-
-      JoystickInputController driverController =
-          new JoystickInputController(
-              drive,
-              () -> -driverJoystick.getY(),
-              () -> -driverJoystick.getX(),
-              () -> -driverJoystick.getTwist(),
-              () -> 0.0);
-
-      drive.setDefaultCommand(
-          drive
-              .run(
-                  () -> {
-                    Translation2d translation = driverController.getTranslationMetersPerSecond();
-                    double omega = driverController.getOmegaRadiansPerSecond();
-                    drive.setRobotSpeeds(
-                        new ChassisSpeeds(translation.getX(), translation.getY(), omega));
-                  })
-              .finallyDo(drive::stop)
-              .withName("Default Drive"));
+      driverXbox
+          .leftTrigger()
+          .and(driverXbox.rightBumper())
+          .onTrue(
+              CustomCommands.reInitCommand(
+                  intakeAlignmentCommands
+                      .driveToPrevious(drive)
+                      .andThen(endRumble.get())
+                      .withName("Align INTAKE -1")));
+                      
+      driverXbox.back().onTrue(new AdjustWrist(wrist, Rotation2d.fromDegrees(-5)));
+      driverXbox.start().onTrue(new AdjustWrist(wrist, Rotation2d.fromDegrees(5)));
     }
   }
 
   private void configureOperatorControllerBindings() {
-    if (operatorController instanceof CommandXboxController) {
-      final CommandXboxController operatorXbox = (CommandXboxController) operatorController;
 
-      operatorXbox.b().onTrue(Commands.idle(drive).withName("Operator Idle Drive"));
-    }
+    operatorController.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
+
+    operatorController.y().onTrue(superstructure.scoreL4());
+    operatorController.x().onTrue(superstructure.scoreL3());
+    operatorController.a().onTrue(superstructure.scoreL2());
+    operatorController.povUp().onTrue(superstructure.scoreL1());
+
+    operatorController.povDown().onTrue(superstructure.stow());
+  }
+
+  private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
+    return Commands.startEnd(
+            () -> controller.setRumble(RumbleType.kBothRumble, rumbleIntensity),
+            () -> controller.setRumble(RumbleType.kBothRumble, 0))
+        .withName("RumbleController");
   }
 
   private Command rumbleControllers(double rumbleIntensity) {
-    return Commands.startEnd(
-            () -> {
-              driverController.setRumble(RumbleType.kBothRumble, rumbleIntensity);
-              operatorController.setRumble(RumbleType.kBothRumble, rumbleIntensity);
-            },
-            () -> {
-              driverController.setRumble(RumbleType.kBothRumble, 0);
-              operatorController.setRumble(RumbleType.kBothRumble, 0);
-            })
-        .withName("RumbleController");
+    return Commands.parallel(
+        rumbleController((CommandXboxController) driverController, rumbleIntensity),
+        rumbleController((CommandXboxController) operatorController, rumbleIntensity));
   }
 
   private void configureAlertTriggers() {
@@ -455,24 +586,31 @@ public class RobotContainer {
     } catch (ParseException e) {
       System.out.println("Failed to parse Choreo auto " + e.getMessage());
     }
-
-    // Testing autos :)
-    dashboardChooser.addOption(
-        "NOT-PROD HANG SIM TEST", new InstantCommand(() -> hang.setSetpoint(0.8)));
   }
 
   private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {
+
+    dashboardChooser.addOption("Elevator Static", elevator.staticCharacterization(0.02));
+
+    dashboardChooser.addOption("Hang Coast", hang.coast());
+
+    dashboardChooser.addOption(
+        "Simple Feed Forward Characterization", DriveCommands.feedforwardCharacterization(drive));
+    dashboardChooser.addOption(
+        "Simple Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+
+    // //
     // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/introduction.html
-    dashboardChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    dashboardChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    dashboardChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    dashboardChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // dashboardChooser.addOption(
+    //     "Drive SysId (Quasistatic Forward)",
+    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // dashboardChooser.addOption(
+    //     "Drive SysId (Quasistatic Reverse)",
+    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // dashboardChooser.addOption(
+    //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // dashboardChooser.addOption(
+    //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**

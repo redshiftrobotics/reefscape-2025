@@ -12,13 +12,13 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drive.ModuleConstants;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.littletonrobotics.junction.LoggedRobot;
 
 public class SwerveAbsoluteEncoderTuning extends LoggedRobot {
 
-  private final Map<String, CANcoder> cancoderMap = new HashMap<>();
+  private final Map<String, CANcoder> cancoderMap = new LinkedHashMap<>();
 
   private final Timer timer = new Timer();
 
@@ -70,6 +70,12 @@ public class SwerveAbsoluteEncoderTuning extends LoggedRobot {
     SmartDashboard.putBoolean("Break Mode", BREAK_MODE);
 
     for (SparkMax sparkMax : turns) {
+      SparkMaxConfig config = new SparkMaxConfig();
+      config.idleMode(BREAK_MODE ? IdleMode.kBrake : IdleMode.kCoast);
+      sparkMax.configure(
+          config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    }
+    for (SparkMax sparkMax : drives) {
       SparkMaxConfig config = new SparkMaxConfig();
       config.idleMode(BREAK_MODE ? IdleMode.kBrake : IdleMode.kCoast);
       sparkMax.configure(

@@ -1,7 +1,6 @@
 package frc.robot.subsystems.drive;
 
 import com.pathplanner.lib.path.PathConstraints;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -57,6 +56,11 @@ public class DriveConstants {
 
   public static final DriveConfig DRIVE_CONFIG =
       switch (Constants.getRobot()) {
+        case COMP_BOT_2025 -> new DriveConfig(
+            new Translation2d(Units.inchesToMeters(22.729226), Units.inchesToMeters(22.729226)),
+            new Translation2d(Units.inchesToMeters(27.5), Units.inchesToMeters(27.5)),
+            5.05968,
+            14.5);
         case T_SHIRT_CANNON_CHASSIS -> new DriveConfig(
             new Translation2d(Units.inchesToMeters(22.729226), Units.inchesToMeters(22.729226)),
             new Translation2d(Units.inchesToMeters(25.729226), Units.inchesToMeters(25.729226)),
@@ -90,6 +94,7 @@ public class DriveConstants {
 
   public static final int GYRO_CAN_ID =
       switch (Constants.getRobot()) {
+        case COMP_BOT_2025 -> 40;
         case CRESCENDO_CHASSIS_2024 -> 40;
         case T_SHIRT_CANNON_CHASSIS -> 40;
         case WOOD_BOT_TWO_2025 -> 40;
@@ -98,9 +103,11 @@ public class DriveConstants {
 
   // --- Pathplanner Config ---
 
-  public static final double robotMassKg = 74.088;
+  // TODO, make sure these values are correct, if unsure of COF use 1.0 !!!
+
+  public static final double robotMassKg = 65;
   public static final double robotMOI = 6.883;
-  public static final double wheelCOF = 1.2;
+  public static final double wheelCOF = 1.0;
   public static final Translation2d[] moduleTranslations = {
     DriveConstants.FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER,
     DriveConstants.FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER,
@@ -123,10 +130,11 @@ public class DriveConstants {
   public static final PIDConstants ROTATION_CONTROLLER_CONSTANTS_TRAJECTORY =
       new PIDConstants(5.0, 0, 0.4);
 
-  public static final PIDConstants TRANSLATION_CONTROLLER_CONSTANTS = new PIDConstants(5.0, 0.0, 1);
-  public static final PIDConstants ROTATION_CONTROLLER_CONSTANTS = new PIDConstants(5.0, 0, 1);
-  public static final Pose2d POSE_POSITION_TOLERANCE =
-      new Pose2d(Units.inchesToMeters(0.5), Units.inchesToMeters(0.5), Rotation2d.fromDegrees(1));
+  public static final PIDConstants TRANSLATION_CONTROLLER_CONSTANTS =
+      new PIDConstants(5.0, 0.0, 0.0);
+  public static final PIDConstants ROTATION_CONTROLLER_CONSTANTS = new PIDConstants(5, 0.0, 0.0);
+  public static final double TRANSLATION_TOLERANCE = Units.inchesToMeters(0.5);
+  public static final Rotation2d ROTATION_TOLERANCE = Rotation2d.fromDegrees(1);
 
   // --- Heading Controller Config ---
 

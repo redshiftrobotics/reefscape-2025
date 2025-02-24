@@ -8,9 +8,10 @@
 package frc.robot.commands;
 
 import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
-import static frc.robot.subsystems.drive.DriveConstants.POSE_POSITION_TOLERANCE;
 import static frc.robot.subsystems.drive.DriveConstants.ROTATION_CONTROLLER_CONSTANTS;
+import static frc.robot.subsystems.drive.DriveConstants.ROTATION_TOLERANCE;
 import static frc.robot.subsystems.drive.DriveConstants.TRANSLATION_CONTROLLER_CONSTANTS;
+import static frc.robot.subsystems.drive.DriveConstants.TRANSLATION_TOLERANCE;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.controller.HolonomicDriveController;
@@ -27,10 +28,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.utility.AllianceFlipUtil;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -61,6 +64,58 @@ public class DriveCommands {
         .finallyDo(drive::stop);
   }
 
+  public static Command joystickHeadingDrive(
+      Drive drive,
+      Supplier<Translation2d> translationSupplier,
+      Supplier<Optional<Rotation2d>> headingSupplier,
+      Supplier<SpeedLevelController.SpeedLevel> speedLevelSupplier,
+      BooleanSupplier useFieldRelative) {
+
+    ProfiledPIDController controller =
+        new ProfiledPIDController(
+            ROTATION_CONTROLLER_CONSTANTS.kP(),
+            ROTATION_CONTROLLER_CONSTANTS.kI(),
+            ROTATION_CONTROLLER_CONSTANTS.kD(),
+            DRIVE_CONFIG.getAngularConstraints());
+    controller.setTolerance(ROTATION_TOLERANCE.getRadians());
+    controller.enableContinuousInput(0, Units.rotationsToRadians(1));
+
+    return drive
+        .run(
+            () -> {
+              Translation2d translation = translationSupplier.get();
+              Optional<Rotation2d> heading = headingSupplier.get();
+
+              if (heading.isPresent()) {
+                controller.setGoal(heading.get().getRadians());
+              }
+
+              double omega =
+                  controller.calculate(
+                      AllianceFlipUtil.apply(drive.getRobotPose().getRotation()).getRadians());
+
+              ChassisSpeeds speeds =
+                  SpeedLevelController.apply(
+                      new ChassisSpeeds(translation.getX(), translation.getY(), 0),
+                      speedLevelSupplier.get());
+
+              if (!controller.atGoal()) {
+                speeds.omegaRadiansPerSecond = omega;
+              }
+
+              drive.setRobotSpeeds(speeds, useFieldRelative.getAsBoolean());
+            })
+        .beforeStarting(
+            () -> {
+              controller.setGoal(
+                  AllianceFlipUtil.apply(drive.getRobotPose().getRotation()).getRadians());
+              controller.reset(
+                  drive.getRobotPose().getRotation().getRadians(),
+                  drive.getRobotSpeeds().omegaRadiansPerSecond);
+            })
+        .finallyDo(drive::stop);
+  }
+
   /** Joystick drive */
   public static Command joystickDriveSmartAngleLock(
       Drive drive,
@@ -77,19 +132,20 @@ public class DriveCommands {
     HolonomicDriveController controller =
         new HolonomicDriveController(
             new PIDController(
-                TRANSLATION_CONTROLLER_CONSTANTS.Kp(),
-                TRANSLATION_CONTROLLER_CONSTANTS.Ki(),
-                TRANSLATION_CONTROLLER_CONSTANTS.Kd()),
+                TRANSLATION_CONTROLLER_CONSTANTS.kP(),
+                TRANSLATION_CONTROLLER_CONSTANTS.kI(),
+                TRANSLATION_CONTROLLER_CONSTANTS.kD()),
             new PIDController(
-                TRANSLATION_CONTROLLER_CONSTANTS.Kp(),
-                TRANSLATION_CONTROLLER_CONSTANTS.Ki(),
-                TRANSLATION_CONTROLLER_CONSTANTS.Kd()),
+                TRANSLATION_CONTROLLER_CONSTANTS.kP(),
+                TRANSLATION_CONTROLLER_CONSTANTS.kI(),
+                TRANSLATION_CONTROLLER_CONSTANTS.kD()),
             new ProfiledPIDController(
-                ROTATION_CONTROLLER_CONSTANTS.Kp(),
-                ROTATION_CONTROLLER_CONSTANTS.Ki(),
-                ROTATION_CONTROLLER_CONSTANTS.Kd(),
+                ROTATION_CONTROLLER_CONSTANTS.kP(),
+                ROTATION_CONTROLLER_CONSTANTS.kI(),
+                ROTATION_CONTROLLER_CONSTANTS.kD(),
                 DRIVE_CONFIG.getAngularConstraints()));
-    controller.setTolerance(POSE_POSITION_TOLERANCE);
+    controller.setTolerance(
+        new Pose2d(TRANSLATION_TOLERANCE, TRANSLATION_TOLERANCE, ROTATION_TOLERANCE));
 
     return drive
         .run(
@@ -115,7 +171,7 @@ public class DriveCommands {
   public static Command pathfindToPoseCommand(
       Drive drive, Pose2d desiredPose, double speedMultiplier, double goalEndVelocity) {
     return AutoBuilder.pathfindToPose(
-        desiredPose, DRIVE_CONFIG.getPathConstraints(), goalEndVelocity);
+        desiredPose, DRIVE_CONFIG.getPathConstraints(speedMultiplier), goalEndVelocity);
   }
 
   /** Estimated feed forward Ks and Kv by driving robot forward, control motors by voltage */
@@ -208,14 +264,14 @@ public class DriveCommands {
             Commands.runOnce(
                 () -> {
                   state.positions = drive.getWheelRadiusCharacterizationPositions();
-                  state.lastAngle = drive.getRobotPose().getRotation();
+                  state.lastAngle = drive.getRawGyroRotation();
                   state.gyroDelta = 0.0;
                 }),
 
             // Update gyro delta
             Commands.run(
                     () -> {
-                      Rotation2d rotation = drive.getRobotPose().getRotation();
+                      Rotation2d rotation = drive.getRawGyroRotation();
                       state.gyroDelta += Math.abs(rotation.minus(state.lastAngle).getRadians());
                       state.lastAngle = rotation;
                     })

@@ -1,8 +1,10 @@
-package frc.robot.commands.Intake;
+package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Intake.CoralIntake;
+import frc.robot.subsystems.superstructure.intake.CoralIntake;
+import frc.robot.subsystems.superstructure.intake.IntakeConstants;
 
+/** use while true on the contoller bindings because end stops motors excute starts them */
 public class ScoreCoral2 extends Command {
 
   private CoralIntake coralIntake;
@@ -13,20 +15,20 @@ public class ScoreCoral2 extends Command {
     addRequirements(coralIntake);
   }
 
-  // for l2
   @Override
-  public void execute() {
-    coralIntake.moveRightMotor(0.3);
-    coralIntake.moveLeftMotor(0.3);
+  public void initialize() {
+    // TODO: use whlie true button in bindings
+    // score on not l1
+    coralIntake.setMotors(IntakeConstants.CORAL_INTAKE_MOTOR_SPEED);
   }
 
   @Override
   public boolean isFinished() {
-    return true;
+    return false;
   }
 
   @Override
   public void end(boolean interrupted) {
-    coralIntake.stop();
+    coralIntake.stopMotors();
   }
 }

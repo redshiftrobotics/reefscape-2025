@@ -1,0 +1,103 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+<<<<<<<< HEAD:src/main/deploy/pathplanner/paths/Low Spawn to D2.path
+        "x": 8.053,
+        "y": 5.05
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.110689614877236,
+        "y": 4.589242455484748
+========
+        "x": 2.0,
+        "y": 7.0
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.0,
+        "y": 7.0
+>>>>>>>> main:src/main/deploy/pathplanner/paths/Rotate.path
+      },
+      "isLocked": false,
+      "linkedName": "Low Spawn"
+    },
+    {
+      "anchor": {
+<<<<<<<< HEAD:src/main/deploy/pathplanner/paths/Low Spawn to D2.path
+        "x": 6.0,
+        "y": 3.85
+      },
+      "prevControl": {
+        "x": 6.4307326145236035,
+        "y": 4.0596457584528345
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "D2"
+========
+        "x": 5.0,
+        "y": 7.0
+      },
+      "prevControl": {
+        "x": 4.749999999999999,
+        "y": 7.0
+      },
+      "nextControl": {
+        "x": 5.539271035817229,
+        "y": 7.0
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.0,
+        "y": 7.0
+      },
+      "prevControl": {
+        "x": 1.0,
+        "y": 7.0
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 180.0
+>>>>>>>> main:src/main/deploy/pathplanner/paths/Rotate.path
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+<<<<<<<< HEAD:src/main/deploy/pathplanner/paths/Low Spawn to D2.path
+  "folder": "Paths B",
+========
+  "folder": null,
+>>>>>>>> main:src/main/deploy/pathplanner/paths/Rotate.path
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

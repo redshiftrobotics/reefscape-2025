@@ -15,25 +15,25 @@ import edu.wpi.first.wpilibj.RobotController;
  */
 public final class Constants {
 
+  // Time between loops in seconds, dt
   public static final double LOOP_PERIOD_SECONDS = Robot.defaultPeriodSecs; // 0.02
 
-  private static final RobotType DEFAULT_ROBOT_TYPE = RobotType.WOOD_BOT_TWO_2025;
+  public static final RobotType PRIMARY_ROBOT_TYPE = RobotType.COMP_BOT_2025;
   private static RobotType robotType = null;
 
-  public static final boolean TUNING_MODE = false;
-  public static final boolean ON_BLOCKS_TEST_MODE = false;
+  public static final boolean TUNING_MODE = true;
 
   public static RobotType getRobot() {
     if (robotType == null) {
       robotType = determineRobotType();
       if (robotType == null) {
         wrongRobotTypeFailedDetermination.set(true);
-        robotType = DEFAULT_ROBOT_TYPE;
+        robotType = PRIMARY_ROBOT_TYPE;
       }
     }
     if (RobotBase.isReal() && robotType == RobotType.SIM_BOT) {
       wrongRobotTypeAlertReal.set(true);
-      robotType = DEFAULT_ROBOT_TYPE;
+      robotType = PRIMARY_ROBOT_TYPE;
     }
     if (RobotBase.isSimulation() && robotType != RobotType.SIM_BOT) {
       wrongRobotTypeAlertSim.set(true);
@@ -44,9 +44,10 @@ public final class Constants {
 
   public static Mode getMode() {
     return switch (getRobot()) {
-      case WOOD_BOT_TWO_2025, T_SHIRT_CANNON_CHASSIS, CRESCENDO_CHASSIS_2024 -> RobotBase.isReal()
-          ? Mode.REAL
-          : Mode.REPLAY;
+      case COMP_BOT_2025,
+          WOOD_BOT_TWO_2025,
+          T_SHIRT_CANNON_CHASSIS,
+          CRESCENDO_CHASSIS_2024 -> RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
       case SIM_BOT -> Mode.SIM;
     };
   }
@@ -63,6 +64,7 @@ public final class Constants {
   }
 
   public enum RobotType {
+    COMP_BOT_2025,
     SIM_BOT,
     T_SHIRT_CANNON_CHASSIS,
     CRESCENDO_CHASSIS_2024,
@@ -78,6 +80,8 @@ public final class Constants {
           return RobotType.T_SHIRT_CANNON_CHASSIS;
         case "032D216B":
           return RobotType.WOOD_BOT_TWO_2025;
+        case "02384981":
+          return RobotType.COMP_BOT_2025;
       }
     } else if (RobotBase.isSimulation()) {
       return RobotType.SIM_BOT;
@@ -88,7 +92,7 @@ public final class Constants {
   private static final Alert wrongRobotTypeAlertReal =
       new Alert(
           String.format(
-              "Invalid robot selected, using %s robot as default.", DEFAULT_ROBOT_TYPE.toString()),
+              "Invalid robot selected, using %s robot as default.", PRIMARY_ROBOT_TYPE.toString()),
           Alert.AlertType.kWarning);
 
   private static final Alert wrongRobotTypeAlertSim =
@@ -101,6 +105,6 @@ public final class Constants {
       new Alert(
           String.format(
               "Failed to determine robot from RoboRio serial number, using %s robot as default.",
-              DEFAULT_ROBOT_TYPE.toString()),
+              PRIMARY_ROBOT_TYPE.toString()),
           AlertType.kError);
 }
