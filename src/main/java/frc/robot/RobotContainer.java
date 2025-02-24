@@ -4,7 +4,6 @@ import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -58,13 +57,10 @@ import frc.robot.subsystems.superstructure.wrist.WristIORelativeEncoder;
 import frc.robot.subsystems.superstructure.wrist.WristIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
-import frc.robot.subsystems.vision.CameraIOSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
-import java.io.IOException;
 import java.util.Arrays;
-import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -131,9 +127,7 @@ public class RobotContainer {
 
         vision =
             new AprilTagVision(
-                new CameraIOPhotonVision(VisionConstants.COMP_FRONT_LEFT_CAMERA),
                 new CameraIOPhotonVision(VisionConstants.COMP_FRONT_RIGHT_CAMERA),
-                new CameraIOPhotonVision(VisionConstants.COMP_BACK_LEFT_CAMERA),
                 new CameraIOPhotonVision(VisionConstants.COMP_BACK_RIGHT_CAMERA));
 
         // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
@@ -231,12 +225,8 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim());
-        vision =
-            new AprilTagVision(
-                new CameraIOSim(VisionConstants.COMP_FRONT_LEFT_CAMERA, drive::getRobotPose),
-                new CameraIOSim(VisionConstants.COMP_FRONT_RIGHT_CAMERA, drive::getRobotPose),
-                new CameraIOSim(VisionConstants.COMP_BACK_LEFT_CAMERA, drive::getRobotPose),
-                new CameraIOSim(VisionConstants.COMP_BACK_RIGHT_CAMERA, drive::getRobotPose));
+        vision = new AprilTagVision(
+        );
         hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
         wrist = new Wrist(new WristIOSim());
@@ -448,11 +438,11 @@ public class RobotContainer {
               Arrays.asList(FieldConstants.Reef.alignmentFaces),
               new Transform2d(
                   DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
-              new Transform2d(0, 0, Rotation2d.kZero),
+              new Transform2d(0, 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(24), 0));
 
-      reefAlignmentCommands.setFinalAlignCommand(superstructure.prepare());
-      reefAlignmentCommands.setEndCommand(rumbleController(driverXbox, 0.3).withTimeout(0.1));
+      reefAlignmentCommands.setFinalAlignCommand(superstructure::prepare);
+      reefAlignmentCommands.setEndCommand(() -> rumbleController(driverXbox, 0.3).withTimeout(0.1));
 
       driverXbox
           .rightTrigger()
@@ -480,11 +470,12 @@ public class RobotContainer {
               Arrays.asList(FieldConstants.CoralStation.alignmentFaces),
               new Transform2d(
                   DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
-              new Transform2d(0, 0, Rotation2d.kZero),
+              new Transform2d(0, 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(10), 0));
 
-      intakeAlignmentCommands.setFinalAlignCommand(superstructure.prepareIntake());
-      intakeAlignmentCommands.setEndCommand(rumbleController(driverXbox, 0.3).withTimeout(0.1));
+      intakeAlignmentCommands.setFinalAlignCommand(superstructure::prepareIntake);
+      intakeAlignmentCommands.setEndCommand(
+          () -> rumbleController(driverXbox, 0.3).withTimeout(0.1));
 
       driverXbox
           .leftTrigger()
@@ -557,23 +548,40 @@ public class RobotContainer {
     // https://pathplanner.dev/pplib-named-commands.html
     NamedCommands.registerCommand("StopWithX", drive.runOnce(drive::stopUsingBrakeArrangement));
 
+    NamedCommands.registerCommand("l1", superstructure.runPrepare(Superstructure.State.L1));
+    NamedCommands.registerCommand("l2", superstructure.runPrepare(Superstructure.State.L2));
+    NamedCommands.registerCommand("l3", superstructure.runPrepare(Superstructure.State.L3));
+    NamedCommands.registerCommand("l4", superstructure.runPrepare(Superstructure.State.L4));
+    NamedCommands.registerCommand("stow", superstructure.runPrepare(Superstructure.State.STOW));
+    NamedCommands.registerCommand("intake", superstructure.runPrepare(Superstructure.State.INTAKE));
+
     // Path planner Autos
     // https://pathplanner.dev/gui-editing-paths-and-autos.html#autos
-    dashboardChooser.addOption("Triangle Auto", AutoBuilder.buildAuto("Triangle Auto"));
-    dashboardChooser.addOption("Rotate Auto", AutoBuilder.buildAuto("Rotate Auto"));
-    dashboardChooser.addOption("Circle Auto", AutoBuilder.buildAuto("Circle Auto"));
+    // dashboardChooser.addOption("Triangle Auto", AutoBuilder.buildAuto("Triangle Auto"));
+    // dashboardChooser.addOption("Rotate Auto", AutoBuilder.buildAuto("Rotate Auto"));
+    // dashboardChooser.addOption("Circle Auto", AutoBuilder.buildAuto("Circle Auto"));
+
+    // Test Auto
+    dashboardChooser.addOption("Inner", AutoBuilder.buildAuto("Inner"));
+    dashboardChooser.addOption("Middle", AutoBuilder.buildAuto("Middle"));
+    dashboardChooser.addOption("Outer", AutoBuilder.buildAuto("Outer"));
+
+    // Leave autos
+    dashboardChooser.addOption("Leave Inner", AutoBuilder.buildAuto("Leave Inner"));
+    dashboardChooser.addOption("Leave Middle", AutoBuilder.buildAuto("Leave Middle"));
+    dashboardChooser.addOption("Leave Outer", AutoBuilder.buildAuto("Leave Outer"));
 
     // Choreo Autos
     // https://pathplanner.dev/pplib-choreo-interop.html#load-choreo-trajectory-as-a-pathplannerpath
-    try {
-      dashboardChooser.addOption(
-          "Four Coral Test",
-          AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("Four Coral Auto")));
-    } catch (IOException e) {
-      System.out.println("Failed to load Choreo auto " + e.getMessage());
-    } catch (ParseException e) {
-      System.out.println("Failed to parse Choreo auto " + e.getMessage());
-    }
+    // try {
+    //   dashboardChooser.addOption(
+    //       "Four Coral Test",
+    //       AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("Four Coral Auto")));
+    // } catch (IOException e) {
+    //   System.out.println("Failed to load Choreo auto " + e.getMessage());
+    // } catch (ParseException e) {
+    //   System.out.println("Failed to parse Choreo auto " + e.getMessage());
+    // }
   }
 
   private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {

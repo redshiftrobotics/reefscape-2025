@@ -14,6 +14,7 @@ import frc.robot.utility.AllianceFlipUtil;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import org.littletonrobotics.junction.Logger;
 
@@ -28,7 +29,7 @@ public class AdaptiveAutoAlignCommands {
 
   private int offset = 0;
 
-  private Command startCommand, finalAlignCommand, endCommand;
+  private Supplier<Command> startCommand, finalAlignCommand, endCommand;
 
   public AdaptiveAutoAlignCommands(
       List<Pose2d> poses,
@@ -50,20 +51,20 @@ public class AdaptiveAutoAlignCommands {
             .map(pose -> pose.transformBy(robotOffset).transformBy(positionOffset))
             .toList();
 
-    setStartCommand(Commands.none());
-    setFinalAlignCommand(Commands.none());
-    setEndCommand(Commands.none());
+    setStartCommand(Commands::none);
+    setFinalAlignCommand(Commands::none);
+    setEndCommand(Commands::none);
   }
 
-  public void setStartCommand(Command startCommand) {
+  public void setStartCommand(Supplier<Command> startCommand) {
     this.startCommand = startCommand;
   }
 
-  public void setFinalAlignCommand(Command finalAlignCommand) {
+  public void setFinalAlignCommand(Supplier<Command> finalAlignCommand) {
     this.finalAlignCommand = finalAlignCommand;
   }
 
-  public void setEndCommand(Command endCommand) {
+  public void setEndCommand(Supplier<Command> endCommand) {
     this.endCommand = endCommand;
   }
 
@@ -99,13 +100,14 @@ public class AdaptiveAutoAlignCommands {
         () -> {
           Pose2d pose = getPose(offset);
           return startCommand
+              .get()
               .andThen(
                   DriveCommands.pathfindToPoseCommand(
                       drive, pose.plus(roughLineupOffset.inverse()).plus(mechanismOffset), 0.25, 0))
               .andThen(Commands.runOnce(drive::stop))
-              .andThen(finalAlignCommand)
+              .andThen(finalAlignCommand.get())
               .andThen(DriveCommands.driveToPosePrecise(drive, pose.plus(mechanismOffset)))
-              .andThen(endCommand)
+              .andThen(endCommand.get())
               .beforeStarting(() -> setCurrentAutoAlignGoal(pose))
               .finallyDo(() -> setCurrentAutoAlignGoal(null));
         },

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superstructure;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -54,26 +55,29 @@ public class Superstructure extends SubsystemBase {
 
   public Command prepareL1() {
     return elevator.runOnce(
-        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight * (1 / 4)));
+        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight / 4.0));
   }
 
   public Command prepareL2() {
     return elevator.runOnce(
-        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight * (1 / 2)));
+        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight / 2.0));
   }
 
   public Command prepareL3() {
     return elevator.runOnce(
-        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight * (3 / 4)));
+        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0)));
   }
 
   public Command prepareL4() {
     return elevator.runOnce(
-        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight * (4 / 4)));
+        () ->
+            elevator.setGoalHeightMeters(
+                ElevatorConstants.carriageMaxHeight - Units.inchesToMeters(1)));
   }
 
   public Command prepareIntake() {
-    return prepareL2();
+    return elevator.runOnce(
+        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight * (3.0 / 5.0)));
   }
 
   public Command stow() {
