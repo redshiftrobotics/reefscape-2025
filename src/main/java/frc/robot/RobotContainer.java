@@ -75,14 +75,13 @@ public class RobotContainer {
   private final Drive drive;
   private final AprilTagVision vision;
 
+  private final Superstructure superstructure;
+  private final Elevator elevator;
+  private final Wrist wrist;
   private final AlgaeIntake algaeIntake;
   private final CoralIntake coralIntake;
 
-  private final Wrist wrist;
   private final Hang hang;
-
-  private final Elevator elevator;
-  private final Superstructure superstructure;
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);

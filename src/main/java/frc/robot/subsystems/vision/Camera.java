@@ -1,11 +1,13 @@
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
@@ -175,19 +177,19 @@ public class Camera {
       return status;
     }
 
-    // Pose2d estimatedRobotPose2d = estimatedRobotPose.toPose2d();
+    Pose2d estimatedRobotPose2d = estimatedRobotPose.toPose2d();
 
-    // if (!MathUtil.isNear(
-    //     estimatedRobotPose2d.getRotation().getDegrees(),
-    //     lastRobotPose.getRotation().getDegrees(),
-    //     maxValidDistanceAwayFromCurrentHeadingDegrees.get())) {
-    //   return VisionResultStatus.NOT_CLOSE_ENOUGH_TO_GYRO_ROTATION;
-    // }
+    if (!MathUtil.isNear(
+        estimatedRobotPose2d.getRotation().getDegrees(),
+        lastRobotPose.getRotation().getDegrees(),
+        maxValidDistanceAwayFromCurrentHeadingDegrees.get())) {
+      return VisionResultStatus.NOT_CLOSE_ENOUGH_TO_GYRO_ROTATION;
+    }
 
-    // if (estimatedRobotPose2d.getTranslation().getDistance(lastRobotPose.getTranslation())
-    //     > maxValidDistanceAwayFromCurrentEstimateMeters.get()) {
-    //   return VisionResultStatus.TOO_FAR_FROM_EXISTING_ESTIMATE;
-    // }
+    if (estimatedRobotPose2d.getTranslation().getDistance(lastRobotPose.getTranslation())
+        > maxValidDistanceAwayFromCurrentEstimateMeters.get()) {
+      return VisionResultStatus.TOO_FAR_FROM_EXISTING_ESTIMATE;
+    }
 
     return status;
   }
@@ -198,29 +200,29 @@ public class Camera {
       return VisionResultStatus.NO_TARGETS_VISIBLE;
     }
 
-    // if (!Arrays.stream(tagsUsed).allMatch(tagsIdsOnField::contains)) {
-    //   return VisionResultStatus.INVALID_TAG;
-    // }
+    if (!Arrays.stream(tagsUsed).allMatch(tagsIdsOnField::contains)) {
+      return VisionResultStatus.INVALID_TAG;
+    }
 
-    // if (estimatedRobotPose.getX() < 0
-    //     || estimatedRobotPose.getY() < 0
-    //     || estimatedRobotPose.getX() > VisionConstants.FIELD.getFieldLength()
-    //     || estimatedRobotPose.getY() > VisionConstants.FIELD.getFieldWidth()) {
-    //   return VisionResultStatus.INVALID_POSE_OUTSIDE_FIELD;
-    // }
+    if (estimatedRobotPose.getX() < 0
+        || estimatedRobotPose.getY() < 0
+        || estimatedRobotPose.getX() > VisionConstants.FIELD.getFieldLength()
+        || estimatedRobotPose.getY() > VisionConstants.FIELD.getFieldWidth()) {
+      return VisionResultStatus.INVALID_POSE_OUTSIDE_FIELD;
+    }
 
-    // if (!MathUtil.isNear(0, estimatedRobotPose.getZ(), zHeightToleranceMeters.get())) {
-    //   return VisionResultStatus.Z_HEIGHT_BAD;
-    // }
+    if (!MathUtil.isNear(0, estimatedRobotPose.getZ(), zHeightToleranceMeters.get())) {
+      return VisionResultStatus.Z_HEIGHT_BAD;
+    }
 
-    // double pitchAndRollToleranceValueRadians =
-    //     Units.degreesToRadians(pitchAndRollToleranceDegrees.get());
-    // if (!MathUtil.isNear(
-    //         0, estimatedRobotPose.getRotation().getX(), pitchAndRollToleranceValueRadians)
-    //     && !MathUtil.isNear(
-    //         0, estimatedRobotPose.getRotation().getY(), pitchAndRollToleranceValueRadians)) {
-    //   return VisionResultStatus.PITCH_OR_ROLL_BAD;
-    // }
+    double pitchAndRollToleranceValueRadians =
+        Units.degreesToRadians(pitchAndRollToleranceDegrees.get());
+    if (!MathUtil.isNear(
+            0, estimatedRobotPose.getRotation().getX(), pitchAndRollToleranceValueRadians)
+        && !MathUtil.isNear(
+            0, estimatedRobotPose.getRotation().getY(), pitchAndRollToleranceValueRadians)) {
+      return VisionResultStatus.PITCH_OR_ROLL_BAD;
+    }
 
     return VisionResultStatus.SUCCESSFUL;
   }
