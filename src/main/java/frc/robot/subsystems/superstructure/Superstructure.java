@@ -5,10 +5,12 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
+import frc.robot.subsystems.superstructure.wrist.Wrist;
 
 public class Superstructure extends SubsystemBase {
 
   private final Elevator elevator;
+  private final Wrist wrist;
 
   private final SuperstructureVisualizer measuredVisualizer =
       new SuperstructureVisualizer("Measured", Color.kYellow);
@@ -17,8 +19,9 @@ public class Superstructure extends SubsystemBase {
   private final SuperstructureVisualizer goalVisualizer =
       new SuperstructureVisualizer("Goal", Color.kGreen);
 
-  public Superstructure(Elevator elevator) {
+  public Superstructure(Elevator elevator, Wrist wrist) {
     this.elevator = elevator;
+    this.wrist = wrist;
   }
 
   public Command scoreL1() {
@@ -51,8 +54,8 @@ public class Superstructure extends SubsystemBase {
 
   @Override
   public void periodic() {
-    measuredVisualizer.update(elevator.getHeightMeters());
-    setpointVisualizer.update(elevator.getSetpoint().position);
-    goalVisualizer.update(elevator.getGoalHeightMeters());
+    measuredVisualizer.update(elevator.getHeightMeters(), wrist.getPosition());
+    setpointVisualizer.update(elevator.getSetpoint().position, wrist.getSetpoint());
+    goalVisualizer.update(elevator.getGoalHeightMeters(), 0);
   }
 }
