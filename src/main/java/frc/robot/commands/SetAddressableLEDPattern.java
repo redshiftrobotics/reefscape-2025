@@ -6,12 +6,17 @@ import frc.robot.subsystems.addressableled.AddressableLEDSubsystem;
 
 public class SetAddressableLEDPattern extends Command {
   private final AddressableLEDSubsystem ledSystem;
-  private final int
-      section; // If this is -1, that means that this command is targeting the whole strip
+
+  // If this is -1, that means that this command is targeting the whole strip
+  private final int section;
+
   private final LEDPattern pattern;
 
   /**
-   * @param
+   * @param led Addressable LED subsystem to use
+   * @param pattern Pattern to apply when command run
+   * @param section Section of LED strip to apply pattern to (index into
+   *     AddressableLEDConstants.SECTIONS)
    */
   public SetAddressableLEDPattern(AddressableLEDSubsystem led, LEDPattern pattern, int section) {
     this.section = section;
@@ -19,12 +24,17 @@ public class SetAddressableLEDPattern extends Command {
     ledSystem = led;
   }
 
+  /**
+   * @param led Addressable LED subsystem to use
+   * @param pattern Pattern to apply when command run
+   */
   public SetAddressableLEDPattern(AddressableLEDSubsystem led, LEDPattern pattern) {
-    this(led, pattern, -1);
+    this.section = -1;
+    this.pattern = pattern;
+    ledSystem = led;
   }
 
-  public void initialize() {}
-
+  @Override
   public void execute() {
     if (section < 0) {
       ledSystem.applyPattern(pattern);
@@ -33,9 +43,8 @@ public class SetAddressableLEDPattern extends Command {
     }
   }
 
+  @Override
   public boolean isFinished() {
     return true;
   }
-
-  public void end(boolean interrupted) {}
 }

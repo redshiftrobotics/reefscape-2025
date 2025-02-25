@@ -29,6 +29,7 @@ public class AddressableLEDSubsystem extends SubsystemBase {
   }
 
   // Periodically update the LED strip
+  @Override
   public void periodic() {
     led.setData(ledBuffer);
   }
