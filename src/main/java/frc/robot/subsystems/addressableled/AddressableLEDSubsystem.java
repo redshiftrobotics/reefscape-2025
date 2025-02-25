@@ -23,8 +23,8 @@ public class AddressableLEDSubsystem extends SubsystemBase {
       ledViews[i] =
           new AddressableLEDBufferView(
               ledBuffer,
-              AddressableLEDConstants.SECTIONS[i].low,
-              AddressableLEDConstants.SECTIONS[i].high);
+              AddressableLEDConstants.SECTIONS[i].low(),
+              AddressableLEDConstants.SECTIONS[i].high());
     }
   }
 

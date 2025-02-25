@@ -1,7 +1,7 @@
 package frc.robot.subsystems.addressableled;
 
 public class AddressableLEDConstants {
-  private record Range(int low, int high) {}
+  public record Range(int low, int high) {}
 
   // TODO: Implement real values
   public static final int LED_COUNT = 64;
