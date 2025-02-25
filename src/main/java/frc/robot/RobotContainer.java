@@ -58,6 +58,7 @@ import frc.robot.subsystems.superstructure.wrist.WristIO;
 import frc.robot.subsystems.superstructure.wrist.WristIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
+import frc.robot.subsystems.vision.CameraIOSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
@@ -133,7 +134,9 @@ public class RobotContainer {
 
         vision =
             new AprilTagVision(
+                new CameraIOPhotonVision(VisionConstants.COMP_FRONT_LEFT_CAMERA),
                 new CameraIOPhotonVision(VisionConstants.COMP_FRONT_RIGHT_CAMERA),
+                new CameraIOPhotonVision(VisionConstants.COMP_BACK_LEFT_CAMERA),
                 new CameraIOPhotonVision(VisionConstants.COMP_BACK_RIGHT_CAMERA));
 
         // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
@@ -231,7 +234,13 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim());
-        vision = new AprilTagVision();
+        vision =
+            new AprilTagVision(
+                new CameraIOSim(VisionConstants.COMP_FRONT_LEFT_CAMERA, drive::getRobotPose),
+                new CameraIOSim(VisionConstants.COMP_FRONT_RIGHT_CAMERA, drive::getRobotPose),
+                new CameraIOSim(VisionConstants.COMP_BACK_LEFT_CAMERA, drive::getRobotPose),
+                new CameraIOSim(VisionConstants.COMP_BACK_RIGHT_CAMERA, drive::getRobotPose));
+
         hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
         wrist = new Wrist(new WristIOSim());
