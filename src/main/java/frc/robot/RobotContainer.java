@@ -4,6 +4,7 @@ import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -62,7 +63,9 @@ import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
+import java.io.IOException;
 import java.util.Arrays;
+import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -230,8 +233,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim());
-        vision = new AprilTagVision(
-        );
+        vision = new AprilTagVision();
         hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
         wrist = new Wrist(new WristIOSim());
@@ -615,16 +617,15 @@ public class RobotContainer {
 
   private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {
 
-    dashboardChooser.addOption("Elevator Static", elevator.staticCharacterization(0.02));
-
-    dashboardChooser.addOption("Hang Coast", hang.coast());
+    dashboardChooser.addOption(
+        "Elevator Static Forward Characterization", elevator.staticCharacterization(0.02));
 
     dashboardChooser.addOption(
         "Simple Feed Forward Characterization", DriveCommands.feedforwardCharacterization(drive));
     dashboardChooser.addOption(
         "Simple Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
 
-    // //
+    // Drive sys id
     // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/introduction.html
     // dashboardChooser.addOption(
     //     "Drive SysId (Quasistatic Forward)",
