@@ -54,9 +54,7 @@ import frc.robot.subsystems.superstructure.intake.CoralIntake;
 import frc.robot.subsystems.superstructure.intake.IntakeIO;
 import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
-import frc.robot.subsystems.superstructure.wrist.WristConstants;
 import frc.robot.subsystems.superstructure.wrist.WristIO;
-import frc.robot.subsystems.superstructure.wrist.WristIORelativeEncoder;
 import frc.robot.subsystems.superstructure.wrist.WristIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
@@ -144,7 +142,7 @@ public class RobotContainer {
         // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
         hang = new Hang(new HangIO() {});
 
-        wrist = new Wrist(new WristIORelativeEncoder(WristConstants.MOTOR_ID));
+        wrist = new Wrist(new WristIO() {});
 
         // algaeIntake =
         //     new AlgaeIntake(
