@@ -91,6 +91,6 @@ public class Superstructure extends SubsystemBase {
   public void periodic() {
     measuredVisualizer.update(elevator.getHeightMeters(), wrist.getPosition());
     setpointVisualizer.update(elevator.getSetpoint().position, wrist.getSetpoint());
-    goalVisualizer.update(elevator.getGoalHeightMeters(), 0);
+    goalVisualizer.update(elevator.getGoalHeightMeters(), wrist.getSetpoint());
   }
 }
