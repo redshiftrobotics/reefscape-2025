@@ -57,30 +57,37 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Command prepareL1() {
-    return elevator.runOnce(
-        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight / 4.0));
+    return Commands.parallel(
+        elevator.runOnce(
+            () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight / 4.0)),
+        wrist.runOnce(() -> wrist.goTo(Units.degreesToRotations(55))));
   }
 
   public Command prepareL2() {
-    return elevator.runOnce(
-        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight / 2.0));
+    return Commands.parallel(
+        elevator.runOnce(
+            () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight / 2.0)),
+        wrist.runOnce(() -> wrist.goTo(Units.degreesToRotations(35))));
   }
 
   public Command prepareL3() {
-    return elevator.runOnce(
-        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0)));
+    return Commands.parallel(
+        elevator.runOnce(
+            () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0))),
+        wrist.runOnce(() -> wrist.goTo(Units.degreesToRotations(35))));
   }
 
   public Command prepareL4() {
-    return elevator.runOnce(
-        () ->
-            elevator.setGoalHeightMeters(
-                ElevatorConstants.carriageMaxHeight - Units.inchesToMeters(1)));
+    return Commands.parallel(
+        elevator.runOnce(() -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)),
+        wrist.runOnce(() -> wrist.goTo(Units.degreesToRotations(90))));
   }
 
   public Command prepareIntake() {
-    return elevator.runOnce(
-        () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight * (3.0 / 5.0)));
+    return Commands.parallel(
+        elevator.runOnce(
+            () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight / 4.0)),
+        wrist.runOnce(() -> wrist.goTo(Units.degreesToRotations(55))));
   }
 
   public Command stow() {
