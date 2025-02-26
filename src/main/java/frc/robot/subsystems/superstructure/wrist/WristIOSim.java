@@ -40,8 +40,7 @@ public class WristIOSim implements WristIO {
   private final DCMotor wristGearbox = DCMotor.getNeo550(1);
   private final SparkMax sparkMax = new SparkMax(MOTOR_ID, MotorType.kBrushless);
   private final SparkMaxSim motorSim = new SparkMaxSim(sparkMax, wristGearbox);
-  private final PIDController pidController = new PIDController(SIM_P, SIM_I, SIM_D);
-
+  private final PIDController pidController = new PIDController(0, 0, 0);
   // The wrist is basically a single jointed arm, so:
   private final SingleJointedArmSim wristSim =
       new SingleJointedArmSim(
@@ -81,7 +80,7 @@ public class WristIOSim implements WristIO {
   }
 
   @Override
-  public void goTo(double setpoint) {
+  public void runPosition(double setpoint) {
     this.setpoint = setpoint;
   }
 

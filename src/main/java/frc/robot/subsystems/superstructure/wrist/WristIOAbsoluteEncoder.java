@@ -47,7 +47,7 @@ public class WristIOAbsoluteEncoder implements WristIO {
   }
 
   @Override
-  public void goTo(double setpoint) {
+  public void runPosition(double setpoint) {
     this.setpoint = setpoint;
 
     pidController.setReference(setpoint, ControlType.kPosition);
