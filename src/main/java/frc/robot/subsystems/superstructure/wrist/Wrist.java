@@ -22,14 +22,8 @@ public class Wrist extends SubsystemBase {
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
 
   // TODO: This is more competant than the way its done in the hang arm
-  
-  // TODO: do we need these visualizers when we have the superstructure visualizer?
-  private final WristVisualizer currentWristVisualizer =
-      new WristVisualizer("Wrist/CurrentPosition", 64, 64, 32, 0, Color.kGreen);
-  private final WristVisualizer targetWristVisualizer =
-      new WristVisualizer("Wrist/SetpointPosition", 64, 64, 32, 0, Color.kOrange);
 
-  /** Creates a new Template. */
+  /** Creates a new Wrist. */
   public Wrist(WristIO io) {
     this.io = io;
   }
