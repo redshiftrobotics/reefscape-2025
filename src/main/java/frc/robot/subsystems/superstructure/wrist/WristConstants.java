@@ -24,11 +24,11 @@ public class WristConstants {
   /** Calculate from OnShape */
   public static final double SIM_MOMENT_OF_INERTIA = 1;
   /** In metres. */
-  public static final double SIM_ARM_LENGTH = Units.inchesToMeters(18);
+  public static final double SIM_ARM_LENGTH = Units.inchesToMeters(14.585);
   /** In radians. */
   public static final double SIM_ARM_MIN_ANGLE = 0;
   /** In radians. */
-  public static final double SIM_ARM_MAX_ANGLE = 0;
+  public static final double SIM_ARM_MAX_ANGLE = Math.PI;
   /** In radians. */
   public static final double SIM_ARM_INIT_ANGLE = 0;
 
