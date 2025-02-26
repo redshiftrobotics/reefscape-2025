@@ -10,8 +10,7 @@ import org.littletonrobotics.junction.Logger;
 /** Mechanism at end of elevator to move intake/ */
 public class Wrist extends SubsystemBase {
 
-  private static final LoggedTunableNumberFactory factory =
-      new LoggedTunableNumberFactory("Wrist");
+  private static final LoggedTunableNumberFactory factory = new LoggedTunableNumberFactory("Wrist");
 
   private static final LoggedTunableNumber kP = factory.getNumber("kP", WRIST_P);
   private static final LoggedTunableNumber kI = factory.getNumber("kI", WRIST_I);
@@ -33,8 +32,7 @@ public class Wrist extends SubsystemBase {
     Logger.processInputs("Wrist", inputs);
 
     LoggedTunableNumber.ifChanged(
-      hashCode(), (values) -> io.setPid(values[0], values[1], values[3]), kP, kI, kD
-    );
+        hashCode(), (values) -> io.setPid(values[0], values[1], values[2]), kP, kI, kD);
   }
 
   public void goTo(double setpoint) {
