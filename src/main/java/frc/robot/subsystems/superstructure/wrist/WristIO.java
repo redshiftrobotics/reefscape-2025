@@ -21,5 +21,5 @@ public interface WristIO {
     return false;
   }
 
-  default void setPid(double kP, double kI, double kD) {}
+  default void setPID(double kP, double kI, double kD) {}
 }

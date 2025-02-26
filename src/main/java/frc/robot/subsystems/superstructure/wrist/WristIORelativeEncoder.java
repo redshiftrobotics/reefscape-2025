@@ -50,7 +50,7 @@ public class WristIORelativeEncoder implements WristIO {
   }
 
   @Override
-  public void setPid(double kP, double kI, double kD) {
+  public void setPID(double kP, double kI, double kD) {
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     motorConfig.closedLoop.pidf(kP, kI, kD, 0);
 

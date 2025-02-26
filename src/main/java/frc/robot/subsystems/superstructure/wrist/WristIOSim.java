@@ -95,7 +95,7 @@ public class WristIOSim implements WristIO {
   }
 
   @Override
-  public void setPid(double kP, double kI, double kD) {
+  public void setPID(double kP, double kI, double kD) {
     pidController.setPID(kP, kI, kD);
   }
 }

@@ -11,8 +11,7 @@ import org.littletonrobotics.junction.Logger;
 /** Mechanism at end of elevator to move intake/ */
 public class Wrist extends SubsystemBase {
 
-  private static final LoggedTunableNumberFactory factory =
-      new LoggedTunableNumberFactory("Elevator");
+  private static final LoggedTunableNumberFactory factory = new LoggedTunableNumberFactory("Wrist");
 
   private static final LoggedTunableNumber kP = factory.getNumber("kP", REAL_P);
   private static final LoggedTunableNumber kI = factory.getNumber("kI", REAL_I);
@@ -30,6 +29,8 @@ public class Wrist extends SubsystemBase {
   /** Creates a new Template. */
   public Wrist(WristIO io) {
     this.io = io;
+
+    setPID(REAL_P, REAL_I, REAL_D);
   }
 
   @Override
@@ -40,6 +41,9 @@ public class Wrist extends SubsystemBase {
     targetWristVisualizer.setRotations(inputs.setpoint);
 
     Logger.processInputs("Wrist", inputs);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(), (values) -> io.setPID(values[0], values[1], values[2]), kP, kI, kD);
   }
 
   public void goTo(double setpoint) {
@@ -60,7 +64,7 @@ public class Wrist extends SubsystemBase {
     return inputs.setpoint;
   }
 
-  public void setPid(double kP, double kI, double kD) {
-    io.setPid(kP, kI, kD);
+  public void setPID(double kP, double kI, double kD) {
+    io.setPID(kP, kI, kD);
   }
 }
