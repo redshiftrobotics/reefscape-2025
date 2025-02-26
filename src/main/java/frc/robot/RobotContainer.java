@@ -134,8 +134,8 @@ public class RobotContainer {
 
         vision =
             new AprilTagVision(
-                new CameraIOPhotonVision(VisionConstants.COMP_FRONT_LEFT_CAMERA),
-                new CameraIOPhotonVision(VisionConstants.COMP_FRONT_RIGHT_CAMERA),
+                // new CameraIOPhotonVision(VisionConstants.COMP_FRONT_LEFT_CAMERA),
+                // new CameraIOPhotonVision(VisionConstants.COMP_FRONT_RIGHT_CAMERA),
                 new CameraIOPhotonVision(VisionConstants.COMP_BACK_LEFT_CAMERA),
                 new CameraIOPhotonVision(VisionConstants.COMP_BACK_RIGHT_CAMERA));
 
