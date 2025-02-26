@@ -82,6 +82,7 @@ public class WristIOSim implements WristIO {
 
   @Override
   public void goTo(double setpoint) {
+    // TODO: nitpick: pidController.setSetpoint lets you set the setpoint directly, and not need to keep another member variable
     this.setpoint = setpoint;
   }
 

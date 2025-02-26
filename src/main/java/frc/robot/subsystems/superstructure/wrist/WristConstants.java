@@ -9,6 +9,9 @@ public class WristConstants {
   public static final double CORAL_SCORING_POSITION_L4 = Units.degreesToRotations(0);
   public static final double CORAL_PICKUP_POSITION = Units.degreesToRotations(55);
 
+  // TODO: Nitpick: there are a lot of PID values here, I would consider using a PIDConstants class to store them all together
+  // Main thing is that we have WRIST PID, REAL PID, and SIM PID, maybe we can combine them into with a inline switch statement.
+  // Also when do we use REAL PID other WRIST PID?
   public static final double WRIST_P = 0;
   public static final double WRIST_I = 0;
   public static final double WRIST_D = 0;

@@ -20,6 +20,9 @@ import edu.wpi.first.units.measure.Angle;
 import java.util.function.Supplier;
 
 public class WristIOAbsoluteEncoder implements WristIO {
+
+  // TODO: This class has a lot of issues.
+
   private final SparkMax motor;
   private final SparkClosedLoopController pidController;
   private final CANcoder encoder;
@@ -34,9 +37,18 @@ public class WristIOAbsoluteEncoder implements WristIO {
     motor = new SparkMax(motorId, MotorType.kBrushless);
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+    // TODO: This is a problem, the PID controller is using the relative encoder on the spark by default,
+    // you need to sync the spark motor controller with the CANCoder position, or use a Rio based PID controller and just read the CANCoder position
+    // check how it is used in ModuleIOSparkMax.java line 160, you can use the same method here
     pidController = motor.getClosedLoopController();
 
+    // TODO: if you choose to use the spark max pid controller, you need to set the gear ratio (as the coefficient)
+    // Again, to do this check ModuleIOSparkMax.java line 103-104
+
     encoder = new CANcoder(encoderId);
+    // TODO: this encoder needs configuring, it's "zero" position is not necessarily our zero position, it is random
+    // Although it is constants, we still want the zero to be something reasonable, especially if we are using it to set the wrist to a certain rotations
+    // Check how it is done in ModuleIOSparkMax.java line 85-90
 
     positionSupplier = encoder.getPosition().asSupplier();
   }
@@ -44,6 +56,7 @@ public class WristIOAbsoluteEncoder implements WristIO {
   @Override
   public void updateInputs(WristIOInputs inputs) {
     inputs.setpoint = setpoint;
+    // TODO: forgot to update position
   }
 
   @Override
@@ -55,6 +68,8 @@ public class WristIOAbsoluteEncoder implements WristIO {
 
   @Override
   public boolean atSetpoint() {
+    // TODO: probably could be in Wrist.java since this is logic that should be similar for all wrist IOs, since 
+    // the setpoint and the position are both inputs
     return MathUtil.isNear(setpoint, positionSupplier.get().in(Units.Rotation), TOLERANCE);
   }
 

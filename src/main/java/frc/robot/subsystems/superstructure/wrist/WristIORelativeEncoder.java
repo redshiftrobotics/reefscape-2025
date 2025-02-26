@@ -30,6 +30,7 @@ public class WristIORelativeEncoder implements WristIO {
     pidController = motor.getClosedLoopController();
 
     encoder = motor.getEncoder();
+    // Todo: encoder needs to account for gear ratio, and whatever constant offset it will be from 0 degrees/rotations when it turns on
   }
 
   @Override
