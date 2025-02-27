@@ -1,7 +1,7 @@
 package frc.robot.subsystems.superstructure.wrist;
 
 import static edu.wpi.first.units.Units.Rotations;
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.ENCODER_OFFSET;
+import static frc.robot.subsystems.superstructure.wrist.WristConstants.ABSOLUTE_ENCODER_OFFSET;
 
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -38,7 +38,7 @@ public class WristIOAbsoluteEncoder implements WristIO {
     MagnetSensorConfigs cancoderConfig = new MagnetSensorConfigs();
     cancoderConfig.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     cancoderConfig.AbsoluteSensorDiscontinuityPoint = 1.0;
-    cancoderConfig.MagnetOffset = ENCODER_OFFSET;
+    cancoderConfig.MagnetOffset = ABSOLUTE_ENCODER_OFFSET;
 
     encoder.getConfigurator().apply(cancoderConfig);
 

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.superstructure.wrist;
 
+import static frc.robot.subsystems.superstructure.wrist.WristConstants.RELATIVE_CONVERSION_FACTOR;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -20,14 +22,15 @@ public class WristIORelativeEncoder implements WristIO {
   public WristIORelativeEncoder(int motorId) {
     SparkMaxConfig config = new SparkMaxConfig();
 
+    config.encoder.positionConversionFactor(RELATIVE_CONVERSION_FACTOR);
+    config.encoder.velocityConversionFactor(RELATIVE_CONVERSION_FACTOR);
+
     motor = new SparkMax(motorId, MotorType.kBrushless);
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     pidController = motor.getClosedLoopController();
 
     encoder = motor.getEncoder();
-    // Todo: encoder needs to account for gear ratio, and whatever constant offset it will be from 0
-    // degrees/rotations when it turns on
   }
 
   @Override

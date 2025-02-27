@@ -12,7 +12,8 @@ public class WristConstants {
   public static final double CORAL_SCORING_POSITION_L4 = Units.degreesToRotations(0);
   public static final double CORAL_PICKUP_POSITION = Units.degreesToRotations(55);
   
-  public static final double ENCODER_OFFSET = 0.0;
+  public static final double ABSOLUTE_ENCODER_OFFSET = 0.0;
+  public static final double RELATIVE_CONVERSION_FACTOR = 0.0;
 
   public static final double TOLERANCE = 0.1;
 
