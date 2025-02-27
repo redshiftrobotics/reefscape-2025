@@ -33,9 +33,13 @@ public class AddressableLEDTestCommand extends Command {
       ticker++;
     } else {
       ticker = 0;
+      ledSystem.applySectionedPattern(LEDPattern.kOff, testCount);
       testCount++;
       if(testCount == AddressableLEDConstants.SECTIONS.length) {
         currentPattern = LEDPattern.solid(Color.kLimeGreen).breathe(Seconds.of(2));
+        ledSystem.applyPattern(currentPattern);
+      } else {
+        ledSystem.applySectionedPattern(currentPattern, testCount);
       }
     }
   }
@@ -47,7 +51,6 @@ public class AddressableLEDTestCommand extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    // TODO Auto-generated method stub
-    super.end(interrupted);
+    ledSystem.applyPattern(LEDPattern.kOff);
   }
 }
