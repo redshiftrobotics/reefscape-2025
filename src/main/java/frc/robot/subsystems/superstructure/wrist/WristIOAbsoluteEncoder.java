@@ -55,23 +55,15 @@ public class WristIOAbsoluteEncoder implements WristIO {
 
   @Override
   public void updateInputs(WristIOInputs inputs) {
-    inputs.setpoint = setpoint;
+    inputs.setpointRotations = setpoint;
     // TODO: forgot to update position
   }
 
   @Override
-  public void goTo(double setpoint) {
+  public void runPosition(double setpoint) {
     this.setpoint = setpoint;
 
     pidController.setReference(setpoint, ControlType.kPosition);
-  }
-
-  @Override
-  public boolean atSetpoint() {
-    // TODO: probably could be in Wrist.java since this is logic that should be similar for all
-    // wrist IOs, since
-    // the setpoint and the position are both inputs
-    return MathUtil.isNear(setpoint, positionSupplier.get().in(Units.Rotation), TOLERANCE);
   }
 
   @Override

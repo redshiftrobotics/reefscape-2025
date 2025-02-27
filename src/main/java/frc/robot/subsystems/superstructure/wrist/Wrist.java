@@ -1,8 +1,13 @@
 package frc.robot.subsystems.superstructure.wrist;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
+
+import static frc.robot.subsystems.superstructure.wrist.WristConstants.TOLERANCE;
+
 import org.littletonrobotics.junction.Logger;
 
 /** Mechanism at end of elevator to move intake/ */
@@ -43,21 +48,21 @@ public class Wrist extends SubsystemBase {
 
   /** In rotations. */
   public void setGoal(double setpoint) {
-    io.goTo(setpoint);
+    io.runPosition(setpoint);
   }
 
   public boolean atSetpoint() {
-    return io.atSetpoint();
+    return MathUtil.isNear(inputs.setpointRotations, inputs.positionRotations, TOLERANCE);
   }
 
   /** Get position in rotations */
   public double getMeasuredPosition() {
-    return inputs.position;
+    return inputs.positionRotations;
   }
 
   /** Get setpoint in rotations */
   public double getSetpoint() {
-    return inputs.setpoint;
+    return inputs.setpointRotations;
   }
 
   public void setPid(double kP, double kI, double kD) {

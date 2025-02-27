@@ -35,19 +35,14 @@ public class WristIORelativeEncoder implements WristIO {
 
   @Override
   public void updateInputs(WristIOInputs inputs) {
-    inputs.setpoint = setpoint;
+    inputs.setpointRotations = setpoint;
   }
 
   @Override
-  public void goTo(double setpoint) {
+  public void runPosition(double setpoint) {
     this.setpoint = setpoint;
 
     pidController.setReference(setpoint, ControlType.kPosition);
-  }
-
-  @Override
-  public boolean atSetpoint() {
-    return MathUtil.isNear(setpoint, encoder.getPosition(), TOLERANCE);
   }
 
   @Override

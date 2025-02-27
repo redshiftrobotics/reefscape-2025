@@ -62,18 +62,13 @@ public class WristIOSim implements WristIO {
 
     RoboRioSim.setVInVoltage(batteryVolts);
 
-    inputs.position = getPosition();
-    inputs.setpoint = pidController.getSetpoint();
+    inputs.positionRotations = getPosition();
+    inputs.setpointRotations = pidController.getSetpoint();
   }
 
   @Override
-  public void goTo(double setpoint) {
+  public void runPosition(double setpoint) {
     this.setpoint = setpoint;
-  }
-
-  @Override
-  public boolean atSetpoint() {
-    return MathUtil.isNear(setpoint, getPosition(), TOLERANCE);
   }
 
   private double getPosition() {
