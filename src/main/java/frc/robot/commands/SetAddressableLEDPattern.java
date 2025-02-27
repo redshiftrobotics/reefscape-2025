@@ -7,7 +7,9 @@ import frc.robot.subsystems.addressableled.AddressableLEDSubsystem;
 public class SetAddressableLEDPattern extends Command {
   private final AddressableLEDSubsystem ledSystem;
 
-  // If this is -1, that means that this command is targeting the whole strip
+  /**
+   * @apiNote If this is -1, that means that this command is targeting the whole strip
+   */
   private final int section;
 
   private final LEDPattern pattern;
