@@ -22,7 +22,6 @@ public class WristIORelativeEncoder implements WristIO {
 
   public WristIORelativeEncoder(int motorId) {
     SparkMaxConfig config = new SparkMaxConfig();
-    config.closedLoop.pidf(WRIST_P, WRIST_I, WRIST_D, WRIST_FF);
 
     motor = new SparkMax(motorId, MotorType.kBrushless);
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -30,7 +29,8 @@ public class WristIORelativeEncoder implements WristIO {
     pidController = motor.getClosedLoopController();
 
     encoder = motor.getEncoder();
-    // Todo: encoder needs to account for gear ratio, and whatever constant offset it will be from 0 degrees/rotations when it turns on
+    // Todo: encoder needs to account for gear ratio, and whatever constant offset it will be from 0
+    // degrees/rotations when it turns on
   }
 
   @Override

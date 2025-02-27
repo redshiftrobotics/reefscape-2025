@@ -10,7 +10,8 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 public class WristVisualizer {
 
-  // TODO: In my option this class is redundant since we can visuilize the wrist as part of the Superstructure, 
+  // TODO: In my option this class is redundant since we can visuilize the wrist as part of the
+  // Superstructure,
   // unless you think it will help in debugging
 
   private final String key;
