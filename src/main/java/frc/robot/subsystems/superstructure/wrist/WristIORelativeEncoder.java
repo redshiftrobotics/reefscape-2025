@@ -1,7 +1,5 @@
 package frc.robot.subsystems.superstructure.wrist;
 
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.*;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -10,7 +8,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.MathUtil;
 
 /** Wrist implementation using the built-in relative encoder. */
 public class WristIORelativeEncoder implements WristIO {

@@ -1,13 +1,11 @@
 package frc.robot.subsystems.superstructure.wrist;
 
+import static frc.robot.subsystems.superstructure.wrist.WristConstants.TOLERANCE;
+
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
-
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.TOLERANCE;
-
 import org.littletonrobotics.junction.Logger;
 
 /** Mechanism at end of elevator to move intake/ */
