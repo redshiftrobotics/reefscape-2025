@@ -18,20 +18,22 @@ public class SetAddressableLEDPattern extends Command {
    * @param section Section of LED strip to apply pattern to (index into
    *     AddressableLEDConstants.SECTIONS)
    */
-  public SetAddressableLEDPattern(AddressableLEDSubsystem led, LEDPattern pattern, int section) {
+  public SetAddressableLEDPattern(AddressableLEDSubsystem ledSystem, LEDPattern pattern, int section) {
     this.section = section;
     this.pattern = pattern;
-    ledSystem = led;
+    this.ledSystem = ledSystem;
+    addRequirements(ledSystem);
   }
 
   /**
    * @param led Addressable LED subsystem to use
    * @param pattern Pattern to apply when command run
    */
-  public SetAddressableLEDPattern(AddressableLEDSubsystem led, LEDPattern pattern) {
-    this.section = -1;
+  public SetAddressableLEDPattern(AddressableLEDSubsystem ledSystem, LEDPattern pattern) {
+    section = -1;
     this.pattern = pattern;
-    ledSystem = led;
+    this.ledSystem = ledSystem;
+    addRequirements(ledSystem);
   }
 
   @Override
