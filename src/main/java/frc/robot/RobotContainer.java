@@ -362,6 +362,15 @@ public class RobotContainer {
     configureAlertTriggers();
   }
 
+  /*
+  IF YOU CHANGE THIS: 
+   * Go to https://robotleopard86.github.io/controller-wizard
+   * Load the controller-mappings.json file (located in root folder of this repo)
+   * Update the controls in the editor to reflect your changes
+   * Save the project file back to controller-mappings.json and export scheme images to the
+     "8032 Reefscape - Driver|Operator.png" files in the root folder of this repo
+   * If you need help with the tool, check "Controller Wizard Usage Guide.pdf" in the repo root folder
+  */
   private void configureDriverControllerBindings(boolean includeAutoAlign) {
     final CommandXboxController driverXbox = (CommandXboxController) driverController;
 
@@ -524,8 +533,16 @@ public class RobotContainer {
     }
   }
 
+  /*
+  IF YOU CHANGE THIS: 
+   * Go to https://robotleopard86.github.io/controller-wizard
+   * Load the controller-mappings.json file (located in root folder of this repo)
+   * Update the controls in the editor to reflect your changes
+   * Save the project file back to controller-mappings.json and export scheme images to the
+     "8032 Reefscape - Driver|Operator.png" files in the root folder of this repo
+   * If you need help with the tool, check "Controller Wizard Usage Guide.pdf" in the repo root folder
+  */
   private void configureOperatorControllerBindings() {
-
     operatorController.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
     operatorController.y().onTrue(superstructure.scoreL4());
