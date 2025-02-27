@@ -36,6 +36,7 @@ public class WristIORelativeEncoder implements WristIO {
   @Override
   public void updateInputs(WristIOInputs inputs) {
     inputs.setpointRotations = setpoint;
+    inputs.positionRotations = encoder.getPosition();
   }
 
   @Override
