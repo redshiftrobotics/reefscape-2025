@@ -15,7 +15,7 @@ public class SetWrist extends Command {
 
   @Override
   public void initialize() {
-    wrist.goTo(setpoint);
+    wrist.setGoal(setpoint);
   }
 
   @Override
