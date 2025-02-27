@@ -1,27 +1,24 @@
 package frc.robot.subsystems.superstructure.wrist;
 
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.TOLERANCE;
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.WRIST_D;
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.WRIST_FF;
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.WRIST_I;
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.WRIST_P;
+import static edu.wpi.first.units.Units.Rotations;
+import static frc.robot.subsystems.superstructure.wrist.WristConstants.ABSOLUTE_ENCODER_OFFSET;
 
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.revrobotics.spark.SparkBase.ControlType;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.Units;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
+import frc.robot.utility.records.PIDConstants;
 import java.util.function.Supplier;
 
 public class WristIOAbsoluteEncoder implements WristIO {
   private final SparkMax motor;
-  private final SparkClosedLoopController pidController;
+  private final PIDController pidController;
   private final CANcoder encoder;
   private final Supplier<Angle> positionSupplier;
 
@@ -29,33 +26,36 @@ public class WristIOAbsoluteEncoder implements WristIO {
 
   public WristIOAbsoluteEncoder(int motorId, int encoderId) {
     SparkMaxConfig config = new SparkMaxConfig();
-    config.closedLoop.pidf(WRIST_P, WRIST_I, WRIST_D, WRIST_FF);
 
     motor = new SparkMax(motorId, MotorType.kBrushless);
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    pidController = motor.getClosedLoopController();
-
     encoder = new CANcoder(encoderId);
+
+    PIDConstants pid = WristConstants.getPidConstants();
+    pidController = new PIDController(pid.kP(), pid.kI(), pid.kD());
+
+    MagnetSensorConfigs cancoderConfig = new MagnetSensorConfigs();
+    cancoderConfig.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+    cancoderConfig.AbsoluteSensorDiscontinuityPoint = 1.0;
+    cancoderConfig.MagnetOffset = ABSOLUTE_ENCODER_OFFSET;
+
+    encoder.getConfigurator().apply(cancoderConfig);
 
     positionSupplier = encoder.getPosition().asSupplier();
   }
 
   @Override
   public void updateInputs(WristIOInputs inputs) {
-    inputs.setpoint = setpoint;
+    motor.set(pidController.calculate(getPosition(), setpoint));
+
+    inputs.setpointRotations = setpoint;
+    inputs.positionRotations = getPosition();
   }
 
   @Override
-  public void goTo(double setpoint) {
+  public void runPosition(double setpoint) {
     this.setpoint = setpoint;
-
-    pidController.setReference(setpoint, ControlType.kPosition);
-  }
-
-  @Override
-  public boolean atSetpoint() {
-    return MathUtil.isNear(setpoint, positionSupplier.get().in(Units.Rotation), TOLERANCE);
   }
 
   @Override
@@ -65,5 +65,9 @@ public class WristIOAbsoluteEncoder implements WristIO {
 
     motor.configure(
         motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+  }
+
+  private double getPosition() {
+    return positionSupplier.get().in(Rotations);
   }
 }
