@@ -18,7 +18,8 @@ public class SetAddressableLEDPattern extends Command {
    * @param section Section of LED strip to apply pattern to (index into
    *     AddressableLEDConstants.SECTIONS)
    */
-  public SetAddressableLEDPattern(AddressableLEDSubsystem ledSystem, LEDPattern pattern, int section) {
+  public SetAddressableLEDPattern(
+      AddressableLEDSubsystem ledSystem, LEDPattern pattern, int section) {
     this.section = section;
     this.pattern = pattern;
     this.ledSystem = ledSystem;

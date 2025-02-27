@@ -18,7 +18,7 @@ public class AddressableLEDSubsystem extends SubsystemBase {
     ledBuffer = new AddressableLEDBuffer(AddressableLEDConstants.LED_COUNT);
     led.setLength(AddressableLEDConstants.LED_COUNT);
 
-    //Create current pattern trackers
+    // Create current pattern trackers
     currentPatterns = new LEDPattern[AddressableLEDConstants.SECTIONS.length];
 
     // Create section views
@@ -35,7 +35,7 @@ public class AddressableLEDSubsystem extends SubsystemBase {
   // Periodically update the LED strip
   @Override
   public void periodic() {
-    for(int i = 0; i < ledViews.length; i++) {
+    for (int i = 0; i < ledViews.length; i++) {
       currentPatterns[i].applyTo(ledViews[i]);
     }
     led.setData(ledBuffer);
@@ -51,7 +51,7 @@ public class AddressableLEDSubsystem extends SubsystemBase {
   // Apply a color pattern to a section of the LED strip
   public void applyPattern(LEDPattern pattern) {
     pattern.applyTo(ledBuffer);
-    for(int i = 0; i < currentPatterns.length; i++) {
+    for (int i = 0; i < currentPatterns.length; i++) {
       currentPatterns[i] = pattern;
     }
   }

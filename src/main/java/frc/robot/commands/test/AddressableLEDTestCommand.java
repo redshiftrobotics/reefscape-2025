@@ -24,18 +24,20 @@ public class AddressableLEDTestCommand extends Command {
   public void initialize() {
     ticker = 0;
     testCount = 0;
-    currentPattern = LEDPattern.rainbow(255, 128).scrollAtAbsoluteSpeed(MetersPerSecond.of(1), AddressableLEDConstants.LED_DENSITY);
+    currentPattern =
+        LEDPattern.rainbow(255, 128)
+            .scrollAtAbsoluteSpeed(MetersPerSecond.of(1), AddressableLEDConstants.LED_DENSITY);
   }
 
   @Override
   public void execute() {
-    if(ticker < 500) {
+    if (ticker < 500) {
       ticker++;
     } else {
       ticker = 0;
       ledSystem.applySectionedPattern(LEDPattern.kOff, testCount);
       testCount++;
-      if(testCount == AddressableLEDConstants.SECTIONS.length) {
+      if (testCount == AddressableLEDConstants.SECTIONS.length) {
         currentPattern = LEDPattern.solid(Color.kLimeGreen).breathe(Seconds.of(2));
         ledSystem.applyPattern(currentPattern);
       } else {
