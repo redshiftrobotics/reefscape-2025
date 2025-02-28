@@ -1,6 +1,6 @@
 package frc.robot.subsystems.superstructure.wrist;
 
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.*;
+import static frc.robot.subsystems.superstructure.wrist.WristConstants.RELATIVE_CONVERSION_FACTOR;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -10,7 +10,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.MathUtil;
 
 /** Wrist implementation using the built-in relative encoder. */
 public class WristIORelativeEncoder implements WristIO {
@@ -22,7 +21,9 @@ public class WristIORelativeEncoder implements WristIO {
 
   public WristIORelativeEncoder(int motorId) {
     SparkMaxConfig config = new SparkMaxConfig();
-    config.closedLoop.pidf(WRIST_P, WRIST_I, WRIST_D, WRIST_FF);
+
+    config.encoder.positionConversionFactor(RELATIVE_CONVERSION_FACTOR);
+    config.encoder.velocityConversionFactor(RELATIVE_CONVERSION_FACTOR);
 
     motor = new SparkMax(motorId, MotorType.kBrushless);
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -34,19 +35,15 @@ public class WristIORelativeEncoder implements WristIO {
 
   @Override
   public void updateInputs(WristIOInputs inputs) {
-    inputs.setpoint = setpoint;
+    inputs.setpointRotations = setpoint;
+    inputs.positionRotations = encoder.getPosition();
   }
 
   @Override
-  public void goTo(double setpoint) {
+  public void runPosition(double setpoint) {
     this.setpoint = setpoint;
 
     pidController.setReference(setpoint, ControlType.kPosition);
-  }
-
-  @Override
-  public boolean atSetpoint() {
-    return MathUtil.isNear(setpoint, encoder.getPosition(), TOLERANCE);
   }
 
   @Override

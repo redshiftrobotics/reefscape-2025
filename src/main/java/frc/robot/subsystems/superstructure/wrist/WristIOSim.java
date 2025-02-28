@@ -5,7 +5,6 @@ import static frc.robot.subsystems.superstructure.wrist.WristConstants.*;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -15,21 +14,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
 
 /**
- * Simulation of the Wrist. gearbox The type of and number of motors in the arm gearbox.
- *
- * <p>gearing The gearing of the arm (numbers greater than 1 represent reductions).
- *
- * <p>jKgMetersSquared The moment of inertia of the arm; can be calculated from CAD software.
- *
- * <p>armLengthMeters The length of the arm.
- *
- * <p>minAngleRads The minimum angle that the arm is capable of.
- *
- * <p>maxAngleRads The maximum angle that the arm is capable of.
- *
- * <p>simulateGravity Whether gravity should be simulated or not.
- *
- * <p>startingAngleRads The initial position of the Arm simulation in radians.
+ * Simulation of the Wrist.
  *
  * @author Aceius E.
  * @see
@@ -40,7 +25,7 @@ public class WristIOSim implements WristIO {
   private final DCMotor wristGearbox = DCMotor.getNeo550(1);
   private final SparkMax sparkMax = new SparkMax(MOTOR_ID, MotorType.kBrushless);
   private final SparkMaxSim motorSim = new SparkMaxSim(sparkMax, wristGearbox);
-  private final PIDController pidController = new PIDController(SIM_P, SIM_I, SIM_D);
+  private final PIDController pidController = new PIDController(0, 0, 0);
 
   // The wrist is basically a single jointed arm, so:
   private final SingleJointedArmSim wristSim =
@@ -76,18 +61,13 @@ public class WristIOSim implements WristIO {
 
     RoboRioSim.setVInVoltage(batteryVolts);
 
-    inputs.position = getPosition();
-    inputs.setpoint = setpoint;
+    inputs.positionRotations = getPosition();
+    inputs.setpointRotations = setpoint;
   }
 
   @Override
-  public void goTo(double setpoint) {
+  public void runPosition(double setpoint) {
     this.setpoint = setpoint;
-  }
-
-  @Override
-  public boolean atSetpoint() {
-    return MathUtil.isNear(setpoint, getPosition(), TOLERANCE);
   }
 
   private double getPosition() {
