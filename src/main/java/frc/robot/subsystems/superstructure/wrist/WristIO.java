@@ -6,19 +6,18 @@ import org.littletonrobotics.junction.AutoLog;
 public interface WristIO {
   @AutoLog
   public static class WristIOInputs {
-    public double setpoint;
-    public double position;
+    public double setpointRotations;
+    public double positionRotations;
   }
 
   /** Updates the set of loggable inputs. */
   default void updateInputs(WristIOInputs inputs) {}
 
   /** Set the setpoint in revolutions. */
+  // TODO: Nitpick: convention in robotics code is to use runPosition to show you are setting a
+  // target in a "set and forget" way,
+  // but goTo is fine and not bad at all.
   default void runPosition(double setpoint) {}
-
-  default boolean atSetpoint() {
-    return false;
-  }
 
   default void setPid(double kP, double kI, double kD) {}
 }

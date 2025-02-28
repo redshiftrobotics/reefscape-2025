@@ -96,7 +96,7 @@ public class Superstructure extends SubsystemBase {
 
   @Override
   public void periodic() {
-    measuredVisualizer.update(elevator.getHeightMeters(), wrist.getPosition());
+    measuredVisualizer.update(elevator.getHeightMeters(), wrist.getMeasuredPosition());
     setpointVisualizer.update(elevator.getSetpoint().position, wrist.getSetpoint());
     goalVisualizer.update(elevator.getGoalHeightMeters(), wrist.getSetpoint());
   }
