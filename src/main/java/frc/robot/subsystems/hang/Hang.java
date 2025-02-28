@@ -1,5 +1,6 @@
 package frc.robot.subsystems.hang;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -38,6 +39,9 @@ public class Hang extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Hang", inputs);
 
+    SmartDashboard.putNumber(
+        "[TEST] Hang Encoder (Remember to start in 0 position)", inputs.positionRotations);
+
     LoggedTunableNumber.ifChanged(
         hashCode(), (values) -> io.setPID(values[0], 0.0, values[1]), kP, kD);
 
@@ -68,6 +72,11 @@ public class Hang extends SubsystemBase {
           io.setBrakeMode(false);
         },
         () -> io.setBrakeMode(true));
+  }
+
+  /** DO NOT USE IN PROD! */
+  public void set(double speed) {
+    io.runOpenLoop(speed);
   }
 
   /** Stop the arm from moving. */
