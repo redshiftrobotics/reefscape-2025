@@ -533,11 +533,11 @@ public class RobotContainer {
     operatorController.povDown().onTrue(superstructure.stow());
 
     if (Constants.RUNNING_TEST_PLANS) {
-      operatorController.povUp().onTrue(hang.runOnce(() -> hang.set(1)));
-      operatorController.povDown().onTrue(hang.runOnce(() -> hang.set(-1)));
+      operatorController.povUp().onTrue(hang.runOnce(() -> hang.set(0.1)));
+      operatorController.povDown().onTrue(hang.runOnce(() -> hang.set(-0.1)));
 
-      operatorController.povUp().onTrue(hang.runOnce(() -> hang.stop()));
-      operatorController.povDown().onTrue(hang.runOnce(() -> hang.stop()));
+      operatorController.povUp().onFalse(hang.runOnce(() -> hang.stop()));
+      operatorController.povDown().onFalse(hang.runOnce(() -> hang.stop()));
     }
   }
 
