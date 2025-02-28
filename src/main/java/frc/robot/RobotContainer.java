@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
+import frc.robot.commands.*;
 import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.controllers.JoystickInputController;
@@ -41,7 +42,9 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.hang.Hang;
+import frc.robot.subsystems.hang.HangConstants;
 import frc.robot.subsystems.hang.HangIO;
+import frc.robot.subsystems.hang.HangIOHardwareRelative;
 import frc.robot.subsystems.hang.HangIOSim;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
@@ -141,11 +144,8 @@ public class RobotContainer {
 
         // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
         elevator = new Elevator(new ElevatorIOHardwareFollow(ElevatorConstants.ELEVATOR_CONFIG));
-
-        // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
-        hang = new Hang(new HangIO() {});
-
-        wrist = new Wrist(new WristIO() {});
+        hang = new Hang(new HangIOHardwareRelative(HangConstants.ELEVATOR_CONFIG.motorId()));
+        wrist = new Wrist(new WristIORelativeEncoder(WristConstants.MOTOR_ID));
 
         // algaeIntake =
         //     new AlgaeIntake(
@@ -515,15 +515,34 @@ public class RobotContainer {
   }
 
   private void configureOperatorControllerBindings() {
-
     operatorController.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
+    operatorController.y().onTrue(superstructure.scoreL4());
+    operatorController.x().onTrue(superstructure.scoreL3());
+    operatorController.a().onTrue(superstructure.scoreL2());
+    //TODO had to comment these out because the d-pad buttons did too many things. not a permanent change!!!
+    // operatorController.povUp().onTrue(superstructure.scoreL1());
     configureOperatorControllerBindingLevel(operatorController.y(), Superstructure.State.L4);
     configureOperatorControllerBindingLevel(operatorController.x(), Superstructure.State.L3);
     configureOperatorControllerBindingLevel(operatorController.a(), Superstructure.State.L2);
     configureOperatorControllerBindingLevel(operatorController.povUp(), Superstructure.State.L1);
 
-    operatorController.povDown().onTrue(superstructure.stow());
+    // operatorController.povDown().onTrue(superstructure.stow());
+
+    if (Constants.RUNNING_TEST_PLANS) {
+      operatorController.povUp().onTrue(hang.runOnce(() -> hang.set(0.5)));
+      operatorController.povDown().onTrue(hang.runOnce(() -> hang.set(-0.5)));
+
+      operatorController.povUp().onFalse(hang.runOnce(() -> hang.stop()));
+      operatorController.povDown().onFalse(hang.runOnce(() -> hang.stop()));
+      
+    }
+  }
+
+  private void configureOperatorControllerBindingLevel(
+      Trigger trigger, Superstructure.State state) {
+    trigger.onTrue(superstructure.setNextPrepare(state));
+    trigger.and(operatorController.rightTrigger()).onTrue(superstructure.runPrepare(state));
   }
 
   private void configureOperatorControllerBindingLevel(
@@ -607,6 +626,7 @@ public class RobotContainer {
               new SetWrist(wrist, 0.25),
               Commands.waitSeconds(1),
               new SetWrist(wrist, 0)));
+
       dashboardChooser.addOption(
           "[TEST] Activate Algae Intake",
           Commands.sequence(
@@ -619,6 +639,10 @@ public class RobotContainer {
               new SetIntakeSpeed(coralIntake, 1),
               Commands.waitSeconds(1),
               new SetIntakeSpeed(coralIntake, 0)));
+
+      dashboardChooser.addOption("[TEST] Stow Hang Arm", hang.stow());
+      dashboardChooser.addOption("[TEST] Deploy Hang Arm", hang.deploy());
+      dashboardChooser.addOption("[TEST] Retract Hang Arm", hang.retract());
     }
   }
 

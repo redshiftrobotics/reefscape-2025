@@ -30,7 +30,7 @@ public class Superstructure extends SubsystemBase {
   private final SuperstructureVisualizer setpointVisualizer =
       new SuperstructureVisualizer("Setpoint", Color.kAliceBlue);
   private final SuperstructureVisualizer goalVisualizer =
-      new SuperstructureVisualizer("Goal", Color.kGreen);
+      new SuperstructureVisualizer("Goal", Color.kLime);
 
   public Superstructure(Elevator elevator, Wrist wrist) {
     this.elevator = elevator;

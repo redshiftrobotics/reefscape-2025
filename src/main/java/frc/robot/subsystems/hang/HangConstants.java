@@ -11,7 +11,7 @@ public class HangConstants {
 
   public static final HangConfig ELEVATOR_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new HangConfig(2, 3);
+        case COMP_BOT_2025 -> new HangConfig(16, 0);
         default -> new HangConfig(0, 0);
       };
 
@@ -25,5 +25,6 @@ public class HangConstants {
 
   public static final double STOWED_POSITION_ROTATIONS = 0.0;
   public static final double DEPLOY_POSITION_ROTATIONS = 0.0;
+  public static final double RETRACT_POSITION_ROTATIONS = STOWED_POSITION_ROTATIONS;
   public static final double TOLERANCE = Units.degreesToRotations(0.3);
 }
