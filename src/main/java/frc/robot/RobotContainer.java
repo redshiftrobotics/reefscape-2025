@@ -528,16 +528,18 @@ public class RobotContainer {
     operatorController.y().onTrue(superstructure.scoreL4());
     operatorController.x().onTrue(superstructure.scoreL3());
     operatorController.a().onTrue(superstructure.scoreL2());
-    operatorController.povUp().onTrue(superstructure.scoreL1());
+    //TODO had to comment these out because the d-pad buttons did too many things. not a permanent change!!!
+    // operatorController.povUp().onTrue(superstructure.scoreL1());
 
-    operatorController.povDown().onTrue(superstructure.stow());
+    // operatorController.povDown().onTrue(superstructure.stow());
 
     if (Constants.RUNNING_TEST_PLANS) {
-      operatorController.povUp().onTrue(hang.runOnce(() -> hang.set(0.1)));
-      operatorController.povDown().onTrue(hang.runOnce(() -> hang.set(-0.1)));
+      operatorController.povUp().onTrue(hang.runOnce(() -> hang.set(0.5)));
+      operatorController.povDown().onTrue(hang.runOnce(() -> hang.set(-0.5)));
 
       operatorController.povUp().onFalse(hang.runOnce(() -> hang.stop()));
       operatorController.povDown().onFalse(hang.runOnce(() -> hang.stop()));
+      
     }
   }
 
