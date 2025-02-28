@@ -12,9 +12,12 @@ import org.littletonrobotics.junction.Logger;
 public class Wrist extends SubsystemBase {
   private static final LoggedTunableNumberFactory factory = new LoggedTunableNumberFactory("Wrist");
 
-  private static final LoggedTunableNumber kP = factory.getNumber("kP", WristConstants.FEEDBACK.kP());
-  private static final LoggedTunableNumber kI = factory.getNumber("kI", WristConstants.FEEDBACK.kI());
-  private static final LoggedTunableNumber kD = factory.getNumber("kD", WristConstants.FEEDBACK.kD());
+  private static final LoggedTunableNumber kP =
+      factory.getNumber("kP", WristConstants.FEEDBACK.kP());
+  private static final LoggedTunableNumber kI =
+      factory.getNumber("kI", WristConstants.FEEDBACK.kI());
+  private static final LoggedTunableNumber kD =
+      factory.getNumber("kD", WristConstants.FEEDBACK.kD());
 
   private final WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();

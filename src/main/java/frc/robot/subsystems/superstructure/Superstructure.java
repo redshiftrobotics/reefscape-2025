@@ -57,7 +57,8 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Command run(State goal) {
-    return runPrepare(goal).andThen(Commands.waitUntil(() -> elevator.atGoalHeight() && wrist.atGoal()));
+    return runPrepare(goal)
+        .andThen(Commands.waitUntil(() -> elevator.atGoalHeight() && wrist.atGoal()));
   }
 
   public Command prepareL1() {
