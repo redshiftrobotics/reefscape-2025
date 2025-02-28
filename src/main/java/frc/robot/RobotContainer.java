@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
-import frc.robot.commands.*;
 import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.controllers.JoystickInputController;
@@ -117,10 +116,10 @@ public class RobotContainer {
           AlertType.kInfo);
   private final Alert tuningModeActiveAlert =
       new Alert("Tuning mode active, do not use in competition.", AlertType.kWarning);
-  private static final Alert testPlansAvaliable =
+  private static final Alert testPlansAvailable =
       new Alert(
           "Running with test plans enabled, ensure you are using the correct auto.",
-          Alert.AlertType.kWarning);
+          AlertType.kWarning);
 
   /** The container for the robot. Contains subsystems, IO devices, and commands. */
   public RobotContainer() {
@@ -144,8 +143,8 @@ public class RobotContainer {
 
         // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
         elevator = new Elevator(new ElevatorIOHardwareFollow(ElevatorConstants.ELEVATOR_CONFIG));
-        hang = new Hang(new HangIOHardwareRelative(HangConstants.ELEVATOR_CONFIG.motorId()));
-        wrist = new Wrist(new WristIORelativeEncoder(WristConstants.MOTOR_ID));
+        hang = new Hang(new HangIOHardwareRelative(HangConstants.HANG_CONFIG));
+        wrist = new Wrist(new WristIO() {});
 
         // algaeIntake =
         //     new AlgaeIntake(
@@ -290,25 +289,13 @@ public class RobotContainer {
     // Configure autos
     configureAutos(autoChooser);
 
-    // Configure sys ids
-    if (Constants.TUNING_MODE) {
-      configureSysIds(autoChooser);
-    }
-
     // Alerts for constants to avoid using them in competition
-    if (Constants.TUNING_MODE) {
-      tuningModeActiveAlert.set(true);
-    }
-    if (Constants.getRobot() != Constants.PRIMARY_ROBOT_TYPE) {
-      notPrimaryBotAlert.set(true);
-    }
-
-    testPlansAvaliable.set(Constants.RUNNING_TEST_PLANS);
+    tuningModeActiveAlert.set(Constants.TUNING_MODE);
+    testPlansAvailable.set(Constants.RUNNING_TEST_PLANS);
+    notPrimaryBotAlert.set(Constants.getRobot() != Constants.PRIMARY_ROBOT_TYPE);
 
     // Hide controller missing warnings for sim
-    if (Constants.getMode() != Mode.REAL || true) {
-      DriverStation.silenceJoystickConnectionWarning(true);
-    }
+    DriverStation.silenceJoystickConnectionWarning(Constants.getMode() != Mode.REAL);
 
     initDashboard();
 
@@ -515,34 +502,15 @@ public class RobotContainer {
   }
 
   private void configureOperatorControllerBindings() {
-    operatorController.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
+    operatorController.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
-    operatorController.y().onTrue(superstructure.scoreL4());
-    operatorController.x().onTrue(superstructure.scoreL3());
-    operatorController.a().onTrue(superstructure.scoreL2());
-    //TODO had to comment these out because the d-pad buttons did too many things. not a permanent change!!!
-    // operatorController.povUp().onTrue(superstructure.scoreL1());
     configureOperatorControllerBindingLevel(operatorController.y(), Superstructure.State.L4);
     configureOperatorControllerBindingLevel(operatorController.x(), Superstructure.State.L3);
-    configureOperatorControllerBindingLevel(operatorController.a(), Superstructure.State.L2);
-    configureOperatorControllerBindingLevel(operatorController.povUp(), Superstructure.State.L1);
+    configureOperatorControllerBindingLevel(operatorController.b(), Superstructure.State.L2);
+    configureOperatorControllerBindingLevel(operatorController.a(), Superstructure.State.L1);
 
-    // operatorController.povDown().onTrue(superstructure.stow());
-
-    if (Constants.RUNNING_TEST_PLANS) {
-      operatorController.povUp().onTrue(hang.runOnce(() -> hang.set(0.5)));
-      operatorController.povDown().onTrue(hang.runOnce(() -> hang.set(-0.5)));
-
-      operatorController.povUp().onFalse(hang.runOnce(() -> hang.stop()));
-      operatorController.povDown().onFalse(hang.runOnce(() -> hang.stop()));
-      
-    }
-  }
-
-  private void configureOperatorControllerBindingLevel(
-      Trigger trigger, Superstructure.State state) {
-    trigger.onTrue(superstructure.setNextPrepare(state));
-    trigger.and(operatorController.rightTrigger()).onTrue(superstructure.runPrepare(state));
+    operatorController.leftBumper().whileTrue(hang.set(+0.5).withName("Hang Arm Up"));
+    operatorController.rightBumper().whileTrue(hang.set(-0.5).withName("Hang Arm Down"));
   }
 
   private void configureOperatorControllerBindingLevel(
@@ -583,12 +551,12 @@ public class RobotContainer {
     // https://pathplanner.dev/pplib-named-commands.html
     NamedCommands.registerCommand("StopWithX", drive.runOnce(drive::stopUsingBrakeArrangement));
 
-    NamedCommands.registerCommand("l1", superstructure.runPrepare(Superstructure.State.L1));
-    NamedCommands.registerCommand("l2", superstructure.runPrepare(Superstructure.State.L2));
-    NamedCommands.registerCommand("l3", superstructure.runPrepare(Superstructure.State.L3));
-    NamedCommands.registerCommand("l4", superstructure.runPrepare(Superstructure.State.L4));
-    NamedCommands.registerCommand("stow", superstructure.runPrepare(Superstructure.State.STOW));
-    NamedCommands.registerCommand("intake", superstructure.runPrepare(Superstructure.State.INTAKE));
+    NamedCommands.registerCommand("l1", superstructure.run(Superstructure.State.L1));
+    NamedCommands.registerCommand("l2", superstructure.run(Superstructure.State.L2));
+    NamedCommands.registerCommand("l3", superstructure.run(Superstructure.State.L3));
+    NamedCommands.registerCommand("l4", superstructure.run(Superstructure.State.L4));
+    NamedCommands.registerCommand("stow", superstructure.run(Superstructure.State.STOW));
+    NamedCommands.registerCommand("intake", superstructure.run(Superstructure.State.INTAKE));
 
     // Path planner Autos
     // https://pathplanner.dev/gui-editing-paths-and-autos.html#autos
@@ -644,30 +612,14 @@ public class RobotContainer {
       dashboardChooser.addOption("[TEST] Deploy Hang Arm", hang.deploy());
       dashboardChooser.addOption("[TEST] Retract Hang Arm", hang.retract());
     }
-  }
-
-  private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {
 
     dashboardChooser.addOption(
-        "Elevator Static Forward Characterization", elevator.staticCharacterization(0.02));
+        "[Characterization] Elevator Static Forward", elevator.staticCharacterization(0.02));
 
     dashboardChooser.addOption(
-        "Simple Feed Forward Characterization", DriveCommands.feedforwardCharacterization(drive));
+        "[Characterization] Drive Feed Forward", DriveCommands.feedforwardCharacterization(drive));
     dashboardChooser.addOption(
-        "Simple Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-
-    // Drive sys id
-    // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/introduction.html
-    // dashboardChooser.addOption(
-    //     "Drive SysId (Quasistatic Forward)",
-    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    // dashboardChooser.addOption(
-    //     "Drive SysId (Quasistatic Reverse)",
-    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // dashboardChooser.addOption(
-    //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // dashboardChooser.addOption(
-    //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        "[Characterization] Drive Wheel Radius", DriveCommands.wheelRadiusCharacterization(drive));
   }
 
   /**

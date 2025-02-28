@@ -1,5 +1,6 @@
 package frc.robot.subsystems.hang;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.utility.records.PIDConstants;
@@ -7,12 +8,12 @@ import frc.robot.utility.records.PIDConstants;
 public class HangConstants {
   private HangConstants() {}
 
-  public static record HangConfig(int motorId, int cancoderId) {}
+  public static record HangConfig(int motorId, int cancoderId, Rotation2d absoluteEncoderOffset) {}
 
-  public static final HangConfig ELEVATOR_CONFIG =
+  public static final HangConfig HANG_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new HangConfig(16, 0);
-        default -> new HangConfig(0, 0);
+        case COMP_BOT_2025 -> new HangConfig(16, 0, Rotation2d.kZero);
+        default -> new HangConfig(0, 0, Rotation2d.kZero);
       };
 
   public static final PIDConstants FEEDBACK =

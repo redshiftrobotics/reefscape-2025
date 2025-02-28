@@ -10,10 +10,10 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
-import frc.robot.utility.records.PIDConstants;
 import java.util.function.Supplier;
 
 public class WristIOAbsoluteEncoder implements WristIO {
@@ -22,18 +22,20 @@ public class WristIOAbsoluteEncoder implements WristIO {
   private final CANcoder encoder;
   private final Supplier<Angle> positionSupplier;
 
-  private double setpoint;
-
   public WristIOAbsoluteEncoder(int motorId, int encoderId) {
-    SparkMaxConfig config = new SparkMaxConfig();
-
     motor = new SparkMax(motorId, MotorType.kBrushless);
+
+    SparkMaxConfig config = new SparkMaxConfig();
+    config
+        .idleMode(IdleMode.kBrake)
+        .smartCurrentLimit(WristConstants.CURRENT_LIMIT)
+        .voltageCompensation(12);
+
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     encoder = new CANcoder(encoderId);
 
-    PIDConstants pid = WristConstants.getPidConstants();
-    pidController = new PIDController(pid.kP(), pid.kI(), pid.kD());
+    pidController = new PIDController(0, 0, 0);
 
     MagnetSensorConfigs cancoderConfig = new MagnetSensorConfigs();
     cancoderConfig.SensorDirection = SensorDirectionValue.Clockwise_Positive;
@@ -47,15 +49,15 @@ public class WristIOAbsoluteEncoder implements WristIO {
 
   @Override
   public void updateInputs(WristIOInputs inputs) {
-    motor.set(pidController.calculate(getPosition(), setpoint));
+    motor.set(pidController.calculate(getPosition()));
 
-    inputs.setpointRotations = setpoint;
+    inputs.setpointRotations = pidController.getSetpoint();
     inputs.positionRotations = getPosition();
   }
 
   @Override
   public void runPosition(double setpoint) {
-    this.setpoint = setpoint;
+    pidController.setSetpoint(setpoint);
   }
 
   @Override

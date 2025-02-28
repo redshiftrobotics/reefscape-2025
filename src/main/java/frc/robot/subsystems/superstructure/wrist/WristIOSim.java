@@ -31,13 +31,13 @@ public class WristIOSim implements WristIO {
   private final SingleJointedArmSim wristSim =
       new SingleJointedArmSim(
           wristGearbox,
-          SIM_GEARING,
-          SIM_MOMENT_OF_INERTIA,
-          SIM_ARM_LENGTH,
-          SIM_ARM_MIN_ANGLE,
-          SIM_ARM_MAX_ANGLE,
+          WristConstants.GEAR_REDUCTION,
+          (double) 1,
+          Units.inchesToMeters(14.585),
+          (double) 0,
+          Math.PI,
           true,
-          SIM_ARM_INIT_ANGLE);
+          (double) 0);
 
   private double setpoint;
 

@@ -1,7 +1,5 @@
 package frc.robot.subsystems.superstructure.wrist;
 
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.RELATIVE_CONVERSION_FACTOR;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -9,6 +7,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 /** Wrist implementation using the built-in relative encoder. */
@@ -20,12 +19,16 @@ public class WristIORelativeEncoder implements WristIO {
   private double setpoint;
 
   public WristIORelativeEncoder(int motorId) {
-    SparkMaxConfig config = new SparkMaxConfig();
-
-    config.encoder.positionConversionFactor(RELATIVE_CONVERSION_FACTOR);
-    config.encoder.velocityConversionFactor(RELATIVE_CONVERSION_FACTOR);
-
     motor = new SparkMax(motorId, MotorType.kBrushless);
+
+    SparkMaxConfig config = new SparkMaxConfig();
+    config
+        .idleMode(IdleMode.kBrake)
+        .smartCurrentLimit(WristConstants.CURRENT_LIMIT)
+        .voltageCompensation(12);
+    config.encoder.positionConversionFactor(1.0 / WristConstants.GEAR_REDUCTION);
+    config.encoder.velocityConversionFactor(1.0 / WristConstants.GEAR_REDUCTION);
+
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     pidController = motor.getClosedLoopController();
