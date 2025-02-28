@@ -2,25 +2,31 @@
   "hubs": [
     {
       "x": -8,
-      "y": -8,
-      "width": 1552,
-      "height": 832,
+      "y": 0,
+      "width": 1536,
+      "height": 728,
       "state": {
         "sidebar": {
           "width": 300,
           "expanded": [
-            "/RealOutputs"
+            "/RealOutputs/Mechanism2d/Goal/Goal Root",
+            "/RealOutputs/Mechanism2d/Goal/dims",
+            "/RealOutputs/Mechanism2d/Goal/Goal Root/Goal Elevator",
+            "/Elevator",
+            "/RealOutputs",
+            "/RealOutputs/Mechanism2d",
+            "/Wrist"
           ]
         },
         "tabs": {
-          "selected": 9,
+          "selected": 1,
           "tabs": [
             {
               "type": 0,
               "title": "",
               "controller": null,
               "controllerUUID": "gzx9mn46nlpciwyqfg33v0bi5kk5xmho",
-              "renderer": "#/",
+              "renderer": "#/tab-reference/3d-field#2d-mechanisms",
               "controlsHeight": 0
             },
             {
@@ -63,6 +69,13 @@
                       "color": "#ff0000",
                       "arrangement": "0,1,2,3"
                     }
+                  },
+                  {
+                    "type": "mechanism",
+                    "logKey": "/RealOutputs/Mechanism2d/Setpoint",
+                    "logType": "Mechanism2d",
+                    "visible": true,
+                    "options": {}
                   },
                   {
                     "type": "trajectory",
@@ -130,17 +143,17 @@
                 "cameraIndex": -5,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  10.28116,
-                  1.5748000000000002,
-                  6.295394842760901e-16
+                  9.727970766466512,
+                  2.596652322829664,
+                  -5.9986035071252175
                 ],
                 "cameraTarget": [
-                  0,
-                  0.5,
-                  0
+                  6.408909243641915,
+                  -4.038273328470995,
+                  -1.9466938845585147
                 ]
               },
-              "controlsHeight": 255
+              "controlsHeight": 257
             },
             {
               "type": 2,
@@ -349,7 +362,7 @@
                   "type": "mechanism",
                   "logKey": "/RealOutputs/Mechanism2d/Goal",
                   "logType": "Mechanism2d",
-                  "visible": true,
+                  "visible": false,
                   "options": {}
                 },
                 {
