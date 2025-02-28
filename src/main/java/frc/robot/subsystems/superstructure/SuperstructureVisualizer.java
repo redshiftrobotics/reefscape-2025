@@ -23,7 +23,10 @@ public class SuperstructureVisualizer {
     this.name = name;
 
     LoggedMechanismRoot2d root =
-        mechanism.getRoot(name + " Root", Units.inchesToMeters(34.886649) / 2, Units.inchesToMeters(34.886649 - 6));
+        mechanism.getRoot(
+            name + " Root",
+            Units.inchesToMeters(34.886649) / 2,
+            Units.inchesToMeters(34.886649 - 6));
 
     elevatorMechanism =
         root.append(

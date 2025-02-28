@@ -60,34 +60,34 @@ public class Superstructure extends SubsystemBase {
     return Commands.parallel(
         elevator.runOnce(
             () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight / 4.0)),
-        wrist.runOnce(() -> wrist.goTo(Units.degreesToRotations(55))));
+        wrist.runOnce(() -> wrist.setGoal(Units.degreesToRotations(55))));
   }
 
   public Command prepareL2() {
     return Commands.parallel(
         elevator.runOnce(
             () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight / 2.0)),
-        wrist.runOnce(() -> wrist.goTo(Units.degreesToRotations(35))));
+        wrist.runOnce(() -> wrist.setGoal(Units.degreesToRotations(35))));
   }
 
   public Command prepareL3() {
     return Commands.parallel(
         elevator.runOnce(
             () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0))),
-        wrist.runOnce(() -> wrist.goTo(Units.degreesToRotations(35))));
+        wrist.runOnce(() -> wrist.setGoal(Units.degreesToRotations(35))));
   }
 
   public Command prepareL4() {
     return Commands.parallel(
         elevator.runOnce(() -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)),
-        wrist.runOnce(() -> wrist.goTo(Units.degreesToRotations(90))));
+        wrist.runOnce(() -> wrist.setGoal(Units.degreesToRotations(90))));
   }
 
   public Command prepareIntake() {
     return Commands.parallel(
         elevator.runOnce(
             () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight / 4.0)),
-        wrist.runOnce(() -> wrist.goTo(Units.degreesToRotations(55))));
+        wrist.runOnce(() -> wrist.setGoal(Units.degreesToRotations(55))));
   }
 
   public Command stow() {
