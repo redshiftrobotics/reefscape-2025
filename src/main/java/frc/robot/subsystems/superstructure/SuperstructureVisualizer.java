@@ -39,6 +39,6 @@ public class SuperstructureVisualizer {
     elevatorMechanism.setLength(carriageHeight);
     wristLigament.setAngle(Units.rotationsToDegrees(wristRotations));
 
-    Logger.recordOutput("Mechanism2d/" + name, mechanism);
+    Logger.recordOutput("SuperstructureVisualizer/" + name, mechanism);
   }
 }
