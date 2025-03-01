@@ -355,7 +355,7 @@ public class RobotContainer {
   }
 
   private void configureDriverControllerBindings(boolean includeAutoAlign) {
-    final CommandXboxController driverXbox = (CommandXboxController) driverController;
+    final CommandXboxController driverXbox = driverController;
 
     final Trigger useFieldRelative =
         new Trigger(new OverrideSwitch(driverXbox.y(), OverrideSwitch.Mode.TOGGLE, true));
