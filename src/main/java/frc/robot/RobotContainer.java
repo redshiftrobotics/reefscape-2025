@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -154,7 +153,7 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIOHardwareFollow(ElevatorConstants.ELEVATOR_CONFIG));
         hang = new Hang(new HangIOHardwareRelative(HangConstants.HANG_CONFIG));
         wrist = new Wrist(new WristIO() {});
-        led = new AddressableLEDSubsystem();
+        led = new AddressableLEDSubsystem(false);
 
         // algaeIntake =
         //     new AlgaeIntake(
@@ -191,7 +190,7 @@ public class RobotContainer {
 
         algaeIntake = new AlgaeIntake(new IntakeIO() {});
         coralIntake = new CoralIntake(new IntakeIO() {});
-        led = new AddressableLEDSubsystem();
+        led = new AddressableLEDSubsystem(true);
 
         break;
 
@@ -212,6 +211,7 @@ public class RobotContainer {
 
         algaeIntake = new AlgaeIntake(new IntakeIO() {});
         coralIntake = new CoralIntake(new IntakeIO() {});
+        led = new AddressableLEDSubsystem(true);
 
         break;
 
@@ -232,6 +232,7 @@ public class RobotContainer {
 
         algaeIntake = new AlgaeIntake(new IntakeIO() {});
         coralIntake = new CoralIntake(new IntakeIO() {});
+        led = new AddressableLEDSubsystem(true);
 
         break;
 
@@ -256,6 +257,7 @@ public class RobotContainer {
         wrist = new Wrist(new WristIOSim());
         algaeIntake = new AlgaeIntake(new IntakeIOSim());
         coralIntake = new CoralIntake(new IntakeIOSim());
+        led = new AddressableLEDSubsystem(true);
         break;
 
       default:
@@ -275,6 +277,7 @@ public class RobotContainer {
 
         algaeIntake = new AlgaeIntake(new IntakeIO() {});
         coralIntake = new CoralIntake(new IntakeIO() {});
+        led = new AddressableLEDSubsystem(true);
 
         break;
     }

@@ -11,8 +11,19 @@ public class AddressableLEDSubsystem extends SubsystemBase {
   private final AddressableLEDBuffer ledBuffer;
   private AddressableLEDBufferView ledViews[];
   private LEDPattern[] currentPatterns;
+  private final boolean fake;
 
-  public AddressableLEDSubsystem() {
+  /**
+   * @param isFake Set this to true to disable useful functions for robots that don't have LEDs attached
+   */
+  public AddressableLEDSubsystem(boolean isFake) {
+    fake = isFake;
+    if(fake) {
+      led = null;
+      ledBuffer = null;
+      return;
+    }
+
     // Create strip and buffer
     led = new AddressableLED(AddressableLEDConstants.LED_STRIP_PORT);
     ledBuffer = new AddressableLEDBuffer(AddressableLEDConstants.LED_COUNT);
@@ -35,6 +46,7 @@ public class AddressableLEDSubsystem extends SubsystemBase {
   // Periodically update the LED strip
   @Override
   public void periodic() {
+    if(fake) return;
     for (int i = 0; i < ledViews.length; i++) {
       currentPatterns[i].applyTo(ledViews[i]);
     }
@@ -43,6 +55,7 @@ public class AddressableLEDSubsystem extends SubsystemBase {
 
   // Apply a color pattern to a section of the LED strip
   public void applySectionedPattern(LEDPattern pattern, int section) {
+    if(fake) return;
     if (section < 0 || section >= ledViews.length) return;
     pattern.applyTo(ledViews[section]);
     currentPatterns[section] = pattern;
@@ -50,6 +63,7 @@ public class AddressableLEDSubsystem extends SubsystemBase {
 
   // Apply a color pattern to a section of the LED strip
   public void applyPattern(LEDPattern pattern) {
+    if(fake) return;
     pattern.applyTo(ledBuffer);
     for (int i = 0; i < currentPatterns.length; i++) {
       currentPatterns[i] = pattern;
