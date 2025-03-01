@@ -82,11 +82,11 @@ public class DriveConstants {
   private static final double TRACK_CENTER_Y = DRIVE_CONFIG.trackCornerToCorner().getY() / 2;
 
   public static final Translation2d FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER =
-      new Translation2d(TRACK_CENTER_X, TRACK_CENTER_Y);
+      new Translation2d(+TRACK_CENTER_X, +TRACK_CENTER_Y);
   public static final Translation2d FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER =
-      new Translation2d(TRACK_CENTER_X, -TRACK_CENTER_Y);
+      new Translation2d(+TRACK_CENTER_X, -TRACK_CENTER_Y);
   public static final Translation2d BACK_LEFT_MODULE_DISTANCE_FROM_CENTER =
-      new Translation2d(-TRACK_CENTER_X, TRACK_CENTER_Y);
+      new Translation2d(-TRACK_CENTER_X, +TRACK_CENTER_Y);
   public static final Translation2d BACK_RIGHT_MODULE_DISTANCE_FROM_CENTER =
       new Translation2d(-TRACK_CENTER_X, -TRACK_CENTER_Y);
 
