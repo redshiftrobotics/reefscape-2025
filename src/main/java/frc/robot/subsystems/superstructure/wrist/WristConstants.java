@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superstructure.wrist;
 
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.utility.records.PIDConstants;
 
@@ -17,7 +18,6 @@ public class WristConstants {
 
   public static final int MOTOR_ID = 0;
   public static final int CANCODER_ID = 0;
-  public static final double ABSOLUTE_ENCODER_OFFSET = 0.0;
 
   public static final double GEAR_REDUCTION = 1.0;
   public static final int CURRENT_LIMIT = 30;
