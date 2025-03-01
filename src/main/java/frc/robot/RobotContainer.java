@@ -545,8 +545,8 @@ public class RobotContainer {
 
   private Command rumbleControllers(double rumbleIntensity) {
     return Commands.parallel(
-        rumbleController((CommandXboxController) driverController, rumbleIntensity),
-        rumbleController((CommandXboxController) operatorController, rumbleIntensity));
+        rumbleController(driverController, rumbleIntensity),
+        rumbleController(operatorController, rumbleIntensity));
   }
 
   private void configureAlertTriggers() {
