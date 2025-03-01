@@ -116,6 +116,31 @@ public class DriveCommands {
         .finallyDo(drive::stop);
   }
 
+  public static Command joystickDriveWithSlowdown(
+      Drive drivetrain,
+      Supplier<Translation2d> translationSupplier,
+      DoubleSupplier omegaSupplier,
+      DoubleSupplier elevatorHeightSupplier,
+      BooleanSupplier useFieldRelativeSupplier) {
+
+    Runnable drive =
+        () -> {
+          Translation2d translation = translationSupplier.get();
+          double elevatorHeight = elevatorHeightSupplier.getAsDouble();
+          boolean fieldRelative = useFieldRelativeSupplier.getAsBoolean();
+
+          double multiplier = 1 - (elevatorHeight / 2);
+
+          double dx = translation.getX() * multiplier;
+          double dy = translation.getY() * multiplier;
+          double omega = omegaSupplier.getAsDouble() * multiplier;
+
+          drivetrain.setRobotSpeeds(new ChassisSpeeds(dx, dy, omega), fieldRelative);
+        };
+
+    return drivetrain.run(drive).finallyDo(drivetrain::stop);
+  }
+
   /** Joystick drive */
   public static Command joystickDriveSmartAngleLock(
       Drive drive,
