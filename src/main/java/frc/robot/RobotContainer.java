@@ -41,7 +41,9 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.hang.Hang;
+import frc.robot.subsystems.hang.HangConstants;
 import frc.robot.subsystems.hang.HangIO;
+import frc.robot.subsystems.hang.HangIOHardwareRelative;
 import frc.robot.subsystems.hang.HangIOSim;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
@@ -54,9 +56,7 @@ import frc.robot.subsystems.superstructure.intake.CoralIntake;
 import frc.robot.subsystems.superstructure.intake.IntakeIO;
 import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
-import frc.robot.subsystems.superstructure.wrist.WristConstants;
 import frc.robot.subsystems.superstructure.wrist.WristIO;
-import frc.robot.subsystems.superstructure.wrist.WristIORelativeEncoder;
 import frc.robot.subsystems.superstructure.wrist.WristIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
@@ -66,7 +66,6 @@ import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -82,14 +81,13 @@ public class RobotContainer {
   private final Drive drive;
   private final AprilTagVision vision;
 
+  private final Superstructure superstructure;
+  private final Elevator elevator;
+  private final Wrist wrist;
   private final AlgaeIntake algaeIntake;
   private final CoralIntake coralIntake;
 
-  private final Wrist wrist;
   private final Hang hang;
-
-  private final Elevator elevator;
-  private final Superstructure superstructure;
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -118,10 +116,10 @@ public class RobotContainer {
           AlertType.kInfo);
   private final Alert tuningModeActiveAlert =
       new Alert("Tuning mode active, do not use in competition.", AlertType.kWarning);
-  private static final Alert testPlansAvaliable =
+  private static final Alert testPlansAvailable =
       new Alert(
           "Running with test plans enabled, ensure you are using the correct auto.",
-          Alert.AlertType.kWarning);
+          AlertType.kWarning);
 
   /** The container for the robot. Contains subsystems, IO devices, and commands. */
   public RobotContainer() {
@@ -136,15 +134,17 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
 
-        vision = new AprilTagVision();
+        vision =
+            new AprilTagVision(
+                // new CameraIOPhotonVision(VisionConstants.COMP_FRONT_LEFT_CAMERA),
+                // new CameraIOPhotonVision(VisionConstants.COMP_FRONT_RIGHT_CAMERA),
+                new CameraIOPhotonVision(VisionConstants.COMP_BACK_LEFT_CAMERA),
+                new CameraIOPhotonVision(VisionConstants.COMP_BACK_RIGHT_CAMERA));
 
         // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
         elevator = new Elevator(new ElevatorIOHardwareFollow(ElevatorConstants.ELEVATOR_CONFIG));
-
-        // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
-        hang = new Hang(new HangIO() {});
-
-        wrist = new Wrist(new WristIORelativeEncoder(WristConstants.MOTOR_ID));
+        hang = new Hang(new HangIOHardwareRelative(HangConstants.HANG_CONFIG));
+        wrist = new Wrist(new WristIO() {});
 
         // algaeIntake =
         //     new AlgaeIntake(
@@ -234,7 +234,12 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim());
         vision =
-            new AprilTagVision(new CameraIOSim(VisionConstants.FRONT_CAMERA, drive::getRobotPose));
+            new AprilTagVision(
+                new CameraIOSim(VisionConstants.COMP_FRONT_LEFT_CAMERA, drive::getRobotPose),
+                new CameraIOSim(VisionConstants.COMP_FRONT_RIGHT_CAMERA, drive::getRobotPose),
+                new CameraIOSim(VisionConstants.COMP_BACK_LEFT_CAMERA, drive::getRobotPose),
+                new CameraIOSim(VisionConstants.COMP_BACK_RIGHT_CAMERA, drive::getRobotPose));
+
         hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
         wrist = new Wrist(new WristIOSim());
@@ -278,32 +283,19 @@ public class RobotContainer {
           }
         });
 
-    // Can also use AutoBuilder.buildAutoChooser(); instead of SendableChooser to
-    // auto populate
+    // Can also use AutoBuilder.buildAutoChooser(); instead of SendableChooser to auto populate
     autoChooser = new LoggedDashboardChooser<>("Auto Chooser", new SendableChooser<Command>());
 
     // Configure autos
     configureAutos(autoChooser);
 
-    // Configure sys ids
-    if (Constants.TUNING_MODE) {
-      configureSysIds(autoChooser);
-    }
-
     // Alerts for constants to avoid using them in competition
-    if (Constants.TUNING_MODE) {
-      tuningModeActiveAlert.set(true);
-    }
-    if (Constants.getRobot() != Constants.PRIMARY_ROBOT_TYPE) {
-      notPrimaryBotAlert.set(true);
-    }
-
-    testPlansAvaliable.set(Constants.RUNNING_TEST_PLANS);
+    tuningModeActiveAlert.set(Constants.TUNING_MODE);
+    testPlansAvailable.set(Constants.RUNNING_TEST_PLANS);
+    notPrimaryBotAlert.set(Constants.getRobot() != Constants.PRIMARY_ROBOT_TYPE);
 
     // Hide controller missing warnings for sim
-    if (Constants.getMode() != Mode.REAL || true) {
-      DriverStation.silenceJoystickConnectionWarning(true);
-    }
+    DriverStation.silenceJoystickConnectionWarning(Constants.getMode() != Mode.REAL);
 
     initDashboard();
 
@@ -449,18 +441,15 @@ public class RobotContainer {
               Arrays.asList(FieldConstants.Reef.alignmentFaces),
               new Transform2d(
                   DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
-              new Transform2d(0, 0, Rotation2d.kZero),
+              new Transform2d(0, 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(24), 0));
 
-      Supplier<Command> endRumble = () -> rumbleController(driverXbox, 0.3).withTimeout(0.1);
+      reefAlignmentCommands.setFinalAlignCommand(superstructure::prepare);
+      reefAlignmentCommands.setEndCommand(() -> rumbleController(driverXbox, 0.3).withTimeout(0.1));
 
       driverXbox
           .rightTrigger()
-          .onTrue(
-              reefAlignmentCommands
-                  .driveToClosest(drive)
-                  .andThen(endRumble.get())
-                  .withName("Algin REEF"))
+          .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Algin REEF"))
           .onFalse(reefAlignmentCommands.stop(drive));
 
       driverXbox
@@ -468,20 +457,14 @@ public class RobotContainer {
           .and(driverXbox.leftBumper())
           .onTrue(
               CustomCommands.reInitCommand(
-                  reefAlignmentCommands
-                      .driveToNext(drive)
-                      .andThen(endRumble.get())
-                      .withName("Algin REEF -1")));
+                  reefAlignmentCommands.driveToNext(drive).withName("Algin REEF -1")));
 
       driverXbox
           .rightTrigger()
           .and(driverXbox.rightBumper())
           .onTrue(
               CustomCommands.reInitCommand(
-                  reefAlignmentCommands
-                      .driveToPrevious(drive)
-                      .andThen(endRumble.get())
-                      .withName("Algin REEF +1")));
+                  reefAlignmentCommands.driveToPrevious(drive).withName("Algin REEF +1")));
 
       // Align to intake
 
@@ -490,16 +473,16 @@ public class RobotContainer {
               Arrays.asList(FieldConstants.CoralStation.alignmentFaces),
               new Transform2d(
                   DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
-              new Transform2d(0, 0, Rotation2d.kZero),
+              new Transform2d(0, 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(10), 0));
+
+      intakeAlignmentCommands.setFinalAlignCommand(superstructure::prepareIntake);
+      intakeAlignmentCommands.setEndCommand(
+          () -> rumbleController(driverXbox, 0.3).withTimeout(0.1));
 
       driverXbox
           .leftTrigger()
-          .onTrue(
-              intakeAlignmentCommands
-                  .driveToClosest(drive)
-                  .andThen(endRumble.get())
-                  .withName("Align INTAKE"))
+          .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Align INTAKE"))
           .onFalse(intakeAlignmentCommands.stop(drive));
 
       driverXbox
@@ -507,33 +490,33 @@ public class RobotContainer {
           .and(driverXbox.leftBumper())
           .onTrue(
               CustomCommands.reInitCommand(
-                  intakeAlignmentCommands
-                      .driveToNext(drive)
-                      .andThen(endRumble.get())
-                      .withName("Align INTAKE +1")));
+                  intakeAlignmentCommands.driveToNext(drive).withName("Align INTAKE +1")));
 
       driverXbox
           .leftTrigger()
           .and(driverXbox.rightBumper())
           .onTrue(
               CustomCommands.reInitCommand(
-                  intakeAlignmentCommands
-                      .driveToPrevious(drive)
-                      .andThen(endRumble.get())
-                      .withName("Align INTAKE -1")));
+                  intakeAlignmentCommands.driveToPrevious(drive).withName("Align INTAKE -1")));
     }
   }
 
   private void configureOperatorControllerBindings() {
+    operatorController.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
-    operatorController.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
+    configureOperatorControllerBindingLevel(operatorController.y(), Superstructure.State.L4);
+    configureOperatorControllerBindingLevel(operatorController.x(), Superstructure.State.L3);
+    configureOperatorControllerBindingLevel(operatorController.b(), Superstructure.State.L2);
+    configureOperatorControllerBindingLevel(operatorController.a(), Superstructure.State.L1);
 
-    operatorController.y().onTrue(superstructure.scoreL4());
-    operatorController.x().onTrue(superstructure.scoreL3());
-    operatorController.a().onTrue(superstructure.scoreL2());
-    operatorController.povUp().onTrue(superstructure.scoreL1());
+    operatorController.leftBumper().whileTrue(hang.set(+0.5).withName("Hang Arm Up"));
+    operatorController.rightBumper().whileTrue(hang.set(-0.5).withName("Hang Arm Down"));
+  }
 
-    operatorController.povDown().onTrue(superstructure.stow());
+  private void configureOperatorControllerBindingLevel(
+      Trigger trigger, Superstructure.State state) {
+    trigger.onTrue(superstructure.setNextPrepare(state));
+    trigger.and(operatorController.rightTrigger()).onTrue(superstructure.runPrepare(state));
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
@@ -568,11 +551,28 @@ public class RobotContainer {
     // https://pathplanner.dev/pplib-named-commands.html
     NamedCommands.registerCommand("StopWithX", drive.runOnce(drive::stopUsingBrakeArrangement));
 
+    NamedCommands.registerCommand("l1", superstructure.run(Superstructure.State.L1));
+    NamedCommands.registerCommand("l2", superstructure.run(Superstructure.State.L2));
+    NamedCommands.registerCommand("l3", superstructure.run(Superstructure.State.L3));
+    NamedCommands.registerCommand("l4", superstructure.run(Superstructure.State.L4));
+    NamedCommands.registerCommand("stow", superstructure.run(Superstructure.State.STOW));
+    NamedCommands.registerCommand("intake", superstructure.run(Superstructure.State.INTAKE));
+
     // Path planner Autos
     // https://pathplanner.dev/gui-editing-paths-and-autos.html#autos
-    dashboardChooser.addOption("Triangle Auto", AutoBuilder.buildAuto("Triangle Auto"));
-    dashboardChooser.addOption("Rotate Auto", AutoBuilder.buildAuto("Rotate Auto"));
-    dashboardChooser.addOption("Circle Auto", AutoBuilder.buildAuto("Circle Auto"));
+    // dashboardChooser.addOption("Triangle Auto", AutoBuilder.buildAuto("Triangle Auto"));
+    // dashboardChooser.addOption("Rotate Auto", AutoBuilder.buildAuto("Rotate Auto"));
+    // dashboardChooser.addOption("Circle Auto", AutoBuilder.buildAuto("Circle Auto"));
+
+    // Test Auto
+    dashboardChooser.addOption("Inner", AutoBuilder.buildAuto("Inner"));
+    dashboardChooser.addOption("Middle", AutoBuilder.buildAuto("Middle"));
+    dashboardChooser.addOption("Outer", AutoBuilder.buildAuto("Outer"));
+
+    // Leave autos
+    dashboardChooser.addOption("Leave Inner", AutoBuilder.buildAuto("Leave Inner"));
+    dashboardChooser.addOption("Leave Middle", AutoBuilder.buildAuto("Leave Middle"));
+    dashboardChooser.addOption("Leave Outer", AutoBuilder.buildAuto("Leave Outer"));
 
     // Choreo Autos
     // https://pathplanner.dev/pplib-choreo-interop.html#load-choreo-trajectory-as-a-pathplannerpath
@@ -594,6 +594,7 @@ public class RobotContainer {
               new SetWrist(wrist, 0.25),
               Commands.waitSeconds(1),
               new SetWrist(wrist, 0)));
+
       dashboardChooser.addOption(
           "[TEST] Activate Algae Intake",
           Commands.sequence(
@@ -606,32 +607,19 @@ public class RobotContainer {
               new SetIntakeSpeed(coralIntake, 1),
               Commands.waitSeconds(1),
               new SetIntakeSpeed(coralIntake, 0)));
+
+      dashboardChooser.addOption("[TEST] Stow Hang Arm", hang.stow());
+      dashboardChooser.addOption("[TEST] Deploy Hang Arm", hang.deploy());
+      dashboardChooser.addOption("[TEST] Retract Hang Arm", hang.retract());
     }
-  }
-
-  private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {
-
-    dashboardChooser.addOption("Elevator Static", elevator.staticCharacterization(0.02));
-
-    dashboardChooser.addOption("Hang Coast", hang.coast());
 
     dashboardChooser.addOption(
-        "Simple Feed Forward Characterization", DriveCommands.feedforwardCharacterization(drive));
-    dashboardChooser.addOption(
-        "Simple Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+        "[Characterization] Elevator Static Forward", elevator.staticCharacterization(0.02));
 
-    // //
-    // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/introduction.html
-    // dashboardChooser.addOption(
-    //     "Drive SysId (Quasistatic Forward)",
-    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    // dashboardChooser.addOption(
-    //     "Drive SysId (Quasistatic Reverse)",
-    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // dashboardChooser.addOption(
-    //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // dashboardChooser.addOption(
-    //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    dashboardChooser.addOption(
+        "[Characterization] Drive Feed Forward", DriveCommands.feedforwardCharacterization(drive));
+    dashboardChooser.addOption(
+        "[Characterization] Drive Wheel Radius", DriveCommands.wheelRadiusCharacterization(drive));
   }
 
   /**

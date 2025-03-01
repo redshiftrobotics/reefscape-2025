@@ -16,6 +16,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import frc.robot.subsystems.hang.HangConstants.HangConfig;
 import java.util.function.Supplier;
 
 public class HangIOHardware implements HangIO {
@@ -30,16 +31,16 @@ public class HangIOHardware implements HangIO {
 
   private boolean breakMode = true;
 
-  public HangIOHardware(int deviceId, int cancoderId) {
-    motor = new SparkMax(deviceId, MotorType.kBrushless);
+  public HangIOHardware(HangConfig config) {
+    motor = new SparkMax(config.motorId(), MotorType.kBrushless);
     control = new PIDController(0, 0, 0);
 
-    cancoder = new CANcoder(deviceId);
+    cancoder = new CANcoder(config.cancoderId());
 
     MagnetSensorConfigs magnetSensorConfig = new MagnetSensorConfigs();
     magnetSensorConfig.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
     magnetSensorConfig.AbsoluteSensorDiscontinuityPoint = 1.0;
-    magnetSensorConfig.MagnetOffset = 0;
+    magnetSensorConfig.MagnetOffset = config.absoluteEncoderOffset().getRotations();
     cancoder.getConfigurator().apply(magnetSensorConfig);
 
     position = cancoder.getPosition().asSupplier();
@@ -61,8 +62,8 @@ public class HangIOHardware implements HangIO {
 
   @Override
   public void updateInputs(HangIOInputs inputs) {
-    inputs.positionRotations = position.get().in(Rotations);
-    inputs.velocityRPM = velocity.get().in(RPM);
+    inputs.positionRotations = position.get().in(Rotations) * (1.0 / HangConstants.GEAR_REDUCTION);
+    inputs.velocityRPM = velocity.get().in(RPM) * (1.0 / HangConstants.GEAR_REDUCTION);
 
     inputs.supplyCurrentAmps = new double[] {motor.getOutputCurrent()};
     inputs.appliedVolts = new double[] {motor.getAppliedOutput() * motor.getBusVoltage()};

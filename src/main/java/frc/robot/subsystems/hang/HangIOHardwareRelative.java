@@ -13,6 +13,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import frc.robot.subsystems.hang.HangConstants.HangConfig;
 
 public class HangIOHardwareRelative implements HangIO {
   private final SparkMax motor;
@@ -21,8 +22,8 @@ public class HangIOHardwareRelative implements HangIO {
 
   private boolean breakMode = true;
 
-  public HangIOHardwareRelative(int deviceId) {
-    motor = new SparkMax(deviceId, MotorType.kBrushless);
+  public HangIOHardwareRelative(HangConfig config) {
+    motor = new SparkMax(config.motorId(), MotorType.kBrushless);
 
     encoder = motor.getEncoder();
     control = motor.getClosedLoopController();

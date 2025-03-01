@@ -10,15 +10,14 @@ import org.littletonrobotics.junction.Logger;
 
 /** Mechanism at end of elevator to move intake/ */
 public class Wrist extends SubsystemBase {
-  private static final LoggedTunableNumberFactory factory =
-      new LoggedTunableNumberFactory("Elevator");
+  private static final LoggedTunableNumberFactory factory = new LoggedTunableNumberFactory("Wrist");
 
-  private static final frc.robot.utility.records.PIDConstants defaultPid =
-      WristConstants.getPidConstants();
-
-  private static final LoggedTunableNumber kP = factory.getNumber("kP", defaultPid.kP());
-  private static final LoggedTunableNumber kI = factory.getNumber("kI", defaultPid.kI());
-  private static final LoggedTunableNumber kD = factory.getNumber("kD", defaultPid.kD());
+  private static final LoggedTunableNumber kP =
+      factory.getNumber("kP", WristConstants.FEEDBACK.kP());
+  private static final LoggedTunableNumber kI =
+      factory.getNumber("kI", WristConstants.FEEDBACK.kI());
+  private static final LoggedTunableNumber kD =
+      factory.getNumber("kD", WristConstants.FEEDBACK.kD());
 
   private final WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
@@ -26,6 +25,8 @@ public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
   public Wrist(WristIO io) {
     this.io = io;
+
+    io.setPid(kP.get(), kI.get(), kD.get());
   }
 
   @Override
@@ -49,7 +50,7 @@ public class Wrist extends SubsystemBase {
     io.runPosition(setpoint);
   }
 
-  public boolean atSetpoint() {
+  public boolean atGoal() {
     return MathUtil.isNear(inputs.setpointRotations, inputs.positionRotations, TOLERANCE);
   }
 

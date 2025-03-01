@@ -10,27 +10,28 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 public class HangVisualization {
-  private final String key;
+  private final String name;
 
-  private LoggedMechanism2d mechanism2d;
-  private LoggedMechanismRoot2d armPivot;
-  private LoggedMechanismLigament2d arm;
+  private final LoggedMechanism2d mechanism2d;
+  private final LoggedMechanismRoot2d armPivot;
+  private final LoggedMechanismLigament2d arm;
 
-  public HangVisualization(String key, Color color) {
-    this.key = key;
+  public HangVisualization(String name, Color color) {
+    this.name = name;
 
     mechanism2d = new LoggedMechanism2d(Units.feetToMeters(4.0), Units.feetToMeters(4.0));
-    armPivot = mechanism2d.getRoot("ArmPivot", Units.feetToMeters(3.5), Units.feetToMeters(1.5));
+    armPivot =
+        mechanism2d.getRoot(name + " Root", Units.feetToMeters(3.5), Units.feetToMeters(1.5));
     arm =
         armPivot.append(
             new LoggedMechanismLigament2d(
-                "Simulated Arm", Units.feetToMeters(1), 0, 8, new Color8Bit(color)));
+                name + " Hang", Units.feetToMeters(1), 0, 8, new Color8Bit(color)));
   }
 
   public void update(double angleRad) {
 
     arm.setAngle(Rotation2d.fromRadians(angleRad));
 
-    Logger.recordOutput(key, mechanism2d);
+    Logger.recordOutput(name, mechanism2d);
   }
 }
