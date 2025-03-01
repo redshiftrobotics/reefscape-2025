@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Percent;
+import static edu.wpi.first.units.Units.Second;
 import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -10,13 +12,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -26,10 +32,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.SetAddressableLEDPattern;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.commands.intake.SetIntakeSpeed;
 import frc.robot.commands.wrist.SetWrist;
+import frc.robot.subsystems.addressableled.AddressableLEDSubsystem;
 import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -86,6 +94,7 @@ public class RobotContainer {
   private final Wrist wrist;
   private final AlgaeIntake algaeIntake;
   private final CoralIntake coralIntake;
+  private final AddressableLEDSubsystem led;
 
   private final Hang hang;
 
@@ -145,6 +154,7 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIOHardwareFollow(ElevatorConstants.ELEVATOR_CONFIG));
         hang = new Hang(new HangIOHardwareRelative(HangConstants.HANG_CONFIG));
         wrist = new Wrist(new WristIO() {});
+        led = new AddressableLEDSubsystem();
 
         // algaeIntake =
         //     new AlgaeIntake(
@@ -181,6 +191,7 @@ public class RobotContainer {
 
         algaeIntake = new AlgaeIntake(new IntakeIO() {});
         coralIntake = new CoralIntake(new IntakeIO() {});
+        led = new AddressableLEDSubsystem();
 
         break;
 
@@ -504,19 +515,24 @@ public class RobotContainer {
   private void configureOperatorControllerBindings() {
     operatorController.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
-    configureOperatorControllerBindingLevel(operatorController.y(), Superstructure.State.L4);
-    configureOperatorControllerBindingLevel(operatorController.x(), Superstructure.State.L3);
-    configureOperatorControllerBindingLevel(operatorController.b(), Superstructure.State.L2);
-    configureOperatorControllerBindingLevel(operatorController.a(), Superstructure.State.L1);
+    configureOperatorControllerBindingLevel(operatorController.y(), Superstructure.State.L4, Color.kAqua);
+    configureOperatorControllerBindingLevel(operatorController.x(), Superstructure.State.L3, Color.kGold);
+    configureOperatorControllerBindingLevel(operatorController.b(), Superstructure.State.L2, Color.kLime);
+    configureOperatorControllerBindingLevel(operatorController.a(), Superstructure.State.L1, Color.kPurple);
 
     operatorController.leftBumper().whileTrue(hang.set(+0.5).withName("Hang Arm Up"));
     operatorController.rightBumper().whileTrue(hang.set(-0.5).withName("Hang Arm Down"));
   }
 
   private void configureOperatorControllerBindingLevel(
-      Trigger trigger, Superstructure.State state) {
+      Trigger trigger, Superstructure.State state, Color color) {
     trigger.onTrue(superstructure.setNextPrepare(state));
-    trigger.and(operatorController.rightTrigger()).onTrue(superstructure.runPrepare(state));
+    if(led != null) {
+      LEDPattern pattern = LEDPattern.gradient(GradientType.kContinuous, Color.kBlack, color).scrollAtRelativeSpeed(Percent.per(Second).of(35));
+      trigger.and(operatorController.rightTrigger()).onTrue(superstructure.runPrepare(state).alongWith(new SetAddressableLEDPattern(led, pattern, 4, 5)));
+    } else {
+      trigger.and(operatorController.rightTrigger()).onTrue(superstructure.runPrepare(state));
+    }
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {

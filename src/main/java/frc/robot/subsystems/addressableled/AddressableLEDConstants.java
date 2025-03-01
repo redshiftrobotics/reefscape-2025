@@ -11,14 +11,32 @@ public class AddressableLEDConstants {
    */
   public record Range(int low, int high) {}
 
-  // TODO: Implement real values
-  public static final int LED_COUNT = 64;
-  public static final Distance LED_DENSITY = Meters.of(1.0 / LED_COUNT);
+  // TODO: Replace these with real values
+  public static final int LED_COUNT = 60;
+  public static final Distance LED_DENSITY = Meters.of(1.0 / 60.0);
   public static final int LED_STRIP_PORT = 0;
 
   /**
    * @apiNote The lower bound of the range represents the lowest index LED for this section, and the
    *     upper bound represents the highest index LED
+   * 
+   * <h2>Sections</h2>
+   * Assume front of robot refers to battery side
+   * <ol>
+   * <li>Front</li>
+   * <li>Left</li>
+   * <li>Back</li>
+   * <li>Right</li>
+   * <li>Superstructure Left</li>
+   * <li>Superstructure Right</li>
+   * </ol>
    */
-  public static final Range SECTIONS[] = {new Range(0, LED_COUNT)};
+  public static final Range SECTIONS[] = {
+    new Range(0, 9),
+    new Range(10, 19),
+    new Range(20, 29),
+    new Range(30, 39),
+    new Range(40, 49),
+    new Range(50, 59)
+  };
 }

@@ -8,9 +8,9 @@ public class SetAddressableLEDPattern extends Command {
   private final AddressableLEDSubsystem ledSystem;
 
   /**
-   * @apiNote If this is -1, that means that this command is targeting the whole strip
+   * @apiNote If this is empty, that means that this command is targeting the whole strip
    */
-  private final int section;
+  private final int[] sections;
 
   private final LEDPattern pattern;
 
@@ -21,8 +21,8 @@ public class SetAddressableLEDPattern extends Command {
    *     AddressableLEDConstants.SECTIONS)
    */
   public SetAddressableLEDPattern(
-      AddressableLEDSubsystem ledSystem, LEDPattern pattern, int section) {
-    this.section = section;
+      AddressableLEDSubsystem ledSystem, LEDPattern pattern, int... sections) {
+    this.sections = sections;
     this.pattern = pattern;
     this.ledSystem = ledSystem;
     addRequirements(ledSystem);
@@ -33,7 +33,7 @@ public class SetAddressableLEDPattern extends Command {
    * @param pattern Pattern to apply when command run
    */
   public SetAddressableLEDPattern(AddressableLEDSubsystem ledSystem, LEDPattern pattern) {
-    section = -1;
+    sections = new int[0];
     this.pattern = pattern;
     this.ledSystem = ledSystem;
     addRequirements(ledSystem);
@@ -41,10 +41,12 @@ public class SetAddressableLEDPattern extends Command {
 
   @Override
   public void execute() {
-    if (section < 0) {
+    if (sections.length <= 0) {
       ledSystem.applyPattern(pattern);
     } else {
-      ledSystem.applySectionedPattern(pattern, section);
+      for(int i = 0; i < sections.length; i++) {
+        ledSystem.applySectionedPattern(pattern, sections[i]);
+      }
     }
   }
 
