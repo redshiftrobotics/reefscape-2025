@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.AddressableLEDBufferView;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class AddressableLEDSubsystem extends SubsystemBase {
   private final AddressableLED led;
@@ -18,7 +19,7 @@ public class AddressableLEDSubsystem extends SubsystemBase {
    *     attached
    */
   public AddressableLEDSubsystem(boolean isFake) {
-    fake = isFake;
+    fake = isFake || Constants.MASTER_LED_DISABLE;
     if (fake) {
       led = null;
       ledBuffer = null;

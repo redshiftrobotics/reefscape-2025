@@ -1,7 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Percent;
-import static edu.wpi.first.units.Units.Second;
 import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -16,8 +14,6 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.SetAddressableLEDPattern;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.commands.intake.SetIntakeSpeed;
@@ -283,7 +278,7 @@ public class RobotContainer {
     }
 
     // Superstructure
-    superstructure = new Superstructure(elevator, wrist);
+    superstructure = new Superstructure(elevator, wrist, led);
 
     // Vision setup
     // vision.setLastRobotPoseSupplier(drive::getRobotPose);
@@ -534,15 +529,8 @@ public class RobotContainer {
   private void configureOperatorControllerBindingLevel(
       Trigger trigger, Superstructure.State state, Color color) {
     trigger.onTrue(superstructure.setNextPrepare(state));
-    LEDPattern pattern =
-        LEDPattern.gradient(GradientType.kContinuous, Color.kBlack, color)
-            .scrollAtRelativeSpeed(Percent.per(Second).of(35));
-    trigger
-        .and(operatorController.rightTrigger())
-        .onTrue(
-            superstructure
-                .runPrepare(state)
-                .alongWith(new SetAddressableLEDPattern(led, pattern, 4, 5)));
+
+    trigger.and(operatorController.rightTrigger()).onTrue(superstructure.runPrepare(state));
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {

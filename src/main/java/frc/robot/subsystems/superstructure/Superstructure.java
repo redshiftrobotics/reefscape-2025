@@ -1,10 +1,17 @@
 package frc.robot.subsystems.superstructure;
 
+import static edu.wpi.first.units.Units.Percent;
+import static edu.wpi.first.units.Units.Second;
+
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.SetAddressableLEDPattern;
+import frc.robot.subsystems.addressableled.AddressableLEDSubsystem;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
@@ -13,6 +20,7 @@ public class Superstructure extends SubsystemBase {
 
   private final Elevator elevator;
   private final Wrist wrist;
+  private final AddressableLEDSubsystem led;
 
   public static enum State {
     STOW,
@@ -32,9 +40,10 @@ public class Superstructure extends SubsystemBase {
   private final SuperstructureVisualizer goalVisualizer =
       new SuperstructureVisualizer("Goal", Color.kLime);
 
-  public Superstructure(Elevator elevator, Wrist wrist) {
+  public Superstructure(Elevator elevator, Wrist wrist, AddressableLEDSubsystem led) {
     this.elevator = elevator;
     this.wrist = wrist;
+    this.led = led;
   }
 
   public Command prepare() {
@@ -63,6 +72,11 @@ public class Superstructure extends SubsystemBase {
 
   public Command prepareL1() {
     return Commands.parallel(
+        new SetAddressableLEDPattern(
+            led,
+            LEDPattern.gradient(
+                    GradientType.kContinuous, Color.kBlack, SuperstructureConstants.L1_COLOR)
+                .scrollAtRelativeSpeed(Percent.per(Second).of(35))),
         elevator.runOnce(
             () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight / 4.0)),
         wrist.runOnce(() -> wrist.setGoal(Units.degreesToRotations(55))));
@@ -70,6 +84,11 @@ public class Superstructure extends SubsystemBase {
 
   public Command prepareL2() {
     return Commands.parallel(
+        new SetAddressableLEDPattern(
+            led,
+            LEDPattern.gradient(
+                    GradientType.kContinuous, Color.kBlack, SuperstructureConstants.L2_COLOR)
+                .scrollAtRelativeSpeed(Percent.per(Second).of(35))),
         elevator.runOnce(
             () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight / 2.0)),
         wrist.runOnce(() -> wrist.setGoal(Units.degreesToRotations(35))));
@@ -77,6 +96,11 @@ public class Superstructure extends SubsystemBase {
 
   public Command prepareL3() {
     return Commands.parallel(
+        new SetAddressableLEDPattern(
+            led,
+            LEDPattern.gradient(
+                    GradientType.kContinuous, Color.kBlack, SuperstructureConstants.L3_COLOR)
+                .scrollAtRelativeSpeed(Percent.per(Second).of(35))),
         elevator.runOnce(
             () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0))),
         wrist.runOnce(() -> wrist.setGoal(Units.degreesToRotations(35))));
@@ -84,19 +108,35 @@ public class Superstructure extends SubsystemBase {
 
   public Command prepareL4() {
     return Commands.parallel(
+        new SetAddressableLEDPattern(
+            led,
+            LEDPattern.gradient(
+                    GradientType.kContinuous, Color.kBlack, SuperstructureConstants.L4_COLOR)
+                .scrollAtRelativeSpeed(Percent.per(Second).of(35))),
         elevator.runOnce(() -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)),
         wrist.runOnce(() -> wrist.setGoal(Units.degreesToRotations(90))));
   }
 
   public Command prepareIntake() {
     return Commands.parallel(
+        new SetAddressableLEDPattern(
+            led,
+            LEDPattern.gradient(
+                    GradientType.kContinuous, Color.kBlack, SuperstructureConstants.INTAKE_COLOR)
+                .scrollAtRelativeSpeed(Percent.per(Second).of(35))),
         elevator.runOnce(
             () -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight / 4.0)),
         wrist.runOnce(() -> wrist.setGoal(Units.degreesToRotations(55))));
   }
 
   public Command stow() {
-    return elevator.runOnce(() -> elevator.setGoalHeightMeters(0));
+    return Commands.parallel(
+        new SetAddressableLEDPattern(
+            led,
+            LEDPattern.gradient(
+                    GradientType.kContinuous, Color.kBlack, SuperstructureConstants.L1_COLOR)
+                .scrollAtRelativeSpeed(Percent.per(Second).of(35))),
+        elevator.runOnce(() -> elevator.setGoalHeightMeters(0)));
   }
 
   @Override
