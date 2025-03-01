@@ -530,12 +530,8 @@ public class RobotContainer {
   private void configureOperatorControllerBindingLevel(
       Trigger trigger, Superstructure.State state, Color color) {
     trigger.onTrue(superstructure.setNextPrepare(state));
-    if(led != null) {
       LEDPattern pattern = LEDPattern.gradient(GradientType.kContinuous, Color.kBlack, color).scrollAtRelativeSpeed(Percent.per(Second).of(35));
       trigger.and(operatorController.rightTrigger()).onTrue(superstructure.runPrepare(state).alongWith(new SetAddressableLEDPattern(led, pattern, 4, 5)));
-    } else {
-      trigger.and(operatorController.rightTrigger()).onTrue(superstructure.runPrepare(state));
-    }
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
