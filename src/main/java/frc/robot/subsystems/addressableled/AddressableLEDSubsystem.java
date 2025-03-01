@@ -43,7 +43,6 @@ public class AddressableLEDSubsystem extends SubsystemBase {
     }
   }
 
-  // Periodically update the LED strip
   @Override
   public void periodic() {
     if(fake) return;
@@ -53,7 +52,12 @@ public class AddressableLEDSubsystem extends SubsystemBase {
     led.setData(ledBuffer);
   }
 
-  // Apply a color pattern to a section of the LED strip
+  /**
+   * Apply a pattern to a section of the LED strip
+   * 
+   * @param pattern The pattern to apply
+   * @param section The section of the LED strip to apply. This is an index into AddressableLEDConstants.SECTIONS.
+   */ 
   public void applySectionedPattern(LEDPattern pattern, int section) {
     if(fake) return;
     if (section < 0 || section >= ledViews.length) return;
@@ -61,7 +65,12 @@ public class AddressableLEDSubsystem extends SubsystemBase {
     currentPatterns[section] = pattern;
   }
 
-  // Apply a color pattern to a section of the LED strip
+  /**
+   * Apply a pattern to the entirety of the LED strip
+   * WARNING: This will overwrite pattern settings for all sections
+   * 
+   * @param pattern The pattern to apply
+   */ 
   public void applyPattern(LEDPattern pattern) {
     if(fake) return;
     pattern.applyTo(ledBuffer);
