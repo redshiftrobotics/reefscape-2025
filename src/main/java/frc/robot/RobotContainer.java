@@ -15,8 +15,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -518,10 +518,14 @@ public class RobotContainer {
   private void configureOperatorControllerBindings() {
     operatorController.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
-    configureOperatorControllerBindingLevel(operatorController.y(), Superstructure.State.L4, Color.kAqua);
-    configureOperatorControllerBindingLevel(operatorController.x(), Superstructure.State.L3, Color.kGold);
-    configureOperatorControllerBindingLevel(operatorController.b(), Superstructure.State.L2, Color.kLime);
-    configureOperatorControllerBindingLevel(operatorController.a(), Superstructure.State.L1, Color.kPurple);
+    configureOperatorControllerBindingLevel(
+        operatorController.y(), Superstructure.State.L4, Color.kAqua);
+    configureOperatorControllerBindingLevel(
+        operatorController.x(), Superstructure.State.L3, Color.kGold);
+    configureOperatorControllerBindingLevel(
+        operatorController.b(), Superstructure.State.L2, Color.kLime);
+    configureOperatorControllerBindingLevel(
+        operatorController.a(), Superstructure.State.L1, Color.kPurple);
 
     operatorController.leftBumper().whileTrue(hang.set(+0.5).withName("Hang Arm Up"));
     operatorController.rightBumper().whileTrue(hang.set(-0.5).withName("Hang Arm Down"));
@@ -530,8 +534,15 @@ public class RobotContainer {
   private void configureOperatorControllerBindingLevel(
       Trigger trigger, Superstructure.State state, Color color) {
     trigger.onTrue(superstructure.setNextPrepare(state));
-      LEDPattern pattern = LEDPattern.gradient(GradientType.kContinuous, Color.kBlack, color).scrollAtRelativeSpeed(Percent.per(Second).of(35));
-      trigger.and(operatorController.rightTrigger()).onTrue(superstructure.runPrepare(state).alongWith(new SetAddressableLEDPattern(led, pattern, 4, 5)));
+    LEDPattern pattern =
+        LEDPattern.gradient(GradientType.kContinuous, Color.kBlack, color)
+            .scrollAtRelativeSpeed(Percent.per(Second).of(35));
+    trigger
+        .and(operatorController.rightTrigger())
+        .onTrue(
+            superstructure
+                .runPrepare(state)
+                .alongWith(new SetAddressableLEDPattern(led, pattern, 4, 5)));
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {

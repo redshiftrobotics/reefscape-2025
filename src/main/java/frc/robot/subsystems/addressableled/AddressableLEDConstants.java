@@ -19,17 +19,16 @@ public class AddressableLEDConstants {
   /**
    * @apiNote The lower bound of the range represents the lowest index LED for this section, and the
    *     upper bound represents the highest index LED
-   * 
-   * <h2>Sections</h2>
-   * Assume front of robot refers to battery side
-   * <ol>
-   * <li>Front</li>
-   * <li>Left</li>
-   * <li>Back</li>
-   * <li>Right</li>
-   * <li>Superstructure Left</li>
-   * <li>Superstructure Right</li>
-   * </ol>
+   *     <h2>Sections</h2>
+   *     Assume front of robot refers to battery side
+   *     <ol>
+   *       <li>Front
+   *       <li>Left
+   *       <li>Back
+   *       <li>Right
+   *       <li>Superstructure Left
+   *       <li>Superstructure Right
+   *     </ol>
    */
   public static final Range SECTIONS[] = {
     new Range(0, 9),

@@ -44,7 +44,7 @@ public class SetAddressableLEDPattern extends Command {
     if (sections.length <= 0) {
       ledSystem.applyPattern(pattern);
     } else {
-      for(int i = 0; i < sections.length; i++) {
+      for (int i = 0; i < sections.length; i++) {
         ledSystem.applySectionedPattern(pattern, sections[i]);
       }
     }

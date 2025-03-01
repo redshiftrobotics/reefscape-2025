@@ -14,11 +14,12 @@ public class AddressableLEDSubsystem extends SubsystemBase {
   private final boolean fake;
 
   /**
-   * @param isFake Set this to true to disable useful functions for robots that don't have LEDs attached
+   * @param isFake Set this to true to disable useful functions for robots that don't have LEDs
+   *     attached
    */
   public AddressableLEDSubsystem(boolean isFake) {
     fake = isFake;
-    if(fake) {
+    if (fake) {
       led = null;
       ledBuffer = null;
       return;
@@ -45,7 +46,7 @@ public class AddressableLEDSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if(fake) return;
+    if (fake) return;
     for (int i = 0; i < ledViews.length; i++) {
       currentPatterns[i].applyTo(ledViews[i]);
     }
@@ -54,25 +55,26 @@ public class AddressableLEDSubsystem extends SubsystemBase {
 
   /**
    * Apply a pattern to a section of the LED strip
-   * 
+   *
    * @param pattern The pattern to apply
-   * @param section The section of the LED strip to apply. This is an index into AddressableLEDConstants.SECTIONS.
-   */ 
+   * @param section The section of the LED strip to apply. This is an index into
+   *     AddressableLEDConstants.SECTIONS.
+   */
   public void applySectionedPattern(LEDPattern pattern, int section) {
-    if(fake) return;
+    if (fake) return;
     if (section < 0 || section >= ledViews.length) return;
     pattern.applyTo(ledViews[section]);
     currentPatterns[section] = pattern;
   }
 
   /**
-   * Apply a pattern to the entirety of the LED strip
-   * WARNING: This will overwrite pattern settings for all sections
-   * 
+   * Apply a pattern to the entirety of the LED strip WARNING: This will overwrite pattern settings
+   * for all sections
+   *
    * @param pattern The pattern to apply
-   */ 
+   */
   public void applyPattern(LEDPattern pattern) {
-    if(fake) return;
+    if (fake) return;
     pattern.applyTo(ledBuffer);
     for (int i = 0; i < currentPatterns.length; i++) {
       currentPatterns[i] = pattern;
