@@ -1,11 +1,11 @@
-package frc.robot.subsystems.led;
+package frc.robot.subsystems.blinkinled;
 
-public class LEDConstants {
+public class BlinkinLEDConstants {
   /**
    * @brief Patterns taken from
    * @link https://www.revrobotics.com/content/docs/REV-11-1105-UM.pdf
    */
-  public static class LEDPatterns {
+  public static class Patterns {
     public static final double HOT_PINK = 0.57;
     public static final double DARK_RED = 0.59;
     public static final double RED = 0.61;
