@@ -1,23 +1,40 @@
 package frc.robot.subsystems.superstructure.intake;
 
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.*;
-
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import frc.robot.subsystems.superstructure.intake.IntakeConstants.IntakeConfig;
 
 /** Hardware implementation of the TemplateIO. */
 public class IntakeIOHardware implements IntakeIO {
   private SparkMax leftMotor;
   private SparkMax rightMotor;
-  private AnalogInput sensor;
 
-  public IntakeIOHardware(int motorIdLeft, int motorIdRight, int analogInputId) {
-    leftMotor = new SparkMax(motorIdLeft, MotorType.kBrushless);
-    rightMotor = new SparkMax(motorIdRight, MotorType.kBrushless);
-    sensor = new AnalogInput(analogInputId);
+  public IntakeIOHardware(IntakeConfig config) {
+    leftMotor = new SparkMax(config.motorIdLeft(), MotorType.kBrushless);
+    rightMotor = new SparkMax(config.motorIdLeft(), MotorType.kBrushless);
+
+    SparkMaxConfig leftMotorConfig = new SparkMaxConfig();
+    leftMotorConfig
+        .smartCurrentLimit(IntakeConstants.MOTOR_CURRENT_LIMIT)
+        .inverted(config.invertedLeft())
+        .idleMode(IdleMode.kCoast)
+        .voltageCompensation(12.0);
+
+    SparkMaxConfig rightMotorConfig = new SparkMaxConfig();
+    rightMotorConfig
+        .smartCurrentLimit(IntakeConstants.MOTOR_CURRENT_LIMIT)
+        .inverted(config.invertedRight())
+        .idleMode(IdleMode.kCoast)
+        .voltageCompensation(12.0);
+
+    leftMotor.configure(
+        leftMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    rightMotor.configure(
+        rightMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   @Override
@@ -25,7 +42,6 @@ public class IntakeIOHardware implements IntakeIO {
     inputs.speedLeft = leftMotor.get();
     inputs.speedRight = rightMotor.get();
 
-    // maybe we coulda had 4 vars but i just did what the example had
     inputs.appliedVolts =
         new double[] {
           leftMotor.getAppliedOutput() * leftMotor.getBusVoltage(),
@@ -44,14 +60,6 @@ public class IntakeIOHardware implements IntakeIO {
   @Override
   public void setRightMotor(double speed) {
     rightMotor.set(speed);
-  }
-
-  @Override
-  public boolean isOccupied() {
-    double sensorState = sensor.getValue();
-    SmartDashboard.putNumber("input", sensorState);
-
-    return MathUtil.isNear(sensorState, SIGNAL_SENSOR_OCCUPIED, SENSOR_VOLTAGE_TOLERANCE);
   }
 
   @Override

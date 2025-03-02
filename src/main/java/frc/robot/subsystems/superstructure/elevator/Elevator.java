@@ -67,6 +67,8 @@ public class Elevator extends SubsystemBase {
     COAST
   }
 
+  boolean stowOnHardStop = false;
+
   private IdleModeControl coastMode = IdleModeControl.AUTO;
   private boolean brakeModeEnabled = true;
 
@@ -159,8 +161,20 @@ public class Elevator extends SubsystemBase {
     followMotorFollowingAlert.set(!inputs.followerMotorFollowing);
   }
 
+  public Command runPrepare(double position) {
+    return Commands.runOnce(() -> setGoalHeightMeters(position));
+  }
+
+  public Command run(double position) {
+    return runPrepare(position).andThen(Commands.waitUntil(this::atGoalHeight));
+  }
+
   public void setGoalSupplier(Supplier<State> goal) {
     this.goalSupplier = goal;
+  }
+
+  public Command stow() {
+    return run(0).andThen(runOnce(io::stop));
   }
 
   /** Sets the goal height of the elevator in meters */

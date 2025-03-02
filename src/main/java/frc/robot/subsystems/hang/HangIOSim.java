@@ -4,28 +4,24 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
 
 public class HangIOSim implements HangIO {
-  private final PWMSparkMax motor = new PWMSparkMax(0);
-  private final Encoder encoder = new Encoder(0, 1);
-  private final EncoderSim encoderSim = new EncoderSim(encoder);
+
+  private static final DCMotor MOTOR = DCMotor.getNEO(1);
 
   private final SingleJointedArmSim arm =
       new SingleJointedArmSim(
-          DCMotor.getNEO(1),
+          MOTOR,
           HangConstants.GEAR_REDUCTION,
           1,
           Units.inchesToMeters(18),
           0,
-          3,
-          false,
+          Math.PI * 2,
+          true,
           0);
 
   private double appliedVolts = 0.0;
@@ -41,13 +37,9 @@ public class HangIOSim implements HangIO {
       appliedVolts = controller.calculate(inputs.positionRotations) + feedForwardVolts;
     }
 
-    motor.set(appliedVolts);
-
-    arm.setInputVoltage(motor.get());
+    arm.setInputVoltage(appliedVolts);
 
     arm.update(Constants.LOOP_PERIOD_SECONDS);
-
-    encoderSim.setDistance(arm.getAngleRads());
 
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(arm.getCurrentDrawAmps()));
@@ -55,7 +47,7 @@ public class HangIOSim implements HangIO {
     inputs.positionRotations = Units.radiansToRotations(arm.getAngleRads());
     inputs.velocityRPM = Units.radiansPerSecondToRotationsPerMinute(arm.getVelocityRadPerSec());
 
-    inputs.appliedVolts = new double[] {motor.getVoltage()};
+    inputs.appliedVolts = new double[] {appliedVolts};
     inputs.supplyCurrentAmps = new double[] {arm.getCurrentDrawAmps()};
   }
 
