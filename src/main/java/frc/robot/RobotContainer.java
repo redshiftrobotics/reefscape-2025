@@ -53,7 +53,9 @@ import frc.robot.subsystems.superstructure.elevator.ElevatorIOHardwareFollow;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
 import frc.robot.subsystems.superstructure.intake.AlgaeIntake;
 import frc.robot.subsystems.superstructure.intake.CoralIntake;
+import frc.robot.subsystems.superstructure.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.intake.IntakeIO;
+import frc.robot.subsystems.superstructure.intake.IntakeIOHardware;
 import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
 import frc.robot.subsystems.superstructure.wrist.WristIO;
@@ -123,150 +125,92 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, IO devices, and commands. */
   public RobotContainer() {
-    switch (Constants.getRobot()) {
-      case COMP_BOT_2025:
-        // Real robot (Competition bot with mechanisms), instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
-
-        vision =
-            new AprilTagVision(
-                // new CameraIOPhotonVision(VisionConstants.COMP_FRONT_LEFT_CAMERA),
-                // new CameraIOPhotonVision(VisionConstants.COMP_FRONT_RIGHT_CAMERA),
-                new CameraIOPhotonVision(VisionConstants.COMP_BACK_LEFT_CAMERA),
-                new CameraIOPhotonVision(VisionConstants.COMP_BACK_RIGHT_CAMERA));
-
-        // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
-        elevator = new Elevator(new ElevatorIOHardwareFollow(ElevatorConstants.ELEVATOR_CONFIG));
-        hang = new Hang(new HangIOHardwareRelative(HangConstants.HANG_CONFIG));
-        wrist = new Wrist(new WristIO() {});
-
-        // algaeIntake =
-        //     new AlgaeIntake(
-        //         new IntakeIOHardware(
-        //             IntakeConstants.ALGAE_INTAKE_LEFT_MOTOR_ID,
-        //             IntakeConstants.ALGAE_INTAKE_RIGHT_MOTOR_ID,
-        //             IntakeConstants.ALGAE_INTAKE_SENSOR_ID));
-        algaeIntake = new AlgaeIntake(new IntakeIO() {});
-
-        // coralIntake =
-        //     new CoralIntake(
-        //         new IntakeIOHardware(
-        //             IntakeConstants.CORAL_INTAKE_LEFT_MOTOR_ID,
-        //             IntakeConstants.CORAL_INTAKE_RIGHT_MOTOR_ID,
-        //             IntakeConstants.CORAL_INTAKE_SENSOR_ID));
-        coralIntake = new CoralIntake(new IntakeIO() {});
-
-        break;
-
-      case WOOD_BOT_TWO_2025:
-        // Real robot (Wood bot test chassis), instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
-        vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
-        elevator = new Elevator(new ElevatorIO() {});
-        hang = new Hang(new HangIO() {});
-
-        wrist = new Wrist(new WristIO() {});
-
-        algaeIntake = new AlgaeIntake(new IntakeIO() {});
-        coralIntake = new CoralIntake(new IntakeIO() {});
-
-        break;
-
-      case T_SHIRT_CANNON_CHASSIS:
-        // Real robot (T-Shirt cannon chassis), instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
-        vision = new AprilTagVision();
-        hang = new Hang(new HangIO() {});
-        elevator = new Elevator(new ElevatorIO() {});
-
-        wrist = new Wrist(new WristIO() {});
-
-        algaeIntake = new AlgaeIntake(new IntakeIO() {});
-        coralIntake = new CoralIntake(new IntakeIO() {});
-
-        break;
-
-      case CRESCENDO_CHASSIS_2024:
-        // Real robot (robot from last year chassis), instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIONavX(),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
-        vision = new AprilTagVision();
-        hang = new Hang(new HangIO() {});
-        elevator = new Elevator(new ElevatorIO() {});
-
-        wrist = new Wrist(new WristIO() {});
-
-        algaeIntake = new AlgaeIntake(new IntakeIO() {});
-        coralIntake = new CoralIntake(new IntakeIO() {});
-
-        break;
-
-      case SIM_BOT:
-        // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim());
-        vision =
-            new AprilTagVision(
-                new CameraIOSim(VisionConstants.COMP_FRONT_LEFT_CAMERA, drive::getRobotPose),
-                new CameraIOSim(VisionConstants.COMP_FRONT_RIGHT_CAMERA, drive::getRobotPose),
-                new CameraIOSim(VisionConstants.COMP_BACK_LEFT_CAMERA, drive::getRobotPose),
-                new CameraIOSim(VisionConstants.COMP_BACK_RIGHT_CAMERA, drive::getRobotPose));
-
-        hang = new Hang(new HangIOSim());
-        elevator = new Elevator(new ElevatorIOSim());
-        wrist = new Wrist(new WristIOSim());
-        algaeIntake = new AlgaeIntake(new IntakeIOSim());
-        coralIntake = new CoralIntake(new IntakeIOSim());
-        break;
-
-      default:
-        // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
-        hang = new Hang(new HangIO() {});
-        vision = new AprilTagVision();
-        elevator = new Elevator(new ElevatorIO() {});
-
-        wrist = new Wrist(new WristIO() {});
-
-        algaeIntake = new AlgaeIntake(new IntakeIO() {});
-        coralIntake = new CoralIntake(new IntakeIO() {});
-
-        break;
-    }
+    drive = switch(Constants.getRobot()) {
+      case COMP_BOT_2025, WOOD_BOT_TWO_2025, T_SHIRT_CANNON_CHASSIS ->
+          new Drive(
+              new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
+              new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+              new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+              new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+              new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+      case CRESCENDO_CHASSIS_2024 ->
+          new Drive(
+              new GyroIONavX(),
+              new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+              new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+              new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+              new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+      case SIM_BOT ->
+          new Drive(
+              new GyroIO() {},
+              new ModuleIOSim(),
+              new ModuleIOSim(),
+              new ModuleIOSim(),
+              new ModuleIOSim());
+      default ->
+        new Drive(
+          new GyroIO() {},
+          new ModuleIO() {},
+          new ModuleIO() {},
+          new ModuleIO() {},
+          new ModuleIO() {});
+    };
+    vision = switch(Constants.getRobot()) {
+      case COMP_BOT_2025 ->
+        new AprilTagVision(
+          // new CameraIOPhotonVision(VisionConstants.COMP_FRONT_LEFT_CAMERA),
+          // new CameraIOPhotonVision(VisionConstants.COMP_FRONT_RIGHT_CAMERA),
+          new CameraIOPhotonVision(VisionConstants.COMP_BACK_LEFT_CAMERA),
+          new CameraIOPhotonVision(VisionConstants.COMP_BACK_RIGHT_CAMERA));
+      case WOOD_BOT_TWO_2025 ->
+        new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
+      case SIM_BOT ->
+          new AprilTagVision(
+              new CameraIOSim(VisionConstants.COMP_FRONT_LEFT_CAMERA, drive::getRobotPose),
+              new CameraIOSim(VisionConstants.COMP_FRONT_RIGHT_CAMERA, drive::getRobotPose),
+              new CameraIOSim(VisionConstants.COMP_BACK_LEFT_CAMERA, drive::getRobotPose),
+              new CameraIOSim(VisionConstants.COMP_BACK_RIGHT_CAMERA, drive::getRobotPose));
+      default ->
+        new AprilTagVision();
+    };
+    elevator = switch(Constants.getRobot()) {
+      case COMP_BOT_2025 -> new Elevator(new ElevatorIOHardwareFollow(ElevatorConstants.ELEVATOR_CONFIG));
+      case SIM_BOT -> new Elevator(new ElevatorIOSim());
+      default -> new Elevator(new ElevatorIO() {});
+    };
+    hang = switch(Constants.getRobot()) {
+      case COMP_BOT_2025 -> new Hang(new HangIOHardwareRelative(HangConstants.HANG_CONFIG));
+      case SIM_BOT -> new Hang(new HangIOSim());
+      default -> new Hang(new HangIO() {});
+    };
+    wrist = switch(Constants.getRobot()) {
+      case COMP_BOT_2025 -> new Wrist(new WristIO() {});
+      case SIM_BOT -> new Wrist(new WristIOSim());
+      default -> new Wrist(new WristIO() {});
+    };
+    algaeIntake = switch(Constants.getRobot()) {
+      case COMP_BOT_2025 ->
+          // new AlgaeIntake(
+          //     new IntakeIOHardware(
+          //         IntakeConstants.ALGAE_INTAKE_LEFT_MOTOR_ID,
+          //         IntakeConstants.ALGAE_INTAKE_RIGHT_MOTOR_ID,
+          //         IntakeConstants.ALGAE_INTAKE_SENSOR_ID));
+          new AlgaeIntake(new IntakeIO() {});
+      case SIM_BOT -> new AlgaeIntake(new IntakeIOSim());
+      default -> new AlgaeIntake(new IntakeIO() {});
+    };
+    coralIntake = switch (Constants.getRobot()) {
+      case COMP_BOT_2025 ->
+          // coralIntake =
+          //     new CoralIntake(
+          //         new IntakeIOHardware(
+          //             IntakeConstants.CORAL_INTAKE_LEFT_MOTOR_ID,
+          //             IntakeConstants.CORAL_INTAKE_RIGHT_MOTOR_ID,
+          //             IntakeConstants.CORAL_INTAKE_SENSOR_ID));
+          new CoralIntake(new IntakeIO() {});
+      case SIM_BOT -> new CoralIntake(new IntakeIOSim());
+      default -> new CoralIntake(new IntakeIO() {});
+    };
 
     // Superstructure
     superstructure = new Superstructure(elevator, wrist);
