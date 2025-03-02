@@ -4,6 +4,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
@@ -66,6 +67,7 @@ public class Superstructure extends SubsystemBase {
   private final SuperstructureVisualizer setpointVisualizer =
       new SuperstructureVisualizer("Setpoint", Color.kAliceBlue);
   private final SuperstructureVisualizer goalVisualizer =
+      new SuperstructureVisualizer("Goal", Color.kLime);
       new SuperstructureVisualizer("Goal", Color.kLime);
 
   public Superstructure(

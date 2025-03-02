@@ -41,7 +41,6 @@ import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.hang.Hang;
 import frc.robot.subsystems.hang.HangConstants;
 import frc.robot.subsystems.hang.HangIO;
-import frc.robot.subsystems.hang.HangIOHardware;
 import frc.robot.subsystems.hang.HangIOSim;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
@@ -53,7 +52,6 @@ import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.intake.IntakeIO;
 import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
-import frc.robot.subsystems.superstructure.wrist.WristConstants;
 import frc.robot.subsystems.superstructure.wrist.WristIO;
 import frc.robot.subsystems.superstructure.wrist.WristIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
@@ -79,14 +77,8 @@ public class RobotContainer {
   private final Drive drive;
   private final AprilTagVision vision;
 
-  private final Superstructure superstructure;
-  private final Elevator elevator;
-
-  private final Wrist algaeWrist;
-  private final Wrist coralWrist;
-
-  private final Intake algaeIntake;
-  private final Intake coralIntake;
+  private final AlgaeIntake algaeIntake;
+  private final CoralIntake coralIntake;
 
   private final Hang hang;
 
@@ -135,19 +127,32 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
 
-        vision =
-            new AprilTagVision(
-                new CameraIOPhotonVision(VisionConstants.COMP_FRONT_LEFT_CAMERA),
-                new CameraIOPhotonVision(VisionConstants.COMP_FRONT_RIGHT_CAMERA),
-                new CameraIOPhotonVision(VisionConstants.COMP_BACK_LEFT_CAMERA),
-                new CameraIOPhotonVision(VisionConstants.COMP_BACK_RIGHT_CAMERA));
+        vision = new AprilTagVision();
 
-        elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
-        hang = new Hang(new HangIOHardware(HangConstants.HANG_CONFIG));
-        algaeWrist = new Wrist("Algae", new WristIO() {}, WristConstants.ALGAE_FEEDBACK);
-        coralWrist = new Wrist("Coral", new WristIO() {}, WristConstants.CORAL_FEEDBACK);
-        algaeIntake = new Intake("Algae", new IntakeIO() {});
-        coralIntake = new Intake("Coral", new IntakeIO() {});
+        // elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
+        elevator = new Elevator(new ElevatorIOHardwareFollow(ElevatorConstants.ELEVATOR_CONFIG));
+
+        // hang = new Hang(new HangIOReal(HangConstants.COMP_BOT_2025_CAN_ID));
+        hang = new Hang(new HangIO() {});
+
+        wrist = new Wrist(new WristIORelativeEncoder(WristConstants.MOTOR_ID));
+
+        // algaeIntake =
+        //     new AlgaeIntake(
+        //         new IntakeIOHardware(
+        //             IntakeConstants.ALGAE_INTAKE_LEFT_MOTOR_ID,
+        //             IntakeConstants.ALGAE_INTAKE_RIGHT_MOTOR_ID,
+        //             IntakeConstants.ALGAE_INTAKE_SENSOR_ID));
+        algaeIntake = new AlgaeIntake(new IntakeIO() {});
+
+        // coralIntake =
+        //     new CoralIntake(
+        //         new IntakeIOHardware(
+        //             IntakeConstants.CORAL_INTAKE_LEFT_MOTOR_ID,
+        //             IntakeConstants.CORAL_INTAKE_RIGHT_MOTOR_ID,
+        //             IntakeConstants.CORAL_INTAKE_SENSOR_ID));
+        coralIntake = new CoralIntake(new IntakeIO() {});
+
         break;
 
       case WOOD_BOT_TWO_2025:
@@ -494,31 +499,14 @@ public class RobotContainer {
 
   private void configureOperatorControllerBindings() {
 
-    new Trigger(DriverStation::isEnabled).onTrue(superstructure.stowLow());
+    operatorController.b().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
-    operatorController.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
+    operatorController.y().onTrue(superstructure.scoreL4());
+    operatorController.x().onTrue(superstructure.scoreL3());
+    operatorController.a().onTrue(superstructure.scoreL2());
+    operatorController.povUp().onTrue(superstructure.scoreL1());
 
-    configureOperatorControllerBindingLevel(operatorController.y(), Superstructure.State.L4);
-    configureOperatorControllerBindingLevel(operatorController.x(), Superstructure.State.L3);
-    configureOperatorControllerBindingLevel(operatorController.b(), Superstructure.State.L2);
-    configureOperatorControllerBindingLevel(operatorController.a(), Superstructure.State.L1);
-
-    operatorController.povDown().onTrue(superstructure.stowLow());
-
-    operatorController.leftBumper().whileTrue(hang.set(+0.5).withName("Hang Arm Up"));
-    operatorController.rightBumper().whileTrue(hang.set(-0.5).withName("Hang Arm Down"));
-  }
-
-  private void configureOperatorControllerBindingLevel(
-      Trigger trigger, Superstructure.State state) {
-    Trigger algae = operatorController.leftTrigger();
-    Trigger force = operatorController.rightTrigger();
-
-    trigger.and(algae.negate()).onTrue(superstructure.setNextPrepare(state));
-    trigger.and(algae).onTrue(superstructure.setNextPrepare(state.asAlgae()));
-
-    trigger.and(algae.negate()).and(force).onTrue(superstructure.run(state));
-    trigger.and(algae).and(force).onTrue(superstructure.run(state.asAlgae()));
+    operatorController.povDown().onTrue(superstructure.stow());
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
@@ -589,13 +577,33 @@ public class RobotContainer {
     }
 
     if (Constants.RUNNING_TEST_PLANS) {
-      dashboardChooser.addOption("[TEST] Stow Hang Arm", hang.stow());
-      dashboardChooser.addOption("[TEST] Deploy Hang Arm", hang.deploy());
-      dashboardChooser.addOption("[TEST] Retract Hang Arm", hang.retract());
+      dashboardChooser.addOption(
+          "[TEST] Rotate Wrist",
+          Commands.sequence(
+              new SetWrist(wrist, 0),
+              new SetWrist(wrist, 0.25),
+              Commands.waitSeconds(1),
+              new SetWrist(wrist, 0)));
+      dashboardChooser.addOption(
+          "[TEST] Activate Algae Intake",
+          Commands.sequence(
+              new SetIntakeSpeed(algaeIntake, 1),
+              Commands.waitSeconds(1),
+              new SetIntakeSpeed(algaeIntake, 0)));
+      dashboardChooser.addOption(
+          "[TEST] Activate Coral Intake",
+          Commands.sequence(
+              new SetIntakeSpeed(coralIntake, 1),
+              Commands.waitSeconds(1),
+              new SetIntakeSpeed(coralIntake, 0)));
     }
+  }
 
-    dashboardChooser.addOption(
-        "[Characterization] Elevator Static Forward", elevator.staticCharacterization(0.02));
+  private void configureSysIds(LoggedDashboardChooser<Command> dashboardChooser) {
+
+    dashboardChooser.addOption("Elevator Static", elevator.staticCharacterization(0.02));
+
+    dashboardChooser.addOption("Hang Coast", hang.coast());
 
     dashboardChooser.addOption(
         "[Characterization] Drive Feed Forward", DriveCommands.feedforwardCharacterization(drive));
