@@ -116,6 +116,82 @@ public class DriveCommands {
         .finallyDo(drive::stop);
   }
 
+  public static Command joystickDriveWithSlowdown(
+      Drive drivetrain,
+      Supplier<Translation2d> translationSupplier,
+      DoubleSupplier omegaSupplier,
+      DoubleSupplier elevatorHeightSupplier,
+      BooleanSupplier useFieldRelativeSupplier) {
+
+    Runnable drive =
+        () -> {
+          Translation2d translation = translationSupplier.get();
+          double elevatorHeight = elevatorHeightSupplier.getAsDouble();
+          boolean fieldRelative = useFieldRelativeSupplier.getAsBoolean();
+
+          double multiplier = getMultiplier(elevatorHeight);
+
+          double dx = translation.getX() * multiplier;
+          double dy = translation.getY() * multiplier;
+          double omega = omegaSupplier.getAsDouble();
+
+          drivetrain.setRobotSpeeds(new ChassisSpeeds(dx, dy, omega), fieldRelative);
+        };
+
+    return drivetrain.run(drive).finallyDo(drivetrain::stop);
+  }
+
+  public static Command joystickHeadingDriveWithSlowdown(
+      Drive drivetrain,
+      Supplier<Translation2d> translationSupplier,
+      Supplier<Optional<Rotation2d>> headingSupplier,
+      DoubleSupplier elevatorHeightSupplier,
+      BooleanSupplier useFieldRelativeSupplier) {
+    ProfiledPIDController controller =
+        new ProfiledPIDController(
+            ROTATION_CONTROLLER_CONSTANTS.kP(),
+            ROTATION_CONTROLLER_CONSTANTS.kI(),
+            ROTATION_CONTROLLER_CONSTANTS.kD(),
+            DRIVE_CONFIG.getAngularConstraints());
+
+    controller.setTolerance(ROTATION_TOLERANCE.getRadians());
+    controller.enableContinuousInput(0, Units.rotationsToRadians(1));
+
+    Runnable setup =
+        () -> {
+          Rotation2d robotRotation = drivetrain.getRobotPose().getRotation();
+          double goal = AllianceFlipUtil.apply(robotRotation).getRadians();
+
+          controller.setGoal(goal);
+          controller.reset(
+              robotRotation.getRadians(), drivetrain.getRobotSpeeds().omegaRadiansPerSecond);
+        };
+
+    Runnable drive =
+        () -> {
+          Translation2d translation = translationSupplier.get();
+          Optional<Rotation2d> heading = headingSupplier.get();
+
+          if (heading.isPresent()) {
+            controller.setGoal(heading.get().getRadians());
+          }
+
+          double multiplier = getMultiplier(elevatorHeightSupplier.getAsDouble());
+
+          double controllerOutput =
+              controller.calculate(
+                  AllianceFlipUtil.apply(drivetrain.getRobotPose().getRotation()).getRadians());
+
+          double dx = translation.getX() * multiplier;
+          double dy = translation.getY() * multiplier;
+          double omega = controller.atGoal() ? 0 : controllerOutput;
+
+          drivetrain.setRobotSpeeds(new ChassisSpeeds(dx, dy, omega));
+        };
+
+    return drivetrain.run(drive).beforeStarting(setup).finallyDo(drivetrain::stop);
+  }
+
   /** Joystick drive */
   public static Command joystickDriveSmartAngleLock(
       Drive drive,
@@ -307,5 +383,13 @@ public class DriveCommands {
     double[] positions = new double[4];
     Rotation2d lastAngle = new Rotation2d();
     double gyroDelta = 0.0;
+  }
+
+  private static double getMultiplier(double elevatorHeight) {
+    return getMultiplier(elevatorHeight, 0.5);
+  }
+
+  private static double getMultiplier(double elevatorHeight, double multiplier) {
+    return 1 - (elevatorHeight * multiplier);
   }
 }
