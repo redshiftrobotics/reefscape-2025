@@ -129,11 +129,11 @@ public class DriveCommands {
           double elevatorHeight = elevatorHeightSupplier.getAsDouble();
           boolean fieldRelative = useFieldRelativeSupplier.getAsBoolean();
 
-          double multiplier = getMultiplierFromElevatorHeight(elevatorHeight);
+          double multiplier = getMultiplier(elevatorHeight);
 
           double dx = translation.getX() * multiplier;
           double dy = translation.getY() * multiplier;
-          double omega = omegaSupplier.getAsDouble() * multiplier;
+          double omega = omegaSupplier.getAsDouble();
 
           drivetrain.setRobotSpeeds(new ChassisSpeeds(dx, dy, omega), fieldRelative);
         };
@@ -176,7 +176,7 @@ public class DriveCommands {
             controller.setGoal(heading.get().getRadians());
           }
 
-          double multiplier = getMultiplierFromElevatorHeight(elevatorHeightSupplier.getAsDouble());
+          double multiplier = getMultiplier(elevatorHeightSupplier.getAsDouble());
 
           double controllerOutput =
               controller.calculate(
@@ -184,7 +184,7 @@ public class DriveCommands {
 
           double dx = translation.getX() * multiplier;
           double dy = translation.getY() * multiplier;
-          double omega = controller.atGoal() ? 0 : controllerOutput * multiplier;
+          double omega = controller.atGoal() ? 0 : controllerOutput;
 
           drivetrain.setRobotSpeeds(new ChassisSpeeds(dx, dy, omega));
         };
@@ -385,7 +385,11 @@ public class DriveCommands {
     double gyroDelta = 0.0;
   }
 
-  private static double getMultiplierFromElevatorHeight(double elevatorHeight) {
-    return 1 - (elevatorHeight / 2);
+  private static double getMultiplier(double elevatorHeight) {
+    return getMultiplier(elevatorHeight, 0.5);
+  }
+
+  private static double getMultiplier(double elevatorHeight, double multiplier) {
+    return 1 - (elevatorHeight * multiplier);
   }
 }
