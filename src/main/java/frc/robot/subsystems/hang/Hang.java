@@ -35,8 +35,6 @@ public class Hang extends SubsystemBase {
 
   @Override
   public void periodic() {
-    io.periodic();
-
     io.updateInputs(inputs);
     Logger.processInputs("Hang", inputs);
 

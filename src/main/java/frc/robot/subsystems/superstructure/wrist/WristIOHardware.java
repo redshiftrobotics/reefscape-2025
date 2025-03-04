@@ -1,4 +1,4 @@
-package frc.robot.subsystems.hang;
+package frc.robot.subsystems.superstructure.wrist;
 
 import static frc.robot.utility.SparkUtil.tryUntilOk;
 
@@ -12,16 +12,16 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import frc.robot.subsystems.hang.HangConstants.HangConfig;
+import frc.robot.subsystems.superstructure.wrist.WristConstants.WristConfig;
 
-public class HangIOHardware implements HangIO {
+public class WristIOHardware implements WristIO {
   private final SparkMax motor;
   private final SparkAbsoluteEncoder encoder;
   private final SparkClosedLoopController control;
 
   private boolean breakMode = true;
 
-  public HangIOHardware(HangConfig config) {
+  public WristIOHardware(WristConfig config) {
     motor = new SparkMax(config.motorId(), MotorType.kBrushless);
     encoder = motor.getAbsoluteEncoder();
     control = motor.getClosedLoopController();
@@ -29,21 +29,20 @@ public class HangIOHardware implements HangIO {
     final SparkMaxConfig motorConfig = new SparkMaxConfig();
     motorConfig
         .idleMode(breakMode ? IdleMode.kBrake : IdleMode.kCoast)
-        .smartCurrentLimit(HangConstants.MOTOR_CURRENT_LIMIT)
-        .voltageCompensation(12.0);
-    motorConfig.absoluteEncoder.zeroOffset(config.absoluteEncoderOffset());
+        .smartCurrentLimit(WristConstants.MOTOR_CURRENT_LIMIT)
+        .voltageCompensation(12)
+        .inverted(config.motorInverted());
+    motorConfig
+        .absoluteEncoder
+        .zeroOffset(config.absoluteEncoderOffset())
+        .inverted(config.encoderInverted());
     motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
 
-    tryUntilOk(
-        motor,
-        5,
-        () ->
-            motor.configure(
-                motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+    motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   @Override
-  public void updateInputs(HangIOInputs inputs) {
+  public void updateInputs(WristIOInputs inputs) {
     inputs.positionRotations = encoder.getPosition();
     inputs.velocityRPM = encoder.getVelocity();
 
@@ -54,21 +53,6 @@ public class HangIOHardware implements HangIO {
   @Override
   public void runPosition(double setpoint) {
     control.setReference(setpoint, ControlType.kPosition);
-  }
-
-  @Override
-  public void runOpenLoop(double output) {
-    motor.set(output);
-  }
-
-  @Override
-  public void runVolts(double volts) {
-    motor.setVoltage(volts);
-  }
-
-  @Override
-  public void stop() {
-    motor.stopMotor();
   }
 
   @Override
