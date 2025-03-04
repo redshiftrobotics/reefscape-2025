@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.0,
-        "y": 6.15
+        "x": 8.013547291475184,
+        "y": 4.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.918834428800632,
-        "y": 6.089960562290159
+        "x": 6.932381720275816,
+        "y": 3.9399605622901586
       },
       "isLocked": false,
       "linkedName": "Mid Spawn"
