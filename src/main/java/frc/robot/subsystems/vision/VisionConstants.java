@@ -50,8 +50,8 @@ public class VisionConstants {
   private static final double FRONT_CAMERA_PITCH = Units.degreesToRadians(10);
   private static final double FRONT_CAMERA_OFFSET_Z = Units.inchesToMeters(8.285);
 
-  private static final double BACK_CAMERA_YAW = Units.degreesToRadians(-20);
-  private static final double BACK_CAMERA_PITCH = Units.degreesToRadians(10);
+  private static final double BACK_CAMERA_YAW = Units.degreesToRadians(20);
+  private static final double BACK_CAMERA_PITCH = Units.degreesToRadians(20);
   private static final double BACK_CAMERA_OFFSET_Z = Units.inchesToMeters(7.888);
 
   public static final CameraConfig COMP_FRONT_LEFT_CAMERA =

@@ -194,6 +194,11 @@ public class Elevator extends SubsystemBase {
     return inputs.positionRad * ElevatorConstants.drumRadius;
   }
 
+  @AutoLogOutput(key = "Elevator/measuredHeightPercent")
+  public double getHeightPercent() {
+    return getHeightMeters() / ElevatorConstants.carriageMaxHeight;
+  }
+
   @AutoLogOutput(key = "Elevator/atGoal")
   public boolean atGoalHeight() {
     return MathUtil.isNear(getHeightMeters(), getGoalHeightMeters(), tolerance.get());
