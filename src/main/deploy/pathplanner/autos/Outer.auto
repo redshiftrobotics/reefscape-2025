@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Mid Spawn to D5"
+            "pathName": "Top Spawn to D1"
           }
         },
         {
@@ -17,15 +17,39 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "l4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stow"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "D5 to P1"
+            "pathName": "D1 to P1"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "intake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stow"
           }
         },
         {
@@ -41,9 +65,27 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "l4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stow"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "D5 to P1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intake"
           }
         }
       ]
