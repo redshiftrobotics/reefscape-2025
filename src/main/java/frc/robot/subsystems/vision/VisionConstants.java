@@ -11,7 +11,7 @@ public class VisionConstants {
   // --- Vision Config ---
 
   public static final AprilTagFieldLayout FIELD =
-      AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
   // Set cameraName on PhotonVision web interface. Edit camera name from camera type to camera
   // position. To find robotToCamera, measure the distance from the camera to the center of the

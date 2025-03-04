@@ -32,7 +32,7 @@ public class ElevatorConstants {
   public static final double maxCarriageVelocity = 3.0;
   public static final double maxCarriageAcceleration = 3.5;
 
-  public static final double carriagePositionTolerance = Units.inchesToMeters(0.3);
+  public static final double carriagePositionTolerance = Units.inchesToMeters(0.8);
 
   public static final PIDConstants pid =
       switch (Constants.getRobot()) {

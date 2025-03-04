@@ -23,7 +23,7 @@ import frc.robot.utility.SparkUtil;
 import java.util.function.DoubleSupplier;
 
 /** Hardware implementation of the TemplateIO. */
-public class ElevatorIOHardwareFollow implements ElevatorIO {
+public class ElevatorIOHardware implements ElevatorIO {
 
   private final SparkMax leader;
   private final SparkMax follower;
@@ -35,7 +35,7 @@ public class ElevatorIOHardwareFollow implements ElevatorIO {
 
   private boolean breakMode = true;
 
-  public ElevatorIOHardwareFollow(ElevatorConfig config) {
+  public ElevatorIOHardware(ElevatorConfig config) {
 
     leader = new SparkMax(config.leaderCanId(), MotorType.kBrushless);
     follower = new SparkMax(config.followerCanId(), MotorType.kBrushless);

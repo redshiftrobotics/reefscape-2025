@@ -1,19 +1,25 @@
 package frc.robot.subsystems.superstructure.intake;
 
+import frc.robot.Constants;
+
 /** Constants for the Template subsystem. */
 public class IntakeConstants {
-  // TODO Check if this is 5 or 4.
-  public static final int SIGNAL_SENSOR_OCCUPIED = 5;
-  public static final double SENSOR_VOLTAGE_TOLERANCE = .3; // this is fine, righte?
 
-  // TODO
-  public static final int CORAL_INTAKE_LEFT_MOTOR_ID = 0;
-  public static final int CORAL_INTAKE_RIGHT_MOTOR_ID = 0;
-  public static final int CORAL_INTAKE_SENSOR_ID = 0;
-  public static final double CORAL_INTAKE_MOTOR_SPEED = 0.3;
+  public static final int MOTOR_CURRENT_LIMIT = 30;
 
-  // TODO
-  public static final int ALGAE_INTAKE_LEFT_MOTOR_ID = 0;
-  public static final int ALGAE_INTAKE_RIGHT_MOTOR_ID = 0;
-  public static final int ALGAE_INTAKE_SENSOR_ID = 0;
+  public record IntakeConfig(
+      int motorIdLeft, int motorIdRight, boolean invertedLeft, boolean invertedRight) {}
+  ;
+
+  public static final IntakeConfig CORAL_INTAKE_CONFIG =
+      switch (Constants.getRobot()) {
+        case COMP_BOT_2025 -> new IntakeConfig(0, 1, false, false);
+        default -> new IntakeConfig(0, 0, false, false);
+      };
+
+  public static final IntakeConfig ALGAE_INTAKE_CONFIG =
+      switch (Constants.getRobot()) {
+        case COMP_BOT_2025 -> new IntakeConfig(2, 3, false, false);
+        default -> new IntakeConfig(0, 0, false, false);
+      };
 }
