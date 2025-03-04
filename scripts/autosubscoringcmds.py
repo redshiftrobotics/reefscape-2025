@@ -21,6 +21,9 @@ with open(in_path, "r+") as file:
 			elif cmd["data"]["waitTime"] == 2.5:
 				cmd["data"]["name"] = "intake"
 				del cmd["data"]["waitTime"]
+			elif cmd["data"]["waitTime"] == 4.0:
+				cmd["data"]["name"] = "l4_algae"
+				del cmd["data"]["waitTime"]
 			
 	file.seek(0)
 	json.dump(doc, file, indent=2)	
