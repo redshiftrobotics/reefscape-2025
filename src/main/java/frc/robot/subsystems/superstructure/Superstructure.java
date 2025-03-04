@@ -1,17 +1,10 @@
 package frc.robot.subsystems.superstructure;
 
-import static edu.wpi.first.units.Units.Percent;
-import static edu.wpi.first.units.Units.Second;
-
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.SetAddressableLEDPattern;
-import frc.robot.subsystems.addressableled.AddressableLEDSubsystem;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.intake.Intake;
@@ -145,11 +138,6 @@ public class Superstructure extends SubsystemBase {
 
   public Command prepareL4() {
     return Commands.parallel(
-        new SetAddressableLEDPattern(
-            led,
-            LEDPattern.gradient(
-                    GradientType.kContinuous, Color.kBlack, SuperstructureConstants.L4_COLOR)
-                .scrollAtRelativeSpeed(Percent.per(Second).of(35))),
         elevator.runOnce(() -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)),
         algaeWrist.runPrepare(algaeHighStow),
         coralWrist.runPrepare(Units.degreesToRotations(90)));
@@ -181,34 +169,6 @@ public class Superstructure extends SubsystemBase {
         elevator.runOnce(() -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)),
         algaeWrist.runPrepare(algaeHighStow),
         coralWrist.runPrepare(Units.degreesToRotations(90)));
-  }
-
-  public Command prepareAlgaeL1() {
-    return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight / 4.0),
-        coralWrist.runPrepare(coralHighStow),
-        algaeWrist.runPrepare(Units.degreesToRotations(90)));
-  }
-
-  public Command prepareAlgaeL2() {
-    return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight / 2.0),
-        coralWrist.runPrepare(coralHighStow),
-        algaeWrist.runPrepare(Units.degreesToRotations(90)));
-  }
-
-  public Command prepareAlgaeL3() {
-    return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0)),
-        coralWrist.runPrepare(coralHighStow),
-        algaeWrist.runPrepare(Units.degreesToRotations(90)));
-  }
-
-  public Command prepareAlgaeL4() {
-    return Commands.parallel(
-        elevator.runOnce(() -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)),
-        coralWrist.runPrepare(coralHighStow),
-        algaeWrist.runPrepare(Units.degreesToRotations(90)));
   }
 
   public Command prepareIntake() {
