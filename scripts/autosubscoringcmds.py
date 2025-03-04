@@ -26,6 +26,7 @@ with open(in_path, "r+") as file:
 				del cmd["data"]["waitTime"]
 			
 	file.seek(0)
+	file.truncate()
 	json.dump(doc, file, indent=2)	
 	
 print("Complete!")

@@ -21,6 +21,7 @@ with open(in_path, "r+") as file:
 	
 	doc["idealStartingState"]["rotation"] = rot
 	file.seek(0)
+	file.truncate()
 	json.dump(doc, file, indent=2)	
 	
 print("Complete!")
