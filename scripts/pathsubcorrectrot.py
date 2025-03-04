@@ -25,14 +25,13 @@ def do_file(in_path):
 		file.truncate()
 		json.dump(doc, file, indent=2)
 		
-	print("Wrote to \"" + file + "\"!")
+	print("Wrote to \"" + in_path.__str__() + "\"!")
 
 if in_path.is_file():
 	do_file(in_path)
 elif in_path.is_dir():
-	for child in in_path:
-		if in_path.is_file():
-			do_file(in_path)
+	for child in in_path.iterdir():
+		do_file(child)
 	
 else:
 	raise SystemExit("Unknown type of path!")
