@@ -377,21 +377,21 @@ public class RobotContainer {
 
     // Default command, normal joystick drive
     drive.setDefaultCommand(
-        DriveCommands.joystickDriveWithSlowdown(
+        DriveCommands.joystickDrive(
                 drive,
                 input::getTranslationMetersPerSecond,
                 input::getOmegaRadiansPerSecond,
-                elevator::getHeightPercent,
+                level::getCurrentSpeedLevel,
                 useFieldRelative::getAsBoolean)
             .withName("DEFAULT Drive"));
 
     // Secondary drive command, angle controlled drive
     useHeadingControlled.whileTrue(
-        DriveCommands.joystickHeadingDriveWithSlowdown(
+        DriveCommands.joystickHeadingDrive(
                 drive,
                 input::getTranslationMetersPerSecond,
                 input::getHeadingDirection,
-                elevator::getHeightPercent,
+                level::getCurrentSpeedLevel,
                 useFieldRelative::getAsBoolean)
             .withName("HEADING Drive"));
 
