@@ -22,7 +22,11 @@ public class SuperstructureVisualizer {
   public SuperstructureVisualizer(String name, Color color) {
     this.name = name;
 
-    LoggedMechanismRoot2d root = mechanism.getRoot(name + " Root", 0.1, 0.06);
+    LoggedMechanismRoot2d root =
+        mechanism.getRoot(
+            name + " Root",
+            Units.inchesToMeters(34.886649) / 2,
+            Units.inchesToMeters(34.886649 - 6));
 
     elevatorMechanism =
         root.append(
@@ -39,6 +43,6 @@ public class SuperstructureVisualizer {
     elevatorMechanism.setLength(carriageHeight);
     wristLigament.setAngle(Units.rotationsToDegrees(wristRotations));
 
-    Logger.recordOutput("Mechanism2d/" + name, mechanism);
+    Logger.recordOutput("SuperstructureVisualizer/" + name, mechanism);
   }
 }

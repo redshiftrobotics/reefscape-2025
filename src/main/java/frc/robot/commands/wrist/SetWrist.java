@@ -20,6 +20,6 @@ public class SetWrist extends Command {
 
   @Override
   public boolean isFinished() {
-    return wrist.atSetpoint();
+    return wrist.atGoal();
   }
 }

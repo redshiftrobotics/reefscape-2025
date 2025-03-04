@@ -11,13 +11,15 @@ public class Hang extends SubsystemBase {
   private final HangIO io;
   private final HangIOInputsAutoLogged inputs = new HangIOInputsAutoLogged();
 
-  private static final LoggedTunableNumberFactory driveFeedbackFactory =
-      new LoggedTunableNumberFactory("Hang/Feedback");
+  private static final LoggedTunableNumberFactory hangFactory =
+      new LoggedTunableNumberFactory("Hang");
 
   private static final LoggedTunableNumber kP =
-      driveFeedbackFactory.getNumber("DriveKp", HangConstants.FEEDBACK.kP());
+      hangFactory.getNumber("HangKp", HangConstants.FEEDBACK.kP());
+  private static final LoggedTunableNumber kI =
+      hangFactory.getNumber("HangKi", HangConstants.FEEDBACK.kI());
   private static final LoggedTunableNumber kD =
-      driveFeedbackFactory.getNumber("DriveKd", HangConstants.FEEDBACK.kD());
+      hangFactory.getNumber("HangKd", HangConstants.FEEDBACK.kD());
 
   private HangVisualization measuredVisualizer =
       new HangVisualization("Hang/Mechanism2d/Measured", Color.kYellow);
@@ -27,7 +29,7 @@ public class Hang extends SubsystemBase {
   public Hang(HangIO io) {
     this.io = io;
 
-    io.setPID(kP.get(), 0.0, kD.get());
+    io.setPID(kP.get(), kI.get(), kD.get());
     io.setBrakeMode(true);
   }
 
@@ -39,7 +41,7 @@ public class Hang extends SubsystemBase {
     Logger.processInputs("Hang", inputs);
 
     LoggedTunableNumber.ifChanged(
-        hashCode(), (values) -> io.setPID(values[0], 0.0, values[1]), kP, kD);
+        hashCode(), (values) -> io.setPID(values[0], values[1], values[2]), kP, kI, kD);
 
     measuredVisualizer.update(inputs.positionRotations);
   }
@@ -59,6 +61,10 @@ public class Hang extends SubsystemBase {
 
   public Command retract() {
     return runOnce(() -> setGoal(HangConstants.STOWED_POSITION_ROTATIONS));
+  }
+
+  public Command set(double speed) {
+    return runEnd(() -> io.runOpenLoop(speed), io::stop);
   }
 
   public Command coast() {

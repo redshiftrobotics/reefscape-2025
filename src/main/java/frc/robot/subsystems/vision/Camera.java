@@ -36,7 +36,7 @@ public class Camera {
       group.getNumber("pitchToleranceDegrees", 10.0);
 
   private static final LoggedTunableNumber maxValidDistanceAwayFromCurrentEstimateMeters =
-      group.getNumber("maxValidDistanceFromCurrentEstimateMeters", 30.0);
+      group.getNumber("maxValidDistanceFromCurrentEstimateMeters", 10.0);
   private static final LoggedTunableNumber maxValidDistanceAwayFromCurrentHeadingDegrees =
       group.getNumber("gyroFilteringToleranceDegrees", 30.0);
 

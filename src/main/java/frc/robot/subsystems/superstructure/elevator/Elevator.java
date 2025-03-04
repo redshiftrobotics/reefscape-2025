@@ -68,7 +68,7 @@ public class Elevator extends SubsystemBase {
   }
 
   private IdleModeControl coastMode = IdleModeControl.AUTO;
-  private boolean brakeModeEnabled = false;
+  private boolean brakeModeEnabled = true;
 
   private boolean stoppedProfile = false;
 
@@ -92,7 +92,7 @@ public class Elevator extends SubsystemBase {
 
     io.setPID(kP.get(), kI.get(), kD.get());
 
-    io.setBrakeMode(true);
+    io.setBrakeMode(brakeModeEnabled);
   }
 
   @Override
@@ -178,6 +178,11 @@ public class Elevator extends SubsystemBase {
   @AutoLogOutput(key = "Elevator/measuredHeightMeters")
   public double getHeightMeters() {
     return inputs.positionRad * ElevatorConstants.drumRadius;
+  }
+
+  @AutoLogOutput(key = "Elevator/measuredHeightPercent")
+  public double getHeightPercent() {
+    return getHeightMeters() / ElevatorConstants.carriageMaxHeight;
   }
 
   @AutoLogOutput(key = "Elevator/atGoal")

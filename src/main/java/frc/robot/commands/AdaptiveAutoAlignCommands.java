@@ -14,6 +14,7 @@ import frc.robot.utility.AllianceFlipUtil;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import org.littletonrobotics.junction.Logger;
 
@@ -27,6 +28,8 @@ public class AdaptiveAutoAlignCommands {
   private final Transform2d roughLineupOffset;
 
   private int offset = 0;
+
+  private Supplier<Command> startCommand, finalAlignCommand, endCommand;
 
   public AdaptiveAutoAlignCommands(
       List<Pose2d> poses,
@@ -47,6 +50,22 @@ public class AdaptiveAutoAlignCommands {
         poses.stream()
             .map(pose -> pose.transformBy(robotOffset).transformBy(positionOffset))
             .toList();
+
+    setStartCommand(Commands::none);
+    setFinalAlignCommand(Commands::none);
+    setEndCommand(Commands::none);
+  }
+
+  public void setStartCommand(Supplier<Command> startCommand) {
+    this.startCommand = startCommand;
+  }
+
+  public void setFinalAlignCommand(Supplier<Command> finalAlignCommand) {
+    this.finalAlignCommand = finalAlignCommand;
+  }
+
+  public void setEndCommand(Supplier<Command> endCommand) {
+    this.endCommand = endCommand;
   }
 
   public static Pose2d getCurrentAutoAlignGoal() {
@@ -80,10 +99,15 @@ public class AdaptiveAutoAlignCommands {
     return Commands.defer(
         () -> {
           Pose2d pose = getPose(offset);
-          return DriveCommands.pathfindToPoseCommand(
-                  drive, pose.plus(roughLineupOffset.inverse()).plus(mechanismOffset), 0.25, 0)
+          return startCommand
+              .get()
+              .andThen(
+                  DriveCommands.pathfindToPoseCommand(
+                      drive, pose.plus(roughLineupOffset.inverse()).plus(mechanismOffset), 0.25, 0))
               .andThen(Commands.runOnce(drive::stop))
+              .andThen(finalAlignCommand.get())
               .andThen(DriveCommands.driveToPosePrecise(drive, pose.plus(mechanismOffset)))
+              .andThen(endCommand.get())
               .beforeStarting(() -> setCurrentAutoAlignGoal(pose))
               .finallyDo(() -> setCurrentAutoAlignGoal(null));
         },
