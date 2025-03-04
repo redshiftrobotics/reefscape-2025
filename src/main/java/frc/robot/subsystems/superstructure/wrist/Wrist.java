@@ -1,57 +1,72 @@
 package frc.robot.subsystems.superstructure.wrist;
 
-import static frc.robot.subsystems.superstructure.wrist.WristConstants.TOLERANCE;
-
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utility.records.PIDConstants;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
 import org.littletonrobotics.junction.Logger;
 
 /** Mechanism at end of elevator to move intake/ */
 public class Wrist extends SubsystemBase {
-  private static final LoggedTunableNumberFactory factory = new LoggedTunableNumberFactory("Wrist");
+  private final String name;
 
-  private static final LoggedTunableNumber kP =
-      factory.getNumber("kP", WristConstants.FEEDBACK.kP());
-  private static final LoggedTunableNumber kI =
-      factory.getNumber("kI", WristConstants.FEEDBACK.kI());
-  private static final LoggedTunableNumber kD =
-      factory.getNumber("kD", WristConstants.FEEDBACK.kD());
+  private final LoggedTunableNumberFactory factory;
+  private final LoggedTunableNumber kP, kI, kD;
 
   private final WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
 
+  private double goalRotations = 0;
+
   /** Creates a new Wrist. */
-  public Wrist(WristIO io) {
+  public Wrist(String name, WristIO io, PIDConstants feedback) {
+    this.name = name;
     this.io = io;
 
-    io.setPid(kP.get(), kI.get(), kD.get());
+    factory = new LoggedTunableNumberFactory("Wrist " + name);
+    kP = factory.getNumber("kP", feedback.kP());
+    kI = factory.getNumber("kI", feedback.kI());
+    kD = factory.getNumber("kD", feedback.kD());
+
+    io.setPID(kP.get(), kI.get(), kD.get());
+    io.setBrakeMode(true);
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
 
-    Logger.processInputs("Wrist", inputs);
+    Logger.processInputs("Wrist " + name, inputs);
 
     LoggedTunableNumber.ifChanged(
         hashCode(),
         (values) -> {
-          io.setPid(values[0], values[1], values[2]);
+          io.setPID(values[0], values[1], values[2]);
         },
         kP,
         kI,
         kD);
   }
 
-  /** In rotations. */
-  public void setGoal(double setpoint) {
-    io.runPosition(setpoint);
+  public Command runPrepare(double position) {
+    return runOnce(() -> setGoalRotations(position));
   }
 
+  public Command run(double position) {
+    return runPrepare(position).andThen(Commands.waitUntil(this::atGoal));
+  }
+
+  public void setGoalRotations(double position) {
+    goalRotations = position;
+    io.runPosition(position);
+  }
+
+  /** Whether wrist is within tolerance of setpoint */
   public boolean atGoal() {
-    return MathUtil.isNear(inputs.setpointRotations, inputs.positionRotations, TOLERANCE);
+    return MathUtil.isNear(inputs.positionRotations, goalRotations, WristConstants.TOLERANCE);
   }
 
   /** Get position in rotations */
@@ -61,10 +76,10 @@ public class Wrist extends SubsystemBase {
 
   /** Get setpoint in rotations */
   public double getSetpoint() {
-    return inputs.setpointRotations;
+    return goalRotations;
   }
 
   public void setPid(double kP, double kI, double kD) {
-    io.setPid(kP, kI, kD);
+    io.setPID(kP, kI, kD);
   }
 }
