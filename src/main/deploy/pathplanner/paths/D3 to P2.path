@@ -55,7 +55,7 @@
   "folder": "Paths A",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 300.0
   },
   "useDefaultConstraints": true
 }

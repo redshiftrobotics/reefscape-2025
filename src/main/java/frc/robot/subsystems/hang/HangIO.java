@@ -14,8 +14,6 @@ public interface HangIO {
 
   public default void updateInputs(HangIOInputs inputs) {}
 
-  public default void periodic() {}
-
   public default void runPosition(double positionRotations) {}
 
   public default void runOpenLoop(double output) {}

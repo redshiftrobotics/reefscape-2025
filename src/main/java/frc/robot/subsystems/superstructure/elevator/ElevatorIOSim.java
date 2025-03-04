@@ -10,7 +10,7 @@ import frc.robot.Constants;
 /** Simulation implementation of the TemplateIO. */
 public class ElevatorIOSim implements ElevatorIO {
 
-  private static final DCMotor MOTOR = DCMotor.getNEO(1);
+  private static final DCMotor MOTOR = DCMotor.getNEO(2);
 
   private final ElevatorSim sim =
       new ElevatorSim(
