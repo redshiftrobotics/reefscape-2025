@@ -12,7 +12,7 @@
         "y": 5.266265484114209
       },
       "isLocked": false,
-      "linkedName": "Coral Pickup 1"
+      "linkedName": "P1"
     },
     {
       "anchor": {
@@ -55,7 +55,7 @@
   "folder": "Paths B",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 125.0
+    "rotation": 126.0
   },
   "useDefaultConstraints": true
 }
