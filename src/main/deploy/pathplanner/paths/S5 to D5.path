@@ -8,24 +8,40 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.918834428800632,
-        "y": 6.089960562290159
+        "x": 7.092521640616952,
+        "y": 6.122772706734164
       },
       "isLocked": false,
-      "linkedName": "Mid Spawn"
+      "linkedName": "S5"
     },
     {
       "anchor": {
-        "x": 5.25,
-        "y": 5.3
+        "x": 3.6177631578947365,
+        "y": 5.391282894736841
       },
       "prevControl": {
-        "x": 6.391833679885655,
-        "y": 5.64602262398551
+        "x": 4.154656737205387,
+        "y": 5.623669667871301
+      },
+      "nextControl": {
+        "x": 2.9731085526315786,
+        "y": 5.112253289473684
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.0,
+        "y": 4.0
+      },
+      "prevControl": {
+        "x": 3.1174342105263158,
+        "y": 4.236677631578948
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Coral Drop"
+      "linkedName": "Farthest Coral Drop"
     }
   ],
   "rotationTargets": [],
@@ -49,7 +65,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "Paths A",

@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.326251170661211,
-        "y": 6.089824140875545
+        "x": 5.888486842105262,
+        "y": 7.286759868421052
       },
       "isLocked": false,
-      "linkedName": "Top Spawn"
+      "linkedName": "S6"
     },
     {
       "anchor": {
-        "x": 6.0,
-        "y": 3.85
+        "x": 5.25,
+        "y": 5.3
       },
       "prevControl": {
-        "x": 6.428055936351696,
-        "y": 4.48611853709987
+        "x": 5.420114913318576,
+        "y": 5.483196387154915
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "D2"
+      "linkedName": "Coral Drop"
     }
   ],
   "rotationTargets": [],
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "placeCoralL3",
-      "waypointRelativePos": 0,
+      "name": "placeCoralL1",
+      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -49,10 +49,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -119.99999999999999
   },
   "reversed": false,
-  "folder": "Paths B",
+  "folder": "Paths A",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

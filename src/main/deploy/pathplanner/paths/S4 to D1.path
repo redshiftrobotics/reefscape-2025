@@ -4,44 +4,28 @@
     {
       "anchor": {
         "x": 8.053,
-        "y": 7.25
+        "y": 5.05
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.230083084845645,
-        "y": 7.015105350042044
+        "x": 7.051794547687432,
+        "y": 5.0779230071807
       },
       "isLocked": false,
-      "linkedName": "Top Spawn"
+      "linkedName": "S4"
     },
     {
       "anchor": {
-        "x": 3.5215460526315785,
-        "y": 5.179605263157893
+        "x": 5.25,
+        "y": 5.3
       },
       "prevControl": {
-        "x": 3.727598556082349,
-        "y": 5.419999850517125
-      },
-      "nextControl": {
-        "x": 3.232894736842105,
-        "y": 4.842845394736842
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 3.0,
-        "y": 4.0
-      },
-      "prevControl": {
-        "x": 3.0135904088675978,
-        "y": 4.249630328259231
+        "x": 6.036263871557313,
+        "y": 5.179709017534991
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Farthest Coral Drop"
+      "linkedName": "Coral Drop"
     }
   ],
   "rotationTargets": [],
@@ -50,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "placeCoralL1",
-      "waypointRelativePos": 0,
+      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -65,7 +49,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -119.99999999999999
   },
   "reversed": false,
   "folder": "Paths A",

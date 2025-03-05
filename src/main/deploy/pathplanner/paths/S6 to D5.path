@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.0,
-        "y": 6.15
+        "x": 8.053,
+        "y": 7.25
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.487349082443203,
-        "y": 5.495071061627607
+        "x": 6.230083084845645,
+        "y": 7.015105350042044
       },
       "isLocked": false,
-      "linkedName": "Mid Spawn"
+      "linkedName": "S6"
     },
     {
       "anchor": {
-        "x": 5.234210526315789,
-        "y": 2.774177631578947
+        "x": 3.5215460526315785,
+        "y": 5.179605263157893
       },
       "prevControl": {
-        "x": 5.869243421052631,
-        "y": 2.8126644736842104
+        "x": 3.727598556082349,
+        "y": 5.419999850517125
+      },
+      "nextControl": {
+        "x": 3.232894736842105,
+        "y": 4.842845394736842
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.0,
+        "y": 4.0
+      },
+      "prevControl": {
+        "x": 3.0135904088675978,
+        "y": 4.249630328259231
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Far Coral Drop"
+      "linkedName": "Farthest Coral Drop"
     }
   ],
   "rotationTargets": [],
@@ -49,7 +65,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "Paths A",

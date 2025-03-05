@@ -4,50 +4,41 @@
     {
       "anchor": {
         "x": 8.053,
-        "y": 5.05
+        "y": 7.25
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.110689614877236,
-        "y": 4.589242455484748
+        "x": 6.860279605263157,
+        "y": 7.190542763157895
       },
       "isLocked": false,
-      "linkedName": "Low Spawn"
+      "linkedName": "S6"
     },
     {
       "anchor": {
-        "x": 5.0,
-        "y": 7.0
+        "x": 3.6,
+        "y": 5.26
       },
       "prevControl": {
-        "x": 4.749999999999999,
-        "y": 7.0
-      },
-      "nextControl": {
-        "x": 5.539271035817229,
-        "y": 7.0
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.0,
-        "y": 7.0
-      },
-      "prevControl": {
-        "x": 1.0,
-        "y": 7.0
+        "x": 4.295230263157897,
+        "y": 6.032532894736842
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "D6"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "placeCoralL3",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -58,10 +49,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -59.99999999999999
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Paths B",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

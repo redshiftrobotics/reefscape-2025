@@ -8,56 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.169766772253811,
-        "y": 4.426661509535252
+        "x": 7.247546868857106,
+        "y": 4.5825867328070675
       },
       "isLocked": false,
-      "linkedName": "Low Spawn"
+      "linkedName": "S4"
     },
     {
       "anchor": {
-        "x": 4.5318256578947365,
-        "y": 2.3796875
+        "x": 5.234210526315789,
+        "y": 2.774177631578947
       },
       "prevControl": {
-        "x": 5.528936177301429,
-        "y": 2.5608254775817088
-      },
-      "nextControl": {
-        "x": 3.812663277401848,
-        "y": 2.2490423843182983
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 3.3579769736842104,
-        "y": 2.822286184210526
-      },
-      "prevControl": {
-        "x": 3.5534316230012966,
-        "y": 2.666409694449129
-      },
-      "nextControl": {
-        "x": 3.003020614376682,
-        "y": 3.1053664358221513
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 3.0,
-        "y": 4.0
-      },
-      "prevControl": {
-        "x": 3.1210183131318607,
-        "y": 3.7812431306525007
+        "x": 5.5292449708885325,
+        "y": 2.850935458745452
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Farthest Coral Drop"
+      "linkedName": "Far Coral Drop"
     }
   ],
   "rotationTargets": [],
@@ -81,7 +49,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 119.99999999999999
   },
   "reversed": false,
   "folder": "Paths A",

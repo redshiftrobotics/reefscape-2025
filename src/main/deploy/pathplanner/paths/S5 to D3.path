@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.053,
-        "y": 7.25
+        "x": 8.0,
+        "y": 6.15
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.860279605263157,
-        "y": 7.190542763157895
+        "x": 7.487349082443203,
+        "y": 5.495071061627607
       },
       "isLocked": false,
-      "linkedName": "Top Spawn"
+      "linkedName": "S5"
     },
     {
       "anchor": {
-        "x": 3.6,
-        "y": 5.26
+        "x": 5.234210526315789,
+        "y": 2.774177631578947
       },
       "prevControl": {
-        "x": 4.295230263157897,
-        "y": 6.032532894736842
+        "x": 5.869243421052631,
+        "y": 2.8126644736842104
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "D6"
+      "linkedName": "Far Coral Drop"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "placeCoralL3",
+      "name": "placeCoralL1",
       "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
       "command": null
@@ -49,10 +49,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": 119.99999999999999
   },
   "reversed": false,
-  "folder": "Paths B",
+  "folder": "Paths A",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

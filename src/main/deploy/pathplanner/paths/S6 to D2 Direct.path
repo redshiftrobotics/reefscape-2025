@@ -4,15 +4,15 @@
     {
       "anchor": {
         "x": 8.053,
-        "y": 5.05
+        "y": 7.25
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.2006531944514665,
-        "y": 4.560909023758789
+        "x": 7.326251170661211,
+        "y": 6.089824140875545
       },
       "isLocked": false,
-      "linkedName": "Low Spawn"
+      "linkedName": "S6"
     },
     {
       "anchor": {
@@ -20,8 +20,8 @@
         "y": 3.85
       },
       "prevControl": {
-        "x": 6.409943003043365,
-        "y": 4.088456572972833
+        "x": 6.428055936351696,
+        "y": 4.48611853709987
       },
       "nextControl": null,
       "isLocked": false,
