@@ -346,18 +346,16 @@ public class RobotContainer {
   }
 
   private void configureDriverControllerBindings(boolean includeAutoAlign) {
-    final CommandXboxController driverXbox = driverController;
-
     final Trigger useFieldRelative =
-        new Trigger(new OverrideSwitch(driverXbox.y(), OverrideSwitch.Mode.TOGGLE, true));
+        new Trigger(new OverrideSwitch(driverController.y(), OverrideSwitch.Mode.TOGGLE, true));
 
     final Trigger useHeadingControlled =
         new Trigger(
             new OverrideSwitch(
-                driverXbox
+                driverController
                     .rightBumper()
-                    .and(driverXbox.leftTrigger().negate())
-                    .and(driverXbox.rightTrigger().negate()),
+                    .and(driverController.leftTrigger().negate())
+                    .and(driverController.rightTrigger().negate()),
                 OverrideSwitch.Mode.HOLD,
                 false));
 
@@ -367,10 +365,10 @@ public class RobotContainer {
     final JoystickInputController input =
         new JoystickInputController(
             drive,
-            () -> -driverXbox.getLeftY(),
-            () -> -driverXbox.getLeftX(),
-            () -> -driverXbox.getRightY(),
-            () -> -driverXbox.getRightX());
+            () -> -driverController.getLeftY(),
+            () -> -driverController.getLeftX(),
+            () -> -driverController.getRightY(),
+            () -> -driverController.getRightX());
 
     final SpeedLevelController level =
         new SpeedLevelController(SpeedLevelController.SpeedLevel.NO_LEVEL);
@@ -397,7 +395,7 @@ public class RobotContainer {
 
     // Cause the robot to resist movement by forming an X shape with the swerve modules
     // Helps prevent getting pushed around
-    driverXbox
+    driverController
         .x()
         .whileTrue(
             drive
@@ -405,13 +403,13 @@ public class RobotContainer {
                 .withName("RESIST Movement With X"));
 
     // Stop the robot and cancel any running commands
-    driverXbox
+    driverController
         .b()
         .or(RobotModeTriggers.disabled())
         .onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
     // Reset the gyro heading
-    driverXbox
+    driverController
         .start()
         .debounce(0.3)
         .onTrue(
@@ -420,7 +418,7 @@ public class RobotContainer {
                     () ->
                         drive.resetPose(
                             new Pose2d(drive.getRobotPose().getTranslation(), Rotation2d.kZero)))
-                .andThen(rumbleController(driverXbox, 0.3).withTimeout(0.25))
+                .andThen(rumbleController(driverController, 0.3).withTimeout(0.25))
                 .ignoringDisable(true)
                 .withName("Reset Gyro Heading"));
 
@@ -436,23 +434,23 @@ public class RobotContainer {
               new Translation2d(Units.inchesToMeters(24), 0));
 
       reefAlignmentCommands.setFinalAlignCommand(superstructure::prepare);
-      reefAlignmentCommands.setEndCommand(() -> rumbleController(driverXbox, 0.3).withTimeout(0.1));
+      reefAlignmentCommands.setEndCommand(() -> rumbleController(driverController, 0.3).withTimeout(0.1));
 
-      driverXbox
+      driverController
           .rightTrigger()
           .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Algin REEF"))
           .onFalse(reefAlignmentCommands.stop(drive));
 
-      driverXbox
+      driverController
           .rightTrigger()
-          .and(driverXbox.leftBumper())
+          .and(driverController.leftBumper())
           .onTrue(
               CustomCommands.reInitCommand(
                   reefAlignmentCommands.driveToNext(drive).withName("Algin REEF -1")));
 
-      driverXbox
+      driverController
           .rightTrigger()
-          .and(driverXbox.rightBumper())
+          .and(driverController.rightBumper())
           .onTrue(
               CustomCommands.reInitCommand(
                   reefAlignmentCommands.driveToPrevious(drive).withName("Algin REEF +1")));
@@ -469,23 +467,23 @@ public class RobotContainer {
 
       intakeAlignmentCommands.setFinalAlignCommand(superstructure::prepareIntake);
       intakeAlignmentCommands.setEndCommand(
-          () -> rumbleController(driverXbox, 0.3).withTimeout(0.1));
+          () -> rumbleController(driverController, 0.3).withTimeout(0.1));
 
-      driverXbox
+      driverController
           .leftTrigger()
           .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Align INTAKE"))
           .onFalse(intakeAlignmentCommands.stop(drive));
 
-      driverXbox
+      driverController
           .leftTrigger()
-          .and(driverXbox.leftBumper())
+          .and(driverController.leftBumper())
           .onTrue(
               CustomCommands.reInitCommand(
                   intakeAlignmentCommands.driveToNext(drive).withName("Align INTAKE +1")));
 
-      driverXbox
+      driverController
           .leftTrigger()
-          .and(driverXbox.rightBumper())
+          .and(driverController.rightBumper())
           .onTrue(
               CustomCommands.reInitCommand(
                   intakeAlignmentCommands.driveToPrevious(drive).withName("Align INTAKE -1")));
