@@ -434,7 +434,8 @@ public class RobotContainer {
               new Translation2d(Units.inchesToMeters(24), 0));
 
       reefAlignmentCommands.setFinalAlignCommand(superstructure::prepare);
-      reefAlignmentCommands.setEndCommand(() -> rumbleController(driverController, 0.3).withTimeout(0.1));
+      reefAlignmentCommands.setEndCommand(
+          () -> rumbleController(driverController, 0.3).withTimeout(0.1));
 
       driverController
           .rightTrigger()
@@ -492,7 +493,8 @@ public class RobotContainer {
 
   private void configureOperatorControllerBindings() {
 
-    new Trigger(DriverStation::isEnabled).onTrue(superstructure.stowLow());
+    new Trigger(DriverStation::isEnabled)
+        .onTrue(elevator.zeroHeight().onlyIf(elevator::needsZeroing).andThen(superstructure.stowLow()));
 
     operatorController.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
@@ -555,6 +557,11 @@ public class RobotContainer {
     NamedCommands.registerCommand("l2", superstructure.run(Superstructure.State.L2));
     NamedCommands.registerCommand("l3", superstructure.run(Superstructure.State.L3));
     NamedCommands.registerCommand("l4", superstructure.run(Superstructure.State.L4));
+
+    NamedCommands.registerCommand("l2_algae", superstructure.run(Superstructure.State.L2_ALGAE));
+    NamedCommands.registerCommand("l3_algae", superstructure.run(Superstructure.State.L3_ALGAE));
+    NamedCommands.registerCommand("l4_algae", superstructure.run(Superstructure.State.L4_ALGAE));
+
     NamedCommands.registerCommand("stow", superstructure.run(Superstructure.State.STOW));
     NamedCommands.registerCommand("intake", superstructure.run(Superstructure.State.INTAKE));
 
@@ -563,16 +570,6 @@ public class RobotContainer {
     // dashboardChooser.addOption("Triangle Auto", AutoBuilder.buildAuto("Triangle Auto"));
     // dashboardChooser.addOption("Rotate Auto", AutoBuilder.buildAuto("Rotate Auto"));
     // dashboardChooser.addOption("Circle Auto", AutoBuilder.buildAuto("Circle Auto"));
-
-    // Test Auto
-    dashboardChooser.addOption("Inner", AutoBuilder.buildAuto("Inner"));
-    dashboardChooser.addOption("Middle", AutoBuilder.buildAuto("Middle"));
-    dashboardChooser.addOption("Outer", AutoBuilder.buildAuto("Outer"));
-
-    // Leave autos
-    dashboardChooser.addOption("Leave Inner", AutoBuilder.buildAuto("Leave Inner"));
-    dashboardChooser.addOption("Leave Middle", AutoBuilder.buildAuto("Leave Middle"));
-    dashboardChooser.addOption("Leave Outer", AutoBuilder.buildAuto("Leave Outer"));
 
     // Choreo Autos
     // https://pathplanner.dev/pplib-choreo-interop.html#load-choreo-trajectory-as-a-pathplannerpath
