@@ -1,11 +1,11 @@
 package frc.robot.commands.test;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.led.LEDConstants;
-import frc.robot.subsystems.led.LEDSubsystem;
+import frc.robot.subsystems.blinkinled.BlinkinLEDConstants;
+import frc.robot.subsystems.blinkinled.BlinkinLEDSubsystem;
 
-public class LEDTestCommand extends Command {
-  private LEDSubsystem ledSystem;
+public class BlinkinLEDTestCommand extends Command {
+  private BlinkinLEDSubsystem ledSystem;
 
   private double currentPattern;
 
@@ -17,14 +17,14 @@ public class LEDTestCommand extends Command {
    * @param time Time in robot updates to wait between changes (each update is 20ms, so 50 updates
    *     is 1 second)
    */
-  public LEDTestCommand(LEDSubsystem led, int time) {
+  public BlinkinLEDTestCommand(BlinkinLEDSubsystem led, int time) {
     ledSystem = led;
     delay = time;
   }
 
   @Override
   public void initialize() {
-    currentPattern = LEDConstants.LEDPatterns.BLACK;
+    currentPattern = BlinkinLEDConstants.Patterns.BLACK;
     ticker = 0;
   }
 
@@ -39,11 +39,11 @@ public class LEDTestCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return currentPattern <= LEDConstants.LEDPatterns.HOT_PINK;
+    return currentPattern <= BlinkinLEDConstants.Patterns.HOT_PINK;
   }
 
   @Override
   public void end(boolean interrupted) {
-    currentPattern = LEDConstants.LEDPatterns.BLACK;
+    currentPattern = BlinkinLEDConstants.Patterns.BLACK;
   }
 }

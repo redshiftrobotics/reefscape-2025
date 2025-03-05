@@ -92,6 +92,11 @@ public final class Constants {
     return null;
   }
 
+  /**
+   * Set this to true to completely disable usage of the AddressableLED subsystem, no matter what
+   */
+  public static boolean MASTER_LED_DISABLE = false;
+
   private static final Alert wrongRobotTypeAlertReal =
       new Alert(
           String.format(

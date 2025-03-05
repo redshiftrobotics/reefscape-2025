@@ -167,8 +167,8 @@ public class Superstructure extends SubsystemBase {
   public Command prepareAlgaeL4() {
     return Commands.parallel(
         elevator.runOnce(() -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)),
-        coralWrist.runPrepare(coralHighStow),
-        algaeWrist.runPrepare(Units.degreesToRotations(90)));
+        algaeWrist.runPrepare(algaeHighStow),
+        coralWrist.runPrepare(Units.degreesToRotations(90)));
   }
 
   public Command prepareIntake() {
