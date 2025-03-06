@@ -81,6 +81,10 @@ public class Superstructure extends SubsystemBase {
     this.algaeIntake = algaeIntake;
   }
 
+  public Command run() {
+    return elevator.defer(() -> run(goal));
+  }
+
   public Command prepare() {
     return elevator.defer(() -> runPrepare(goal));
   }

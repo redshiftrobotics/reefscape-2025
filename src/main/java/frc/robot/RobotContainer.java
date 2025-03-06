@@ -431,9 +431,13 @@ public class RobotContainer {
               new Transform2d(0, 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(6), 0));
 
-      reefAlignmentCommands.setFinalAlignCommand(superstructure::prepare);
+      reefAlignmentCommands.setFinalAlignCommand(superstructure::prepare, Units.inchesToMeters(12));
       reefAlignmentCommands.setEndCommand(
-          () -> rumbleController(driverController, 0.3).withTimeout(0.1));
+          () ->
+              Commands.parallel(
+                      superstructure.run(),
+                      rumbleController(driverController, 0.5).withTimeout(0.1))
+                  .andThen(rumbleController(driverController, 0.5).withTimeout(0.1)));
 
       driverController
           .rightTrigger()
@@ -464,7 +468,8 @@ public class RobotContainer {
               new Transform2d(0, 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(4), 0));
 
-      intakeAlignmentCommands.setFinalAlignCommand(superstructure::prepareIntake);
+      intakeAlignmentCommands.setFinalAlignCommand(
+          superstructure::prepareIntake, Units.inchesToMeters(12));
       intakeAlignmentCommands.setEndCommand(
           () -> rumbleController(driverController, 0.3).withTimeout(0.1));
 
