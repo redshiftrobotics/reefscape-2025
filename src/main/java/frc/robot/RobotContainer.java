@@ -5,6 +5,7 @@ import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -504,8 +505,10 @@ public class RobotContainer {
 
     operatorController.povDown().onTrue(superstructure.stowLow());
 
-    operatorController.leftBumper().whileTrue(hang.set(+0.5).withName("Hang Arm Up"));
-    operatorController.rightBumper().whileTrue(hang.set(-0.5).withName("Hang Arm Down"));
+    operatorController.leftBumper().whileTrue(hang.runSet(+0.5).withName("Hang Arm Up"));
+    operatorController.rightBumper().whileTrue(hang.runSet(-0.5).withName("Hang Arm Down"));
+    hang.setDefaultCommand(
+        hang.run(() -> hang.set(MathUtil.applyDeadband(operatorController.getLeftY(), 0.2))));
   }
 
   private void configureOperatorControllerBindingLevel(

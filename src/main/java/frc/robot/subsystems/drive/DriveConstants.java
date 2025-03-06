@@ -57,8 +57,8 @@ public class DriveConstants {
   public static final DriveConfig DRIVE_CONFIG =
       switch (Constants.getRobot()) {
         case COMP_BOT_2025 -> new DriveConfig(
-            new Translation2d(Units.inchesToMeters(22.729226), Units.inchesToMeters(22.729226)),
-            new Translation2d(Units.inchesToMeters(27.5), Units.inchesToMeters(27.5)),
+            new Translation2d(Units.inchesToMeters(28), Units.inchesToMeters(28)),
+            new Translation2d(Units.inchesToMeters(35), Units.inchesToMeters(35)),
             5.05968,
             14.5);
         case T_SHIRT_CANNON_CHASSIS -> new DriveConfig(
