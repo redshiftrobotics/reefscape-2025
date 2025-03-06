@@ -112,26 +112,26 @@ public class Superstructure extends SubsystemBase {
                 : coralIntake.intake(1.0).withTimeout(1));
   }
 
+  private static final double coralHighStow = Units.degreesToRotations(20);
   private static final double algaeHighStow = Units.degreesToRotations(160);
-  private static final double coralHighStow = Units.degreesToRotations(160);
 
   public Command prepareL1() {
     return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight / 4.0),
+        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight / 4.0),
         algaeWrist.runPrepare(algaeHighStow),
         coralWrist.runPrepare(Units.degreesToRotations(55)));
   }
 
   public Command prepareL2() {
     return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight / 2.0),
+        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight / 2.0),
         algaeWrist.runPrepare(algaeHighStow),
         coralWrist.runPrepare(Units.degreesToRotations(35)));
   }
 
   public Command prepareL3() {
     return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0)),
+        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0)),
         algaeWrist.runPrepare(algaeHighStow),
         coralWrist.runPrepare(Units.degreesToRotations(35)));
   }
@@ -145,21 +145,21 @@ public class Superstructure extends SubsystemBase {
 
   public Command prepareAlgaeL1() {
     return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight / 4.0),
+        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight / 4.0),
         coralWrist.runPrepare(coralHighStow),
         algaeWrist.runPrepare(Units.degreesToRotations(90)));
   }
 
   public Command prepareAlgaeL2() {
     return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight / 2.0),
+        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight / 2.0),
         coralWrist.runPrepare(coralHighStow),
         algaeWrist.runPrepare(Units.degreesToRotations(90)));
   }
 
   public Command prepareAlgaeL3() {
     return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0)),
+        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0)),
         coralWrist.runPrepare(coralHighStow),
         algaeWrist.runPrepare(Units.degreesToRotations(90)));
   }
@@ -173,13 +173,13 @@ public class Superstructure extends SubsystemBase {
 
   public Command prepareIntake() {
     return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight / 4.0),
+        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight / 4.0),
         coralWrist.runPrepare(Units.degreesToRotations(55)));
   }
 
   public Command stowLow() {
     return Commands.parallel(
-        elevator.stow(),
+        elevator.runStow(),
         algaeWrist.runPrepare(Units.degreesToRotations(20)),
         coralWrist.runPrepare(Units.degreesToRotations(90)));
   }

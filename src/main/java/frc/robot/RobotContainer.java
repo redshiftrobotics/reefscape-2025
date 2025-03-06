@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -275,7 +274,9 @@ public class RobotContainer {
         });
 
     // Can also use AutoBuilder.buildAutoChooser(); instead of SendableChooser to auto populate
-    autoChooser = new LoggedDashboardChooser<>("Auto Chooser", new SendableChooser<Command>());
+    // autoChooser = new LoggedDashboardChooser<>("Auto Chooser", new SendableChooser<Command>());
+    autoChooser = new LoggedDashboardChooser<>("Auto Chooser", AutoBuilder.buildAutoChooser());
+    autoChooser.addDefaultOption("None", Commands.none());
 
     // Configure autos
     configureAutos(autoChooser);
@@ -346,18 +347,16 @@ public class RobotContainer {
   }
 
   private void configureDriverControllerBindings(boolean includeAutoAlign) {
-    final CommandXboxController driverXbox = driverController;
-
     final Trigger useFieldRelative =
-        new Trigger(new OverrideSwitch(driverXbox.y(), OverrideSwitch.Mode.TOGGLE, true));
+        new Trigger(new OverrideSwitch(driverController.y(), OverrideSwitch.Mode.TOGGLE, true));
 
     final Trigger useHeadingControlled =
         new Trigger(
             new OverrideSwitch(
-                driverXbox
+                driverController
                     .rightBumper()
-                    .and(driverXbox.leftTrigger().negate())
-                    .and(driverXbox.rightTrigger().negate()),
+                    .and(driverController.leftTrigger().negate())
+                    .and(driverController.rightTrigger().negate()),
                 OverrideSwitch.Mode.HOLD,
                 false));
 
@@ -367,10 +366,10 @@ public class RobotContainer {
     final JoystickInputController input =
         new JoystickInputController(
             drive,
-            () -> -driverXbox.getLeftY(),
-            () -> -driverXbox.getLeftX(),
-            () -> -driverXbox.getRightY(),
-            () -> -driverXbox.getRightX());
+            () -> -driverController.getLeftY(),
+            () -> -driverController.getLeftX(),
+            () -> -driverController.getRightY(),
+            () -> -driverController.getRightX());
 
     final SpeedLevelController level =
         new SpeedLevelController(SpeedLevelController.SpeedLevel.NO_LEVEL);
@@ -397,21 +396,18 @@ public class RobotContainer {
 
     // Cause the robot to resist movement by forming an X shape with the swerve modules
     // Helps prevent getting pushed around
-    driverXbox
+    driverController
         .x()
-        .whileTrue(
-            drive
-                .startEnd(drive::stopUsingBrakeArrangement, drive::stopUsingForwardArrangement)
-                .withName("RESIST Movement With X"));
+        .whileTrue(DriveCommands.holdPositionCommand(drive).withName("RESIST Movement With X"));
 
     // Stop the robot and cancel any running commands
-    driverXbox
+    driverController
         .b()
         .or(RobotModeTriggers.disabled())
         .onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
     // Reset the gyro heading
-    driverXbox
+    driverController
         .start()
         .debounce(0.3)
         .onTrue(
@@ -420,7 +416,7 @@ public class RobotContainer {
                     () ->
                         drive.resetPose(
                             new Pose2d(drive.getRobotPose().getTranslation(), Rotation2d.kZero)))
-                .andThen(rumbleController(driverXbox, 0.3).withTimeout(0.25))
+                .andThen(rumbleController(driverController, 0.3).withTimeout(0.25))
                 .ignoringDisable(true)
                 .withName("Reset Gyro Heading"));
 
@@ -433,26 +429,27 @@ public class RobotContainer {
               new Transform2d(
                   DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
               new Transform2d(0, 0, Rotation2d.k180deg),
-              new Translation2d(Units.inchesToMeters(24), 0));
+              new Translation2d(Units.inchesToMeters(6), 0));
 
       reefAlignmentCommands.setFinalAlignCommand(superstructure::prepare);
-      reefAlignmentCommands.setEndCommand(() -> rumbleController(driverXbox, 0.3).withTimeout(0.1));
+      reefAlignmentCommands.setEndCommand(
+          () -> rumbleController(driverController, 0.3).withTimeout(0.1));
 
-      driverXbox
+      driverController
           .rightTrigger()
           .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Algin REEF"))
           .onFalse(reefAlignmentCommands.stop(drive));
 
-      driverXbox
+      driverController
           .rightTrigger()
-          .and(driverXbox.leftBumper())
+          .and(driverController.leftBumper())
           .onTrue(
               CustomCommands.reInitCommand(
                   reefAlignmentCommands.driveToNext(drive).withName("Algin REEF -1")));
 
-      driverXbox
+      driverController
           .rightTrigger()
-          .and(driverXbox.rightBumper())
+          .and(driverController.rightBumper())
           .onTrue(
               CustomCommands.reInitCommand(
                   reefAlignmentCommands.driveToPrevious(drive).withName("Algin REEF +1")));
@@ -465,27 +462,27 @@ public class RobotContainer {
               new Transform2d(
                   DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
               new Transform2d(0, 0, Rotation2d.k180deg),
-              new Translation2d(Units.inchesToMeters(10), 0));
+              new Translation2d(Units.inchesToMeters(4), 0));
 
       intakeAlignmentCommands.setFinalAlignCommand(superstructure::prepareIntake);
       intakeAlignmentCommands.setEndCommand(
-          () -> rumbleController(driverXbox, 0.3).withTimeout(0.1));
+          () -> rumbleController(driverController, 0.3).withTimeout(0.1));
 
-      driverXbox
+      driverController
           .leftTrigger()
           .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Align INTAKE"))
           .onFalse(intakeAlignmentCommands.stop(drive));
 
-      driverXbox
+      driverController
           .leftTrigger()
-          .and(driverXbox.leftBumper())
+          .and(driverController.leftBumper())
           .onTrue(
               CustomCommands.reInitCommand(
                   intakeAlignmentCommands.driveToNext(drive).withName("Align INTAKE +1")));
 
-      driverXbox
+      driverController
           .leftTrigger()
-          .and(driverXbox.rightBumper())
+          .and(driverController.rightBumper())
           .onTrue(
               CustomCommands.reInitCommand(
                   intakeAlignmentCommands.driveToPrevious(drive).withName("Align INTAKE -1")));
@@ -494,7 +491,9 @@ public class RobotContainer {
 
   private void configureOperatorControllerBindings() {
 
-    new Trigger(DriverStation::isEnabled).onTrue(superstructure.stowLow());
+    new Trigger(DriverStation::isEnabled)
+        .onTrue(
+            elevator.zeroHeight().onlyIf(elevator::needsZeroing).andThen(superstructure.stowLow()));
 
     operatorController.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
@@ -557,6 +556,11 @@ public class RobotContainer {
     NamedCommands.registerCommand("l2", superstructure.run(Superstructure.State.L2));
     NamedCommands.registerCommand("l3", superstructure.run(Superstructure.State.L3));
     NamedCommands.registerCommand("l4", superstructure.run(Superstructure.State.L4));
+
+    NamedCommands.registerCommand("l2_algae", superstructure.run(Superstructure.State.L2_ALGAE));
+    NamedCommands.registerCommand("l3_algae", superstructure.run(Superstructure.State.L3_ALGAE));
+    NamedCommands.registerCommand("l4_algae", superstructure.run(Superstructure.State.L4_ALGAE));
+
     NamedCommands.registerCommand("stow", superstructure.run(Superstructure.State.STOW));
     NamedCommands.registerCommand("intake", superstructure.run(Superstructure.State.INTAKE));
 
@@ -565,16 +569,6 @@ public class RobotContainer {
     // dashboardChooser.addOption("Triangle Auto", AutoBuilder.buildAuto("Triangle Auto"));
     // dashboardChooser.addOption("Rotate Auto", AutoBuilder.buildAuto("Rotate Auto"));
     // dashboardChooser.addOption("Circle Auto", AutoBuilder.buildAuto("Circle Auto"));
-
-    // Test Auto
-    dashboardChooser.addOption("Inner", AutoBuilder.buildAuto("Inner"));
-    dashboardChooser.addOption("Middle", AutoBuilder.buildAuto("Middle"));
-    dashboardChooser.addOption("Outer", AutoBuilder.buildAuto("Outer"));
-
-    // Leave autos
-    dashboardChooser.addOption("Leave Inner", AutoBuilder.buildAuto("Leave Inner"));
-    dashboardChooser.addOption("Leave Middle", AutoBuilder.buildAuto("Leave Middle"));
-    dashboardChooser.addOption("Leave Outer", AutoBuilder.buildAuto("Leave Outer"));
 
     // Choreo Autos
     // https://pathplanner.dev/pplib-choreo-interop.html#load-choreo-trajectory-as-a-pathplannerpath
@@ -592,15 +586,16 @@ public class RobotContainer {
       dashboardChooser.addOption("[TEST] Stow Hang Arm", hang.stow());
       dashboardChooser.addOption("[TEST] Deploy Hang Arm", hang.deploy());
       dashboardChooser.addOption("[TEST] Retract Hang Arm", hang.retract());
+
+      dashboardChooser.addOption(
+          "[Characterization] Elevator Static Forward", elevator.staticCharacterization(0.02));
+      dashboardChooser.addOption(
+          "[Characterization] Drive Feed Forward",
+          DriveCommands.feedforwardCharacterization(drive));
+      dashboardChooser.addOption(
+          "[Characterization] Drive Wheel Radius",
+          DriveCommands.wheelRadiusCharacterization(drive));
     }
-
-    dashboardChooser.addOption(
-        "[Characterization] Elevator Static Forward", elevator.staticCharacterization(0.02));
-
-    dashboardChooser.addOption(
-        "[Characterization] Drive Feed Forward", DriveCommands.feedforwardCharacterization(drive));
-    dashboardChooser.addOption(
-        "[Characterization] Drive Wheel Radius", DriveCommands.wheelRadiusCharacterization(drive));
   }
 
   /**

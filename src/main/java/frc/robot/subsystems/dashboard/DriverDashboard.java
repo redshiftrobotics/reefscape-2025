@@ -99,6 +99,9 @@ public class DriverDashboard extends SubsystemBase {
       Pose2d pose = poseSupplier.get();
       SmartDashboard.putNumber("Heading Degrees", -pose.getRotation().getDegrees());
       field.setRobotPose(pose);
+
+      // SmartDashboard.putNumber("[test] DISTANCE TO REEF", pose.plus(new
+      // Transform2d(DRIVE_CONFIG.bumperCornerToCorner().getX(), 0, Rotation2d.kZero)).getX() - );
     }
 
     if (autoAlginPoseSupplier != null) {

@@ -50,6 +50,9 @@ public class Elevator extends SubsystemBase {
   private static final LoggedTunableNumber staticCharacterizationVelocityThresh =
       new LoggedTunableNumber("Elevator/StaticCharacterizationVelocityThresh", 0.1);
 
+  private static final LoggedTunableNumber hardStopVelocityThresh =
+      new LoggedTunableNumber("Elevator/StaticCharacterizationVelocityThresh", 0.05);
+
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
@@ -59,6 +62,8 @@ public class Elevator extends SubsystemBase {
   private final Alert followMotorFollowingAlert =
       new Alert("Elevator follower not following!", Alert.AlertType.kWarning);
 
+  private final Alert zeroingAlert = new Alert("Elevator needs zeroing!", Alert.AlertType.kInfo);
+
   private Debouncer disabledDebouncer = new Debouncer(3, DebounceType.kRising);
 
   enum IdleModeControl {
@@ -67,7 +72,7 @@ public class Elevator extends SubsystemBase {
     COAST
   }
 
-  boolean stowOnHardStop = false;
+  private boolean zeroedHeightEncoder = false;
 
   private IdleModeControl coastMode = IdleModeControl.AUTO;
   private boolean brakeModeEnabled = true;
@@ -159,22 +164,23 @@ public class Elevator extends SubsystemBase {
 
     motorDisconnectedAlert.set(!inputs.motorConnected);
     followMotorFollowingAlert.set(!inputs.followerMotorFollowing);
+    zeroingAlert.set(!zeroedHeightEncoder);
   }
 
-  public Command runPrepare(double position) {
+  public Command runPositionPrepare(double position) {
     return Commands.runOnce(() -> setGoalHeightMeters(position));
   }
 
-  public Command run(double position) {
-    return runPrepare(position).andThen(Commands.waitUntil(this::atGoalHeight));
+  public Command runPosition(double position) {
+    return runPositionPrepare(position).andThen(Commands.waitUntil(this::atGoalHeight));
   }
 
   public void setGoalSupplier(Supplier<State> goal) {
     this.goalSupplier = goal;
   }
 
-  public Command stow() {
-    return run(0).andThen(runOnce(io::stop));
+  public Command runStow() {
+    return runPosition(0);
   }
 
   /** Sets the goal height of the elevator in meters */
@@ -199,6 +205,11 @@ public class Elevator extends SubsystemBase {
     return getHeightMeters() / ElevatorConstants.carriageMaxHeight;
   }
 
+  @AutoLogOutput(key = "Elevator/isStowed")
+  public boolean isStowed() {
+    return MathUtil.isNear(getHeightMeters(), 0.0, tolerance.get());
+  }
+
   @AutoLogOutput(key = "Elevator/atGoal")
   public boolean atGoalHeight() {
     return MathUtil.isNear(getHeightMeters(), getGoalHeightMeters(), tolerance.get());
@@ -214,6 +225,30 @@ public class Elevator extends SubsystemBase {
 
   public void setCoastMode(IdleModeControl coastMode) {
     this.coastMode = coastMode;
+  }
+
+  @AutoLogOutput(key = "Elevator/needsZeroing")
+  public boolean needsZeroing() {
+    return !zeroedHeightEncoder;
+  }
+
+  public Command zeroHeight() {
+    return Commands.runEnd(
+            () -> {
+              io.runOpenLoop(-0.1);
+              System.out.println("set -0.1");
+            },
+            io::stop)
+        .until(() -> inputs.velocityRadPerSec <= hardStopVelocityThresh.get())
+        .andThen(
+            () -> {
+              io.zeroEncoder();
+              zeroedHeightEncoder = true;
+            })
+        .andThen(Commands.print("Zeroed Elevator Encoder"))
+        .beforeStarting(() -> stoppedProfile = true)
+        .finallyDo(() -> stoppedProfile = false)
+        .withName("Zero Elevator Height");
   }
 
   public Command staticCharacterization(double outputRampRate) {
