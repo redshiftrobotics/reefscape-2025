@@ -10,12 +10,8 @@ package frc.robot.commands;
 import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 import static frc.robot.subsystems.drive.DriveConstants.ROTATION_CONTROLLER_CONSTANTS;
 import static frc.robot.subsystems.drive.DriveConstants.ROTATION_TOLERANCE;
-import static frc.robot.subsystems.drive.DriveConstants.TRANSLATION_CONTROLLER_CONSTANTS;
-import static frc.robot.subsystems.drive.DriveConstants.TRANSLATION_TOLERANCE;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.controller.HolonomicDriveController;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -26,6 +22,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.controllers.SimpleDriveController;
 import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.utility.AllianceFlipUtil;
@@ -204,24 +201,8 @@ public class DriveCommands {
   }
 
   /** Drive to a pose, more precise */
-  public static Command driveToPosePrecise(Drive drive, Pose2d desiredPose) {
-    HolonomicDriveController controller =
-        new HolonomicDriveController(
-            new PIDController(
-                TRANSLATION_CONTROLLER_CONSTANTS.kP(),
-                TRANSLATION_CONTROLLER_CONSTANTS.kI(),
-                TRANSLATION_CONTROLLER_CONSTANTS.kD()),
-            new PIDController(
-                TRANSLATION_CONTROLLER_CONSTANTS.kP(),
-                TRANSLATION_CONTROLLER_CONSTANTS.kI(),
-                TRANSLATION_CONTROLLER_CONSTANTS.kD()),
-            new ProfiledPIDController(
-                ROTATION_CONTROLLER_CONSTANTS.kP(),
-                ROTATION_CONTROLLER_CONSTANTS.kI(),
-                ROTATION_CONTROLLER_CONSTANTS.kD(),
-                DRIVE_CONFIG.getAngularConstraints()));
-    controller.setTolerance(
-        new Pose2d(TRANSLATION_TOLERANCE, TRANSLATION_TOLERANCE, ROTATION_TOLERANCE));
+  public static Command driveToPoseSimple(Drive drive, Pose2d desiredPose) {
+    SimpleDriveController controller = new SimpleDriveController();
 
     return drive
         .run(
@@ -241,6 +222,20 @@ public class DriveCommands {
                       drive.getRobotSpeeds().omegaRadiansPerSecond);
             })
         .finallyDo(drive::stop);
+  }
+
+  public static Command holdPositionCommand(Drive drive) {
+    SimpleDriveController controller = new SimpleDriveController();
+    return Commands.either(
+            drive.run(drive::stopUsingBrakeArrangement),
+            drive.run(() -> drive.setRobotSpeeds(controller.calculate(drive.getRobotPose()))),
+            controller::atReference)
+        .beforeStarting(
+            () -> {
+              controller.reset(drive.getRobotPose());
+              controller.setSetpoint(drive.getRobotPose());
+            })
+        .finallyDo(drive::stopUsingForwardArrangement);
   }
 
   /** Pathfind to a pose with pathplanner, only gets you roughly to target pose. */

@@ -106,7 +106,7 @@ public class AdaptiveAutoAlignCommands {
                       drive, pose.plus(roughLineupOffset.inverse()).plus(mechanismOffset), 0.25, 0))
               .andThen(Commands.runOnce(drive::stop))
               .andThen(finalAlignCommand.get())
-              .andThen(DriveCommands.driveToPosePrecise(drive, pose.plus(mechanismOffset)))
+              .andThen(DriveCommands.driveToPoseSimple(drive, pose.plus(mechanismOffset)))
               .andThen(endCommand.get())
               .beforeStarting(() -> setCurrentAutoAlignGoal(pose))
               .finallyDo(() -> setCurrentAutoAlignGoal(null));

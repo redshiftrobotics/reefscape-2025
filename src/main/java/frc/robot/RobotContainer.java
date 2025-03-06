@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -275,7 +274,9 @@ public class RobotContainer {
         });
 
     // Can also use AutoBuilder.buildAutoChooser(); instead of SendableChooser to auto populate
-    autoChooser = new LoggedDashboardChooser<>("Auto Chooser", new SendableChooser<Command>());
+    // autoChooser = new LoggedDashboardChooser<>("Auto Chooser", new SendableChooser<Command>());
+    autoChooser = new LoggedDashboardChooser<>("Auto Chooser", AutoBuilder.buildAutoChooser());
+    autoChooser.addDefaultOption("None", Commands.none());
 
     // Configure autos
     configureAutos(autoChooser);
@@ -397,10 +398,7 @@ public class RobotContainer {
     // Helps prevent getting pushed around
     driverController
         .x()
-        .whileTrue(
-            drive
-                .startEnd(drive::stopUsingBrakeArrangement, drive::stopUsingForwardArrangement)
-                .withName("RESIST Movement With X"));
+        .whileTrue(DriveCommands.holdPositionCommand(drive).withName("RESIST Movement With X"));
 
     // Stop the robot and cancel any running commands
     driverController
@@ -431,7 +429,7 @@ public class RobotContainer {
               new Transform2d(
                   DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
               new Transform2d(0, 0, Rotation2d.k180deg),
-              new Translation2d(Units.inchesToMeters(24), 0));
+              new Translation2d(Units.inchesToMeters(6), 0));
 
       reefAlignmentCommands.setFinalAlignCommand(superstructure::prepare);
       reefAlignmentCommands.setEndCommand(
@@ -464,7 +462,7 @@ public class RobotContainer {
               new Transform2d(
                   DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
               new Transform2d(0, 0, Rotation2d.k180deg),
-              new Translation2d(Units.inchesToMeters(10), 0));
+              new Translation2d(Units.inchesToMeters(4), 0));
 
       intakeAlignmentCommands.setFinalAlignCommand(superstructure::prepareIntake);
       intakeAlignmentCommands.setEndCommand(
@@ -494,7 +492,8 @@ public class RobotContainer {
   private void configureOperatorControllerBindings() {
 
     new Trigger(DriverStation::isEnabled)
-        .onTrue(elevator.zeroHeight().onlyIf(elevator::needsZeroing).andThen(superstructure.stowLow()));
+        .onTrue(
+            elevator.zeroHeight().onlyIf(elevator::needsZeroing).andThen(superstructure.stowLow()));
 
     operatorController.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
@@ -587,15 +586,16 @@ public class RobotContainer {
       dashboardChooser.addOption("[TEST] Stow Hang Arm", hang.stow());
       dashboardChooser.addOption("[TEST] Deploy Hang Arm", hang.deploy());
       dashboardChooser.addOption("[TEST] Retract Hang Arm", hang.retract());
+
+      dashboardChooser.addOption(
+          "[Characterization] Elevator Static Forward", elevator.staticCharacterization(0.02));
+      dashboardChooser.addOption(
+          "[Characterization] Drive Feed Forward",
+          DriveCommands.feedforwardCharacterization(drive));
+      dashboardChooser.addOption(
+          "[Characterization] Drive Wheel Radius",
+          DriveCommands.wheelRadiusCharacterization(drive));
     }
-
-    dashboardChooser.addOption(
-        "[Characterization] Elevator Static Forward", elevator.staticCharacterization(0.02));
-
-    dashboardChooser.addOption(
-        "[Characterization] Drive Feed Forward", DriveCommands.feedforwardCharacterization(drive));
-    dashboardChooser.addOption(
-        "[Characterization] Drive Wheel Radius", DriveCommands.wheelRadiusCharacterization(drive));
   }
 
   /**

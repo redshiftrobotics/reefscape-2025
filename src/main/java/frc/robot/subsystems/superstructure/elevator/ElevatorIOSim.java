@@ -87,8 +87,7 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
-  public void zeroEncoder() {
-  }
+  public void zeroEncoder() {}
 
   @Override
   public void setBrakeMode(boolean enable) {

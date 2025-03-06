@@ -112,8 +112,8 @@ public class Superstructure extends SubsystemBase {
                 : coralIntake.intake(1.0).withTimeout(1));
   }
 
+  private static final double coralHighStow = Units.degreesToRotations(20);
   private static final double algaeHighStow = Units.degreesToRotations(160);
-  private static final double coralHighStow = Units.degreesToRotations(160);
 
   public Command prepareL1() {
     return Commands.parallel(

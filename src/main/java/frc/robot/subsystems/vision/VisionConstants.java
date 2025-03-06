@@ -65,14 +65,14 @@ public class VisionConstants {
 
   public static final CameraConfig COMP_FRONT_RIGHT_CAMERA =
       new CameraConfig(
-          "BackLeftCamera8032",
+          "Arducam_OV9281_USB_Camera",
           new Transform3d(
               new Translation3d(+CAMERA_OFFSET_X, -CAMERA_OFFSET_Y, FRONT_CAMERA_OFFSET_Z),
               new Rotation3d(0, -FRONT_CAMERA_PITCH, -FRONT_CAMERA_YAW)));
 
   public static final CameraConfig COMP_BACK_LEFT_CAMERA =
       new CameraConfig(
-          "Arducam_OV9281_USB_Camera",
+          "FrontLeftCamera8032",
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, +CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
               new Rotation3d(
@@ -80,7 +80,7 @@ public class VisionConstants {
 
   public static final CameraConfig COMP_BACK_RIGHT_CAMERA =
       new CameraConfig(
-          "FrontLeftCamera8032",
+          "BackRightCamera8032",
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, -CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
               new Rotation3d(
