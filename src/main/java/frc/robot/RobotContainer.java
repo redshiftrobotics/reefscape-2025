@@ -511,6 +511,7 @@ public class RobotContainer {
     configureOperatorControllerBindingLevel(operatorController.a(), Superstructure.State.L1);
 
     operatorController.povDown().onTrue(superstructure.stowLow());
+    operatorController.povUp().onTrue(superstructure.stowHigh());
 
     operatorController.leftBumper().whileTrue(hang.runSet(+0.5).withName("Hang Arm Up"));
     operatorController.rightBumper().whileTrue(hang.runSet(-0.5).withName("Hang Arm Down"));
