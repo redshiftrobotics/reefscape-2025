@@ -1,10 +1,11 @@
 {
-  "robotWidth": 0.9,
-  "robotLength": 0.9,
+  "robotWidth": 0.889,
+  "robotLength": 0.889,
   "holonomicMode": true,
   "pathFolders": [
-    "Paths B",
-    "Paths A"
+    "Linked Waypoints",
+    "Paths A",
+    "Paths B"
   ],
   "autoFolders": [
     "Algae Clear",
