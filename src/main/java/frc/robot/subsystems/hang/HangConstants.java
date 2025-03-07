@@ -22,7 +22,7 @@ public class HangConstants {
         default -> new PIDConstants(1.0, 0.0, 0.0);
       };
 
-  public static final int MOTOR_CURRENT_LIMIT = 30;
+  public static final int MOTOR_CURRENT_LIMIT = 40;
   public static final double GEAR_REDUCTION = Math.pow(5, 3);
 
   public static final double STOWED_POSITION_ROTATIONS = 0.0;

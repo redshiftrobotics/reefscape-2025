@@ -30,6 +30,7 @@ public class AdaptiveAutoAlignCommands {
   private int offset = 0;
 
   private Supplier<Command> startCommand, finalAlignCommand, endCommand;
+  private double finalAlignDistance;
 
   public AdaptiveAutoAlignCommands(
       List<Pose2d> poses,
@@ -52,7 +53,7 @@ public class AdaptiveAutoAlignCommands {
             .toList();
 
     setStartCommand(Commands::none);
-    setFinalAlignCommand(Commands::none);
+    setFinalAlignCommand(Commands::none, 0);
     setEndCommand(Commands::none);
   }
 
@@ -60,8 +61,9 @@ public class AdaptiveAutoAlignCommands {
     this.startCommand = startCommand;
   }
 
-  public void setFinalAlignCommand(Supplier<Command> finalAlignCommand) {
+  public void setFinalAlignCommand(Supplier<Command> finalAlignCommand, double finalAlignDistance) {
     this.finalAlignCommand = finalAlignCommand;
+    this.finalAlignDistance = finalAlignDistance;
   }
 
   public void setEndCommand(Supplier<Command> endCommand) {
@@ -102,14 +104,26 @@ public class AdaptiveAutoAlignCommands {
           return startCommand
               .get()
               .andThen(
-                  DriveCommands.pathfindToPoseCommand(
-                      drive, pose.plus(roughLineupOffset.inverse()).plus(mechanismOffset), 0.25, 0))
-              .andThen(Commands.runOnce(drive::stop))
-              .andThen(finalAlignCommand.get())
-              .andThen(DriveCommands.driveToPosePrecise(drive, pose.plus(mechanismOffset)))
-              .andThen(endCommand.get())
-              .beforeStarting(() -> setCurrentAutoAlignGoal(pose))
-              .finallyDo(() -> setCurrentAutoAlignGoal(null));
+                  Commands.parallel(
+                          DriveCommands.pathfindToPoseCommand(
+                                  drive,
+                                  pose.plus(roughLineupOffset.inverse()).plus(mechanismOffset),
+                                  0.25,
+                                  DRIVE_CONFIG.maxLinearVelocity() / 2.0)
+                              .andThen(
+                                  DriveCommands.driveToPoseSimple(
+                                      drive, pose.plus(mechanismOffset)))
+                              .beforeStarting(() -> setCurrentAutoAlignGoal(pose))
+                              .finallyDo(() -> setCurrentAutoAlignGoal(null)),
+                          Commands.waitUntil(
+                                  () ->
+                                      drive
+                                              .getRobotPose()
+                                              .getTranslation()
+                                              .getDistance(pose.getTranslation())
+                                          < finalAlignDistance)
+                              .andThen(finalAlignCommand.get()))
+                      .andThen(endCommand.get()));
         },
         Set.of(drive));
   }

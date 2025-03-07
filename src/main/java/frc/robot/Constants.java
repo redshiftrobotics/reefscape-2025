@@ -24,7 +24,7 @@ public final class Constants {
   public static final boolean TUNING_MODE = false;
 
   /** Enables all test plan autos in the auto chooser. */
-  public static final boolean RUNNING_TEST_PLANS = true;
+  public static final boolean RUNNING_TEST_PLANS = false;
 
   public static RobotType getRobot() {
     if (robotType == null) {

@@ -23,15 +23,13 @@ public class WristConstants {
 
   public static final WristConfig CORAL_WRIST_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new WristConfig(1, 9, 0, false, false);
-        case SIM_BOT -> new WristConfig(1, 1, 0, false, false);
+        case COMP_BOT_2025 -> new WristConfig(13, 9.0, 0, false, false);
         default -> new WristConfig(0, 1, 0, false, false);
       };
 
   public static final WristConfig ALGAE_WRIST_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new WristConfig(1, 2, 0, false, false);
-        case SIM_BOT -> new WristConfig(1, 1, 0, false, false);
+        case COMP_BOT_2025 -> new WristConfig(12, 2.0, 0, false, false);
         default -> new WristConfig(0, 1, 0, false, false);
       };
 

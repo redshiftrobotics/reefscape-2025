@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.drive.Drive;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -51,11 +50,7 @@ public class DriverDashboard extends SubsystemBase {
   // --- Setters ---
 
   public void addSubsystem(SubsystemBase subsystem) {
-    if (subsystem instanceof Drive) {
-      SmartDashboard.putData(subsystem);
-    } else {
-      throw new IllegalArgumentException("Unknown subsystem can not be added to driver dashboard");
-    }
+    SmartDashboard.putData(subsystem);
   }
 
   public void addCommand(String name, Runnable runnable, boolean runsWhenDisabled) {
@@ -99,6 +94,9 @@ public class DriverDashboard extends SubsystemBase {
       Pose2d pose = poseSupplier.get();
       SmartDashboard.putNumber("Heading Degrees", -pose.getRotation().getDegrees());
       field.setRobotPose(pose);
+
+      // SmartDashboard.putNumber("[test] DISTANCE TO REEF", pose.plus(new
+      // Transform2d(DRIVE_CONFIG.bumperCornerToCorner().getX(), 0, Rotation2d.kZero)).getX() - );
     }
 
     if (autoAlginPoseSupplier != null) {

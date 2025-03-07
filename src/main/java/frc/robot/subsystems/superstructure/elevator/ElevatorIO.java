@@ -30,6 +30,8 @@ public interface ElevatorIO {
 
   default void stop() {}
 
+  default void zeroEncoder() {}
+
   default void setPID(double kP, double kI, double kD) {}
 
   default void setBrakeMode(boolean enable) {}
