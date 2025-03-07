@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S6 to D5"
+            "pathName": null
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "D5 to P2"
+            "pathName": null
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "P2 to D5"
+            "pathName": null
           }
         },
         {
@@ -43,7 +43,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "D5 to P2"
+            "pathName": null
           }
         }
       ]

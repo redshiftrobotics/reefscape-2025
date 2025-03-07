@@ -3,42 +3,35 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.25,
-        "y": 5.3
+        "x": 2.0,
+        "y": 7.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.778951469807464,
-        "y": 6.093247180345939
+        "x": 3.0,
+        "y": 7.0
       },
       "isLocked": false,
-      "linkedName": "D1"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.337,
-        "y": 6.988
+        "x": 6.648601973684211,
+        "y": 4.948684210526316
       },
       "prevControl": {
-        "x": 2.05921684057151,
-        "y": 6.490110363860639
+        "x": 7.148601973684203,
+        "y": 4.948684210526316
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "P1"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "getCoral",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -49,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 126.0
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Paths A",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 240.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }
