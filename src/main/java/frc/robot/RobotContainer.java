@@ -302,6 +302,8 @@ public class RobotContainer {
 
     DriverDashboard dashboard = DriverDashboard.getInstance();
     dashboard.addSubsystem(drive);
+    dashboard.addSubsystem(superstructure);
+    dashboard.addSubsystem(elevator);
     dashboard.setPoseSupplier(drive::getRobotPose);
     dashboard.setRobotSupplier(drive::getRobotSpeeds);
     dashboard.setFieldRelativeSupplier(() -> false);
@@ -509,6 +511,7 @@ public class RobotContainer {
     configureOperatorControllerBindingLevel(operatorController.a(), Superstructure.State.L1);
 
     operatorController.povDown().onTrue(superstructure.stowLow());
+    operatorController.povUp().onTrue(superstructure.stowHigh());
 
     operatorController.leftBumper().whileTrue(hang.runSet(+0.5).withName("Hang Arm Up"));
     operatorController.rightBumper().whileTrue(hang.runSet(-0.5).withName("Hang Arm Down"));

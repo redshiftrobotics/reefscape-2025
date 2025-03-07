@@ -109,8 +109,7 @@ public class AdaptiveAutoAlignCommands {
                                   drive,
                                   pose.plus(roughLineupOffset.inverse()).plus(mechanismOffset),
                                   0.25,
-                                  0)
-                              .andThen(Commands.runOnce(drive::stop))
+                                  DRIVE_CONFIG.maxLinearVelocity() / 2.0)
                               .andThen(
                                   DriveCommands.driveToPoseSimple(
                                       drive, pose.plus(mechanismOffset)))

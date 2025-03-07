@@ -188,6 +188,13 @@ public class Superstructure extends SubsystemBase {
         coralWrist.runPrepare(Units.degreesToRotations(90)));
   }
 
+  public Command stowHigh() {
+    return Commands.parallel(
+        elevator.runStow(),
+        algaeWrist.runPrepare(algaeHighStow),
+        coralWrist.runPrepare(coralHighStow));
+  }
+
   @Override
   public void periodic() {
     measuredVisualizer.update(
