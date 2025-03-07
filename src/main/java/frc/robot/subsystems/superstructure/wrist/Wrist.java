@@ -3,6 +3,7 @@ package frc.robot.subsystems.superstructure.wrist;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -45,6 +46,8 @@ public class Wrist extends SubsystemBase {
     io.updateInputs(inputs);
 
     Logger.processInputs("Wrist " + name, inputs);
+
+    Logger.recordOutput("Wrist" + name + "/degrees", Units.rotationsToDegrees(inputs.positionRotations));
 
     io.setBrakeMode(!disabledDebouncer.calculate(DriverStation.isDisabled()));
 
