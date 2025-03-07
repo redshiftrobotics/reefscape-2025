@@ -57,7 +57,7 @@
       },
       "nextControl": {
         "x": 6.268964196927292,
-        "y": 3.020210262277693
+        "y": 3.0202102622776925
       },
       "isLocked": false,
       "linkedName": "SR"
@@ -90,13 +90,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 54.0
   },
   "reversed": false,
   "folder": "Linked Waypoints",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 126.0
   },
   "useDefaultConstraints": true
 }

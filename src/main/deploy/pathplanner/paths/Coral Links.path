@@ -81,15 +81,15 @@
     {
       "anchor": {
         "x": 5.269970794,
-        "y": 4.91
+        "y": 5.048
       },
       "prevControl": {
         "x": 5.507550550869319,
-        "y": 4.832180599296094
+        "y": 4.970180599296094
       },
       "nextControl": {
-        "x": 4.975705457361964,
-        "y": 5.006386798466592
+        "x": 5.03239103713068,
+        "y": 5.125819400703906
       },
       "isLocked": false,
       "linkedName": "C5"
@@ -202,13 +202,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -119.99999999999999
   },
   "reversed": false,
   "folder": "Linked Waypoints",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

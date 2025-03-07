@@ -3,9 +3,10 @@
   "robotLength": 0.889,
   "holonomicMode": true,
   "pathFolders": [
+    "C-P",
     "Linked Waypoints",
-    "Paths A",
-    "Paths B"
+    "P-C",
+    "S-C"
   ],
   "autoFolders": [
     "Algae Clear",
