@@ -302,6 +302,8 @@ public class RobotContainer {
 
     DriverDashboard dashboard = DriverDashboard.getInstance();
     dashboard.addSubsystem(drive);
+    dashboard.addSubsystem(superstructure);
+    dashboard.addSubsystem(elevator);
     dashboard.setPoseSupplier(drive::getRobotPose);
     dashboard.setRobotSupplier(drive::getRobotSpeeds);
     dashboard.setFieldRelativeSupplier(() -> false);
