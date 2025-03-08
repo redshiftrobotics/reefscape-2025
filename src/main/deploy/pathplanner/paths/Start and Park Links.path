@@ -1,0 +1,102 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.112424545,
+        "y": 7.036871946
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.2056283147658817,
+        "y": 6.973578821580739
+      },
+      "isLocked": false,
+      "linkedName": "PL"
+    },
+    {
+      "anchor": {
+        "x": 7.2,
+        "y": 6.1
+      },
+      "prevControl": {
+        "x": 6.750595364457781,
+        "y": 6.461982338823997
+      },
+      "nextControl": {
+        "x": 7.690753934423527,
+        "y": 5.704712005795458
+      },
+      "isLocked": false,
+      "linkedName": "SL"
+    },
+    {
+      "anchor": {
+        "x": 7.2,
+        "y": 4.002
+      },
+      "prevControl": {
+        "x": 7.518896404976605,
+        "y": 5.117393718685199
+      },
+      "nextControl": {
+        "x": 6.798698240484214,
+        "y": 2.5983797180652926
+      },
+      "isLocked": false,
+      "linkedName": "SC"
+    },
+    {
+      "anchor": {
+        "x": 7.2,
+        "y": 1.9
+      },
+      "prevControl": {
+        "x": 7.359795496635588,
+        "y": 1.7077361207741144
+      },
+      "nextControl": {
+        "x": 6.268964196927292,
+        "y": 3.0202102622776925
+      },
+      "isLocked": false,
+      "linkedName": "SR"
+    },
+    {
+      "anchor": {
+        "x": 1.112424545,
+        "y": 1.014928054
+      },
+      "prevControl": {
+        "x": 1.6008938014546932,
+        "y": 0.8651797548833933
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "PR"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 54.0
+  },
+  "reversed": false,
+  "folder": "Linked Waypoints",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -54.0
+  },
+  "useDefaultConstraints": true
+}
