@@ -72,7 +72,7 @@ public class Elevator extends SubsystemBase {
     COAST
   }
 
-  private boolean zeroedHeightEncoder = false;
+  private boolean zeroedHeightEncoder = true;
 
   private IdleModeControl coastMode = IdleModeControl.AUTO;
   private boolean brakeModeEnabled = true;

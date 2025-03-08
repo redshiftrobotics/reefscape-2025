@@ -44,6 +44,7 @@ import frc.robot.subsystems.hang.HangIO;
 import frc.robot.subsystems.hang.HangIOHardware;
 import frc.robot.subsystems.hang.HangIOSim;
 import frc.robot.subsystems.superstructure.Superstructure;
+import frc.robot.subsystems.superstructure.Superstructure.State;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
@@ -150,18 +151,19 @@ public class RobotContainer {
         algaeWrist =
             new Wrist(
                 "Algae",
-                new WristIOHardware(WristConstants.ALGAE_WRIST_CONFIG),
+                // new WristIOHardware(WristConstants.ALGAE_WRIST_CONFIG),
+                new WristIO() {},
                 WristConstants.ALGAE_FEEDBACK,
                 WristConstants.ALGAE_FEEDFORWARD);
         coralWrist =
             new Wrist(
                 "Coral",
                 new WristIOHardware(WristConstants.CORAL_WRIST_CONFIG),
-                // new WristIO() {},
                 WristConstants.CORAL_FEEDBACK,
                 WristConstants.CORAL_FEEDFORWARD);
         algaeIntake =
-            new Intake("Algae", new IntakeIOHardware(IntakeConstants.ALGAE_INTAKE_CONFIG));
+            // new Intake("Algae", new IntakeIOHardware(IntakeConstants.ALGAE_INTAKE_CONFIG));
+            new Intake("Algae", new IntakeIO() {});
         coralIntake =
             new Intake("Coral", new IntakeIOHardware(IntakeConstants.CORAL_INTAKE_CONFIG));
         break;
@@ -274,7 +276,8 @@ public class RobotContainer {
         algaeWrist =
             new Wrist(
                 "Algae",
-                new WristIOSim(WristConstants.ALGAE_WRIST_CONFIG),
+                // new WristIOSim(WristConstants.ALGAE_WRIST_CONFIG),
+                new WristIO() {},
                 WristConstants.ALGAE_FEEDBACK,
                 WristConstants.ALGAE_FEEDFORWARD);
         coralWrist =
@@ -283,7 +286,7 @@ public class RobotContainer {
                 new WristIOSim(WristConstants.CORAL_WRIST_CONFIG),
                 WristConstants.CORAL_FEEDBACK,
                 WristConstants.CORAL_FEEDFORWARD);
-        algaeIntake = new Intake("Algae", new IntakeIOSim());
+        algaeIntake = new Intake("Algae", new IntakeIO() {});
         coralIntake = new Intake("Coral", new IntakeIOSim());
         break;
 
@@ -561,13 +564,17 @@ public class RobotContainer {
 
     operatorController.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
+    operatorController
+        .leftTrigger()
+        .whileTrue(superstructure.run(State.INTAKE).andThen(superstructure.stowLow()));
+
     configureOperatorControllerBindingLevel(operatorController.y(), Superstructure.State.L4);
     configureOperatorControllerBindingLevel(operatorController.x(), Superstructure.State.L3);
     configureOperatorControllerBindingLevel(operatorController.b(), Superstructure.State.L2);
     configureOperatorControllerBindingLevel(operatorController.a(), Superstructure.State.L1);
 
     operatorController.povDown().onTrue(superstructure.stowLow());
-    operatorController.povUp().onTrue(superstructure.stowHigh());
+    // operatorController.povUp().onTrue(superstructure.stowHigh());
 
     operatorController.leftBumper().whileTrue(hang.runSet(+0.5).withName("Hang Arm Up"));
     operatorController.rightBumper().whileTrue(hang.runSet(-0.5).withName("Hang Arm Down"));
@@ -581,10 +588,10 @@ public class RobotContainer {
     Trigger force = operatorController.rightTrigger();
 
     trigger.and(algae.negate()).onTrue(superstructure.setNextPrepare(state));
-    trigger.and(algae).onTrue(superstructure.setNextPrepare(state.asAlgae()));
+    // trigger.and(algae).onTrue(superstructure.setNextPrepare(state.asAlgae()));
 
     trigger.and(algae.negate()).and(force).onTrue(superstructure.run(state));
-    trigger.and(algae).and(force).onTrue(superstructure.run(state.asAlgae()));
+    // trigger.and(algae).and(force).onTrue(superstructure.run(state.asAlgae()));
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
@@ -624,8 +631,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("l3", superstructure.run(Superstructure.State.L3));
     NamedCommands.registerCommand("l4", superstructure.run(Superstructure.State.L4));
 
-    NamedCommands.registerCommand("l2_algae", superstructure.run(Superstructure.State.L2_ALGAE));
-    NamedCommands.registerCommand("l3_algae", superstructure.run(Superstructure.State.L3_ALGAE));
+    // NamedCommands.registerCommand("l2_algae", superstructure.run(Superstructure.State.L2_ALGAE));
+    // NamedCommands.registerCommand("l3_algae", superstructure.run(Superstructure.State.L3_ALGAE));
 
     NamedCommands.registerCommand("stow", superstructure.run(Superstructure.State.STOW));
     NamedCommands.registerCommand("intake", superstructure.run(Superstructure.State.INTAKE));
