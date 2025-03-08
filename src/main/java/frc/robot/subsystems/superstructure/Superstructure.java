@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
-import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
 
@@ -25,10 +24,10 @@ public class Superstructure extends SubsystemBase {
     L1(false),
     L2(false),
     L3(false),
-    L4(false),
+    L4(false);
 
-    L2_ALGAE(true),
-    L3_ALGAE(true);
+    // L2_ALGAE(true),
+    // L3_ALGAE(true);
 
     public boolean isLevel() {
       return this == L1 || this == L2 || this == L3 || this == L4;
@@ -40,8 +39,8 @@ public class Superstructure extends SubsystemBase {
 
     public State asAlgae() {
       return switch (this) {
-        case L2 -> L2_ALGAE;
-        case L3 -> L3_ALGAE;
+          // case L2 -> L2_ALGAE;
+          // case L3 -> L3_ALGAE;
         default -> this;
       };
     }
@@ -98,92 +97,74 @@ public class Superstructure extends SubsystemBase {
       case L2 -> prepareL2();
       case L3 -> prepareL3();
       case L4 -> prepareL4();
-      case L2_ALGAE -> prepareAlgaeL2();
-      case L3_ALGAE -> prepareAlgaeL3();
       case INTAKE -> prepareIntake();
+    };
+  }
+
+  public Command runWheels(State newGoal) {
+    return switch (newGoal) {
+      case STOW -> stowLow();
+      case L1 -> scoreL1Wheels();
+      case L2 -> scoreLevelWheels();
+      case L3 -> scoreLevelWheels();
+      case L4 -> scoreLevelWheels();
+      case INTAKE -> intakeWheels();
+      default -> Commands.none();
     };
   }
 
   public Command run(State goal) {
     return runPrepare(goal)
+        .andThen(coralIntake.runOnce(() -> coralIntake.setMotors(-0.1)))
         .andThen(Commands.waitUntil(() -> elevator.atGoalHeight() && coralWrist.atGoal()))
-        .andThen(
-            goal.isAlgae()
-                ? algaeIntake.intake(1.0).withTimeout(1)
-                : coralIntake.intake(1.0).withTimeout(1));
+        .andThen(runWheels(goal));
   }
 
-  private static final double coralHighStow = Units.degreesToRotations(20);
-  private static final double algaeHighStow = Units.degreesToRotations(160);
+  public Command scoreLevelWheels() {
+    return coralIntake.intake(1.0).withTimeout(1.0);
+  }
+
+  public Command intakeWheels() {
+    return coralIntake.intake(-1.0);
+  }
+
+  public Command scoreL1Wheels() {
+    return coralIntake.intake(1.0, 0.4).withTimeout(1.0);
+  }
 
   public Command prepareL1() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight / 4.0),
-        algaeWrist.runPrepare(algaeHighStow),
-        coralWrist.runPrepare(Units.degreesToRotations(55)));
+    return Commands.parallel(elevator.runPositionPrepare(0), coralWrist.runPrepare(-7.690));
   }
 
   public Command prepareL2() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight / 2.0),
-        algaeWrist.runPrepare(algaeHighStow),
-        coralWrist.runPrepare(Units.degreesToRotations(35)));
+    return Commands.parallel(elevator.runPositionPrepare(0.599), coralWrist.runPrepare(-7.690));
   }
 
   public Command prepareL3() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0)),
-        algaeWrist.runPrepare(algaeHighStow),
-        coralWrist.runPrepare(Units.degreesToRotations(35)));
+    return Commands.parallel(elevator.runPositionPrepare(1.033), coralWrist.runPrepare(-8.262));
   }
 
   public Command prepareL4() {
-    return Commands.parallel(
-        elevator.runOnce(() -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)),
-        algaeWrist.runPrepare(algaeHighStow),
-        coralWrist.runPrepare(Units.degreesToRotations(90)));
-  }
-
-  public Command prepareAlgaeL1() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight / 4.0),
-        coralWrist.runPrepare(coralHighStow),
-        algaeWrist.runPrepare(Units.degreesToRotations(90)));
-  }
-
-  public Command prepareAlgaeL2() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight / 2.0),
-        coralWrist.runPrepare(coralHighStow),
-        algaeWrist.runPrepare(Units.degreesToRotations(90)));
-  }
-
-  public Command prepareAlgaeL3() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0)),
-        coralWrist.runPrepare(coralHighStow),
-        algaeWrist.runPrepare(Units.degreesToRotations(90)));
+    return Commands.parallel(elevator.runPositionPrepare(0), coralWrist.runPrepare(-8.262));
   }
 
   public Command prepareIntake() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight / 4.0),
-        coralWrist.runPrepare(Units.degreesToRotations(55)));
+    return Commands.parallel(elevator.runPositionPrepare(0.121), coralWrist.runPrepare(-3.19));
   }
 
   public Command stowLow() {
     return Commands.parallel(
         elevator.runStow(),
         algaeWrist.runPrepare(Units.degreesToRotations(20)),
-        coralWrist.runPrepare(Units.degreesToRotations(90)));
+        coralWrist.runPrepare(-1.619));
   }
 
-  public Command stowHigh() {
-    return Commands.parallel(
-        elevator.runStow(),
-        algaeWrist.runPrepare(algaeHighStow),
-        coralWrist.runPrepare(coralHighStow));
-  }
+  // public Command stowHigh() {
+  //   return Commands.parallel(
+  //       elevator.runStow(),
+  //       algaeWrist.runPrepare(algaeHighStow),
+  //       coralWrist.runPrepare(coralHighStow));
+  // }
 
   @Override
   public void periodic() {

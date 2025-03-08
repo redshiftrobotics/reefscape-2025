@@ -24,7 +24,7 @@ public class WristConstants {
 
   public static final WristConfig CORAL_WRIST_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new WristConfig(13, 9.0, 0, false, false);
+        case COMP_BOT_2025 -> new WristConfig(13, 20.0, 0, false, false);
         default -> new WristConfig(0, 1, 0, false, false);
       };
 
@@ -36,7 +36,7 @@ public class WristConstants {
 
   public static final PIDConstants CORAL_FEEDBACK =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new PIDConstants(0.0, 0.0, 0.0);
+        case COMP_BOT_2025 -> new PIDConstants(0.3, 0.0, 0.0);
         case SIM_BOT -> new PIDConstants(10.0, 0.0, 3.0);
         default -> new PIDConstants(0.0, 0.0, 0.0);
       };
