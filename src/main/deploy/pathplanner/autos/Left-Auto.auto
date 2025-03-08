@@ -1,0 +1,93 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SL-C4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "l4"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "C4-PL"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stow"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "PL-C3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "l4"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "C3-PL"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stow"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "PL-C2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "l4"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "No Algae Clear",
+  "choreoAuto": false
+}
