@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.28025,
-        "y": 5.90675
+        "x": 4.5553278688524586,
+        "y": 6.28468237704918
       },
       "isLocked": false,
       "linkedName": "C4"
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 126.0
+    "rotation": -54.0
   },
   "reversed": false,
   "folder": "C-P",
