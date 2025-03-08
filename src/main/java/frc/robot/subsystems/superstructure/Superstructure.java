@@ -28,8 +28,7 @@ public class Superstructure extends SubsystemBase {
     L4(false),
 
     L2_ALGAE(true),
-    L3_ALGAE(true),
-    L4_ALGAE(true);
+    L3_ALGAE(true);
 
     public boolean isLevel() {
       return this == L1 || this == L2 || this == L3 || this == L4;
@@ -43,7 +42,6 @@ public class Superstructure extends SubsystemBase {
       return switch (this) {
         case L2 -> L2_ALGAE;
         case L3 -> L3_ALGAE;
-        case L4 -> L4_ALGAE;
         default -> this;
       };
     }
@@ -102,7 +100,6 @@ public class Superstructure extends SubsystemBase {
       case L4 -> prepareL4();
       case L2_ALGAE -> prepareAlgaeL2();
       case L3_ALGAE -> prepareAlgaeL3();
-      case L4_ALGAE -> prepareAlgaeL4();
       case INTAKE -> prepareIntake();
     };
   }
@@ -164,13 +161,6 @@ public class Superstructure extends SubsystemBase {
   public Command prepareAlgaeL3() {
     return Commands.parallel(
         elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0)),
-        coralWrist.runPrepare(coralHighStow),
-        algaeWrist.runPrepare(Units.degreesToRotations(90)));
-  }
-
-  public Command prepareAlgaeL4() {
-    return Commands.parallel(
-        elevator.runOnce(() -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)),
         coralWrist.runPrepare(coralHighStow),
         algaeWrist.runPrepare(Units.degreesToRotations(90)));
   }

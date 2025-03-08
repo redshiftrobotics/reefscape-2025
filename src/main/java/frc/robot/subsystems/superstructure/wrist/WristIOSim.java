@@ -42,14 +42,14 @@ public class WristIOSim implements WristIO {
     inputs.positionRotations = Units.radiansToRotations(arm.getAngleRads());
     inputs.velocityRPM = Units.radiansPerSecondToRotationsPerMinute(arm.getVelocityRadPerSec());
 
-    inputs.appliedVolts = new double[] {appliedVolts};
-    inputs.supplyCurrentAmps = new double[] {arm.getCurrentDrawAmps()};
+    inputs.appliedVolts = appliedVolts;
+    inputs.supplyCurrentAmps = arm.getCurrentDrawAmps();
   }
 
   @Override
-  public void runPosition(double positionRotations) {
+  public void runPosition(double positionRotations, double feedforward) {
     controller.setSetpoint(positionRotations);
-    feedForwardVolts = 0;
+    feedForwardVolts = feedforward;
     runClosedLoop = true;
   }
 

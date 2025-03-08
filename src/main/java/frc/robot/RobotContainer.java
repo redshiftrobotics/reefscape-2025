@@ -50,11 +50,14 @@ import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOHardware;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
 import frc.robot.subsystems.superstructure.intake.Intake;
+import frc.robot.subsystems.superstructure.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.intake.IntakeIO;
+import frc.robot.subsystems.superstructure.intake.IntakeIOHardware;
 import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
 import frc.robot.subsystems.superstructure.wrist.WristConstants;
 import frc.robot.subsystems.superstructure.wrist.WristIO;
+import frc.robot.subsystems.superstructure.wrist.WristIOHardware;
 import frc.robot.subsystems.superstructure.wrist.WristIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
@@ -144,10 +147,23 @@ public class RobotContainer {
 
         elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
         hang = new Hang(new HangIOHardware(HangConstants.HANG_CONFIG));
-        algaeWrist = new Wrist("Algae", new WristIO() {}, WristConstants.ALGAE_FEEDBACK);
-        coralWrist = new Wrist("Coral", new WristIO() {}, WristConstants.CORAL_FEEDBACK);
-        algaeIntake = new Intake("Algae", new IntakeIO() {});
-        coralIntake = new Intake("Coral", new IntakeIO() {});
+        algaeWrist =
+            new Wrist(
+                "Algae",
+                new WristIOHardware(WristConstants.ALGAE_WRIST_CONFIG),
+                WristConstants.ALGAE_FEEDBACK,
+                WristConstants.ALGAE_FEEDFORWARD);
+        coralWrist =
+            new Wrist(
+                "Coral",
+                new WristIOHardware(WristConstants.CORAL_WRIST_CONFIG),
+                // new WristIO() {},
+                WristConstants.CORAL_FEEDBACK,
+                WristConstants.CORAL_FEEDFORWARD);
+        algaeIntake =
+            new Intake("Algae", new IntakeIOHardware(IntakeConstants.ALGAE_INTAKE_CONFIG));
+        coralIntake =
+            new Intake("Coral", new IntakeIOHardware(IntakeConstants.CORAL_INTAKE_CONFIG));
         break;
 
       case WOOD_BOT_TWO_2025:
@@ -162,8 +178,18 @@ public class RobotContainer {
         vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
         elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
-        algaeWrist = new Wrist("Algae", new WristIO() {}, WristConstants.ALGAE_FEEDBACK);
-        coralWrist = new Wrist("Coral", new WristIO() {}, WristConstants.CORAL_FEEDBACK);
+        algaeWrist =
+            new Wrist(
+                "Algae",
+                new WristIO() {},
+                WristConstants.ALGAE_FEEDBACK,
+                WristConstants.ALGAE_FEEDFORWARD);
+        coralWrist =
+            new Wrist(
+                "Coral",
+                new WristIO() {},
+                WristConstants.CORAL_FEEDBACK,
+                WristConstants.CORAL_FEEDFORWARD);
         algaeIntake = new Intake("Algae", new IntakeIO() {});
         coralIntake = new Intake("Coral", new IntakeIO() {});
         break;
@@ -180,8 +206,18 @@ public class RobotContainer {
         vision = new AprilTagVision();
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
-        algaeWrist = new Wrist("Algae", new WristIO() {}, WristConstants.ALGAE_FEEDBACK);
-        coralWrist = new Wrist("Coral", new WristIO() {}, WristConstants.CORAL_FEEDBACK);
+        algaeWrist =
+            new Wrist(
+                "Algae",
+                new WristIO() {},
+                WristConstants.ALGAE_FEEDBACK,
+                WristConstants.ALGAE_FEEDFORWARD);
+        coralWrist =
+            new Wrist(
+                "Coral",
+                new WristIO() {},
+                WristConstants.CORAL_FEEDBACK,
+                WristConstants.CORAL_FEEDFORWARD);
         algaeIntake = new Intake("Algae", new IntakeIO() {});
         coralIntake = new Intake("Coral", new IntakeIO() {});
         break;
@@ -199,8 +235,18 @@ public class RobotContainer {
         hang = new Hang(new HangIO() {});
         elevator = new Elevator(new ElevatorIO() {});
 
-        algaeWrist = new Wrist("Algae", new WristIO() {}, WristConstants.ALGAE_FEEDBACK);
-        coralWrist = new Wrist("Coral", new WristIO() {}, WristConstants.CORAL_FEEDBACK);
+        algaeWrist =
+            new Wrist(
+                "Algae",
+                new WristIO() {},
+                WristConstants.ALGAE_FEEDBACK,
+                WristConstants.ALGAE_FEEDFORWARD);
+        coralWrist =
+            new Wrist(
+                "Coral",
+                new WristIO() {},
+                WristConstants.CORAL_FEEDBACK,
+                WristConstants.CORAL_FEEDFORWARD);
 
         algaeIntake = new Intake("Algae", new IntakeIO() {});
         coralIntake = new Intake("Coral", new IntakeIO() {});
@@ -229,12 +275,14 @@ public class RobotContainer {
             new Wrist(
                 "Algae",
                 new WristIOSim(WristConstants.ALGAE_WRIST_CONFIG),
-                WristConstants.ALGAE_FEEDBACK);
+                WristConstants.ALGAE_FEEDBACK,
+                WristConstants.ALGAE_FEEDFORWARD);
         coralWrist =
             new Wrist(
                 "Coral",
                 new WristIOSim(WristConstants.CORAL_WRIST_CONFIG),
-                WristConstants.CORAL_FEEDBACK);
+                WristConstants.CORAL_FEEDBACK,
+                WristConstants.CORAL_FEEDFORWARD);
         algaeIntake = new Intake("Algae", new IntakeIOSim());
         coralIntake = new Intake("Coral", new IntakeIOSim());
         break;
@@ -251,8 +299,18 @@ public class RobotContainer {
         hang = new Hang(new HangIO() {});
         vision = new AprilTagVision();
         elevator = new Elevator(new ElevatorIO() {});
-        algaeWrist = new Wrist("Algae", new WristIO() {}, WristConstants.ALGAE_FEEDBACK);
-        coralWrist = new Wrist("Coral", new WristIO() {}, WristConstants.CORAL_FEEDBACK);
+        algaeWrist =
+            new Wrist(
+                "Algae",
+                new WristIO() {},
+                WristConstants.ALGAE_FEEDBACK,
+                WristConstants.ALGAE_FEEDFORWARD);
+        coralWrist =
+            new Wrist(
+                "Coral",
+                new WristIO() {},
+                WristConstants.CORAL_FEEDBACK,
+                WristConstants.CORAL_FEEDFORWARD);
         algaeIntake = new Intake("Algae", new IntakeIO() {});
         coralIntake = new Intake("Coral", new IntakeIO() {});
 
@@ -499,9 +557,7 @@ public class RobotContainer {
 
   private void configureOperatorControllerBindings() {
 
-    new Trigger(DriverStation::isEnabled)
-        .onTrue(
-            elevator.zeroHeight().onlyIf(elevator::needsZeroing).andThen(superstructure.stowLow()));
+    new Trigger(DriverStation::isEnabled).onTrue(superstructure.stowLow());
 
     operatorController.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
@@ -570,7 +626,6 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("l2_algae", superstructure.run(Superstructure.State.L2_ALGAE));
     NamedCommands.registerCommand("l3_algae", superstructure.run(Superstructure.State.L3_ALGAE));
-    NamedCommands.registerCommand("l4_algae", superstructure.run(Superstructure.State.L4_ALGAE));
 
     NamedCommands.registerCommand("stow", superstructure.run(Superstructure.State.STOW));
     NamedCommands.registerCommand("intake", superstructure.run(Superstructure.State.INTAKE));

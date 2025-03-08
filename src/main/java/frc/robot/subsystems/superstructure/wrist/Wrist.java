@@ -1,13 +1,16 @@
 package frc.robot.subsystems.superstructure.wrist;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utility.records.ArmFeedForwardConstants;
 import frc.robot.utility.records.PIDConstants;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
@@ -19,16 +22,22 @@ public class Wrist extends SubsystemBase {
 
   private final LoggedTunableNumberFactory factory;
   private final LoggedTunableNumber kP, kI, kD;
+  private final LoggedTunableNumber kS, kG, kV, kA;
 
   private final WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
+
+  private ArmFeedforward feedforward;
+
+  private final Alert motorConnectedAlert;
 
   private Debouncer disabledDebouncer = new Debouncer(3, DebounceType.kRising);
 
   private double goalRotations = 0;
 
   /** Creates a new Wrist. */
-  public Wrist(String name, WristIO io, PIDConstants feedback) {
+  public Wrist(
+      String name, WristIO io, PIDConstants feedback, ArmFeedForwardConstants feedforward) {
     this.name = name;
     this.io = io;
 
@@ -37,8 +46,18 @@ public class Wrist extends SubsystemBase {
     kI = factory.getNumber("kI", feedback.kI());
     kD = factory.getNumber("kD", feedback.kD());
 
+    kS = factory.getNumber("kS", feedforward.kS());
+    kG = factory.getNumber("kG", feedforward.kG());
+    kV = factory.getNumber("kV", feedforward.kV());
+    kA = factory.getNumber("kA", feedforward.kA());
+
     io.setPID(kP.get(), kI.get(), kD.get());
     io.setBrakeMode(true);
+
+    this.feedforward = new ArmFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
+
+    motorConnectedAlert =
+        new Alert("Wrist " + name + " motor disconnected!", Alert.AlertType.kWarning);
   }
 
   @Override
@@ -47,7 +66,8 @@ public class Wrist extends SubsystemBase {
 
     Logger.processInputs("Wrist " + name, inputs);
 
-    Logger.recordOutput("Wrist" + name + "/degrees", Units.rotationsToDegrees(inputs.positionRotations));
+    Logger.recordOutput(
+        "Wrist" + name + "/degrees", Units.rotationsToDegrees(inputs.positionRotations));
 
     io.setBrakeMode(!disabledDebouncer.calculate(DriverStation.isDisabled()));
 
@@ -59,6 +79,16 @@ public class Wrist extends SubsystemBase {
         kP,
         kI,
         kD);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> feedforward = new ArmFeedforward(values[0], values[1], values[2], values[3]),
+        kS,
+        kG,
+        kV,
+        kA);
+
+    motorConnectedAlert.set(!inputs.motorConnected);
   }
 
   public Command runPrepare(double position) {
@@ -70,8 +100,8 @@ public class Wrist extends SubsystemBase {
   }
 
   public void setGoalRotations(double position) {
+    io.runPosition(position, feedforward.calculate(position, 0));
     goalRotations = position;
-    io.runPosition(position);
   }
 
   /** Whether wrist is within tolerance of setpoint */

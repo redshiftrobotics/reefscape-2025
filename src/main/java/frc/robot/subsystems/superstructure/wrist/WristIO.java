@@ -6,18 +6,21 @@ import org.littletonrobotics.junction.AutoLog;
 public interface WristIO {
   @AutoLog
   public static class WristIOInputs {
+    public boolean motorConnected = false;
+
     public double positionRotations;
+    public double positionDegrees;
     public double velocityRPM;
 
-    public double[] appliedVolts = new double[] {};
-    public double[] supplyCurrentAmps = new double[] {};
+    public double appliedVolts;
+    public double supplyCurrentAmps;
   }
 
   /** Updates the set of loggable inputs. */
   default void updateInputs(WristIOInputs inputs) {}
 
   /** Set the setpoint in revolutions. */
-  default void runPosition(double setpoint) {}
+  default void runPosition(double setpoint, double feedfoward) {}
 
   /** Set the PID constants. */
   default void setPID(double kP, double kI, double kD) {}

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superstructure.wrist;
 
+import static frc.robot.utility.SparkUtil.ifOk;
 import static frc.robot.utility.SparkUtil.tryUntilOk;
 
 import com.revrobotics.spark.SparkAbsoluteEncoder;
@@ -12,12 +13,17 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.superstructure.wrist.WristConstants.WristConfig;
+import frc.robot.utility.SparkUtil;
 
 public class WristIOHardware implements WristIO {
   private final SparkMax motor;
   private final SparkAbsoluteEncoder encoder;
   private final SparkClosedLoopController control;
+
+  private final Debouncer connectDebounce = new Debouncer(0.5);
 
   private boolean breakMode = true;
 
@@ -38,20 +44,29 @@ public class WristIOHardware implements WristIO {
         .inverted(config.encoderInverted());
     motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
 
-    motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    motor.configure(motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   @Override
   public void updateInputs(WristIOInputs inputs) {
-    inputs.positionRotations = encoder.getPosition();
-    inputs.velocityRPM = encoder.getVelocity();
 
-    inputs.appliedVolts = new double[] {motor.getAppliedOutput() * motor.getBusVoltage()};
-    inputs.supplyCurrentAmps = new double[] {motor.getOutputCurrent()};
+    SparkUtil.clearStickyFault();
+
+    ifOk(motor, encoder::getPosition, value -> inputs.positionRotations = value);
+    ifOk(motor, encoder::getVelocity, value -> inputs.velocityRPM = value);
+    inputs.positionDegrees = Units.rotationsToDegrees(inputs.positionRotations);
+
+    ifOk(
+        motor,
+        () -> motor.getAppliedOutput() * motor.getBusVoltage(),
+        value -> inputs.appliedVolts = value);
+    ifOk(motor, motor::getOutputCurrent, value -> inputs.supplyCurrentAmps = value);
+
+    inputs.motorConnected = connectDebounce.calculate(!SparkUtil.hasStickyFault());
   }
 
   @Override
-  public void runPosition(double setpoint) {
+  public void runPosition(double setpoint, double feedforward) {
     control.setReference(setpoint, ControlType.kPosition);
   }
 

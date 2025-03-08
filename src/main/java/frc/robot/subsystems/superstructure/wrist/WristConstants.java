@@ -3,6 +3,7 @@ package frc.robot.subsystems.superstructure.wrist;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
+import frc.robot.utility.records.ArmFeedForwardConstants;
 import frc.robot.utility.records.PIDConstants;
 
 /** Constants for the Template subsystem. */
@@ -29,7 +30,7 @@ public class WristConstants {
 
   public static final WristConfig ALGAE_WRIST_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new WristConfig(12, 2.0, 0, false, false);
+        case COMP_BOT_2025 -> new WristConfig(12, 125.0, 0.361, true, false);
         default -> new WristConfig(0, 1, 0, false, false);
       };
 
@@ -40,10 +41,22 @@ public class WristConstants {
         default -> new PIDConstants(0.0, 0.0, 0.0);
       };
 
+  public static final ArmFeedForwardConstants CORAL_FEEDFORWARD =
+      switch (Constants.getRobot()) {
+        case COMP_BOT_2025 -> new ArmFeedForwardConstants(0.0, 0.0, 0.0, 0.0);
+        default -> new ArmFeedForwardConstants(0.0, 0.0, 0.0, 0.0);
+      };
+
   public static final PIDConstants ALGAE_FEEDBACK =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new PIDConstants(0.0, 0.0, 0.0);
+        case COMP_BOT_2025 -> new PIDConstants(2.0, 0.0, 0.0);
         case SIM_BOT -> new PIDConstants(10.0, 0.0, 3.0);
         default -> new PIDConstants(0.0, 0.0, 0.0);
+      };
+
+  public static final ArmFeedForwardConstants ALGAE_FEEDFORWARD =
+      switch (Constants.getRobot()) {
+        case COMP_BOT_2025 -> new ArmFeedForwardConstants(0.0, 0.0, 0.0, 0.0);
+        default -> new ArmFeedForwardConstants(0.0, 0.0, 0.0, 0.0);
       };
 }
