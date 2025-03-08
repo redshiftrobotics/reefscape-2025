@@ -36,37 +36,19 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "intake"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "PR-C10"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "l4"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "C10-PR"
+                  "name": "intake"
                 }
               },
               {
-                "type": "named",
+                "type": "wait",
                 "data": {
-                  "name": "stow"
+                  "waitTime": 3.0
                 }
               }
             ]
@@ -75,13 +57,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "PR-C11"
+            "pathName": "PR-C0"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "l4"
+            "name": "l2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stow"
           }
         }
       ]
