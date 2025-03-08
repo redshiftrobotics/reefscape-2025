@@ -13,7 +13,6 @@ public class ElevatorConstants {
   public static final ElevatorConfig ELEVATOR_CONFIG =
       switch (Constants.getRobot()) {
         case COMP_BOT_2025 -> new ElevatorConfig(3, 17, true); // left is leader, right is follower
-        case SIM_BOT -> new ElevatorConfig(0, 0, false);
         default -> new ElevatorConfig(0, 1, false);
       };
 

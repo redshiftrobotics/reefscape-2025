@@ -51,7 +51,7 @@ public class VisionConstants {
       Units.degreesToRadians(20); // more bent back mount
   private static final double FRONT_CAMERA_OFFSET_Z = Units.inchesToMeters(8.0);
 
-  private static final double BACK_CAMERA_YAW = Units.degreesToRadians(-20); // 20 degrees inward
+  private static final double BACK_CAMERA_YAW = Units.degreesToRadians(-30); // 30 degrees inward
   private static final double BACK_CAMERA_PITCH =
       Units.degreesToRadians(20); // more bent back mount
   private static final double BACK_CAMERA_OFFSET_Z = Units.inchesToMeters(8.0);
