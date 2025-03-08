@@ -491,7 +491,9 @@ public class RobotContainer {
           new AdaptiveAutoAlignCommands(
               Arrays.asList(FieldConstants.Reef.alignmentFaces),
               new Transform2d(
-                  DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
+                  DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0 + Units.inchesToMeters(10),
+                  0,
+                  Rotation2d.k180deg),
               new Transform2d(0, 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(6), 0));
 
@@ -566,7 +568,8 @@ public class RobotContainer {
 
     operatorController
         .leftTrigger()
-        .whileTrue(superstructure.run(State.INTAKE).andThen(superstructure.stowLow()));
+        .whileTrue(superstructure.run(State.INTAKE))
+        .onFalse(superstructure.stowLow());
 
     configureOperatorControllerBindingLevel(operatorController.y(), Superstructure.State.L4);
     configureOperatorControllerBindingLevel(operatorController.x(), Superstructure.State.L3);

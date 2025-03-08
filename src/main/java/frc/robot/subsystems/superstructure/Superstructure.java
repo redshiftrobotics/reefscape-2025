@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
-import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
 
@@ -116,6 +115,7 @@ public class Superstructure extends SubsystemBase {
 
   public Command run(State goal) {
     return runPrepare(goal)
+        .andThen(coralIntake.runOnce(() -> coralIntake.setMotors(-0.1)))
         .andThen(Commands.waitUntil(() -> elevator.atGoalHeight() && coralWrist.atGoal()))
         .andThen(runWheels(goal));
   }
@@ -133,40 +133,30 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Command prepareL1() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight / 4.0),
-        coralWrist.runPrepare(Units.degreesToRotations(55)));
+    return Commands.parallel(elevator.runPositionPrepare(0), coralWrist.runPrepare(-7.690));
   }
 
   public Command prepareL2() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight / 2.0),
-        coralWrist.runPrepare(Units.degreesToRotations(35)));
+    return Commands.parallel(elevator.runPositionPrepare(0.599), coralWrist.runPrepare(-7.690));
   }
 
   public Command prepareL3() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0)),
-        coralWrist.runPrepare(Units.degreesToRotations(35)));
+    return Commands.parallel(elevator.runPositionPrepare(1.033), coralWrist.runPrepare(-8.262));
   }
 
   public Command prepareL4() {
-    return Commands.parallel(
-        elevator.runOnce(() -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)),
-        coralWrist.runPrepare(Units.degreesToRotations(90)));
+    return Commands.parallel(elevator.runPositionPrepare(0), coralWrist.runPrepare(-8.262));
   }
 
   public Command prepareIntake() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(ElevatorConstants.carriageMaxHeight / 4.0),
-        coralWrist.runPrepare(Units.degreesToRotations(55)));
+    return Commands.parallel(elevator.runPositionPrepare(0.121), coralWrist.runPrepare(-3.19));
   }
 
   public Command stowLow() {
     return Commands.parallel(
         elevator.runStow(),
         algaeWrist.runPrepare(Units.degreesToRotations(20)),
-        coralWrist.runPrepare(Units.degreesToRotations(90)));
+        coralWrist.runPrepare(-1.619));
   }
 
   // public Command stowHigh() {

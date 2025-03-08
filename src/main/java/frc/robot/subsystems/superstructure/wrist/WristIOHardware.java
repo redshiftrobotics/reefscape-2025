@@ -3,7 +3,7 @@ package frc.robot.subsystems.superstructure.wrist;
 import static frc.robot.utility.SparkUtil.ifOk;
 import static frc.robot.utility.SparkUtil.tryUntilOk;
 
-import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -20,7 +20,7 @@ import frc.robot.utility.SparkUtil;
 
 public class WristIOHardware implements WristIO {
   private final SparkMax motor;
-  private final SparkAbsoluteEncoder encoder;
+  private final RelativeEncoder encoder;
   private final SparkClosedLoopController control;
 
   private final Debouncer connectDebounce = new Debouncer(0.5);
@@ -29,7 +29,7 @@ public class WristIOHardware implements WristIO {
 
   public WristIOHardware(WristConfig config) {
     motor = new SparkMax(config.motorId(), MotorType.kBrushless);
-    encoder = motor.getAbsoluteEncoder();
+    encoder = motor.getEncoder();
     control = motor.getClosedLoopController();
 
     final SparkMaxConfig motorConfig = new SparkMaxConfig();
@@ -38,13 +38,16 @@ public class WristIOHardware implements WristIO {
         .smartCurrentLimit(WristConstants.MOTOR_CURRENT_LIMIT)
         .voltageCompensation(12)
         .inverted(config.motorInverted());
-    motorConfig
-        .absoluteEncoder
-        .zeroOffset(config.absoluteEncoderOffset())
-        .inverted(config.encoderInverted());
-    motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
+    // motorConfig
+    //     .encoder
+    //     .positionConversionFactor(1.0 / config.gearReduction())
+    //     .velocityConversionFactor(1.0 / config.gearReduction())
+    //     .inverted(config.encoderInverted());
+    motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kPrimaryEncoder);
 
-    motor.configure(motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    encoder.setPosition(0);
   }
 
   @Override
