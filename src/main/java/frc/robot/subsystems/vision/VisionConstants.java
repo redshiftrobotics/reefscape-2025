@@ -76,7 +76,7 @@ public class VisionConstants {
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, +CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
               new Rotation3d(
-                  0, -BACK_CAMERA_PITCH, Units.degreesToRadians(180) - BACK_CAMERA_YAW)));
+                  0, -(BACK_CAMERA_PITCH - 10), Units.degreesToRadians(180) - BACK_CAMERA_YAW)));
 
   public static final CameraConfig COMP_BACK_RIGHT_CAMERA =
       new CameraConfig(
