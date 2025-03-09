@@ -5,15 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "l4"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Copy of SC-C6"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "l4"
           }
         },
         {

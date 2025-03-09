@@ -133,7 +133,7 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Command prepareL1() {
-    return Commands.parallel(elevator.runPositionPrepare(0), coralWrist.runPrepare(-7.690));
+    return Commands.parallel(elevator.runPositionPrepare(1.82), coralWrist.runPrepare(-6.71));
   }
 
   public Command prepareL2() {
@@ -144,8 +144,8 @@ public class Superstructure extends SubsystemBase {
 
   public Command prepareL3() {
     return Commands.parallel(
-        elevator.runPositionPrepare(1.033 + Units.inchesToMeters(1)),
-        coralWrist.runPrepare(-8.262));
+        elevator.runPositionPrepare(1.035 + Units.inchesToMeters(2)),
+        coralWrist.runPrepare(-7.643));
   }
 
   public Command prepareL4() {

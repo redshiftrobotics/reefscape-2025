@@ -17,18 +17,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "take1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "take2"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -63,18 +51,6 @@
           "type": "named",
           "data": {
             "name": "l3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "take1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "take2"
           }
         },
         {

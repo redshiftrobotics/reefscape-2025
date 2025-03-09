@@ -335,38 +335,6 @@ public class RobotContainer {
           }
         });
 
-        NamedCommands.registerCommand(
-          "l1",
-          superstructure
-              .runPrepare(Superstructure.State.L1)
-              .andThen(Commands.waitSeconds(1))
-              .andThen(coralIntake.intake(1).withTimeout(1))
-              .andThen(superstructure.stowLowWait()));
-      NamedCommands.registerCommand(
-          "l2",
-          superstructure
-              .runPrepare(Superstructure.State.L2)
-              .andThen(Commands.waitSeconds(1))
-              .andThen(coralIntake.intake(1).withTimeout(1))
-              .andThen(superstructure.stowLowWait()));
-      NamedCommands.registerCommand(
-          "l3",
-          superstructure
-              .runPrepare(Superstructure.State.L3)
-              .andThen(Commands.waitSeconds(1))
-              .andThen(coralIntake.intake(1).withTimeout(1))
-              .andThen(superstructure.stowLowWait()));
-      NamedCommands.registerCommand(
-          "l4",
-          superstructure
-              .runPrepare(Superstructure.State.L3)
-              .andThen(Commands.waitSeconds(1))
-              .andThen(coralIntake.intake(1).withTimeout(1))
-              .andThen(superstructure.stowLowWait()));
-  
-      NamedCommands.registerCommand("stow", superstructure.runPrepare(Superstructure.State.STOW));
-      NamedCommands.registerCommand("intake", superstructure.runPrepare(Superstructure.State.INTAKE));
-
     // Can also use AutoBuilder.buildAutoChooser(); instead of SendableChooser to auto populate
     // autoChooser = new LoggedDashboardChooser<>("Auto Chooser", new SendableChooser<Command>());
     autoChooser = new LoggedDashboardChooser<>("Auto Chooser", AutoBuilder.buildAutoChooser());
@@ -374,6 +342,7 @@ public class RobotContainer {
 
     // Configure autos
     configureAutos(autoChooser);
+    namedCommands();
 
     // Alerts for constants to avoid using them in competition
     tuningModeActiveAlert.set(Constants.TUNING_MODE);
@@ -529,7 +498,6 @@ public class RobotContainer {
               new Transform2d(0, 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(6), 0));
 
-      reefAlignmentCommands.setFinalAlignCommand(superstructure::prepare, Units.inchesToMeters(12));
       reefAlignmentCommands.setEndCommand(
           () -> rumbleController(driverController, 0.5).withTimeout(0.1));
 
@@ -628,8 +596,11 @@ public class RobotContainer {
 
   private void configureOperatorControllerBindingLevel(
       Trigger trigger, Superstructure.State state) {
-    trigger.onTrue(superstructure.runPrepare(state));
-    trigger.onFalse(superstructure.stowLow());
+    trigger.whileTrue(
+        superstructure
+            .runPrepare(state)
+            .andThen(Commands.idle())
+            .andThen(superstructure.stowLow()));
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
@@ -659,13 +630,52 @@ public class RobotContainer {
         .onChange(rumbleControllers(0.2).withTimeout(0.2));
   }
 
-  private void configureAutos(LoggedDashboardChooser<Command> dashboardChooser) {
+  private void namedCommands() {
     // Set up named commands for path planner auto
     // https://pathplanner.dev/pplib-named-commands.html
     NamedCommands.registerCommand("StopWithX", drive.runOnce(drive::stopUsingBrakeArrangement));
 
-    NamedCommands.registerCommand("take1", coralIntake.intake(1).withTimeout(1));
-    NamedCommands.registerCommand("take2", coralIntake.intake(-1).withTimeout(1));
+    NamedCommands.registerCommand(
+        "l1",
+        superstructure
+            .runPrepare(Superstructure.State.L1)
+            .andThen(Commands.waitSeconds(1))
+            .andThen(coralIntake.intake(1).withTimeout(1))
+            .andThen(superstructure.stowLowWait()));
+    NamedCommands.registerCommand(
+        "l2",
+        superstructure
+            .runPrepare(Superstructure.State.L2)
+            .andThen(Commands.waitSeconds(1))
+            .andThen(coralIntake.intake(1).withTimeout(1))
+            .andThen(superstructure.stowLowWait()));
+    NamedCommands.registerCommand(
+        "l3",
+        superstructure
+            .runPrepare(Superstructure.State.L3)
+            .andThen(Commands.waitSeconds(1))
+            .andThen(coralIntake.intake(1).withTimeout(1))
+            .andThen(superstructure.stowLowWait()));
+    NamedCommands.registerCommand(
+        "l4",
+        superstructure
+            .runPrepare(Superstructure.State.L3)
+            .andThen(Commands.waitSeconds(1))
+            .andThen(coralIntake.intake(1).withTimeout(1))
+            .andThen(superstructure.stowLowWait()));
+
+    NamedCommands.registerCommand(
+        "stow",
+        superstructure
+            .runPrepare(Superstructure.State.STOW)
+            .andThen(Commands.waitSeconds(1))
+            .andThen(coralIntake.intake(-0.3).withTimeout(2.5))
+            .andThen(superstructure.stowLowWait()));
+
+    NamedCommands.registerCommand("stow", superstructure.runPrepare(Superstructure.State.STOW));
+  }
+
+  private void configureAutos(LoggedDashboardChooser<Command> dashboardChooser) {
 
     // Path planner Autos
     // https://pathplanner.dev/gui-editing-paths-and-autos.html#autos
