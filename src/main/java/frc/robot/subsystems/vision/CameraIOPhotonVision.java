@@ -17,7 +17,10 @@ public class CameraIOPhotonVision implements CameraIO {
   private final PhotonCamera camera;
   private final PhotonPoseEstimator photonPoseEstimator;
 
+  private final String cameraPositionTitle;
+
   public CameraIOPhotonVision(CameraConfig config) {
+    this.cameraPositionTitle = config.cameraPosition();
 
     // --- Setup Camera ---
     camera = new PhotonCamera(config.cameraName());
@@ -48,6 +51,11 @@ public class CameraIOPhotonVision implements CameraIO {
 
   protected PhotonPoseEstimator getPhotonPoseEstimator() {
     return photonPoseEstimator;
+  }
+
+  @Override
+  public String getCameraPosition() {
+    return cameraPositionTitle;
   }
 
   @Override

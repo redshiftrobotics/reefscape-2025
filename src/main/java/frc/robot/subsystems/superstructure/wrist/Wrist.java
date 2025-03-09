@@ -120,12 +120,12 @@ public class Wrist extends SubsystemBase {
     motorConnectedAlert.set(!inputs.motorConnected);
   }
 
-  public Command runPrepare(double position) {
+  public Command runPositionPrepare(double position) {
     return runOnce(() -> setGoalRotations(position));
   }
 
   public Command run(double position) {
-    return runPrepare(position).andThen(Commands.waitUntil(this::atGoal));
+    return runPositionPrepare(position).andThen(Commands.waitUntil(this::atGoal));
   }
 
   public void setGoalRotations(double position) {

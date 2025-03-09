@@ -106,7 +106,7 @@ public class DriveConstants {
   public static final double robotMassKg = 65;
   public static final double robotMOI = 6.883;
   public static final double wheelCOF = 1.0;
-  public static final Translation2d[] moduleTranslations = {
+  public static final Translation2d[] MODULE_TRANSLATION = {
     DriveConstants.FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER,
     DriveConstants.FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER,
     DriveConstants.BACK_LEFT_MODULE_DISTANCE_FROM_CENTER,

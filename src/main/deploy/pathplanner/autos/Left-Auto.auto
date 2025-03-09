@@ -13,7 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "l2"
+            "name": "l1"
           }
         },
         {
@@ -42,7 +42,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 3.0
+                  "waitTime": 1.0
                 }
               },
               {
@@ -63,7 +63,7 @@
         {
           "type": "named",
           "data": {
-            "name": "l2"
+            "name": "l1"
           }
         },
         {

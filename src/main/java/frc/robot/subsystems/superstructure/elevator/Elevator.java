@@ -168,19 +168,11 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command runPositionPrepare(double position) {
-    return Commands.runOnce(() -> setGoalHeightMeters(position));
-  }
-
-  public Command runPosition(double position) {
-    return runPositionPrepare(position).andThen(Commands.waitUntil(this::atGoalHeight));
+    return runOnce(() -> setGoalHeightMeters(position));
   }
 
   public void setGoalSupplier(Supplier<State> goal) {
     this.goalSupplier = goal;
-  }
-
-  public Command runStow() {
-    return runPosition(0);
   }
 
   /** Sets the goal height of the elevator in meters */
