@@ -137,11 +137,15 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Command prepareL2() {
-    return Commands.parallel(elevator.runPositionPrepare(0.599), coralWrist.runPrepare(-7.690));
+    return Commands.parallel(
+        elevator.runPositionPrepare(0.599 + Units.inchesToMeters(1)),
+        coralWrist.runPrepare(-7.690));
   }
 
   public Command prepareL3() {
-    return Commands.parallel(elevator.runPositionPrepare(1.033), coralWrist.runPrepare(-8.262));
+    return Commands.parallel(
+        elevator.runPositionPrepare(1.033 + Units.inchesToMeters(1)),
+        coralWrist.runPrepare(-8.262));
   }
 
   public Command prepareL4() {
@@ -149,12 +153,21 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Command prepareIntake() {
-    return Commands.parallel(elevator.runPositionPrepare(0.121), coralWrist.runPrepare(-3.19));
+    return Commands.parallel(
+        (elevator.runPositionPrepare(0.218 + Units.inchesToMeters(1.5))),
+        coralWrist.runPrepare(-4.214));
   }
 
   public Command stowLow() {
     return Commands.parallel(
         elevator.runStow(),
+        algaeWrist.runPrepare(Units.degreesToRotations(20)),
+        coralWrist.runPrepare(-1.619));
+  }
+
+  public Command stowLowWait() {
+    return Commands.parallel(
+        Commands.waitSeconds(0.3).andThen(elevator.runStow()),
         algaeWrist.runPrepare(Units.degreesToRotations(20)),
         coralWrist.runPrepare(-1.619));
   }

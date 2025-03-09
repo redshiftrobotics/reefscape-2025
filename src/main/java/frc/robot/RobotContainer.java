@@ -335,6 +335,38 @@ public class RobotContainer {
           }
         });
 
+        NamedCommands.registerCommand(
+          "l1",
+          superstructure
+              .runPrepare(Superstructure.State.L1)
+              .andThen(Commands.waitSeconds(1))
+              .andThen(coralIntake.intake(1).withTimeout(1))
+              .andThen(superstructure.stowLowWait()));
+      NamedCommands.registerCommand(
+          "l2",
+          superstructure
+              .runPrepare(Superstructure.State.L2)
+              .andThen(Commands.waitSeconds(1))
+              .andThen(coralIntake.intake(1).withTimeout(1))
+              .andThen(superstructure.stowLowWait()));
+      NamedCommands.registerCommand(
+          "l3",
+          superstructure
+              .runPrepare(Superstructure.State.L3)
+              .andThen(Commands.waitSeconds(1))
+              .andThen(coralIntake.intake(1).withTimeout(1))
+              .andThen(superstructure.stowLowWait()));
+      NamedCommands.registerCommand(
+          "l4",
+          superstructure
+              .runPrepare(Superstructure.State.L3)
+              .andThen(Commands.waitSeconds(1))
+              .andThen(coralIntake.intake(1).withTimeout(1))
+              .andThen(superstructure.stowLowWait()));
+  
+      NamedCommands.registerCommand("stow", superstructure.runPrepare(Superstructure.State.STOW));
+      NamedCommands.registerCommand("intake", superstructure.runPrepare(Superstructure.State.INTAKE));
+
     // Can also use AutoBuilder.buildAutoChooser(); instead of SendableChooser to auto populate
     // autoChooser = new LoggedDashboardChooser<>("Auto Chooser", new SendableChooser<Command>());
     autoChooser = new LoggedDashboardChooser<>("Auto Chooser", AutoBuilder.buildAutoChooser());
@@ -499,11 +531,7 @@ public class RobotContainer {
 
       reefAlignmentCommands.setFinalAlignCommand(superstructure::prepare, Units.inchesToMeters(12));
       reefAlignmentCommands.setEndCommand(
-          () ->
-              Commands.parallel(
-                      superstructure.run(),
-                      rumbleController(driverController, 0.5).withTimeout(0.1))
-                  .andThen(rumbleController(driverController, 0.5).withTimeout(0.1)));
+          () -> rumbleController(driverController, 0.5).withTimeout(0.1));
 
       driverController
           .rightTrigger()
@@ -530,12 +558,12 @@ public class RobotContainer {
           new AdaptiveAutoAlignCommands(
               Arrays.asList(FieldConstants.CoralStation.alignmentFaces),
               new Transform2d(
-                  DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
+                  DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0 + Units.inchesToMeters(14),
+                  0,
+                  Rotation2d.k180deg),
               new Transform2d(0, 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(4), 0));
 
-      intakeAlignmentCommands.setFinalAlignCommand(
-          superstructure::prepareIntake, Units.inchesToMeters(12));
       intakeAlignmentCommands.setEndCommand(
           () -> rumbleController(driverController, 0.3).withTimeout(0.1));
 
@@ -568,33 +596,40 @@ public class RobotContainer {
 
     operatorController
         .leftTrigger()
-        .whileTrue(superstructure.run(State.INTAKE))
-        .onFalse(superstructure.stowLow());
+        .whileTrue(superstructure.runPrepare(State.INTAKE))
+        .whileTrue(coralIntake.intake(-0.6))
+        .onFalse(superstructure.stowLowWait());
 
-    configureOperatorControllerBindingLevel(operatorController.y(), Superstructure.State.L4);
-    configureOperatorControllerBindingLevel(operatorController.x(), Superstructure.State.L3);
+    operatorController.rightTrigger().whileTrue(coralIntake.intake(1));
+    configureOperatorControllerBindingLevel(operatorController.y(), Superstructure.State.L3);
+    configureOperatorControllerBindingLevel(operatorController.x(), Superstructure.State.L2);
     configureOperatorControllerBindingLevel(operatorController.b(), Superstructure.State.L2);
     configureOperatorControllerBindingLevel(operatorController.a(), Superstructure.State.L1);
 
-    operatorController.povDown().onTrue(superstructure.stowLow());
-    // operatorController.povUp().onTrue(superstructure.stowHigh());
+    operatorController.povLeft().whileTrue(coralIntake.intake(1));
+    operatorController.povRight().whileTrue(coralIntake.intake(-1));
 
-    operatorController.leftBumper().whileTrue(hang.runSet(+0.5).withName("Hang Arm Up"));
-    operatorController.rightBumper().whileTrue(hang.runSet(-0.5).withName("Hang Arm Down"));
+    operatorController.povDown().onTrue(superstructure.stowLow());
+
+    coralIntake.setDefaultCommand(
+        coralIntake.run(
+            () ->
+                coralIntake.setMotors(
+                    Math.abs(operatorController.getRightY()) < 0.2
+                        ? -0.05
+                        : MathUtil.applyDeadband(operatorController.getRightY(), 0.2))));
+
     hang.setDefaultCommand(
         hang.run(() -> hang.set(MathUtil.applyDeadband(operatorController.getLeftY(), 0.2))));
+
+    operatorController.leftBumper().whileTrue(hang.runSet(+1));
+    operatorController.rightBumper().whileTrue(hang.runSet(-1));
   }
 
   private void configureOperatorControllerBindingLevel(
       Trigger trigger, Superstructure.State state) {
-    Trigger algae = operatorController.leftTrigger();
-    Trigger force = operatorController.rightTrigger();
-
-    trigger.and(algae.negate()).onTrue(superstructure.setNextPrepare(state));
-    // trigger.and(algae).onTrue(superstructure.setNextPrepare(state.asAlgae()));
-
-    trigger.and(algae.negate()).and(force).onTrue(superstructure.run(state));
-    // trigger.and(algae).and(force).onTrue(superstructure.run(state.asAlgae()));
+    trigger.onTrue(superstructure.runPrepare(state));
+    trigger.onFalse(superstructure.stowLow());
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
@@ -629,16 +664,8 @@ public class RobotContainer {
     // https://pathplanner.dev/pplib-named-commands.html
     NamedCommands.registerCommand("StopWithX", drive.runOnce(drive::stopUsingBrakeArrangement));
 
-    NamedCommands.registerCommand("l1", superstructure.run(Superstructure.State.L1));
-    NamedCommands.registerCommand("l2", superstructure.run(Superstructure.State.L2));
-    NamedCommands.registerCommand("l3", superstructure.run(Superstructure.State.L3));
-    NamedCommands.registerCommand("l4", superstructure.run(Superstructure.State.L4));
-
-    // NamedCommands.registerCommand("l2_algae", superstructure.run(Superstructure.State.L2_ALGAE));
-    // NamedCommands.registerCommand("l3_algae", superstructure.run(Superstructure.State.L3_ALGAE));
-
-    NamedCommands.registerCommand("stow", superstructure.run(Superstructure.State.STOW));
-    NamedCommands.registerCommand("intake", superstructure.run(Superstructure.State.INTAKE));
+    NamedCommands.registerCommand("take1", coralIntake.intake(1).withTimeout(1));
+    NamedCommands.registerCommand("take2", coralIntake.intake(-1).withTimeout(1));
 
     // Path planner Autos
     // https://pathplanner.dev/gui-editing-paths-and-autos.html#autos

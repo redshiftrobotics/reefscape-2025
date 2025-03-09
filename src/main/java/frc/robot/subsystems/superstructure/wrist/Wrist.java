@@ -2,15 +2,18 @@ package frc.robot.subsystems.superstructure.wrist;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.utility.records.ArmFeedForwardConstants;
 import frc.robot.utility.records.PIDConstants;
 import frc.robot.utility.tunable.LoggedTunableNumber;
@@ -24,12 +27,16 @@ public class Wrist extends SubsystemBase {
   private final LoggedTunableNumberFactory factory;
   private final LoggedTunableNumber kP, kI, kD;
   private final LoggedTunableNumber kS, kG, kV, kA;
+  private final LoggedTunableNumber maxVelocity, maxAcceleration;
 
   private final WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
 
-  // private Profil controller;
+  private TrapezoidProfile profile;
   private ArmFeedforward feedforward;
+
+  private State setpoint = new State();
+  private State goal = new State();
 
   private final Alert motorConnectedAlert;
 
@@ -53,6 +60,11 @@ public class Wrist extends SubsystemBase {
     kV = factory.getNumber("kV", feedforward.kV());
     kA = factory.getNumber("kA", feedforward.kA());
 
+    maxVelocity = factory.getNumber("maxVelocity", 8);
+    maxAcceleration = factory.getNumber("maxAcceleration", 5d);
+
+    profile = new TrapezoidProfile(new Constraints(maxVelocity.get(), maxAcceleration.get()));
+
     io.setPID(kP.get(), kI.get(), kD.get());
     io.setBrakeMode(true);
 
@@ -73,6 +85,15 @@ public class Wrist extends SubsystemBase {
 
     io.setBrakeMode(!disabledDebouncer.calculate(DriverStation.isDisabled()));
 
+    setpoint = profile.calculate(Constants.LOOP_PERIOD_SECONDS, setpoint, goal);
+
+    io.runPosition(setpoint.position, feedforward.calculate(setpoint.position, setpoint.velocity));
+
+    Logger.recordOutput("Wrist" + name + "/Profile/SetpointPositionRotations", setpoint.position);
+    Logger.recordOutput("Wrist" + name + "/Profile/SetpointVelocityRPM", setpoint.velocity);
+    Logger.recordOutput("Wrist" + name + "/Profile/GoalPositionRotations", goal.position);
+    Logger.recordOutput("Wrist" + name + "/Profile/GoalVelocityRPM", goal.velocity);
+
     LoggedTunableNumber.ifChanged(
         hashCode(),
         (values) -> {
@@ -90,6 +111,12 @@ public class Wrist extends SubsystemBase {
         kV,
         kA);
 
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> profile = new TrapezoidProfile(new Constraints(values[0], values[1])),
+        maxVelocity,
+        maxAcceleration);
+
     motorConnectedAlert.set(!inputs.motorConnected);
   }
 
@@ -102,8 +129,7 @@ public class Wrist extends SubsystemBase {
   }
 
   public void setGoalRotations(double position) {
-    io.runPosition(position, feedforward.calculate(position, 0));
-    goalRotations = position;
+    goal = new State(position, 0);
   }
 
   /** Whether wrist is within tolerance of setpoint */

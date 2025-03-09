@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "l4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of SC-C6"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "take1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "take2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stow"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "No Algae Clear",
+  "choreoAuto": false
+}

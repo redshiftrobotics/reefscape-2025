@@ -13,7 +13,7 @@ public class WristConstants {
 
   public static final int MOTOR_CURRENT_LIMIT = 30;
 
-  public static final double TOLERANCE = Units.degreesToRotations(5);
+  public static final double TOLERANCE = Units.degreesToRotations(15);
 
   public record WristConfig(
       int motorId,

@@ -154,7 +154,7 @@ public class Elevator extends SubsystemBase {
       Logger.recordOutput("Elevator/Profile/GoalVelocityMetersPerSec", goal.velocity);
 
     } else {
-      Logger.recordOutput("Profile/ShouldRunProfiled", false);
+      Logger.recordOutput("Elevator/Profile/ShouldRunProfiled", false);
 
       Logger.recordOutput("Elevator/Profile/SetpointPositionMeters", 0.0);
       Logger.recordOutput("Elevator/Profile/SetpointVelocityMetersPerSec", 0.0);
