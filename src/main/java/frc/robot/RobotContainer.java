@@ -4,7 +4,6 @@ import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,6 +17,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -66,9 +66,7 @@ import frc.robot.subsystems.vision.CameraIOSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
-import java.io.IOException;
 import java.util.Arrays;
-import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -337,12 +335,12 @@ public class RobotContainer {
 
     // Can also use AutoBuilder.buildAutoChooser(); instead of SendableChooser to auto populate
     // autoChooser = new LoggedDashboardChooser<>("Auto Chooser", new SendableChooser<Command>());
+    registerNamedCommands();
     autoChooser = new LoggedDashboardChooser<>("Auto Chooser", AutoBuilder.buildAutoChooser());
     autoChooser.addDefaultOption("None", Commands.none());
 
     // Configure autos
     configureAutos(autoChooser);
-    namedCommands();
 
     // Alerts for constants to avoid using them in competition
     tuningModeActiveAlert.set(Constants.TUNING_MODE);
@@ -364,8 +362,6 @@ public class RobotContainer {
 
     DriverDashboard dashboard = DriverDashboard.getInstance();
     dashboard.addSubsystem(drive);
-    dashboard.addSubsystem(superstructure);
-    dashboard.addSubsystem(elevator);
     dashboard.setPoseSupplier(drive::getRobotPose);
     dashboard.setRobotSupplier(drive::getRobotSpeeds);
     dashboard.setFieldRelativeSupplier(() -> false);
@@ -406,22 +402,22 @@ public class RobotContainer {
   /** Define button->command mappings. */
   private void configureControllerBindings() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
-    configureDriverControllerBindings(true);
-    configureOperatorControllerBindings();
+    configureDriverControllerBindings(driverController, true);
+    configureOperatorControllerBindings(operatorController);
     configureAlertTriggers();
   }
 
-  private void configureDriverControllerBindings(boolean includeAutoAlign) {
+  private void configureDriverControllerBindings(
+      CommandXboxController xbox, boolean includeAutoAlign) {
     final Trigger useFieldRelative =
-        new Trigger(new OverrideSwitch(driverController.y(), OverrideSwitch.Mode.TOGGLE, true));
+        new Trigger(new OverrideSwitch(xbox.y(), OverrideSwitch.Mode.TOGGLE, true));
 
     final Trigger useHeadingControlled =
         new Trigger(
             new OverrideSwitch(
-                driverController
-                    .rightBumper()
-                    .and(driverController.leftTrigger().negate())
-                    .and(driverController.rightTrigger().negate()),
+                xbox.rightBumper()
+                    .and(xbox.leftTrigger().negate())
+                    .and(xbox.rightTrigger().negate()),
                 OverrideSwitch.Mode.HOLD,
                 false));
 
@@ -431,10 +427,10 @@ public class RobotContainer {
     final JoystickInputController input =
         new JoystickInputController(
             drive,
-            () -> -driverController.getLeftY(),
-            () -> -driverController.getLeftX(),
-            () -> -driverController.getRightY(),
-            () -> -driverController.getRightX());
+            () -> -xbox.getLeftY(),
+            () -> -xbox.getLeftX(),
+            () -> -xbox.getRightY(),
+            () -> -xbox.getRightX());
 
     final SpeedLevelController level =
         new SpeedLevelController(SpeedLevelController.SpeedLevel.NO_LEVEL);
@@ -461,19 +457,15 @@ public class RobotContainer {
 
     // Cause the robot to resist movement by forming an X shape with the swerve modules
     // Helps prevent getting pushed around
-    driverController
-        .x()
-        .whileTrue(DriveCommands.holdPositionCommand(drive).withName("RESIST Movement With X"));
+    xbox.x().whileTrue(DriveCommands.holdPositionCommand(drive).withName("RESIST Movement With X"));
 
     // Stop the robot and cancel any running commands
-    driverController
-        .b()
+    xbox.b()
         .or(RobotModeTriggers.disabled())
         .onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
     // Reset the gyro heading
-    driverController
-        .start()
+    xbox.start()
         .debounce(0.3)
         .onTrue(
             drive
@@ -481,7 +473,7 @@ public class RobotContainer {
                     () ->
                         drive.resetPose(
                             new Pose2d(drive.getRobotPose().getTranslation(), Rotation2d.kZero)))
-                .andThen(rumbleController(driverController, 0.3).withTimeout(0.25))
+                .andThen(rumbleController(xbox, 0.3).withTimeout(0.25))
                 .ignoringDisable(true)
                 .withName("Reset Gyro Heading"));
 
@@ -498,24 +490,20 @@ public class RobotContainer {
               new Transform2d(0, 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(6), 0));
 
-      reefAlignmentCommands.setEndCommand(
-          () -> rumbleController(driverController, 0.5).withTimeout(0.1));
+      reefAlignmentCommands.setEndCommand(() -> rumbleController(xbox, 0.5).withTimeout(0.1));
 
-      driverController
-          .rightTrigger()
+      xbox.rightTrigger()
           .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Algin REEF"))
           .onFalse(reefAlignmentCommands.stop(drive));
 
-      driverController
-          .rightTrigger()
-          .and(driverController.leftBumper())
+      xbox.rightTrigger()
+          .and(xbox.leftBumper())
           .onTrue(
               CustomCommands.reInitCommand(
                   reefAlignmentCommands.driveToNext(drive).withName("Algin REEF -1")));
 
-      driverController
-          .rightTrigger()
-          .and(driverController.rightBumper())
+      xbox.rightTrigger()
+          .and(xbox.rightBumper())
           .onTrue(
               CustomCommands.reInitCommand(
                   reefAlignmentCommands.driveToPrevious(drive).withName("Algin REEF +1")));
@@ -532,66 +520,62 @@ public class RobotContainer {
               new Transform2d(0, 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(4), 0));
 
-      intakeAlignmentCommands.setEndCommand(
-          () -> rumbleController(driverController, 0.3).withTimeout(0.1));
+      intakeAlignmentCommands.setEndCommand(() -> rumbleController(xbox, 0.3).withTimeout(0.1));
 
-      driverController
-          .leftTrigger()
+      xbox.leftTrigger()
           .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Align INTAKE"))
           .onFalse(intakeAlignmentCommands.stop(drive));
 
-      driverController
-          .leftTrigger()
-          .and(driverController.leftBumper())
+      xbox.leftTrigger()
+          .and(xbox.leftBumper())
           .onTrue(
               CustomCommands.reInitCommand(
                   intakeAlignmentCommands.driveToNext(drive).withName("Align INTAKE +1")));
 
-      driverController
-          .leftTrigger()
-          .and(driverController.rightBumper())
+      xbox.leftTrigger()
+          .and(xbox.rightBumper())
           .onTrue(
               CustomCommands.reInitCommand(
                   intakeAlignmentCommands.driveToPrevious(drive).withName("Align INTAKE -1")));
     }
   }
 
-  private void configureOperatorControllerBindings() {
+  private void configureOperatorControllerBindings(CommandXboxController xbox) {
 
     new Trigger(DriverStation::isEnabled).onTrue(superstructure.stowLow());
 
-    operatorController.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
+    xbox.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
-    operatorController
-        .leftTrigger()
+    xbox.leftTrigger()
         .whileTrue(superstructure.runPrepare(State.INTAKE))
-        .whileTrue(coralIntake.intake(-0.6))
-        .onFalse(superstructure.stowLowWait());
+        .whileTrue(superstructure.intake())
+        .onFalse(superstructure.stowLow());
 
-    operatorController.rightTrigger().whileTrue(coralIntake.intake(1));
-    configureOperatorControllerBindingLevel(operatorController.y(), Superstructure.State.L3);
-    configureOperatorControllerBindingLevel(operatorController.x(), Superstructure.State.L2);
-    configureOperatorControllerBindingLevel(operatorController.b(), Superstructure.State.L2);
-    configureOperatorControllerBindingLevel(operatorController.a(), Superstructure.State.L1);
+    xbox.rightTrigger().whileTrue(superstructure.outtake());
+    configureOperatorControllerBindingLevel(xbox.y(), Superstructure.State.L3);
+    configureOperatorControllerBindingLevel(xbox.x(), Superstructure.State.L2);
+    configureOperatorControllerBindingLevel(xbox.b(), Superstructure.State.L2);
+    configureOperatorControllerBindingLevel(xbox.a(), Superstructure.State.L1);
 
-    operatorController.povLeft().whileTrue(coralIntake.intake(1));
-    operatorController.povRight().whileTrue(coralIntake.intake(-1));
+    xbox.povLeft().whileTrue(coralIntake.intake(1));
+    xbox.povRight().whileTrue(coralIntake.intake(-1));
 
-    operatorController.povDown().onTrue(superstructure.stowLow());
+    xbox.povDown().onTrue(superstructure.stowLow());
 
     coralIntake.setDefaultCommand(
-        coralIntake.run(
-            () ->
-                coralIntake.setMotors(
-                    Math.abs(operatorController.getRightY()) < 0.2
-                        ? -0.05
-                        : MathUtil.applyDeadband(operatorController.getRightY(), 0.2))));
+        coralIntake
+            .run(
+                () ->
+                    coralIntake.setMotors(
+                        Math.abs(xbox.getRightY()) < 0.2
+                            ? -0.05
+                            : MathUtil.applyDeadband(xbox.getRightY(), 0.2)))
+            .onlyIf(DriverStation::isTeleopEnabled));
 
-    hang.setDefaultCommand(
-        hang.run(() -> hang.set(MathUtil.applyDeadband(operatorController.getLeftY(), 0.2))));
+    hang.setDefaultCommand(hang.run(() -> hang.set(MathUtil.applyDeadband(xbox.getLeftY(), 0.2))));
 
-    operatorController.leftBumper().whileTrue(hang.runSet(+1));
-    operatorController.rightBumper().whileTrue(hang.runSet(-1));
+    xbox.leftBumper().whileTrue(hang.runSet(+1));
+    xbox.rightBumper().whileTrue(hang.runSet(-1));
   }
 
   private void configureOperatorControllerBindingLevel(
@@ -599,8 +583,10 @@ public class RobotContainer {
     trigger.whileTrue(
         superstructure
             .runPrepare(state)
-            .andThen(Commands.idle())
-            .andThen(superstructure.stowLow()));
+            .andThen(
+                Commands.idle(elevator, coralWrist)
+                    .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)));
+    trigger.onFalse(superstructure.stowLow());
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
@@ -630,70 +616,57 @@ public class RobotContainer {
         .onChange(rumbleControllers(0.2).withTimeout(0.2));
   }
 
-  private void namedCommands() {
+  private void registerNamedCommands() {
     // Set up named commands for path planner auto
     // https://pathplanner.dev/pplib-named-commands.html
-    NamedCommands.registerCommand("StopWithX", drive.runOnce(drive::stopUsingBrakeArrangement));
 
     NamedCommands.registerCommand(
         "l1",
-        superstructure
-            .runPrepare(Superstructure.State.L1)
-            .andThen(Commands.waitSeconds(1))
-            .andThen(coralIntake.intake(1).withTimeout(1))
-            .andThen(superstructure.stowLowWait()));
-    NamedCommands.registerCommand(
-        "l2",
-        superstructure
-            .runPrepare(Superstructure.State.L2)
-            .andThen(Commands.waitSeconds(1))
-            .andThen(coralIntake.intake(1).withTimeout(1))
-            .andThen(superstructure.stowLowWait()));
-    NamedCommands.registerCommand(
-        "l3",
-        superstructure
-            .runPrepare(Superstructure.State.L3)
-            .andThen(Commands.waitSeconds(1))
-            .andThen(coralIntake.intake(1).withTimeout(1))
-            .andThen(superstructure.stowLowWait()));
-    NamedCommands.registerCommand(
-        "l4",
-        superstructure
-            .runPrepare(Superstructure.State.L3)
-            .andThen(Commands.waitSeconds(1))
-            .andThen(coralIntake.intake(1).withTimeout(1))
-            .andThen(superstructure.stowLowWait()));
+        Commands.parallel(
+                Commands.runOnce(() -> elevator.setGoalHeightMeters(Superstructure.L1_HEIGHT)),
+                Commands.runOnce(() -> coralWrist.setGoalRotations(Superstructure.L1_CORAL_ANGLE)))
+            .andThen(Commands.waitSeconds(2))
+            .andThen(
+                Commands.runEnd(() -> coralIntake.setMotors(1), coralIntake::stopMotors)
+                    .withTimeout(0.5)));
 
     NamedCommands.registerCommand(
         "stow",
-        superstructure
-            .runPrepare(Superstructure.State.STOW)
-            .andThen(Commands.waitSeconds(1))
-            .andThen(coralIntake.intake(-0.3).withTimeout(2.5))
-            .andThen(superstructure.stowLowWait()));
-
-    NamedCommands.registerCommand("stow", superstructure.runPrepare(Superstructure.State.STOW));
+        Commands.parallel(
+            Commands.runOnce(() -> elevator.setGoalHeightMeters(Superstructure.STOW_HEIGHT)),
+            Commands.runOnce(() -> coralWrist.setGoalRotations(Superstructure.STOW_CORAL_ANGLE))));
+    NamedCommands.registerCommand(
+        "intake",
+        Commands.parallel(
+                Commands.runOnce(() -> elevator.setGoalHeightMeters(Superstructure.INTAKE_HEIGHT)),
+                Commands.runOnce(
+                    () -> coralWrist.setGoalRotations(Superstructure.INTAKE_CORAL_ANGLE)))
+            .andThen(
+                Commands.runEnd(
+                    () -> coralIntake.setMotors(-0.6), () -> coralIntake.setMotors(0.05)))
+            .withTimeout(3));
   }
 
   private void configureAutos(LoggedDashboardChooser<Command> dashboardChooser) {
 
     // Path planner Autos
     // https://pathplanner.dev/gui-editing-paths-and-autos.html#autos
-    // dashboardChooser.addOption("Triangle Auto", AutoBuilder.buildAuto("Triangle Auto"));
-    // dashboardChooser.addOption("Rotate Auto", AutoBuilder.buildAuto("Rotate Auto"));
-    // dashboardChooser.addOption("Circle Auto", AutoBuilder.buildAuto("Circle Auto"));
+    // dashboardChooser.addOption("Center Test", AutoBuilder.buildAuto("Center-Auto"));
+    // dashboardChooser.addOption("Right Test", AutoBuilder.buildAuto("Right-Auto"));
+    // dashboardChooser.addOption("Left Test", AutoBuilder.buildAuto("Left-Auto"));
 
-    // Choreo Autos
+    // // Choreo Autos
+    // //
     // https://pathplanner.dev/pplib-choreo-interop.html#load-choreo-trajectory-as-a-pathplannerpath
-    try {
-      dashboardChooser.addOption(
-          "Four Coral Test",
-          AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("Four Coral Auto")));
-    } catch (IOException e) {
-      System.out.println("Failed to load Choreo auto " + e.getMessage());
-    } catch (ParseException e) {
-      System.out.println("Failed to parse Choreo auto " + e.getMessage());
-    }
+    // try {
+    //   dashboardChooser.addOption(
+    //       "Four Coral Test",
+    //       AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory("Four Coral Auto")));
+    // } catch (IOException e) {
+    //   System.out.println("Failed to load Choreo auto " + e.getMessage());
+    // } catch (ParseException e) {
+    //   System.out.println("Failed to parse Choreo auto " + e.getMessage());
+    // }
 
     if (Constants.RUNNING_TEST_PLANS) {
       dashboardChooser.addOption("[TEST] Stow Hang Arm", hang.stow());

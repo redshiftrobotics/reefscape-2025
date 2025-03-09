@@ -73,12 +73,15 @@ public class Camera {
         VisionConstants.FIELD.getTags().stream().map((tag) -> tag.ID).collect(Collectors.toSet());
 
     this.missingCameraAlert =
-        new Alert("Missing Camera: " + this.getCameraName(), Alert.AlertType.kError);
+        new Alert(
+            String.format(
+                "Missing cameras %s (Real Position %s)", getCameraName(), io.getCameraPosition()),
+            Alert.AlertType.kError);
   }
 
   /** Get name of camera as specified by IO */
   public String getCameraName() {
-    return io.getCameraName();
+    return io.getCameraPosition() + " (" + io.getCameraName() + ")";
   }
 
   /** Run periodic of module. Updates the set of loggable inputs, updating vision result. */
