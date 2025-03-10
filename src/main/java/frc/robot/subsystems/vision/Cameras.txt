@@ -1,0 +1,8 @@
+Cameras on bot:
+- FrontRight8032 (front left)
+- Arducam_OV9281_USB_Camera (front right)
+- BackRightCamera8032 (back right)
+
+Cameras not on bot:
+- FrontLeftCamera8032 (broken)
+- jessiecam (going to be back left)
