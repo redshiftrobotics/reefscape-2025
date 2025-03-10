@@ -2,7 +2,7 @@ package frc.robot.subsystems.hang;
 
 import static frc.robot.utility.SparkUtil.tryUntilOk;
 
-import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -16,14 +16,14 @@ import frc.robot.subsystems.hang.HangConstants.HangConfig;
 
 public class HangIOHardware implements HangIO {
   private final SparkMax motor;
-  private final SparkAbsoluteEncoder encoder;
+  private final RelativeEncoder encoder;
   private final SparkClosedLoopController control;
 
   private boolean breakMode = true;
 
   public HangIOHardware(HangConfig config) {
     motor = new SparkMax(config.motorId(), MotorType.kBrushless);
-    encoder = motor.getAbsoluteEncoder();
+    encoder = motor.getEncoder();
     control = motor.getClosedLoopController();
 
     final SparkMaxConfig motorConfig = new SparkMaxConfig();
@@ -49,6 +49,25 @@ public class HangIOHardware implements HangIO {
 
     inputs.appliedVolts = new double[] {motor.getAppliedOutput() * motor.getBusVoltage()};
     inputs.supplyCurrentAmps = new double[] {motor.getOutputCurrent()};
+  }
+
+  @Override
+  public void setLimits(double forward, double backward) {
+    SparkMaxConfig motorConfig = new SparkMaxConfig();
+
+    motorConfig
+        .softLimit
+        .forwardSoftLimitEnabled(true)
+        .forwardSoftLimit(forward)
+        .reverseSoftLimitEnabled(true)
+        .reverseSoftLimit(backward);
+
+    tryUntilOk(
+        motor,
+        5,
+        () ->
+            motor.configure(
+                motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
   }
 
   @Override
