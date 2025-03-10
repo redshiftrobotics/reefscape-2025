@@ -6,3 +6,6 @@ Cameras on bot:
 
 Cameras not on bot:
 - FrontLeftCamera8032 (broken)
+- geraldcam (backup)
+- spencercam (backup)
+- willycam (backup)
