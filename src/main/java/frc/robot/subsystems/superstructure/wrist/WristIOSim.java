@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superstructure.wrist;
 
+import static frc.robot.subsystems.superstructure.wrist.WristConstants.GEAR_REDUCTION;
 import static frc.robot.subsystems.superstructure.wrist.WristConstants.MOTOR;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -19,14 +20,7 @@ public class WristIOSim implements WristIO {
   public WristIOSim(WristConfig config) {
     arm =
         new SingleJointedArmSim(
-            MOTOR,
-            config.gearReduction(),
-            0.025,
-            Units.inchesToMeters(18),
-            0,
-            Math.PI * 2,
-            false,
-            0);
+            MOTOR, GEAR_REDUCTION, 0.025, Units.inchesToMeters(18), 0, Math.PI * 2, false, 0);
   }
 
   @Override

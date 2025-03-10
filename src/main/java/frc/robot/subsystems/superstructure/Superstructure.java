@@ -14,9 +14,7 @@ public class Superstructure extends VirtualSubsystem {
 
   private final Elevator elevator;
   private final Wrist coralWrist;
-  private final Wrist algaeWrist;
   private final Intake coralIntake;
-  private final Intake algaeIntake;
 
   public static enum State {
     STOW,
@@ -57,8 +55,6 @@ public class Superstructure extends VirtualSubsystem {
     }
   }
 
-  private State goal = State.STOW;
-
   private final SuperstructureVisualizer measuredVisualizer =
       new SuperstructureVisualizer("Measured", Color.kYellow);
   private final SuperstructureVisualizer setpointVisualizer =
@@ -66,17 +62,10 @@ public class Superstructure extends VirtualSubsystem {
   private final SuperstructureVisualizer goalVisualizer =
       new SuperstructureVisualizer("Goal", Color.kLime);
 
-  public Superstructure(
-      Elevator elevator,
-      Wrist coralWrist,
-      Wrist algaeWrist,
-      Intake coralIntake,
-      Intake algaeIntake) {
+  public Superstructure(Elevator elevator, Wrist coralWrist, Intake coralIntake) {
     this.elevator = elevator;
     this.coralWrist = coralWrist;
-    this.algaeWrist = algaeWrist;
     this.coralIntake = coralIntake;
-    this.algaeIntake = algaeIntake;
   }
 
   public Command runPrepare(State newGoal) {
@@ -140,40 +129,33 @@ public class Superstructure extends VirtualSubsystem {
   }
 
   public Command intake() {
-    return coralIntake.intake(-0.6);
+    return coralIntake.runMotors(-0.6);
+  }
+
+  public Command passiveIntake() {
+    return coralIntake.runMotors(-0.05);
   }
 
   public Command outtake() {
-    return coralIntake.intake(1);
+    return coralIntake.runMotors(1);
   }
 
   public Command stopIntake() {
-    return coralIntake.intake(0);
+    return coralIntake.runMotors(0);
   }
 
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Elevator Height", elevator.getHeightMeters());
     SmartDashboard.putNumber("Coral Wrist Position", coralWrist.getMeasuredPosition());
-    SmartDashboard.putNumber("Algae Wrist Position", algaeWrist.getMeasuredPosition());
 
     measuredVisualizer.update(
         elevator.getHeightMeters(),
         coralWrist.getMeasuredPosition(),
-        algaeWrist.getMeasuredPosition(),
-        coralIntake.isIntakeRunning(),
-        algaeIntake.isIntakeRunning());
+        coralIntake.isIntakeRunning());
     setpointVisualizer.update(
-        elevator.getSetpoint().position,
-        coralWrist.getSetpoint(),
-        algaeWrist.getSetpoint(),
-        coralIntake.isIntakeRunning(),
-        algaeIntake.isIntakeRunning());
+        elevator.getSetpoint().position, coralWrist.getGoal(), coralIntake.isIntakeRunning());
     goalVisualizer.update(
-        elevator.getGoalHeightMeters(),
-        coralWrist.getSetpoint(),
-        algaeWrist.getSetpoint(),
-        coralIntake.isIntakeRunning(),
-        algaeIntake.isIntakeRunning());
+        elevator.getGoalHeightMeters(), coralWrist.getGoal(), coralIntake.isIntakeRunning());
   }
 }

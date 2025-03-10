@@ -7,34 +7,30 @@ import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
 
-  private final String name;
-
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
   private final Alert motorDisconnectedAlert;
 
-  public Intake(String name, IntakeIO io) {
-    this.name = name;
+  public Intake(IntakeIO io) {
     this.io = io;
 
-    motorDisconnectedAlert =
-        new Alert("Intake " + name + " motor/s disconnected!", Alert.AlertType.kWarning);
+    motorDisconnectedAlert = new Alert("Intake motor/s disconnected!", Alert.AlertType.kWarning);
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Intake " + name, inputs);
+    Logger.processInputs("Intake", inputs);
 
     motorDisconnectedAlert.set(!inputs.motorConnected);
   }
 
-  public Command intake(double speed) {
-    return startEnd(() -> setMotors(speed), this::stopMotors);
+  public Command runMotors(double speed) {
+    return runMotors(speed, speed);
   }
 
-  public Command intake(double leftSpeed, double rightSpeed) {
+  public Command runMotors(double leftSpeed, double rightSpeed) {
     return startEnd(
         () -> {
           setLeftMotor(leftSpeed);

@@ -57,10 +57,10 @@ public class Elevator extends SubsystemBase {
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
   private final Alert motorDisconnectedAlert =
-      new Alert("Elevator motor disconnected!", Alert.AlertType.kWarning);
+      new Alert("Elevator motor disconnected!", Alert.AlertType.kError);
 
   private final Alert followMotorFollowingAlert =
-      new Alert("Elevator follower not following!", Alert.AlertType.kWarning);
+      new Alert("Elevator follower not following!", Alert.AlertType.kError);
 
   private final Alert zeroingAlert = new Alert("Elevator needs zeroing!", Alert.AlertType.kInfo);
 

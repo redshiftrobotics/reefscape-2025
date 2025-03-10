@@ -38,11 +38,6 @@ public class WristIOHardware implements WristIO {
         .smartCurrentLimit(WristConstants.MOTOR_CURRENT_LIMIT)
         .voltageCompensation(12)
         .inverted(config.motorInverted());
-    // motorConfig
-    //     .encoder
-    //     .positionConversionFactor(1.0 / config.gearReduction())
-    //     .velocityConversionFactor(1.0 / config.gearReduction())
-    //     .inverted(config.encoderInverted());
     motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kPrimaryEncoder);
 
     motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

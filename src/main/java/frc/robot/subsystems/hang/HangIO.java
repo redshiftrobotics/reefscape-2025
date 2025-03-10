@@ -5,6 +5,9 @@ import org.littletonrobotics.junction.AutoLog;
 public interface HangIO {
   @AutoLog
   public static class HangIOInputs {
+
+    boolean motorConnected = false;
+
     double positionRotations = 0.0;
     double velocityRPM = 0.0;
 

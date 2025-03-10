@@ -20,8 +20,6 @@ public class SuperstructureVisualizer {
   private final LoggedMechanismLigament2d carriageMechanism;
   private final LoggedMechanismLigament2d elevatorMechanism;
   private final LoggedMechanismLigament2d coralWristLigament;
-  private final LoggedMechanismLigament2d algaeWristLigament;
-  private final LoggedMechanismLigament2d algaeIntake;
   private final LoggedMechanismLigament2d coralIntake;
 
   public SuperstructureVisualizer(String name, Color color) {
@@ -47,20 +45,10 @@ public class SuperstructureVisualizer {
                 4.0,
                 new Color8Bit(color)));
 
-    algaeWristLigament =
-        elevatorMechanism.append(
-            new LoggedMechanismLigament2d(
-                name + " Coral Wrist", Units.inchesToMeters(10.0), 0, 4.0, new Color8Bit(color)));
-
     coralWristLigament =
         carriageMechanism.append(
             new LoggedMechanismLigament2d(
                 name + " Algae Wrist", Units.inchesToMeters(9.0), 0, 4.0, new Color8Bit(color)));
-
-    algaeIntake =
-        algaeWristLigament.append(
-            new LoggedMechanismLigament2d(
-                name + " Algae Intake", 0, 0, 10.0, new Color8Bit(color)));
 
     coralIntake =
         coralWristLigament.append(
@@ -68,18 +56,11 @@ public class SuperstructureVisualizer {
                 name + " Coral Intake", 0, 0, 10.0, new Color8Bit(color)));
   }
 
-  public void update(
-      double carriageHeight,
-      double wristRotations,
-      double algaeRotations,
-      boolean coralIntakeRunning,
-      boolean algaeIntakeRunning) {
+  public void update(double carriageHeight, double wristRotations, boolean coralIntakeRunning) {
     elevatorMechanism.setLength(carriageHeight);
     coralWristLigament.setAngle(Units.rotationsToDegrees(wristRotations));
-    algaeWristLigament.setAngle(Units.rotationsToDegrees(algaeRotations));
 
     coralIntake.setLineWeight(coralIntakeRunning ? 10.0 : 0.0);
-    algaeIntake.setLineWeight(algaeIntakeRunning ? 10.0 : 0.0);
 
     Logger.recordOutput("SuperstructureVisualizer/" + name, mechanism);
   }

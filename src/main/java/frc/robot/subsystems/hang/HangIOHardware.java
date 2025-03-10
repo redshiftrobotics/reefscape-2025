@@ -1,5 +1,6 @@
 package frc.robot.subsystems.hang;
 
+import static frc.robot.utility.SparkUtil.ifOk;
 import static frc.robot.utility.SparkUtil.tryUntilOk;
 
 import com.revrobotics.spark.SparkAbsoluteEncoder;
@@ -12,7 +13,9 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.filter.Debouncer;
 import frc.robot.subsystems.hang.HangConstants.HangConfig;
+import frc.robot.utility.SparkUtil;
 
 public class HangIOHardware implements HangIO {
   private final SparkMax motor;
@@ -20,6 +23,8 @@ public class HangIOHardware implements HangIO {
   private final SparkClosedLoopController control;
 
   private boolean breakMode = true;
+
+  private final Debouncer connectDebounce = new Debouncer(0.5);
 
   public HangIOHardware(HangConfig config) {
     motor = new SparkMax(config.motorId(), MotorType.kBrushless);
@@ -44,11 +49,18 @@ public class HangIOHardware implements HangIO {
 
   @Override
   public void updateInputs(HangIOInputs inputs) {
-    inputs.positionRotations = encoder.getPosition();
-    inputs.velocityRPM = encoder.getVelocity();
+    SparkUtil.clearStickyFault();
 
-    inputs.appliedVolts = new double[] {motor.getAppliedOutput() * motor.getBusVoltage()};
-    inputs.supplyCurrentAmps = new double[] {motor.getOutputCurrent()};
+    ifOk(motor, encoder::getPosition, value -> inputs.positionRotations = value);
+    ifOk(motor, encoder::getVelocity, value -> inputs.velocityRPM = value);
+
+    ifOk(
+        motor,
+        () -> motor.getAppliedOutput() * motor.getBusVoltage(),
+        value -> inputs.appliedVolts = new double[] {value});
+    ifOk(motor, motor::getOutputCurrent, value -> inputs.supplyCurrentAmps = new double[] {value});
+
+    inputs.motorConnected = connectDebounce.calculate(!SparkUtil.hasStickyFault());
   }
 
   @Override

@@ -2,12 +2,17 @@ package frc.robot.subsystems.superstructure.intake.sensor;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public class SensorIO {
+public interface SensorIO {
   @AutoLog
   public static class SensorIOInputs {
-    public boolean hasItem;
-    public double distance;
+    boolean connected = false;
+
+    double rawValue = 0.0;
+    boolean rawDetected = false;
+
+    boolean hasItem;
   }
 
-  public void updateInputs(SensorIO inputs) {}
+  /** Updates the set of loggable inputs. */
+  default void updateInputs(SensorIOInputs inputs) {}
 }
