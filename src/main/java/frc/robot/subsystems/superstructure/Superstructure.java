@@ -79,11 +79,11 @@ public class Superstructure extends VirtualSubsystem {
     };
   }
 
-  public static final double L1_HEIGHT = 1.82;
-  public static final double L1_CORAL_ANGLE = -6.71;
+  public static final double L1_HEIGHT = 0.151148670108898;
+  public static final double L1_CORAL_ANGLE = -6.214284896850586;
 
-  public static final double L2_HEIGHT = 0.599 + Units.inchesToMeters(1);
-  public static final double L2_CORAL_ANGLE = -7.690;
+  public static final double L2_HEIGHT = 0.469491383230037 + Units.inchesToMeters(3);
+  public static final double L2_CORAL_ANGLE = -7.428585529327393;
 
   public static final double L3_HEIGHT = 1.035 + Units.inchesToMeters(2);
   public static final double L3_CORAL_ANGLE = -7.643;
@@ -138,6 +138,10 @@ public class Superstructure extends VirtualSubsystem {
 
   public Command outtake() {
     return coralIntake.runMotors(1);
+  }
+
+  public Command outtakel1() {
+    return coralIntake.intake(0.5, 0.3);
   }
 
   public Command stopIntake() {

@@ -28,4 +28,6 @@ public interface HangIO {
   public default void setBrakeMode(boolean enable) {}
 
   public default void stop() {}
+
+  public default void setLimits(double forward, double backward) {}
 }

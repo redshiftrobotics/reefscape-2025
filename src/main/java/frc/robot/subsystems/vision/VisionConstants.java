@@ -54,7 +54,7 @@ public class VisionConstants {
       Units.degreesToRadians(20); // more bent back mount
   private static final double FRONT_CAMERA_OFFSET_Z = Units.inchesToMeters(8.0);
 
-  private static final double BACK_CAMERA_YAW = Units.degreesToRadians(-30); // 30 degrees inward
+  private static final double BACK_CAMERA_YAW = Units.degreesToRadians(-20); // 30 degrees inward
   private static final double BACK_CAMERA_PITCH =
       Units.degreesToRadians(20); // more bent back mount
   private static final double BACK_CAMERA_OFFSET_Z = Units.inchesToMeters(8.0);
@@ -77,12 +77,12 @@ public class VisionConstants {
 
   public static final CameraConfig COMP_BACK_LEFT_CAMERA =
       new CameraConfig(
-          "FrontLeftCamera8032",
+          "jessiecam",
           "back left",
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, +CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
               new Rotation3d(
-                  0, -(BACK_CAMERA_PITCH - 10), Units.degreesToRadians(180) - BACK_CAMERA_YAW)));
+                  0, -(BACK_CAMERA_PITCH), Units.degreesToRadians(180) - BACK_CAMERA_YAW)));
 
   public static final CameraConfig COMP_BACK_RIGHT_CAMERA =
       new CameraConfig(
@@ -91,5 +91,5 @@ public class VisionConstants {
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, -CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
               new Rotation3d(
-                  0, -BACK_CAMERA_PITCH, Units.degreesToRadians(180) + BACK_CAMERA_YAW)));
+                  0, -(BACK_CAMERA_PITCH), Units.degreesToRadians(180) + BACK_CAMERA_YAW)));
 }

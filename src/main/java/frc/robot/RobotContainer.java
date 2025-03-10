@@ -471,7 +471,8 @@ public class RobotContainer {
         .whileTrue(superstructure.intake())
         .onFalse(superstructure.stowLow());
 
-    xbox.rightTrigger().whileTrue(superstructure.outtake());
+    xbox.rightTrigger().and(xbox.a().negate()).whileTrue(superstructure.outtake());
+    xbox.rightTrigger().and(xbox.a()).whileTrue(superstructure.outtakel1());
     configureOperatorControllerBindingLevel(xbox.y(), Superstructure.State.L3);
     configureOperatorControllerBindingLevel(xbox.x(), Superstructure.State.L2);
     configureOperatorControllerBindingLevel(xbox.b(), Superstructure.State.L2);
@@ -543,8 +544,8 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "l1",
         Commands.parallel(
-                Commands.runOnce(() -> elevator.setGoalHeightMeters(Superstructure.L1_HEIGHT)),
-                Commands.runOnce(() -> coralWrist.setGoalRotations(Superstructure.L1_CORAL_ANGLE)))
+                Commands.runOnce(() -> elevator.setGoalHeightMeters(Superstructure.L2_HEIGHT)),
+                Commands.runOnce(() -> coralWrist.setGoalRotations(Superstructure.L2_CORAL_ANGLE)))
             .andThen(Commands.waitSeconds(2))
             .andThen(
                 Commands.runEnd(() -> coralIntake.setMotors(1), coralIntake::stopMotors)
@@ -564,7 +565,7 @@ public class RobotContainer {
             .andThen(
                 Commands.runEnd(
                     () -> coralIntake.setMotors(-0.6), () -> coralIntake.setMotors(0.05)))
-            .withTimeout(3));
+            .withTimeout(4));
   }
 
   private void configureAutos(LoggedDashboardChooser<Command> dashboardChooser) {
