@@ -77,7 +77,7 @@ public class VisionConstants {
 
   public static final CameraConfig COMP_BACK_LEFT_CAMERA =
       new CameraConfig(
-          "FrontLeftCamera8032",
+          "jessiecam",
           "back left",
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, +CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
