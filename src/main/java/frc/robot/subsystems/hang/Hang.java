@@ -15,11 +15,11 @@ public class Hang extends SubsystemBase {
       new LoggedTunableNumberFactory("Hang");
 
   private static final LoggedTunableNumber kP =
-      hangFactory.getNumber("HangKp", HangConstants.FEEDBACK.kP());
+      hangFactory.getNumber("kP", HangConstants.FEEDBACK.kP());
   private static final LoggedTunableNumber kI =
-      hangFactory.getNumber("HangKi", HangConstants.FEEDBACK.kI());
+      hangFactory.getNumber("kI", HangConstants.FEEDBACK.kI());
   private static final LoggedTunableNumber kD =
-      hangFactory.getNumber("HangKd", HangConstants.FEEDBACK.kD());
+      hangFactory.getNumber("kD", HangConstants.FEEDBACK.kD());
 
   private HangVisualization measuredVisualizer =
       new HangVisualization("Hang/Mechanism2d/Measured", Color.kYellow);
