@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.ManualAlignCommands;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.subsystems.dashboard.DriverDashboard;
@@ -396,6 +397,10 @@ public class RobotContainer {
                 .andThen(rumbleController(xbox, 0.3).withTimeout(0.25))
                 .ignoringDisable(true)
                 .withName("Reset Gyro Heading"));
+
+    xbox.povRight().whileTrue(ManualAlignCommands.alignToSourceRight(drive));
+    xbox.povLeft().whileTrue(ManualAlignCommands.alignToSourceLeft(drive));
+    xbox.povUp().whileTrue(ManualAlignCommands.alignToCage(drive));
 
     if (includeAutoAlign) {
       // Align to reef
