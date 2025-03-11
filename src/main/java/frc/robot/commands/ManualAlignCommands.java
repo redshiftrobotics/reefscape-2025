@@ -75,8 +75,7 @@ public class ManualAlignCommands {
   }
 
   private static boolean isBlue() {
-    boolean isBlue =
-        DriverStation.getAlliance().isPresent()
-            && DriverStation.getAlliance().get() == Alliance.Blue;
+    return DriverStation.getAlliance().isPresent()
+        && DriverStation.getAlliance().get() == Alliance.Blue;
   }
 }
