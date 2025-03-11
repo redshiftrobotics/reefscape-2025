@@ -52,8 +52,16 @@ public class Intake extends SubsystemBase {
     io.setRightMotor(speed);
   }
 
-  public boolean isIntakeRunning() {
-    return (inputs.speedLeft + inputs.speedRight) != 0;
+  public double getRightMotor() {
+    return inputs.speedRight;
+  }
+
+  public double getLeftMotor() {
+    return inputs.speedLeft;
+  }
+
+  public double getMotorsAvg() {
+    return (inputs.speedLeft + inputs.speedRight) / 2;
   }
 
   public void stopMotors() {

@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -37,9 +39,10 @@ public class Wrist extends SubsystemBase {
   private static final LoggedTunableNumber kA =
       factory.getNumber("kA", WristConstants.FEEDFORWARD.kA());
 
-  private static final LoggedTunableNumber maxVelocity = factory.getNumber("maxVelocity", 8);
+  private static final LoggedTunableNumber maxVelocity =
+      factory.getNumber("maxVelocity", WristConstants.MAX_VELOCITY);
   private static final LoggedTunableNumber maxAcceleration =
-      factory.getNumber("maxAcceleration", 5d);
+      factory.getNumber("maxAcceleration", WristConstants.MAX_ACCELERATION);
 
   private final WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
@@ -48,7 +51,7 @@ public class Wrist extends SubsystemBase {
   private ArmFeedforward feedforward;
 
   private State setpoint = new State();
-  private State goal = new State();
+  private Supplier<State> goalSupplier = State::new;
 
   private final Alert motorConnectedAlert =
       new Alert("Wrist motor disconnected!", Alert.AlertType.kError);
@@ -75,14 +78,14 @@ public class Wrist extends SubsystemBase {
 
     io.setBrakeMode(!disabledDebouncer.calculate(DriverStation.isDisabled()));
 
-    setpoint = profile.calculate(Constants.LOOP_PERIOD_SECONDS, setpoint, goal);
+    setpoint = profile.calculate(Constants.LOOP_PERIOD_SECONDS, setpoint, goalSupplier.get());
 
     io.runPosition(setpoint.position, feedforward.calculate(setpoint.position, setpoint.velocity));
 
     Logger.recordOutput("Wrist/Profile/SetpointPositionRotations", setpoint.position);
     Logger.recordOutput("Wrist/Profile/SetpointVelocityRPM", setpoint.velocity);
-    Logger.recordOutput("Wrist/Profile/GoalPositionRotations", goal.position);
-    Logger.recordOutput("Wrist/Profile/GoalVelocityRPM", goal.velocity);
+    Logger.recordOutput("Wrist/Profile/GoalPositionRotations", goalSupplier.get().position);
+    Logger.recordOutput("Wrist/Profile/GoalVelocityRPM", goalSupplier.get().velocity);
 
     LoggedTunableNumber.ifChanged(
         hashCode(),
@@ -110,37 +113,46 @@ public class Wrist extends SubsystemBase {
     motorConnectedAlert.set(!inputs.motorConnected);
   }
 
-  public Command runPositionPrepare(double position) {
-    return runOnce(() -> setGoalRotations(position));
+  public Command runPositionPrepare(Rotation2d position) {
+    return runOnce(() -> setGoalRotation(position));
   }
 
-  public Command run(double position) {
+  public Command runPosition(Rotation2d position) {
     return runPositionPrepare(position).andThen(Commands.waitUntil(this::atGoal));
   }
 
-  public void setGoalRotations(double position) {
-    goal = new State(position, 0);
+  public void setGoalRotation(Rotation2d position) {
+    setGoalSupplier(() -> new State(position.getRadians(), 0));
+  }
+
+  public void setGoalSupplier(Supplier<State> positionSupplier) {
+    this.goalSupplier = positionSupplier;
   }
 
   /** Whether wrist is within tolerance of setpoint */
   @AutoLogOutput(key = "Wrist/atGoal")
   public boolean atGoal() {
-    return MathUtil.isNear(inputs.positionRotations, goal.position, WristConstants.TOLERANCE);
+    return MathUtil.isNear(
+        inputs.positionRad, goalSupplier.get().position, WristConstants.TOLERANCE_DEGREES);
   }
 
   /** Get position in rotations */
-  @AutoLogOutput(key = "Wrist/measuredRotation")
-  public double getMeasuredPosition() {
-    return inputs.positionRotations;
+  @AutoLogOutput(key = "Wrist/measuredDegrees")
+  public Rotation2d getMeasuredRotation() {
+    return new Rotation2d(inputs.positionRad);
   }
 
   /** Get setpoint in rotations */
-  @AutoLogOutput(key = "Wrist/goalRotation")
-  public double getGoalRotation() {
-    return goal.position;
+  @AutoLogOutput(key = "Wrist/goalDegrees")
+  public Rotation2d getGoalRotations() {
+    return new Rotation2d(goalSupplier.get().position);
   }
 
-  public void setPid(double kP, double kI, double kD) {
-    io.setPID(kP, kI, kD);
+  public State getGoalSupplier() {
+    return goalSupplier.get();
+  }
+
+  public State getSetpoint() {
+    return setpoint;
   }
 }

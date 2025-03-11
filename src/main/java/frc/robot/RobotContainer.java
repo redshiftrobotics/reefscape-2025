@@ -473,10 +473,11 @@ public class RobotContainer {
     xbox.rightTrigger().and(xbox.a().negate()).whileTrue(superstructure.outtake());
     xbox.rightTrigger().and(xbox.a()).whileTrue(superstructure.outtakeL1());
 
-    configureOperatorControllerBindingLevel(xbox.y(), Superstructure.State.L3);
-    configureOperatorControllerBindingLevel(xbox.x(), Superstructure.State.L2);
-    configureOperatorControllerBindingLevel(xbox.b(), Superstructure.State.L2);
-    configureOperatorControllerBindingLevel(xbox.a(), Superstructure.State.L1);
+    configureOperatorControllerBindingLevel(xbox.y(), Superstructure.State.L4);
+    configureOperatorControllerBindingLevel(xbox.x(), Superstructure.State.L3);
+    configureOperatorControllerBindingLevel(xbox.a(), Superstructure.State.L2);
+
+    configureOperatorControllerBindingLevel(xbox.b(), Superstructure.State.L1);
 
     xbox.povDown().onTrue(superstructure.stowLow());
 
@@ -535,7 +536,7 @@ public class RobotContainer {
         "l1",
         Commands.parallel(
                 Commands.runOnce(() -> elevator.setGoalHeightMeters(Superstructure.L2_HEIGHT)),
-                Commands.runOnce(() -> coralWrist.setGoalRotations(Superstructure.L2_CORAL_ANGLE)))
+                Commands.runOnce(() -> coralWrist.setGoalRotation(Superstructure.L2_CORAL_ANGLE)))
             .andThen(Commands.waitSeconds(2))
             .andThen(
                 Commands.runEnd(() -> coralIntake.setMotors(1), coralIntake::stopMotors)
@@ -545,13 +546,13 @@ public class RobotContainer {
         "stow",
         Commands.parallel(
             Commands.runOnce(() -> elevator.setGoalHeightMeters(Superstructure.STOW_HEIGHT)),
-            Commands.runOnce(() -> coralWrist.setGoalRotations(Superstructure.STOW_CORAL_ANGLE))));
+            Commands.runOnce(() -> coralWrist.setGoalRotation(Superstructure.STOW_CORAL_ANGLE))));
     NamedCommands.registerCommand(
         "intake",
         Commands.parallel(
                 Commands.runOnce(() -> elevator.setGoalHeightMeters(Superstructure.INTAKE_HEIGHT)),
                 Commands.runOnce(
-                    () -> coralWrist.setGoalRotations(Superstructure.INTAKE_CORAL_ANGLE)))
+                    () -> coralWrist.setGoalRotation(Superstructure.INTAKE_CORAL_ANGLE)))
             .andThen(
                 Commands.runEnd(
                     () -> coralIntake.setMotors(-0.6), () -> coralIntake.setMotors(0.05)))

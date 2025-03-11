@@ -43,19 +43,15 @@ public class WristIOHardware implements WristIO {
     motorConfig
         .softLimit
         .forwardSoftLimitEnabled(true)
-        .forwardSoftLimit(WristConstants.MAX_POSITION)
+        .forwardSoftLimit(Units.degreesToRotations(WristConstants.MAX_POSITION_DEGREES))
         .reverseSoftLimitEnabled(true)
-        .reverseSoftLimit(WristConstants.MIN_POSITION);
+        .reverseSoftLimit(Units.degreesToRotations(WristConstants.MIN_POSITION_DEGREES));
     motorConfig
         .absoluteEncoder
         .inverted(config.encoderInverted())
-        .zeroOffset(config.absoluteEncoderOffset());
-    motorConfig
-        .closedLoop
-        .pidf(0, 0, 0, 0)
-        .positionWrappingEnabled(true)
-        .positionWrappingInputRange(0.0, 1.0)
-        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
+        .zeroOffset(config.absoluteEncoderOffset())
+        .zeroCentered(true);
+    motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
 
     motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
@@ -65,9 +61,12 @@ public class WristIOHardware implements WristIO {
 
     SparkUtil.clearStickyFault();
 
-    ifOk(motor, encoder::getPosition, value -> inputs.positionRotations = value);
-    ifOk(motor, encoder::getVelocity, value -> inputs.velocityRPM = value);
-    inputs.positionDegrees = Units.rotationsToDegrees(inputs.positionRotations);
+    ifOk(
+        motor, encoder::getPosition, value -> inputs.positionRad = Units.rotationsToRadians(value));
+    ifOk(
+        motor,
+        encoder::getVelocity,
+        value -> inputs.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(value));
 
     ifOk(
         motor,

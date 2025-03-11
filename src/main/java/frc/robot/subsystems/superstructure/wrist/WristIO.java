@@ -8,9 +8,8 @@ public interface WristIO {
   public static class WristIOInputs {
     public boolean motorConnected = false;
 
-    public double positionRotations;
-    public double positionDegrees;
-    public double velocityRPM;
+    public double positionRad;
+    public double velocityRadPerSec;
 
     public double appliedVolts;
     public double supplyCurrentAmps;
