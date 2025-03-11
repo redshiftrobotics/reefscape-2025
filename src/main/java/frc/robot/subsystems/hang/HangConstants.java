@@ -27,6 +27,7 @@ public class HangConstants {
 
   public static final double STOWED_POSITION_ROTATIONS = 0.0;
   public static final double DEPLOY_POSITION_ROTATIONS = 0.0;
-  public static final double RETRACT_POSITION_ROTATIONS = STOWED_POSITION_ROTATIONS;
+  public static final double RETRACT_POSITION_ROTATIONS = 0.0;
+
   public static final double TOLERANCE = Units.degreesToRotations(0.3);
 }
