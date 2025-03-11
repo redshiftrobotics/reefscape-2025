@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -137,15 +138,23 @@ public class Wrist extends SubsystemBase {
   }
 
   /** Get position in rotations */
-  @AutoLogOutput(key = "Wrist/measuredDegrees")
   public Rotation2d getMeasuredRotation() {
     return new Rotation2d(inputs.positionRad);
   }
 
   /** Get setpoint in rotations */
-  @AutoLogOutput(key = "Wrist/goalDegrees")
   public Rotation2d getGoalRotations() {
     return new Rotation2d(goalSupplier.get().position);
+  }
+
+  @AutoLogOutput(key = "Wrist/goalDegrees")
+  public double getGoalDegrees() {
+    return Units.radiansToDegrees(goalSupplier.get().position);
+  }
+
+  @AutoLogOutput(key = "Wrist/measuredDegrees")
+  public double getMeasuredDegrees() {
+    return Units.radiansToDegrees(inputs.positionRad);
   }
 
   public State getGoalSupplier() {
