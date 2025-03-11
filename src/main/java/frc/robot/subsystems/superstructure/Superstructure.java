@@ -68,6 +68,13 @@ public class Superstructure extends VirtualSubsystem {
     this.coralIntake = coralIntake;
   }
 
+  public Command run(State newGoal) {
+    return runPrepare(newGoal).andThen(Commands.idle(elevator, coralWrist)).finallyDo(() -> {
+      elevator.setGoalHeightMeters(STOW_HEIGHT);
+      coralWrist.setGoalRotations(STOW_CORAL_ANGLE);
+    });
+  }
+
   public Command runPrepare(State newGoal) {
     return switch (newGoal) {
       case STOW -> stowLow();

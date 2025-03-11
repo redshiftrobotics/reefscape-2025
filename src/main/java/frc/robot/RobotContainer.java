@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -67,6 +66,8 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
 import java.util.Arrays;
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -468,9 +469,7 @@ public class RobotContainer {
 
     // Primary scoring
     xbox.leftTrigger()
-        .whileTrue(superstructure.runPrepare(State.INTAKE))
-        .whileTrue(superstructure.intake())
-        .onFalse(superstructure.stowLow());
+        .whileTrue(superstructure.run(State.INTAKE).alongWith(superstructure.intake()));
 
     xbox.rightTrigger().and(xbox.a().negate()).whileTrue(superstructure.outtake());
     xbox.rightTrigger().and(xbox.a()).whileTrue(superstructure.outtakeL1());
@@ -484,9 +483,12 @@ public class RobotContainer {
 
     coralIntake.setDefaultCommand(superstructure.passiveIntake());
 
+    
     // Hang
-
     hang.setDefaultCommand(hang.run(() -> hang.set(MathUtil.applyDeadband(xbox.getLeftX(), 0.2))));
+
+    DoubleSupplier hangSpeed = () -> MathUtil.applyDeadband(xbox.getRightX(), 0.2);
+    new Trigger(() -> hangSpeed.getAsDouble() != 0).and(DriverStation::isTeleopEnabled).whileTrue(Commands.run(() -> hang.set(hangSpeed.getAsDouble())));
 
     xbox.rightBumper().and(xbox.leftBumper().negate()).onTrue(hang.deploy());
     xbox.leftBumper().and(xbox.rightBumper().negate()).onTrue(hang.retract());
@@ -495,13 +497,7 @@ public class RobotContainer {
 
   private void configureOperatorControllerBindingLevel(
       Trigger trigger, Superstructure.State state) {
-    trigger.whileTrue(
-        superstructure
-            .runPrepare(state)
-            .andThen(
-                Commands.idle(elevator, coralWrist)
-                    .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)));
-    trigger.onFalse(superstructure.stowLow());
+    trigger.whileTrue(superstructure.run(state));
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
