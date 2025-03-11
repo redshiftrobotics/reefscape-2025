@@ -398,9 +398,9 @@ public class RobotContainer {
                 .ignoringDisable(true)
                 .withName("Reset Gyro Heading"));
 
-    xbox.povRight().whileTrue(ManualAlignCommands.alignToSourceRight(drive));
-    xbox.povLeft().whileTrue(ManualAlignCommands.alignToSourceLeft(drive));
-    xbox.povUp().whileTrue(ManualAlignCommands.alignToCage(drive));
+    xbox.povRight().whileTrue(ManualAlignCommands.alignToSourceRight(drive, input));
+    xbox.povLeft().whileTrue(ManualAlignCommands.alignToSourceLeft(drive, input));
+    xbox.povUp().whileTrue(ManualAlignCommands.alignToCage(drive, input));
 
     if (includeAutoAlign) {
       // Align to reef
