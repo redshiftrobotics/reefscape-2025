@@ -61,21 +61,12 @@ public class Hang extends SubsystemBase {
     return runOnce(() -> setGoal(HangConstants.STOWED_POSITION_ROTATIONS));
   }
 
-  public void set(double speed) {
-    io.runOpenLoop(speed);
-  }
-
   public Command runSet(double speed) {
     return runEnd(() -> io.runOpenLoop(speed), io::stop);
   }
 
-  public Command coast() {
-    return startEnd(
-        () -> {
-          io.stop();
-          io.setBrakeMode(false);
-        },
-        () -> io.setBrakeMode(true));
+  public void set(double speed) {
+    io.runOpenLoop(speed);
   }
 
   /** Stop the arm from moving. */

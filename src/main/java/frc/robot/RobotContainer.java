@@ -466,37 +466,31 @@ public class RobotContainer {
 
     xbox.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
+    // Primary scoring
     xbox.leftTrigger()
         .whileTrue(superstructure.runPrepare(State.INTAKE))
         .whileTrue(superstructure.intake())
         .onFalse(superstructure.stowLow());
 
     xbox.rightTrigger().and(xbox.a().negate()).whileTrue(superstructure.outtake());
-    xbox.rightTrigger().and(xbox.a()).whileTrue(superstructure.outtakel1());
+    xbox.rightTrigger().and(xbox.a()).whileTrue(superstructure.outtakeL1());
+
     configureOperatorControllerBindingLevel(xbox.y(), Superstructure.State.L3);
     configureOperatorControllerBindingLevel(xbox.x(), Superstructure.State.L2);
     configureOperatorControllerBindingLevel(xbox.b(), Superstructure.State.L2);
     configureOperatorControllerBindingLevel(xbox.a(), Superstructure.State.L1);
 
-    xbox.povLeft().whileTrue(coralIntake.runMotors(1));
-    xbox.povRight().whileTrue(coralIntake.runMotors(-1));
-
     xbox.povDown().onTrue(superstructure.stowLow());
 
-    coralIntake.setDefaultCommand(
-        coralIntake
-            .run(
-                () ->
-                    coralIntake.setMotors(
-                        Math.abs(xbox.getRightY()) < 0.2
-                            ? -0.05
-                            : MathUtil.applyDeadband(xbox.getRightY(), 0.2)))
-            .onlyIf(DriverStation::isTeleopEnabled));
+    coralIntake.setDefaultCommand(superstructure.passiveIntake());
 
-    hang.setDefaultCommand(hang.run(() -> hang.set(MathUtil.applyDeadband(xbox.getLeftY(), 0.2))));
+    // Hang
 
-    xbox.leftBumper().whileTrue(hang.runSet(+1));
-    xbox.rightBumper().whileTrue(hang.runSet(-1));
+    hang.setDefaultCommand(hang.run(() -> hang.set(MathUtil.applyDeadband(xbox.getLeftX(), 0.2))));
+
+    xbox.rightBumper().and(xbox.leftBumper().negate()).onTrue(hang.deploy());
+    xbox.leftBumper().and(xbox.rightBumper().negate()).onTrue(hang.retract());
+    xbox.rightBumper().and(xbox.leftBumper()).onTrue(hang.stow());
   }
 
   private void configureOperatorControllerBindingLevel(

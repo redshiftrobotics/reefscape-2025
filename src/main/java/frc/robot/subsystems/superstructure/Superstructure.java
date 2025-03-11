@@ -140,8 +140,8 @@ public class Superstructure extends VirtualSubsystem {
     return coralIntake.runMotors(1);
   }
 
-  public Command outtakel1() {
-    return coralIntake.intake(0.5, 0.3);
+  public Command outtakeL1() {
+    return coralIntake.runMotors(0.5, 0.3);
   }
 
   public Command stopIntake() {
