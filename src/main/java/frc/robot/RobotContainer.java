@@ -67,7 +67,6 @@ import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
 import java.util.Arrays;
 import java.util.function.DoubleSupplier;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -483,12 +482,13 @@ public class RobotContainer {
 
     coralIntake.setDefaultCommand(superstructure.passiveIntake());
 
-    
     // Hang
     hang.setDefaultCommand(hang.run(() -> hang.set(MathUtil.applyDeadband(xbox.getLeftX(), 0.2))));
 
     DoubleSupplier hangSpeed = () -> MathUtil.applyDeadband(xbox.getRightX(), 0.2);
-    new Trigger(() -> hangSpeed.getAsDouble() != 0).and(DriverStation::isTeleopEnabled).whileTrue(Commands.run(() -> hang.set(hangSpeed.getAsDouble())));
+    new Trigger(() -> hangSpeed.getAsDouble() != 0)
+        .and(DriverStation::isTeleopEnabled)
+        .whileTrue(Commands.run(() -> hang.set(hangSpeed.getAsDouble())));
 
     xbox.rightBumper().and(xbox.leftBumper().negate()).onTrue(hang.deploy());
     xbox.leftBumper().and(xbox.rightBumper().negate()).onTrue(hang.retract());

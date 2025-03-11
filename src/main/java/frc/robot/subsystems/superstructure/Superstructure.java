@@ -69,10 +69,13 @@ public class Superstructure extends VirtualSubsystem {
   }
 
   public Command run(State newGoal) {
-    return runPrepare(newGoal).andThen(Commands.idle(elevator, coralWrist)).finallyDo(() -> {
-      elevator.setGoalHeightMeters(STOW_HEIGHT);
-      coralWrist.setGoalRotations(STOW_CORAL_ANGLE);
-    });
+    return runPrepare(newGoal)
+        .andThen(Commands.idle(elevator, coralWrist))
+        .finallyDo(
+            () -> {
+              elevator.setGoalHeightMeters(STOW_HEIGHT);
+              coralWrist.setGoalRotations(STOW_CORAL_ANGLE);
+            });
   }
 
   public Command runPrepare(State newGoal) {
@@ -87,22 +90,22 @@ public class Superstructure extends VirtualSubsystem {
   }
 
   public static final double L1_HEIGHT = 0.151148670108898;
-  public static final double L1_CORAL_ANGLE = -6.214284896850586;
+  public static final double L1_CORAL_ANGLE = 0;
 
   public static final double L2_HEIGHT = 0.469491383230037 + Units.inchesToMeters(3);
-  public static final double L2_CORAL_ANGLE = -7.428585529327393;
+  public static final double L2_CORAL_ANGLE = 0;
 
   public static final double L3_HEIGHT = 1.035 + Units.inchesToMeters(2);
-  public static final double L3_CORAL_ANGLE = -7.643;
+  public static final double L3_CORAL_ANGLE = 0;
 
   public static final double L4_HEIGHT = L3_HEIGHT;
   public static final double L4_CORAL_ANGLE = L3_CORAL_ANGLE;
 
   public static final double INTAKE_HEIGHT = 0.218 + Units.inchesToMeters(1.5);
-  public static final double INTAKE_CORAL_ANGLE = -4.214;
+  public static final double INTAKE_CORAL_ANGLE = 0;
 
   public static final double STOW_HEIGHT = 0;
-  public static final double STOW_CORAL_ANGLE = -1.619;
+  public static final double STOW_CORAL_ANGLE = 0;
 
   public Command prepareL1() {
     return Commands.parallel(
@@ -165,8 +168,12 @@ public class Superstructure extends VirtualSubsystem {
         coralWrist.getMeasuredPosition(),
         coralIntake.isIntakeRunning());
     setpointVisualizer.update(
-        elevator.getSetpoint().position, coralWrist.getGoal(), coralIntake.isIntakeRunning());
+        elevator.getSetpoint().position,
+        coralWrist.getGoalRotation(),
+        coralIntake.isIntakeRunning());
     goalVisualizer.update(
-        elevator.getGoalHeightMeters(), coralWrist.getGoal(), coralIntake.isIntakeRunning());
+        elevator.getGoalHeightMeters(),
+        coralWrist.getGoalRotation(),
+        coralIntake.isIntakeRunning());
   }
 }

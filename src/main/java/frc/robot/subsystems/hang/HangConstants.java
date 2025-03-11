@@ -7,7 +7,8 @@ import frc.robot.utility.records.PIDConstants;
 public class HangConstants {
   private HangConstants() {}
 
-  public static record HangConfig(int motorId, double absoluteEncoderOffset, boolean motorInverted, boolean encoderInverted) {}
+  public static record HangConfig(
+      int motorId, double absoluteEncoderOffset, boolean motorInverted, boolean encoderInverted) {}
 
   public static final HangConfig HANG_CONFIG =
       switch (Constants.getRobot()) {

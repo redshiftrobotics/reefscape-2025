@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 /** Mechanism at end of elevator to move intake/ */
@@ -122,17 +123,20 @@ public class Wrist extends SubsystemBase {
   }
 
   /** Whether wrist is within tolerance of setpoint */
+  @AutoLogOutput(key = "Wrist/atGoal")
   public boolean atGoal() {
     return MathUtil.isNear(inputs.positionRotations, goal.position, WristConstants.TOLERANCE);
   }
 
   /** Get position in rotations */
+  @AutoLogOutput(key = "Wrist/measuredRotation")
   public double getMeasuredPosition() {
     return inputs.positionRotations;
   }
 
   /** Get setpoint in rotations */
-  public double getGoal() {
+  @AutoLogOutput(key = "Wrist/goalRotation")
+  public double getGoalRotation() {
     return goal.position;
   }
 

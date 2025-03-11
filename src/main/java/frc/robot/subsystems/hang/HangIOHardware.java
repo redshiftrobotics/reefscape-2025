@@ -3,10 +3,10 @@ package frc.robot.subsystems.hang;
 import static frc.robot.utility.SparkUtil.ifOk;
 import static frc.robot.utility.SparkUtil.tryUntilOk;
 
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -37,7 +37,10 @@ public class HangIOHardware implements HangIO {
         .idleMode(breakMode ? IdleMode.kBrake : IdleMode.kCoast)
         .smartCurrentLimit(HangConstants.MOTOR_CURRENT_LIMIT)
         .voltageCompensation(12.0);
-    motorConfig.absoluteEncoder.inverted(config.encoderInverted()).zeroOffset(config.absoluteEncoderOffset());
+    motorConfig
+        .absoluteEncoder
+        .inverted(config.encoderInverted())
+        .zeroOffset(config.absoluteEncoderOffset());
     motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
 
     tryUntilOk(
