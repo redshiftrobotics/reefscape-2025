@@ -1,13 +1,18 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.FieldConstants.CoralStation;
+import frc.robot.FieldConstants.Reef;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController.SpeedLevel;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.utility.AllianceFlipUtil;
 import java.util.Optional;
 
 public class ManualAlignCommands {
@@ -15,7 +20,7 @@ public class ManualAlignCommands {
     return DriveCommands.joystickHeadingDrive(
         drivetrain,
         input::getTranslationMetersPerSecond,
-        () -> Optional.of(Rotation2d.kZero),
+        () -> Optional.of(isBlue() ? Rotation2d.k180deg : Rotation2d.kZero),
         () -> SpeedLevel.NO_LEVEL,
         () -> true);
   }
@@ -38,11 +43,40 @@ public class ManualAlignCommands {
         () -> true);
   }
 
+  public static Command alignToReef(Drive drivetrain, JoystickInputController input) {
+    return DriveCommands.joystickHeadingDrive(
+        drivetrain,
+        input::getTranslationMetersPerSecond,
+        () -> {
+          Translation2d robotPose = drivetrain.getRobotPose().getTranslation();
+          Translation2d reefPose = AllianceFlipUtil.apply(Reef.center);
+
+          double dx = robotPose.getX() - reefPose.getX();
+          double dy = robotPose.getY() - reefPose.getY();
+
+          double angleRad = Math.atan2(dy, dx);
+
+          for (Pose2d face : Reef.alignmentFaces) {
+            double faceRad = face.getRotation().getRadians();
+
+            if (MathUtil.isNear(faceRad, angleRad, 0.5)) {
+              angleRad = faceRad;
+            }
+          }
+
+          return Optional.of(Rotation2d.fromRadians(angleRad));
+        },
+        () -> SpeedLevel.NO_LEVEL,
+        () -> true);
+  }
+
   private static Rotation2d allianceRotation() {
+    return Rotation2d.fromDegrees(isBlue() ? 0 : 180);
+  }
+
+  private static boolean isBlue() {
     boolean isBlue =
         DriverStation.getAlliance().isPresent()
             && DriverStation.getAlliance().get() == Alliance.Blue;
-
-    return Rotation2d.fromDegrees(isBlue ? 0 : 180);
   }
 }

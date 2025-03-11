@@ -401,6 +401,7 @@ public class RobotContainer {
     xbox.povRight().whileTrue(ManualAlignCommands.alignToSourceRight(drive, input));
     xbox.povLeft().whileTrue(ManualAlignCommands.alignToSourceLeft(drive, input));
     xbox.povUp().whileTrue(ManualAlignCommands.alignToCage(drive, input));
+    xbox.povDown().whileTrue(ManualAlignCommands.alignToReef(drive, input));
 
     if (includeAutoAlign) {
       // Align to reef
