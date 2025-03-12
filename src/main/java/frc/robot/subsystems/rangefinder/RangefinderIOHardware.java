@@ -6,8 +6,6 @@ import java.util.Optional;
 public class RangefinderIOHardware implements RangefinderIO {
   LaserCan sensor;
 
-  int measurementMillimetres;
-
   public RangefinderIOHardware(int id) {
     sensor = new LaserCan(id);
   }
