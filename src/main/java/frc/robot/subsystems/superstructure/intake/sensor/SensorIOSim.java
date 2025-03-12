@@ -1,8 +1,7 @@
 package frc.robot.subsystems.superstructure.intake.sensor;
 
-import java.util.Random;
-
 import edu.wpi.first.wpilibj.Timer;
+import java.util.Random;
 
 public class SensorIOSim implements SensorIO {
 
