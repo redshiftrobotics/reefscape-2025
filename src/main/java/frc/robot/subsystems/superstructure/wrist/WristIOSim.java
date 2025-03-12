@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superstructure.wrist;
 
+import static frc.robot.subsystems.superstructure.wrist.WristConstants.GEAR_REDUCTION;
 import static frc.robot.subsystems.superstructure.wrist.WristConstants.MOTOR;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -20,12 +21,12 @@ public class WristIOSim implements WristIO {
     arm =
         new SingleJointedArmSim(
             MOTOR,
-            config.gearReduction(),
+            GEAR_REDUCTION,
             0.025,
             Units.inchesToMeters(18),
-            0,
-            Math.PI * 2,
-            false,
+            Units.rotationsToRadians(-0.5),
+            Units.rotationsToRadians(0.5),
+            true,
             0);
   }
 
@@ -33,23 +34,23 @@ public class WristIOSim implements WristIO {
   public void updateInputs(WristIOInputs inputs) {
 
     if (runClosedLoop) {
-      appliedVolts = controller.calculate(inputs.positionRotations) + feedForwardVolts;
+      appliedVolts = controller.calculate(inputs.positionRad) + feedForwardVolts;
     }
 
     arm.setInputVoltage(appliedVolts);
     arm.update(Constants.LOOP_PERIOD_SECONDS);
 
-    inputs.positionRotations = Units.radiansToRotations(arm.getAngleRads());
-    inputs.velocityRPM = Units.radiansPerSecondToRotationsPerMinute(arm.getVelocityRadPerSec());
+    inputs.positionRad = arm.getAngleRads();
+    inputs.velocityRadPerSec = arm.getVelocityRadPerSec();
 
-    inputs.appliedVolts = new double[] {appliedVolts};
-    inputs.supplyCurrentAmps = new double[] {arm.getCurrentDrawAmps()};
+    inputs.appliedVolts = appliedVolts;
+    inputs.supplyCurrentAmps = arm.getCurrentDrawAmps();
   }
 
   @Override
-  public void runPosition(double positionRotations) {
+  public void runPosition(double positionRotations, double feedforward) {
     controller.setSetpoint(positionRotations);
-    feedForwardVolts = 0;
+    feedForwardVolts = feedforward;
     runClosedLoop = true;
   }
 

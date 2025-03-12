@@ -13,7 +13,6 @@ public class ElevatorConstants {
   public static final ElevatorConfig ELEVATOR_CONFIG =
       switch (Constants.getRobot()) {
         case COMP_BOT_2025 -> new ElevatorConfig(3, 17, true); // left is leader, right is follower
-        case SIM_BOT -> new ElevatorConfig(0, 0, false);
         default -> new ElevatorConfig(0, 1, false);
       };
 
@@ -32,7 +31,7 @@ public class ElevatorConstants {
   public static final double maxCarriageVelocity = 3.0;
   public static final double maxCarriageAcceleration = 3.5;
 
-  public static final double carriagePositionTolerance = Units.inchesToMeters(0.8);
+  public static final double carriagePositionTolerance = Units.inchesToMeters(2);
 
   public static final PIDConstants pid =
       switch (Constants.getRobot()) {

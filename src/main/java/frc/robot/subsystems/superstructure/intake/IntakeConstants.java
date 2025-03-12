@@ -13,13 +13,13 @@ public class IntakeConstants {
 
   public static final IntakeConfig CORAL_INTAKE_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new IntakeConfig(0, 1, false, false);
+        case COMP_BOT_2025 -> new IntakeConfig(4, 7, false, true);
         default -> new IntakeConfig(0, 0, false, false);
       };
 
   public static final IntakeConfig ALGAE_INTAKE_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new IntakeConfig(2, 3, false, false);
+        case COMP_BOT_2025 -> new IntakeConfig(5, 6, false, false);
         default -> new IntakeConfig(0, 0, false, false);
       };
 }

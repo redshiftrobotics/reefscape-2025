@@ -139,6 +139,11 @@ public class ElevatorIOHardware implements ElevatorIO {
   }
 
   @Override
+  public void zeroEncoder() {
+    tryUntilOk(leader, 5, () -> encoder.setPosition(0.0));
+  }
+
+  @Override
   public void setPID(double kP, double kI, double kD) {
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     motorConfig.closedLoop.pidf(kP, kI, kD, 0);

@@ -1,35 +1,34 @@
 package frc.robot.subsystems.superstructure;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
-import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
+import frc.robot.utility.VirtualSubsystem;
 
-public class Superstructure extends SubsystemBase {
+public class Superstructure extends VirtualSubsystem {
 
   private final Elevator elevator;
   private final Wrist coralWrist;
-  private final Wrist algaeWrist;
   private final Intake coralIntake;
-  private final Intake algaeIntake;
 
   public static enum State {
     STOW,
+    STOW_HIGH,
     INTAKE,
 
     L1(false),
     L2(false),
     L3(false),
-    L4(false),
+    L4(false);
 
-    L2_ALGAE(true),
-    L3_ALGAE(true),
-    L4_ALGAE(true);
+    // L2_ALGAE(true),
+    // L3_ALGAE(true);
 
     public boolean isLevel() {
       return this == L1 || this == L2 || this == L3 || this == L4;
@@ -41,9 +40,8 @@ public class Superstructure extends SubsystemBase {
 
     public State asAlgae() {
       return switch (this) {
-        case L2 -> L2_ALGAE;
-        case L3 -> L3_ALGAE;
-        case L4 -> L4_ALGAE;
+          // case L2 -> L2_ALGAE;
+          // case L3 -> L3_ALGAE;
         default -> this;
       };
     }
@@ -59,8 +57,6 @@ public class Superstructure extends SubsystemBase {
     }
   }
 
-  private State goal = State.STOW;
-
   private final SuperstructureVisualizer measuredVisualizer =
       new SuperstructureVisualizer("Measured", Color.kYellow);
   private final SuperstructureVisualizer setpointVisualizer =
@@ -68,100 +64,94 @@ public class Superstructure extends SubsystemBase {
   private final SuperstructureVisualizer goalVisualizer =
       new SuperstructureVisualizer("Goal", Color.kLime);
 
-  public Superstructure(
-      Elevator elevator,
-      Wrist coralWrist,
-      Wrist algaeWrist,
-      Intake coralIntake,
-      Intake algaeIntake) {
+  public Superstructure(Elevator elevator, Wrist coralWrist, Intake coralIntake) {
     this.elevator = elevator;
     this.coralWrist = coralWrist;
-    this.algaeWrist = algaeWrist;
     this.coralIntake = coralIntake;
-    this.algaeIntake = algaeIntake;
-  }
-
-  public Command prepare() {
-    return elevator.defer(() -> runPrepare(goal));
-  }
-
-  public Command setNextPrepare(State newGoal) {
-    return Commands.runOnce(() -> this.goal = newGoal);
-  }
-
-  public Command runPrepare(State newGoal) {
-    return switch (newGoal) {
-      case STOW -> stowLow();
-      case L1 -> prepareL1();
-      case L2 -> prepareL2();
-      case L3 -> prepareL3();
-      case L4 -> prepareL4();
-      case L2_ALGAE -> prepareAlgaeL2();
-      case L3_ALGAE -> prepareAlgaeL3();
-      case L4_ALGAE -> prepareAlgaeL4();
-      case INTAKE -> prepareIntake();
-    };
   }
 
   public Command run(State goal) {
     return runPrepare(goal)
-        .andThen(Commands.waitUntil(() -> elevator.atGoalHeight() && coralWrist.atGoal()))
-        .andThen(
-            goal.isAlgae()
-                ? algaeIntake.intake(1.0).withTimeout(1)
-                : coralIntake.intake(1.0).withTimeout(1));
+        .andThen(Commands.idle(elevator, coralWrist))
+        .finallyDo(
+            () -> {
+              elevator.setGoalHeightMeters(STOW_HEIGHT);
+              coralWrist.setGoalRotation(STOW_CORAL_ANGLE);
+            });
   }
 
-  private static final double algaeHighStow = Units.degreesToRotations(160);
-  private static final double coralHighStow = Units.degreesToRotations(160);
+  public Command runAction(State newGoal) {
+    return runPrepare(newGoal)
+        .andThen(Commands.idle(elevator, coralWrist))
+        .until(() -> elevator.atGoalHeight() && coralWrist.atGoal());
+  }
+
+  public Command runPrepare(State goal) {
+    return switch (goal) {
+      case STOW -> stowLow();
+      case STOW_HIGH -> stowHigh();
+      case L1 -> prepareL1();
+      case L2 -> prepareL2();
+      case L3 -> prepareL3();
+      case L4 -> prepareL4();
+      case INTAKE -> prepareIntake();
+    };
+  }
+
+  public static final double L1_HEIGHT = 0.151148670108898;
+  public static final Rotation2d L1_CORAL_ANGLE = Rotation2d.fromDegrees(70);
+
+  public static final double L2_HEIGHT = 0.469491383230037 + Units.inchesToMeters(3);
+  public static final Rotation2d L2_CORAL_ANGLE = Rotation2d.fromDegrees(-35);
+
+  public static final double L3_HEIGHT = 1.035 + Units.inchesToMeters(2);
+  public static final Rotation2d L3_CORAL_ANGLE = Rotation2d.fromDegrees(-35);
+
+  public static final double L4_HEIGHT = L3_HEIGHT;
+  public static final Rotation2d L4_CORAL_ANGLE = L3_CORAL_ANGLE;
+
+  public static final double INTAKE_HEIGHT = 0.218 + Units.inchesToMeters(1.5);
+  public static final Rotation2d INTAKE_CORAL_ANGLE = Rotation2d.fromDegrees(35);
+
+  public static final double STOW_HEIGHT = 0.054886473109919;
+  public static final Rotation2d STOW_CORAL_ANGLE = Rotation2d.fromDegrees(-90);
+  public static final Rotation2d STOW_CORAL_ANGLE_HIGH = Rotation2d.fromDegrees(90);
 
   public Command prepareL1() {
     return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight / 4.0),
-        algaeWrist.runPrepare(algaeHighStow),
-        coralWrist.runPrepare(Units.degreesToRotations(55)));
+        elevator.runPositionPrepare(L1_HEIGHT), coralWrist.runPositionPrepare(L1_CORAL_ANGLE));
   }
 
   public Command prepareL2() {
     return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight / 2.0),
-        algaeWrist.runPrepare(algaeHighStow),
-        coralWrist.runPrepare(Units.degreesToRotations(35)));
+        elevator.runPositionPrepare(L2_HEIGHT), coralWrist.runPositionPrepare(L2_CORAL_ANGLE));
   }
 
   public Command prepareL3() {
     return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0)),
-        algaeWrist.runPrepare(algaeHighStow),
-        coralWrist.runPrepare(Units.degreesToRotations(35)));
+        elevator.runPositionPrepare(L3_HEIGHT), coralWrist.runPositionPrepare(L3_CORAL_ANGLE));
   }
 
   public Command prepareL4() {
     return Commands.parallel(
-        elevator.runOnce(() -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)),
-        algaeWrist.runPrepare(algaeHighStow),
-        coralWrist.runPrepare(Units.degreesToRotations(90)));
+        elevator.runPositionPrepare(L4_HEIGHT), coralWrist.runPositionPrepare(L4_CORAL_ANGLE));
   }
 
-  public Command prepareAlgaeL1() {
+  public Command prepareIntake() {
     return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight / 4.0),
-        coralWrist.runPrepare(coralHighStow),
-        algaeWrist.runPrepare(Units.degreesToRotations(90)));
+        elevator.runPositionPrepare(INTAKE_HEIGHT),
+        coralWrist.runPositionPrepare(INTAKE_CORAL_ANGLE));
   }
 
-  public Command prepareAlgaeL2() {
+  public Command stowLow() {
     return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight / 2.0),
-        coralWrist.runPrepare(coralHighStow),
-        algaeWrist.runPrepare(Units.degreesToRotations(90)));
+        elevator.runPositionPrepare(STOW_HEIGHT), coralWrist.runPositionPrepare(STOW_CORAL_ANGLE));
   }
 
-  public Command prepareAlgaeL3() {
+  public Command stowHigh() {
     return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight * (3.0 / 4.0)),
-        coralWrist.runPrepare(coralHighStow),
-        algaeWrist.runPrepare(Units.degreesToRotations(90)));
+        elevator.runPositionPrepare(STOW_HEIGHT),
+        coralWrist.runPositionPrepare(STOW_CORAL_ANGLE_HIGH));
   }
 
   public Command prepareAlgaeL4() {
@@ -170,39 +160,43 @@ public class Superstructure extends SubsystemBase {
         algaeWrist.runPrepare(algaeHighStow),
         coralWrist.runPrepare(Units.degreesToRotations(90)));
   }
-
-  public Command prepareIntake() {
-    return Commands.parallel(
-        elevator.runPrepare(ElevatorConstants.carriageMaxHeight / 4.0),
-        coralWrist.runPrepare(Units.degreesToRotations(55)));
+  
+  public Command intake() {
+    return coralIntake.runMotors(-0.6);
   }
 
-  public Command stowLow() {
-    return Commands.parallel(
-        elevator.stow(),
-        algaeWrist.runPrepare(Units.degreesToRotations(20)),
-        coralWrist.runPrepare(Units.degreesToRotations(90)));
+  public Command passiveIntake() {
+    return coralIntake.runMotors(-0.05);
+  }
+
+  public Command outtake() {
+    return coralIntake.runMotors(1);
+  }
+
+  public Command outtakeL1() {
+    return coralIntake.runMotors(0.5, 0.3);
+  }
+
+  public Command stopIntake() {
+    return coralIntake.runMotors(0);
   }
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Elevator Height Meters", elevator.getMeasuredHeightMeters());
+    SmartDashboard.putNumber("Coral Wrist Degrees", coralWrist.getGoalRotations().getDegrees());
+
     measuredVisualizer.update(
-        elevator.getHeightMeters(),
-        coralWrist.getMeasuredPosition(),
-        algaeWrist.getMeasuredPosition(),
-        coralIntake.isIntakeRunning(),
-        algaeIntake.isIntakeRunning());
+        elevator.getMeasuredHeightMeters(),
+        coralWrist.getMeasuredRotation().getRadians(),
+        coralIntake.getMotorsAvg());
     setpointVisualizer.update(
         elevator.getSetpoint().position,
-        coralWrist.getSetpoint(),
-        algaeWrist.getSetpoint(),
-        coralIntake.isIntakeRunning(),
-        algaeIntake.isIntakeRunning());
+        coralWrist.getSetpoint().position,
+        coralIntake.getMotorsAvg());
     goalVisualizer.update(
         elevator.getGoalHeightMeters(),
-        coralWrist.getSetpoint(),
-        algaeWrist.getSetpoint(),
-        coralIntake.isIntakeRunning(),
-        algaeIntake.isIntakeRunning());
+        coralWrist.getGoalRotations().getRadians(),
+        coralIntake.getMotorsAvg());
   }
 }

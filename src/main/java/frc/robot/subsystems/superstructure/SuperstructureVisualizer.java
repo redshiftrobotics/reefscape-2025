@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superstructure;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -20,18 +21,12 @@ public class SuperstructureVisualizer {
   private final LoggedMechanismLigament2d carriageMechanism;
   private final LoggedMechanismLigament2d elevatorMechanism;
   private final LoggedMechanismLigament2d coralWristLigament;
-  private final LoggedMechanismLigament2d algaeWristLigament;
-  private final LoggedMechanismLigament2d algaeIntake;
   private final LoggedMechanismLigament2d coralIntake;
 
   public SuperstructureVisualizer(String name, Color color) {
     this.name = name;
 
-    root =
-        mechanism.getRoot(
-            name + " Root",
-            Units.inchesToMeters(34.886649) / 2,
-            Units.inchesToMeters(34.886649 - 6));
+    root = mechanism.getRoot(name + " Root", Units.inchesToMeters(34.886649) / 2, 0);
 
     elevatorMechanism =
         root.append(
@@ -47,39 +42,22 @@ public class SuperstructureVisualizer {
                 4.0,
                 new Color8Bit(color)));
 
-    algaeWristLigament =
-        elevatorMechanism.append(
-            new LoggedMechanismLigament2d(
-                name + " Coral Wrist", Units.inchesToMeters(10.0), 0, 4.0, new Color8Bit(color)));
-
     coralWristLigament =
         carriageMechanism.append(
             new LoggedMechanismLigament2d(
-                name + " Algae Wrist", Units.inchesToMeters(9.0), 0, 4.0, new Color8Bit(color)));
-
-    algaeIntake =
-        algaeWristLigament.append(
-            new LoggedMechanismLigament2d(
-                name + " Algae Intake", 0, 0, 10.0, new Color8Bit(color)));
+                name + " Algae Wrist", Units.inchesToMeters(9.0), 0.0, 4.0, new Color8Bit(color)));
 
     coralIntake =
         coralWristLigament.append(
             new LoggedMechanismLigament2d(
-                name + " Coral Intake", 0, 0, 10.0, new Color8Bit(color)));
+                name + " Coral Intake", 0.0, -4.0, 10.0, new Color8Bit(235, 137, 52)));
   }
 
-  public void update(
-      double carriageHeight,
-      double wristRotations,
-      double algaeRotations,
-      boolean coralIntakeRunning,
-      boolean algaeIntakeRunning) {
+  public void update(double carriageHeight, double wristRadians, double coralIntakeOutput) {
     elevatorMechanism.setLength(carriageHeight);
-    coralWristLigament.setAngle(Units.rotationsToDegrees(wristRotations));
-    algaeWristLigament.setAngle(Units.rotationsToDegrees(algaeRotations));
+    coralWristLigament.setAngle(new Rotation2d(-wristRadians).plus(Rotation2d.kCCW_Pi_2));
 
-    coralIntake.setLineWeight(coralIntakeRunning ? 10.0 : 0.0);
-    algaeIntake.setLineWeight(algaeIntakeRunning ? 10.0 : 0.0);
+    coralIntake.setLength(coralIntakeOutput * Units.inchesToMeters(3.0));
 
     Logger.recordOutput("SuperstructureVisualizer/" + name, mechanism);
   }

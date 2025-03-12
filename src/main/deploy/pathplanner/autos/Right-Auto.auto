@@ -1,0 +1,81 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SR-C9"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "l1"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "C9-PR"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stow"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intake"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.0
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "PR-C0"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "l1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stow"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "No Algae Clear",
+  "choreoAuto": false
+}

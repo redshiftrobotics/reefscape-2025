@@ -26,6 +26,10 @@ public interface CameraIO {
     return "Camera";
   }
 
+  default String getCameraPosition() {
+    return getCameraName();
+  }
+
   /** Set april tag field layout to use */
   default void setAprilTagFieldLayout(AprilTagFieldLayout layout) {}
 }

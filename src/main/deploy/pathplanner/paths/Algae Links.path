@@ -1,0 +1,118 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.2131,
+        "y": 4.0259
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.458324604902621,
+        "y": 3.977269832918718
+      },
+      "isLocked": false,
+      "linkedName": "A0"
+    },
+    {
+      "anchor": {
+        "x": 3.846,
+        "y": 5.130430292
+      },
+      "prevControl": {
+        "x": 3.511581496113062,
+        "y": 4.8371146769367375
+      },
+      "nextControl": {
+        "x": 4.440497029734295,
+        "y": 5.651858561976205
+      },
+      "isLocked": false,
+      "linkedName": "A1"
+    },
+    {
+      "anchor": {
+        "x": 5.12699,
+        "y": 5.130430292
+      },
+      "prevControl": {
+        "x": 5.190151370680904,
+        "y": 4.888540562466666
+      },
+      "nextControl": {
+        "x": 5.050533012614511,
+        "y": 5.42323837707218
+      },
+      "isLocked": false,
+      "linkedName": "A2"
+    },
+    {
+      "anchor": {
+        "x": 5.7658,
+        "y": 4.0259
+      },
+      "prevControl": {
+        "x": 5.754571091282434,
+        "y": 4.404233328830707
+      },
+      "nextControl": {
+        "x": 5.793159112914457,
+        "y": 3.1040949944441163
+      },
+      "isLocked": false,
+      "linkedName": "A3"
+    },
+    {
+      "anchor": {
+        "x": 5.12699,
+        "y": 2.921369708
+      },
+      "prevControl": {
+        "x": 4.497461676233899,
+        "y": 2.8549914837800516
+      },
+      "nextControl": {
+        "x": 5.545074851978098,
+        "y": 2.9654530780405146
+      },
+      "isLocked": false,
+      "linkedName": "A4"
+    },
+    {
+      "anchor": {
+        "x": 3.851656,
+        "y": 2.921369708
+      },
+      "prevControl": {
+        "x": 3.6716751643199554,
+        "y": 2.747856311433877
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "A5"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Linked Waypoints",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

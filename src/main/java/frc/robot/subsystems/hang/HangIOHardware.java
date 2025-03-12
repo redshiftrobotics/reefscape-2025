@@ -1,5 +1,6 @@
 package frc.robot.subsystems.hang;
 
+import static frc.robot.utility.SparkUtil.ifOk;
 import static frc.robot.utility.SparkUtil.tryUntilOk;
 
 import com.revrobotics.spark.SparkAbsoluteEncoder;
@@ -12,7 +13,9 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.filter.Debouncer;
 import frc.robot.subsystems.hang.HangConstants.HangConfig;
+import frc.robot.utility.SparkUtil;
 
 public class HangIOHardware implements HangIO {
   private final SparkMax motor;
@@ -21,6 +24,8 @@ public class HangIOHardware implements HangIO {
 
   private boolean breakMode = true;
 
+  private final Debouncer connectDebounce = new Debouncer(0.5);
+
   public HangIOHardware(HangConfig config) {
     motor = new SparkMax(config.motorId(), MotorType.kBrushless);
     encoder = motor.getAbsoluteEncoder();
@@ -28,10 +33,14 @@ public class HangIOHardware implements HangIO {
 
     final SparkMaxConfig motorConfig = new SparkMaxConfig();
     motorConfig
+        .inverted(config.motorInverted())
         .idleMode(breakMode ? IdleMode.kBrake : IdleMode.kCoast)
         .smartCurrentLimit(HangConstants.MOTOR_CURRENT_LIMIT)
         .voltageCompensation(12.0);
-    motorConfig.absoluteEncoder.zeroOffset(config.absoluteEncoderOffset());
+    motorConfig
+        .absoluteEncoder
+        .inverted(config.encoderInverted())
+        .zeroOffset(config.absoluteEncoderOffset());
     motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
 
     tryUntilOk(
@@ -44,11 +53,37 @@ public class HangIOHardware implements HangIO {
 
   @Override
   public void updateInputs(HangIOInputs inputs) {
-    inputs.positionRotations = encoder.getPosition();
-    inputs.velocityRPM = encoder.getVelocity();
+    SparkUtil.clearStickyFault();
 
-    inputs.appliedVolts = new double[] {motor.getAppliedOutput() * motor.getBusVoltage()};
-    inputs.supplyCurrentAmps = new double[] {motor.getOutputCurrent()};
+    ifOk(motor, encoder::getPosition, value -> inputs.positionRotations = value);
+    ifOk(motor, encoder::getVelocity, value -> inputs.velocityRPM = value);
+
+    ifOk(
+        motor,
+        () -> motor.getAppliedOutput() * motor.getBusVoltage(),
+        value -> inputs.appliedVolts = new double[] {value});
+    ifOk(motor, motor::getOutputCurrent, value -> inputs.supplyCurrentAmps = new double[] {value});
+
+    inputs.motorConnected = connectDebounce.calculate(!SparkUtil.hasStickyFault());
+  }
+
+  @Override
+  public void setLimits(double forward, double backward) {
+    SparkMaxConfig motorConfig = new SparkMaxConfig();
+
+    motorConfig
+        .softLimit
+        .forwardSoftLimitEnabled(true)
+        .forwardSoftLimit(forward)
+        .reverseSoftLimitEnabled(true)
+        .reverseSoftLimit(backward);
+
+    tryUntilOk(
+        motor,
+        5,
+        () ->
+            motor.configure(
+                motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
   }
 
   @Override

@@ -1,0 +1,17 @@
+Cameras on bot:
+- FrontRight8032 (front left)
+- Arducam_OV9281_USB_Camera (front right)
+- BackRightCamera8032 (back right)
+- jessiecam (back left)
+
+Cameras not on bot:
+- FrontLeftCamera8032 (broken)
+- geraldcam (backup)
+- spencercam (backup)
+- willycam (backup)
+- kathycam (backup)
+- connorcam (backup)
+- jarreaucam (backup)
+- neilcam (backup)
+- zachcam (backup)
+- scottiecam (backup)

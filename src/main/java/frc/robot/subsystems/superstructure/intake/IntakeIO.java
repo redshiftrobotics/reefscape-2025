@@ -6,6 +6,8 @@ import org.littletonrobotics.junction.AutoLog;
 public interface IntakeIO {
   @AutoLog
   public static class IntakeIOInputs {
+    public boolean motorConnected = false;
+
     public double speedLeft;
     public double speedRight;
 

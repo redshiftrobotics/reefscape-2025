@@ -57,8 +57,8 @@ public class DriveConstants {
   public static final DriveConfig DRIVE_CONFIG =
       switch (Constants.getRobot()) {
         case COMP_BOT_2025 -> new DriveConfig(
-            new Translation2d(Units.inchesToMeters(22.729226), Units.inchesToMeters(22.729226)),
-            new Translation2d(Units.inchesToMeters(27.5), Units.inchesToMeters(27.5)),
+            new Translation2d(Units.inchesToMeters(22.729228), Units.inchesToMeters(22.729228)),
+            new Translation2d(Units.inchesToMeters(35), Units.inchesToMeters(35)),
             5.05968,
             14.5);
         case T_SHIRT_CANNON_CHASSIS -> new DriveConfig(
@@ -106,7 +106,7 @@ public class DriveConstants {
   public static final double robotMassKg = 65;
   public static final double robotMOI = 6.883;
   public static final double wheelCOF = 1.0;
-  public static final Translation2d[] moduleTranslations = {
+  public static final Translation2d[] MODULE_TRANSLATION = {
     DriveConstants.FRONT_LEFT_MODULE_DISTANCE_FROM_CENTER,
     DriveConstants.FRONT_RIGHT_MODULE_DISTANCE_FROM_CENTER,
     DriveConstants.BACK_LEFT_MODULE_DISTANCE_FROM_CENTER,

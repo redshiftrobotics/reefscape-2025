@@ -1,5 +1,6 @@
 package frc.robot.subsystems.hang;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -15,11 +16,11 @@ public class Hang extends SubsystemBase {
       new LoggedTunableNumberFactory("Hang");
 
   private static final LoggedTunableNumber kP =
-      hangFactory.getNumber("HangKp", HangConstants.FEEDBACK.kP());
+      hangFactory.getNumber("kP", HangConstants.FEEDBACK.kP());
   private static final LoggedTunableNumber kI =
-      hangFactory.getNumber("HangKi", HangConstants.FEEDBACK.kI());
+      hangFactory.getNumber("kI", HangConstants.FEEDBACK.kI());
   private static final LoggedTunableNumber kD =
-      hangFactory.getNumber("HangKd", HangConstants.FEEDBACK.kD());
+      hangFactory.getNumber("kD", HangConstants.FEEDBACK.kD());
 
   private HangVisualization measuredVisualizer =
       new HangVisualization("Hang/Mechanism2d/Measured", Color.kYellow);
@@ -37,6 +38,8 @@ public class Hang extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Hang", inputs);
+
+    SmartDashboard.putNumber("Hang Rotations", inputs.positionRotations);
 
     LoggedTunableNumber.ifChanged(
         hashCode(), (values) -> io.setPID(values[0], values[1], values[2]), kP, kI, kD);
@@ -61,17 +64,12 @@ public class Hang extends SubsystemBase {
     return runOnce(() -> setGoal(HangConstants.STOWED_POSITION_ROTATIONS));
   }
 
-  public Command set(double speed) {
+  public Command runSet(double speed) {
     return runEnd(() -> io.runOpenLoop(speed), io::stop);
   }
 
-  public Command coast() {
-    return startEnd(
-        () -> {
-          io.stop();
-          io.setBrakeMode(false);
-        },
-        () -> io.setBrakeMode(true));
+  public void set(double speed) {
+    io.runOpenLoop(speed);
   }
 
   /** Stop the arm from moving. */
