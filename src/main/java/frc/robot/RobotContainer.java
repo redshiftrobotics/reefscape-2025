@@ -4,6 +4,7 @@ import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -68,6 +69,7 @@ import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
 import java.util.Arrays;
 import java.util.function.BiConsumer;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -476,10 +478,7 @@ public class RobotContainer {
   private void configureOperatorControllerBindings(CommandXboxController xbox) {
 
     new Trigger(DriverStation::isEnabled)
-        .onTrue(
-            Commands.runOnce(() -> coralWrist.setConstraints(1, 3))
-                .andThen(superstructure.runAction(Superstructure.State.STOW))
-                .finallyDo(coralWrist::resetContraints));
+        .onTrue(superstructure.runAction(Superstructure.State.STOW_HIGH));
 
     xbox.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
@@ -487,12 +486,14 @@ public class RobotContainer {
     xbox.leftTrigger()
         .whileTrue(superstructure.run(State.INTAKE).alongWith(superstructure.intake()));
 
-    xbox.rightTrigger().and(xbox.a().negate()).whileTrue(superstructure.outtake());
-    xbox.rightTrigger().and(xbox.a()).whileTrue(superstructure.outtakeL1());
-
     final BiConsumer<Trigger, Superstructure.State> configureOperatorControllerBindingLevel =
         (trigger, level) -> {
-          trigger.whileTrue(superstructure.run(level));
+          trigger.whileTrue(
+              superstructure
+                  .run(level)
+                  .alongWith(
+                      Commands.waitUntil(superstructure::atGoal)
+                          .andThen(superstructure.runWheels(level).asProxy())));
         };
 
     configureOperatorControllerBindingLevel.accept(xbox.y(), Superstructure.State.L4);
@@ -505,11 +506,17 @@ public class RobotContainer {
     // Intake
 
     coralIntake.setDefaultCommand(superstructure.passiveIntake());
-    new Trigger(() -> !JoystickUtil.isDeadband(xbox.getLeftX()))
+
+    DoubleSupplier intakeSpeed =
+        () ->
+            MathUtil.clamp(
+                JoystickUtil.applyDeadband(-xbox.getLeftX())
+                    + JoystickUtil.applyDeadband(-xbox.getLeftY()),
+                -1,
+                +1);
+    new Trigger(() -> intakeSpeed.getAsDouble() != 0)
         .and(DriverStation::isTeleopEnabled)
-        .whileTrue(
-            Commands.run(
-                () -> coralIntake.setMotors(JoystickUtil.applyDeadband(xbox.getRightX()))));
+        .whileTrue(coralIntake.run(() -> coralIntake.setMotors(intakeSpeed.getAsDouble())));
 
     // Hang
     hang.setDefaultCommand(hang.run(() -> hang.set(JoystickUtil.applyDeadband(xbox.getLeftX()))));

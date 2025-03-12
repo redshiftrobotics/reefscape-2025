@@ -7,6 +7,7 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -45,13 +46,14 @@ public class Elevator extends SubsystemBase {
       factory.getNumber("MaxAcceleration", ElevatorConstants.maxCarriageAcceleration);
 
   private static final LoggedTunableNumber tolerance =
-      factory.getNumber("Tolerance", ElevatorConstants.carriagePositionTolerance);
+      factory.getNumber(
+          "ToleranceInches", Units.metersToInches(ElevatorConstants.carriagePositionTolerance));
 
   private static final LoggedTunableNumber staticCharacterizationVelocityThresh =
-      new LoggedTunableNumber("Elevator/StaticCharacterizationVelocityThresh", 0.1);
+      factory.getNumber("/StaticCharacterizationVelocityThresh", 0.1);
 
   private static final LoggedTunableNumber hardStopVelocityThresh =
-      new LoggedTunableNumber("Elevator/StaticCharacterizationVelocityThresh", 0.05);
+      factory.getNumber("/StaticCharacterizationVelocityThresh", 0.05);
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
@@ -144,10 +146,11 @@ public class Elevator extends SubsystemBase {
 
       setpoint = profile.calculate(Constants.LOOP_PERIOD_SECONDS, setpoint, goal);
 
-      io.runPosition(
-          setpoint.position / ElevatorConstants.drumRadius,
-          feedforward.calculate(setpoint.velocity));
+      double feedforwardVolts = feedforward.calculate(setpoint.velocity);
 
+      io.runPosition(setpoint.position / ElevatorConstants.drumRadius, feedforwardVolts);
+
+      Logger.recordOutput("Wrist/Feedforward/Volts", feedforwardVolts);
       Logger.recordOutput("Elevator/Profile/SetpointPositionMeters", setpoint.position);
       Logger.recordOutput("Elevator/Profile/SetpointVelocityMetersPerSec", setpoint.velocity);
       Logger.recordOutput("Elevator/Profile/GoalPositionMeters", goal.position);
@@ -156,6 +159,7 @@ public class Elevator extends SubsystemBase {
     } else {
       Logger.recordOutput("Elevator/Profile/ShouldRunProfiled", false);
 
+      Logger.recordOutput("Wrist/FeedForward/Volts", 0);
       Logger.recordOutput("Elevator/Profile/SetpointPositionMeters", 0.0);
       Logger.recordOutput("Elevator/Profile/SetpointVelocityMetersPerSec", 0.0);
       Logger.recordOutput("Elevator/Profile/GoalPositionMeters", 0.0);
@@ -199,7 +203,8 @@ public class Elevator extends SubsystemBase {
 
   @AutoLogOutput(key = "Elevator/atGoal")
   public boolean atGoalHeight() {
-    return MathUtil.isNear(getGoalHeightMeters(), getGoalHeightMeters(), tolerance.get());
+    return MathUtil.isNear(
+        getMeasuredHeightMeters(), getGoalHeightMeters(), Units.inchesToMeters(tolerance.get()));
   }
 
   public State getGoal() {

@@ -11,8 +11,6 @@ public interface WristIO {
     public double positionRad;
     public double velocityRadPerSec;
 
-    public double setpointRad;
-
     public double appliedVolts;
     public double supplyCurrentAmps;
   }
@@ -21,7 +19,7 @@ public interface WristIO {
   default void updateInputs(WristIOInputs inputs) {}
 
   /** Set the setpoint in revolutions. */
-  default void runPosition(double setpoint, double feedfoward) {}
+  default void runPosition(double setpoint, double feedforward) {}
 
   /** Set the PID constants. */
   default void setPID(double kP, double kI, double kD) {}

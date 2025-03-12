@@ -15,11 +15,11 @@ public class SuperstructureVisualizer {
 
   private final LoggedMechanism2d mechanism =
       new LoggedMechanism2d(
-          Units.inchesToMeters(28.0), Units.feetToMeters(9.0), new Color8Bit(Color.kDarkGray));
+          Units.inchesToMeters(28.0), Units.feetToMeters(5.0), new Color8Bit(Color.kDarkGray));
 
   private final LoggedMechanismRoot2d root;
-  private final LoggedMechanismLigament2d carriageMechanism;
   private final LoggedMechanismLigament2d elevatorMechanism;
+  private final LoggedMechanismLigament2d carriage, carriageJoint;
   private final LoggedMechanismLigament2d coralWristLigament;
   private final LoggedMechanismLigament2d coralIntake;
 
@@ -33,7 +33,7 @@ public class SuperstructureVisualizer {
             new LoggedMechanismLigament2d(
                 name + " Elevator", Units.inchesToMeters(26.0), 90, 4.0, new Color8Bit(color)));
 
-    carriageMechanism =
+    carriage =
         elevatorMechanism.append(
             new LoggedMechanismLigament2d(
                 name + " Carriage",
@@ -42,10 +42,19 @@ public class SuperstructureVisualizer {
                 4.0,
                 new Color8Bit(color)));
 
-    coralWristLigament =
-        carriageMechanism.append(
+    carriageJoint =
+        carriage.append(
             new LoggedMechanismLigament2d(
-                name + " Algae Wrist", Units.inchesToMeters(9.0), 0.0, 4.0, new Color8Bit(color)));
+                name + " Carriage Joint",
+                Units.inchesToMeters(4),
+                90.0,
+                4.0,
+                new Color8Bit(color)));
+
+    coralWristLigament =
+        carriageJoint.append(
+            new LoggedMechanismLigament2d(
+                name + " Algae Wrist", Units.inchesToMeters(9.0), 0, 4.0, new Color8Bit(color)));
 
     coralIntake =
         coralWristLigament.append(
@@ -55,7 +64,7 @@ public class SuperstructureVisualizer {
 
   public void update(double carriageHeight, double wristRadians, double coralIntakeOutput) {
     elevatorMechanism.setLength(carriageHeight);
-    coralWristLigament.setAngle(new Rotation2d(-wristRadians).plus(Rotation2d.kCCW_Pi_2));
+    coralWristLigament.setAngle(new Rotation2d(-wristRadians));
 
     coralIntake.setLength(coralIntakeOutput * Units.inchesToMeters(3.0));
 

@@ -6,7 +6,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.Constants;
-import java.util.Random;
 
 /** Simulation implementation of the TemplateIO. */
 public class ElevatorIOSim implements ElevatorIO {
@@ -24,7 +23,7 @@ public class ElevatorIOSim implements ElevatorIO {
           0.0,
           ElevatorConstants.carriageMaxHeight,
           true,
-          new Random().nextDouble() * ElevatorConstants.carriageMaxHeight);
+          0);
 
   private double appliedVolts = 0.0;
 

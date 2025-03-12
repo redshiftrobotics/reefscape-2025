@@ -24,10 +24,10 @@ public class WristIOSim implements WristIO {
             GEAR_REDUCTION,
             0.025,
             Units.inchesToMeters(18),
-            Units.rotationsToRadians(-0.5),
-            Units.rotationsToRadians(0.5),
+            Units.degreesToRadians(WristConstants.MIN_POSITION_DEGREES),
+            Units.degreesToRadians(WristConstants.MAX_POSITION_DEGREES),
             true,
-            Units.degreesToRadians(-10));
+            Units.degreesToRadians(100));
   }
 
   @Override
@@ -48,8 +48,8 @@ public class WristIOSim implements WristIO {
   }
 
   @Override
-  public void runPosition(double positionRotations, double feedforward) {
-    controller.setSetpoint(positionRotations);
+  public void runPosition(double positionRad, double feedforward) {
+    controller.setSetpoint(positionRad);
     feedForwardVolts = feedforward;
     runClosedLoop = true;
   }
