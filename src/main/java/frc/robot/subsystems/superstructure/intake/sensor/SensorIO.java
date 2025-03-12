@@ -13,4 +13,8 @@ public interface SensorIO {
 
   /** Updates the set of loggable inputs. */
   default void updateInputs(SensorIOInputs inputs) {}
+
+  default void simulateItemDesire() {}
+
+  default void simulateItemEjection() {}
 }

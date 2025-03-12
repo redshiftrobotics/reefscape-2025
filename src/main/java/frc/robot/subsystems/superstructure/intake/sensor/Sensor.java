@@ -28,4 +28,14 @@ public class Sensor {
   public boolean isDetected() {
     return hasItem;
   }
+
+  /** For simulation, request item */
+  public void simulateItemRequest() {
+    io.simulateItemDesire();
+  }
+
+  /** For simulation, eject item */
+  public void simulateItemEjection() {
+    io.simulateItemEjection();
+  }
 }
