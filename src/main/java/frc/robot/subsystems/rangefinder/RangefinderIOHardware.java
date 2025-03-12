@@ -1,13 +1,22 @@
 package frc.robot.subsystems.rangefinder;
 
+import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.interfaces.LaserCanInterface.RangingMode;
+
 import java.util.Optional;
 
 public class RangefinderIOHardware implements RangefinderIO {
-  LaserCan sensor;
+  private final LaserCan sensor;
 
   public RangefinderIOHardware(int id) {
     sensor = new LaserCan(id);
+
+    try {
+      sensor.setRangingMode(RangingMode.SHORT);
+    } catch (ConfigurationFailedException e) {
+      e.printStackTrace();
+    }
   }
 
   @Override
