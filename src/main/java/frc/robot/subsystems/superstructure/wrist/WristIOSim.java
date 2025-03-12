@@ -27,7 +27,7 @@ public class WristIOSim implements WristIO {
             Units.rotationsToRadians(-0.5),
             Units.rotationsToRadians(0.5),
             true,
-            0);
+            Units.degreesToRadians(-10));
   }
 
   @Override

@@ -99,10 +99,6 @@ public class WristIOHardware implements WristIO {
   public void setPID(double kP, double kI, double kD) {
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     motorConfig.closedLoop.pidf(kP, kI, kD, 0, ClosedLoopSlot.kSlot0);
-    System.out.println(kP + " " + kI + " " + kD);
-    SmartDashboard.putNumber("Kp", kP);
-    SmartDashboard.putNumber("Ki", kI);
-    SmartDashboard.putNumber("Kd", kD);
     motor.configure(motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 

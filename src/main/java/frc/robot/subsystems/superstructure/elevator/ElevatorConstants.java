@@ -16,7 +16,7 @@ public class ElevatorConstants {
         default -> new ElevatorConfig(0, 1, false);
       };
 
-  public static final int currentLimit = 35;
+  public static final int currentLimit = 40;
   public static final double gearReduction = 9.0;
 
   public static final double elevatorHeight = 1.245 + Units.inchesToMeters(8.5);
@@ -31,7 +31,7 @@ public class ElevatorConstants {
   public static final double maxCarriageVelocity = 3.0;
   public static final double maxCarriageAcceleration = 3.5;
 
-  public static final double carriagePositionTolerance = Units.inchesToMeters(2);
+  public static final double carriagePositionTolerance = Units.inchesToMeters(1);
 
   public static final PIDConstants pid =
       switch (Constants.getRobot()) {

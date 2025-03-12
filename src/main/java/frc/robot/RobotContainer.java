@@ -464,7 +464,7 @@ public class RobotContainer {
 
     new Trigger(DriverStation::isEnabled)
         .onTrue(
-            Commands.runOnce(() -> coralWrist.setConstraints(3, 8))
+            Commands.runOnce(() -> coralWrist.setConstraints(1, 3))
                 .andThen(superstructure.runAction(Superstructure.State.STOW))
                 .finallyDo(coralWrist::resetContraints));
 

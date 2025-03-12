@@ -99,7 +99,7 @@ public class Superstructure extends VirtualSubsystem {
   }
 
   public static final double L1_HEIGHT = 0.151148670108898;
-  public static final Rotation2d L1_CORAL_ANGLE = Rotation2d.fromDegrees(70);
+  public static final Rotation2d L1_CORAL_ANGLE = Rotation2d.fromDegrees(0);
 
   public static final double L2_HEIGHT = 0.469491383230037 + Units.inchesToMeters(3);
   public static final Rotation2d L2_CORAL_ANGLE = Rotation2d.fromDegrees(-35);
