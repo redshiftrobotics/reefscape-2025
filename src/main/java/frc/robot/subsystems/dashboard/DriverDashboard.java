@@ -95,8 +95,17 @@ public class DriverDashboard extends SubsystemBase {
       SmartDashboard.putNumber("Heading Degrees", -pose.getRotation().getDegrees());
       field.setRobotPose(pose);
 
-      // SmartDashboard.putNumber("[test] DISTANCE TO REEF", pose.plus(new
-      // Transform2d(DRIVE_CONFIG.bumperCornerToCorner().getX(), 0, Rotation2d.kZero)).getX() - );
+      // SmartDashboard.putNumber(
+      // "Distance To Reef [Tag 8] [Test]",
+      // Units.metersToInches(
+      //     Math.abs(
+      //             AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
+      //                 .getTagPose(18)
+      //                 .get()
+      //                 .toPose2d()
+      //                 .minus(pose)
+      //                 .getX())
+      //         - DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0));
     }
 
     if (autoAlginPoseSupplier != null) {

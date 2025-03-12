@@ -7,17 +7,18 @@ import frc.robot.utility.records.PIDConstants;
 public class HangConstants {
   private HangConstants() {}
 
-  public static record HangConfig(int motorId, double absoluteEncoderOffset) {}
+  public static record HangConfig(
+      int motorId, double absoluteEncoderOffset, boolean motorInverted, boolean encoderInverted) {}
 
   public static final HangConfig HANG_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new HangConfig(16, 0.0);
-        default -> new HangConfig(0, 0.0);
+        case COMP_BOT_2025 -> new HangConfig(16, 0.0, false, false);
+        default -> new HangConfig(0, 0.0, false, false);
       };
 
   public static final PIDConstants FEEDBACK =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new PIDConstants(0.0, 0.0, 0.0);
+        case COMP_BOT_2025 -> new PIDConstants(1.0, 0.0, 0.0);
         case SIM_BOT -> new PIDConstants(10.0, 0.0, 0.0);
         default -> new PIDConstants(1.0, 0.0, 0.0);
       };
@@ -27,6 +28,7 @@ public class HangConstants {
 
   public static final double STOWED_POSITION_ROTATIONS = 0.0;
   public static final double DEPLOY_POSITION_ROTATIONS = 0.0;
-  public static final double RETRACT_POSITION_ROTATIONS = STOWED_POSITION_ROTATIONS;
+  public static final double RETRACT_POSITION_ROTATIONS = 0.0;
+
   public static final double TOLERANCE = Units.degreesToRotations(0.3);
 }

@@ -3,7 +3,7 @@ package frc.robot.subsystems.hang;
 import static frc.robot.utility.SparkUtil.ifOk;
 import static frc.robot.utility.SparkUtil.tryUntilOk;
 
-import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -19,7 +19,7 @@ import frc.robot.utility.SparkUtil;
 
 public class HangIOHardware implements HangIO {
   private final SparkMax motor;
-  private final RelativeEncoder encoder;
+  private final SparkAbsoluteEncoder encoder;
   private final SparkClosedLoopController control;
 
   private boolean breakMode = true;
@@ -28,15 +28,19 @@ public class HangIOHardware implements HangIO {
 
   public HangIOHardware(HangConfig config) {
     motor = new SparkMax(config.motorId(), MotorType.kBrushless);
-    encoder = motor.getEncoder();
+    encoder = motor.getAbsoluteEncoder();
     control = motor.getClosedLoopController();
 
     final SparkMaxConfig motorConfig = new SparkMaxConfig();
     motorConfig
+        .inverted(config.motorInverted())
         .idleMode(breakMode ? IdleMode.kBrake : IdleMode.kCoast)
         .smartCurrentLimit(HangConstants.MOTOR_CURRENT_LIMIT)
         .voltageCompensation(12.0);
-    motorConfig.absoluteEncoder.zeroOffset(config.absoluteEncoderOffset());
+    motorConfig
+        .absoluteEncoder
+        .inverted(config.encoderInverted())
+        .zeroOffset(config.absoluteEncoderOffset());
     motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
 
     tryUntilOk(

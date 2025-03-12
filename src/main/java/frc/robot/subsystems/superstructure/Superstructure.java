@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superstructure;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -18,6 +19,7 @@ public class Superstructure extends VirtualSubsystem {
 
   public static enum State {
     STOW,
+    STOW_HIGH,
     INTAKE,
 
     L1(false),
@@ -68,9 +70,26 @@ public class Superstructure extends VirtualSubsystem {
     this.coralIntake = coralIntake;
   }
 
-  public Command runPrepare(State newGoal) {
-    return switch (newGoal) {
+  public Command run(State goal) {
+    return runPrepare(goal)
+        .andThen(Commands.idle(elevator, coralWrist))
+        .finallyDo(
+            () -> {
+              elevator.setGoalHeightMeters(STOW_HEIGHT);
+              coralWrist.setGoalRotation(STOW_CORAL_ANGLE);
+            });
+  }
+
+  public Command runAction(State newGoal) {
+    return runPrepare(newGoal)
+        .andThen(Commands.idle(elevator, coralWrist))
+        .until(() -> elevator.atGoalHeight() && coralWrist.atGoal());
+  }
+
+  public Command runPrepare(State goal) {
+    return switch (goal) {
       case STOW -> stowLow();
+      case STOW_HIGH -> stowHigh();
       case L1 -> prepareL1();
       case L2 -> prepareL2();
       case L3 -> prepareL3();
@@ -80,22 +99,23 @@ public class Superstructure extends VirtualSubsystem {
   }
 
   public static final double L1_HEIGHT = 0.151148670108898;
-  public static final double L1_CORAL_ANGLE = -6.214284896850586;
+  public static final Rotation2d L1_CORAL_ANGLE = Rotation2d.fromDegrees(0);
 
   public static final double L2_HEIGHT = 0.469491383230037 + Units.inchesToMeters(3);
-  public static final double L2_CORAL_ANGLE = -7.428585529327393;
+  public static final Rotation2d L2_CORAL_ANGLE = Rotation2d.fromDegrees(-35);
 
   public static final double L3_HEIGHT = 1.035 + Units.inchesToMeters(2);
-  public static final double L3_CORAL_ANGLE = -7.643;
+  public static final Rotation2d L3_CORAL_ANGLE = Rotation2d.fromDegrees(-35);
 
   public static final double L4_HEIGHT = L3_HEIGHT;
-  public static final double L4_CORAL_ANGLE = L3_CORAL_ANGLE;
+  public static final Rotation2d L4_CORAL_ANGLE = L3_CORAL_ANGLE;
 
   public static final double INTAKE_HEIGHT = 0.218 + Units.inchesToMeters(1.5);
-  public static final double INTAKE_CORAL_ANGLE = -4.214;
+  public static final Rotation2d INTAKE_CORAL_ANGLE = Rotation2d.fromDegrees(35);
 
-  public static final double STOW_HEIGHT = 0;
-  public static final double STOW_CORAL_ANGLE = -1.619;
+  public static final double STOW_HEIGHT = 0.054886473109919;
+  public static final Rotation2d STOW_CORAL_ANGLE = Rotation2d.fromDegrees(-90);
+  public static final Rotation2d STOW_CORAL_ANGLE_HIGH = Rotation2d.fromDegrees(90);
 
   public Command prepareL1() {
     return Commands.parallel(
@@ -128,6 +148,12 @@ public class Superstructure extends VirtualSubsystem {
         elevator.runPositionPrepare(STOW_HEIGHT), coralWrist.runPositionPrepare(STOW_CORAL_ANGLE));
   }
 
+  public Command stowHigh() {
+    return Commands.parallel(
+        elevator.runPositionPrepare(STOW_HEIGHT),
+        coralWrist.runPositionPrepare(STOW_CORAL_ANGLE_HIGH));
+  }
+
   public Command intake() {
     return coralIntake.runMotors(-0.6);
   }
@@ -150,16 +176,20 @@ public class Superstructure extends VirtualSubsystem {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Elevator Height", elevator.getHeightMeters());
-    SmartDashboard.putNumber("Coral Wrist Position", coralWrist.getMeasuredPosition());
+    SmartDashboard.putNumber("Elevator Height Meters", elevator.getMeasuredHeightMeters());
+    SmartDashboard.putNumber("Coral Wrist Degrees", coralWrist.getGoalRotations().getDegrees());
 
     measuredVisualizer.update(
-        elevator.getHeightMeters(),
-        coralWrist.getMeasuredPosition(),
-        coralIntake.isIntakeRunning());
+        elevator.getMeasuredHeightMeters(),
+        coralWrist.getMeasuredRotation().getRadians(),
+        coralIntake.getMotorsAvg());
     setpointVisualizer.update(
-        elevator.getSetpoint().position, coralWrist.getGoal(), coralIntake.isIntakeRunning());
+        elevator.getSetpoint().position,
+        coralWrist.getSetpoint().position,
+        coralIntake.getMotorsAvg());
     goalVisualizer.update(
-        elevator.getGoalHeightMeters(), coralWrist.getGoal(), coralIntake.isIntakeRunning());
+        elevator.getGoalHeightMeters(),
+        coralWrist.getGoalRotations().getRadians(),
+        coralIntake.getMotorsAvg());
   }
 }

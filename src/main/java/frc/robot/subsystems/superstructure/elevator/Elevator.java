@@ -188,23 +188,18 @@ public class Elevator extends SubsystemBase {
 
   /** Gets the current measured height of the elevator */
   @AutoLogOutput(key = "Elevator/measuredHeightMeters")
-  public double getHeightMeters() {
+  public double getMeasuredHeightMeters() {
     return inputs.positionRad * ElevatorConstants.drumRadius;
   }
 
   @AutoLogOutput(key = "Elevator/measuredHeightPercent")
   public double getHeightPercent() {
-    return getHeightMeters() / ElevatorConstants.carriageMaxHeight;
-  }
-
-  @AutoLogOutput(key = "Elevator/isStowed")
-  public boolean isStowed() {
-    return MathUtil.isNear(getHeightMeters(), 0.0, tolerance.get());
+    return getMeasuredHeightMeters() / ElevatorConstants.carriageMaxHeight;
   }
 
   @AutoLogOutput(key = "Elevator/atGoal")
   public boolean atGoalHeight() {
-    return MathUtil.isNear(getHeightMeters(), getGoalHeightMeters(), tolerance.get());
+    return MathUtil.isNear(getGoalHeightMeters(), getGoalHeightMeters(), tolerance.get());
   }
 
   public State getGoal() {

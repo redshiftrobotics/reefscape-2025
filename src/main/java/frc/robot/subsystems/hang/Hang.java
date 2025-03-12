@@ -1,5 +1,6 @@
 package frc.robot.subsystems.hang;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -37,6 +38,8 @@ public class Hang extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Hang", inputs);
+
+    SmartDashboard.putNumber("Hang Rotations", inputs.positionRotations);
 
     LoggedTunableNumber.ifChanged(
         hashCode(), (values) -> io.setPID(values[0], values[1], values[2]), kP, kI, kD);

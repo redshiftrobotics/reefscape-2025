@@ -20,21 +20,28 @@ public class WristIOSim implements WristIO {
   public WristIOSim(WristConfig config) {
     arm =
         new SingleJointedArmSim(
-            MOTOR, GEAR_REDUCTION, 0.025, Units.inchesToMeters(18), 0, Math.PI * 2, false, 0);
+            MOTOR,
+            GEAR_REDUCTION,
+            0.025,
+            Units.inchesToMeters(18),
+            Units.rotationsToRadians(-0.5),
+            Units.rotationsToRadians(0.5),
+            true,
+            Units.degreesToRadians(-10));
   }
 
   @Override
   public void updateInputs(WristIOInputs inputs) {
 
     if (runClosedLoop) {
-      appliedVolts = controller.calculate(inputs.positionRotations) + feedForwardVolts;
+      appliedVolts = controller.calculate(inputs.positionRad) + feedForwardVolts;
     }
 
     arm.setInputVoltage(appliedVolts);
     arm.update(Constants.LOOP_PERIOD_SECONDS);
 
-    inputs.positionRotations = Units.radiansToRotations(arm.getAngleRads());
-    inputs.velocityRPM = Units.radiansPerSecondToRotationsPerMinute(arm.getVelocityRadPerSec());
+    inputs.positionRad = arm.getAngleRads();
+    inputs.velocityRadPerSec = arm.getVelocityRadPerSec();
 
     inputs.appliedVolts = appliedVolts;
     inputs.supplyCurrentAmps = arm.getCurrentDrawAmps();
