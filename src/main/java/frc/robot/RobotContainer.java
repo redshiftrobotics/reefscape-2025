@@ -462,7 +462,11 @@ public class RobotContainer {
 
   private void configureOperatorControllerBindings(CommandXboxController xbox) {
 
-    new Trigger(DriverStation::isEnabled).onTrue(superstructure.stowLow());
+    new Trigger(DriverStation::isEnabled)
+        .onTrue(
+            Commands.runOnce(() -> coralWrist.setConstraints(3, 8))
+                .andThen(superstructure.runAction(Superstructure.State.STOW))
+                .finallyDo(coralWrist::resetContraints));
 
     xbox.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 

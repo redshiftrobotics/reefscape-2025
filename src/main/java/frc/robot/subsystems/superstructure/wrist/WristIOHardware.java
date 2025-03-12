@@ -31,7 +31,7 @@ public class WristIOHardware implements WristIO {
   private final Debouncer connectDebounce = new Debouncer(0.5);
 
   private boolean breakMode = true;
-  private double setpoint;
+  private double setpointRad;
 
   public WristIOHardware(WristConfig config) {
     motor = new SparkMax(config.motorId(), MotorType.kBrushless);
@@ -66,7 +66,7 @@ public class WristIOHardware implements WristIO {
 
     SparkUtil.clearStickyFault();
 
-    inputs.setpointRad = setpoint;
+    inputs.setpointRad = setpointRad;
 
     ifOk(
         motor, encoder::getPosition, value -> inputs.positionRad = Units.rotationsToRadians(value));
@@ -85,13 +85,13 @@ public class WristIOHardware implements WristIO {
   }
 
   @Override
-  public void runPosition(double setpoint, double feedforward) {
-    this.setpoint = setpoint;
+  public void runPosition(double setpointRad, double feedforwardVolts) {
+    this.setpointRad = setpointRad;
     control.setReference(
-        Units.radiansToRotations(setpoint),
+        Units.radiansToRotations(setpointRad),
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
-        feedforward,
+        feedforwardVolts,
         ArbFFUnits.kVoltage);
   }
 

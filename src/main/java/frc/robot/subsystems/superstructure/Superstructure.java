@@ -19,6 +19,7 @@ public class Superstructure extends VirtualSubsystem {
 
   public static enum State {
     STOW,
+    STOW_HIGH,
     INTAKE,
 
     L1(false),
@@ -69,8 +70,8 @@ public class Superstructure extends VirtualSubsystem {
     this.coralIntake = coralIntake;
   }
 
-  public Command run(State newGoal) {
-    return runPrepare(newGoal)
+  public Command run(State goal) {
+    return runPrepare(goal)
         .andThen(Commands.idle(elevator, coralWrist))
         .finallyDo(
             () -> {
@@ -79,9 +80,16 @@ public class Superstructure extends VirtualSubsystem {
             });
   }
 
-  public Command runPrepare(State newGoal) {
-    return switch (newGoal) {
+  public Command runAction(State newGoal) {
+    return runPrepare(newGoal)
+        .andThen(Commands.idle(elevator, coralWrist))
+        .until(() -> elevator.atGoalHeight() && coralWrist.atGoal());
+  }
+
+  public Command runPrepare(State goal) {
+    return switch (goal) {
       case STOW -> stowLow();
+      case STOW_HIGH -> stowHigh();
       case L1 -> prepareL1();
       case L2 -> prepareL2();
       case L3 -> prepareL3();
@@ -105,8 +113,9 @@ public class Superstructure extends VirtualSubsystem {
   public static final double INTAKE_HEIGHT = 0.218 + Units.inchesToMeters(1.5);
   public static final Rotation2d INTAKE_CORAL_ANGLE = Rotation2d.fromDegrees(35);
 
-  public static final double STOW_HEIGHT = 0;
-  public static final Rotation2d STOW_CORAL_ANGLE = Rotation2d.fromDegrees(0);
+  public static final double STOW_HEIGHT = 0.054886473109919;
+  public static final Rotation2d STOW_CORAL_ANGLE = Rotation2d.fromDegrees(-90);
+  public static final Rotation2d STOW_CORAL_ANGLE_HIGH = Rotation2d.fromDegrees(90);
 
   public Command prepareL1() {
     return Commands.parallel(
@@ -137,6 +146,12 @@ public class Superstructure extends VirtualSubsystem {
   public Command stowLow() {
     return Commands.parallel(
         elevator.runPositionPrepare(STOW_HEIGHT), coralWrist.runPositionPrepare(STOW_CORAL_ANGLE));
+  }
+
+  public Command stowHigh() {
+    return Commands.parallel(
+        elevator.runPositionPrepare(STOW_HEIGHT),
+        coralWrist.runPositionPrepare(STOW_CORAL_ANGLE_HIGH));
   }
 
   public Command intake() {

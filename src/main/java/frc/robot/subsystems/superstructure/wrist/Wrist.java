@@ -170,4 +170,12 @@ public class Wrist extends SubsystemBase {
   public State getSetpoint() {
     return setpoint;
   }
+
+  public void setConstraints(double maxVelocity, double maxAcceleration) {
+    profile = new TrapezoidProfile(new Constraints(maxVelocity, maxAcceleration));
+  }
+
+  public void resetContraints() {
+    setConstraints(WristConstants.MAX_VELOCITY, WristConstants.MAX_ACCELERATION);
+  }
 }

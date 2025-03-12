@@ -134,7 +134,7 @@ public class Elevator extends SubsystemBase {
 
     Logger.recordOutput("Elevator/breakModeEnabled", brakeModeEnabled);
 
-    if (!stoppedProfile && brakeModeEnabled && DriverStation.isEnabled() && false) {
+    if (!stoppedProfile && brakeModeEnabled && DriverStation.isEnabled()) {
       Logger.recordOutput("Elevator/shouldRunProfiled", true);
 
       State goal =
