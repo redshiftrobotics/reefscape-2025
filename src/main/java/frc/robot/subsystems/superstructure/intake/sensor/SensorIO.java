@@ -8,9 +8,7 @@ public interface SensorIO {
     boolean connected = false;
 
     double rawValue = 0.0;
-    boolean rawDetected = false;
-
-    boolean hasItem;
+    boolean detected = false;
   }
 
   /** Updates the set of loggable inputs. */
