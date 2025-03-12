@@ -153,13 +153,6 @@ public class Superstructure extends VirtualSubsystem {
         elevator.runPositionPrepare(STOW_HEIGHT),
         coralWrist.runPositionPrepare(STOW_CORAL_ANGLE_HIGH));
   }
-
-  public Command prepareAlgaeL4() {
-    return Commands.parallel(
-        elevator.runOnce(() -> elevator.setGoalHeightMeters(ElevatorConstants.carriageMaxHeight)),
-        algaeWrist.runPrepare(algaeHighStow),
-        coralWrist.runPrepare(Units.degreesToRotations(90)));
-  }
   
   public Command intake() {
     return coralIntake.runMotors(-0.6);
