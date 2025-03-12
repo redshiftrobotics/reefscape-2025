@@ -4,8 +4,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.FieldConstants.CoralStation;
 import frc.robot.FieldConstants.Reef;
@@ -20,7 +18,7 @@ public class ManualAlignCommands {
     return DriveCommands.joystickHeadingDrive(
         drivetrain,
         input::getTranslationMetersPerSecond,
-        () -> Optional.of(isBlue() ? Rotation2d.k180deg : Rotation2d.kZero),
+        () -> Optional.of(AllianceFlipUtil.apply(Rotation2d.kZero)),
         () -> SpeedLevel.NO_LEVEL,
         () -> true);
   }
@@ -29,7 +27,7 @@ public class ManualAlignCommands {
     return DriveCommands.joystickHeadingDrive(
         drivetrain,
         input::getTranslationMetersPerSecond,
-        () -> Optional.of(CoralStation.leftCenterFace.getRotation().minus(allianceRotation())),
+        () -> Optional.of(AllianceFlipUtil.apply(CoralStation.leftCenterFace.getRotation())),
         () -> SpeedLevel.NO_LEVEL,
         () -> true);
   }
@@ -38,7 +36,7 @@ public class ManualAlignCommands {
     return DriveCommands.joystickHeadingDrive(
         drivetrain,
         input::getTranslationMetersPerSecond,
-        () -> Optional.of(CoralStation.rightCenterFace.getRotation().minus(allianceRotation())),
+        () -> Optional.of(AllianceFlipUtil.apply(CoralStation.rightCenterFace.getRotation())),
         () -> SpeedLevel.NO_LEVEL,
         () -> true);
   }
@@ -68,14 +66,5 @@ public class ManualAlignCommands {
         },
         () -> SpeedLevel.NO_LEVEL,
         () -> true);
-  }
-
-  private static Rotation2d allianceRotation() {
-    return Rotation2d.fromDegrees(isBlue() ? 0 : 180);
-  }
-
-  private static boolean isBlue() {
-    return DriverStation.getAlliance().isPresent()
-        && DriverStation.getAlliance().get() == Alliance.Blue;
   }
 }
