@@ -3,6 +3,7 @@ package frc.robot.subsystems.superstructure.wrist;
 import static frc.robot.utility.SparkUtil.ifOk;
 import static frc.robot.utility.SparkUtil.tryUntilOk;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -17,21 +18,25 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.superstructure.wrist.WristConstants.WristConfig;
 import frc.robot.utility.SparkUtil;
 
 public class WristIOHardware implements WristIO {
   private final SparkMax motor;
-  private final SparkAbsoluteEncoder encoder;
+  private final RelativeEncoder encoder;
+  private final SparkAbsoluteEncoder absEncoder;
   private final SparkClosedLoopController control;
 
   private final Debouncer connectDebounce = new Debouncer(0.5);
 
   private boolean breakMode = true;
+  private double setpoint;
 
   public WristIOHardware(WristConfig config) {
     motor = new SparkMax(config.motorId(), MotorType.kBrushless);
-    encoder = motor.getAbsoluteEncoder();
+    encoder = motor.getEncoder();
+    absEncoder = motor.getAbsoluteEncoder();
     control = motor.getClosedLoopController();
 
     final SparkMaxConfig motorConfig = new SparkMaxConfig();
@@ -41,25 +46,27 @@ public class WristIOHardware implements WristIO {
         .voltageCompensation(12)
         .inverted(config.motorInverted());
     motorConfig
-        .softLimit
-        .forwardSoftLimitEnabled(true)
-        .forwardSoftLimit(Units.degreesToRotations(WristConstants.MAX_POSITION_DEGREES))
-        .reverseSoftLimitEnabled(true)
-        .reverseSoftLimit(Units.degreesToRotations(WristConstants.MIN_POSITION_DEGREES));
+        .encoder
+        .positionConversionFactor(1.0 / WristConstants.GEAR_REDUCTION)
+        .velocityConversionFactor(1.0 / WristConstants.GEAR_REDUCTION);
     motorConfig
         .absoluteEncoder
         .inverted(config.encoderInverted())
         .zeroOffset(config.absoluteEncoderOffset())
         .zeroCentered(true);
-    motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
+    motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kPrimaryEncoder);
 
     motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    encoder.setPosition(absEncoder.getPosition());
   }
 
   @Override
   public void updateInputs(WristIOInputs inputs) {
 
     SparkUtil.clearStickyFault();
+
+    inputs.setpointRad = setpoint;
 
     ifOk(
         motor, encoder::getPosition, value -> inputs.positionRad = Units.rotationsToRadians(value));
@@ -79,15 +86,23 @@ public class WristIOHardware implements WristIO {
 
   @Override
   public void runPosition(double setpoint, double feedforward) {
+    this.setpoint = setpoint;
     control.setReference(
-        setpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0, feedforward, ArbFFUnits.kVoltage);
+        Units.radiansToRotations(setpoint),
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0,
+        feedforward,
+        ArbFFUnits.kVoltage);
   }
 
   @Override
   public void setPID(double kP, double kI, double kD) {
     SparkMaxConfig motorConfig = new SparkMaxConfig();
-    motorConfig.closedLoop.pidf(kP, kI, kD, 0);
-
+    motorConfig.closedLoop.pidf(kP, kI, kD, 0, ClosedLoopSlot.kSlot0);
+    System.out.println(kP + " " + kI + " " + kD);
+    SmartDashboard.putNumber("Kp", kP);
+    SmartDashboard.putNumber("Ki", kI);
+    SmartDashboard.putNumber("Kd", kD);
     motor.configure(motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 

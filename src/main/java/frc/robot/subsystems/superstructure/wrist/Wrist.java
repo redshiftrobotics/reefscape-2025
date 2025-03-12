@@ -81,7 +81,13 @@ public class Wrist extends SubsystemBase {
 
     setpoint = profile.calculate(Constants.LOOP_PERIOD_SECONDS, setpoint, goalSupplier.get());
 
-    io.runPosition(setpoint.position, feedforward.calculate(setpoint.position, setpoint.velocity));
+    double feedforwardVolts = feedforward.calculate(setpoint.position, setpoint.velocity);
+
+    io.runPosition(setpoint.position, feedforwardVolts);
+
+    Logger.recordOutput("Wrist/FeedForward/Volts", feedforwardVolts);
+    Logger.recordOutput(
+        "Wrist/FeedForward/MeasuredVolts[Test]", feedforward.calculate(inputs.positionRad, 0));
 
     Logger.recordOutput("Wrist/Profile/SetpointPositionRotations", setpoint.position);
     Logger.recordOutput("Wrist/Profile/SetpointVelocityRPM", setpoint.velocity);

@@ -103,10 +103,10 @@ public class Superstructure extends VirtualSubsystem {
   public static final Rotation2d L4_CORAL_ANGLE = L3_CORAL_ANGLE;
 
   public static final double INTAKE_HEIGHT = 0.218 + Units.inchesToMeters(1.5);
-  public static final Rotation2d INTAKE_CORAL_ANGLE = Rotation2d.fromDegrees(55);
+  public static final Rotation2d INTAKE_CORAL_ANGLE = Rotation2d.fromDegrees(35);
 
   public static final double STOW_HEIGHT = 0;
-  public static final Rotation2d STOW_CORAL_ANGLE = Rotation2d.fromDegrees(80);
+  public static final Rotation2d STOW_CORAL_ANGLE = Rotation2d.fromDegrees(0);
 
   public Command prepareL1() {
     return Commands.parallel(

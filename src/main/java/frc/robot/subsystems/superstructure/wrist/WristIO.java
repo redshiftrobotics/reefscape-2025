@@ -11,6 +11,8 @@ public interface WristIO {
     public double positionRad;
     public double velocityRadPerSec;
 
+    public double setpointRad;
+
     public double appliedVolts;
     public double supplyCurrentAmps;
   }
