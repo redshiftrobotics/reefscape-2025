@@ -119,7 +119,6 @@ public class DriveCommands {
       DoubleSupplier omegaSupplier,
       DoubleSupplier elevatorHeightSupplier,
       BooleanSupplier useFieldRelativeSupplier) {
-
     Runnable drive =
         () -> {
           Translation2d translation = translationSupplier.get();

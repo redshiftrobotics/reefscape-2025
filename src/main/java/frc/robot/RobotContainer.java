@@ -27,6 +27,7 @@ import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
+import frc.robot.subsystems.addressableled.AddressableLEDSubsystem;
 import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -76,7 +77,6 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-
   // Subsystems
   private final Drive drive;
   private final AprilTagVision vision;
@@ -88,6 +88,8 @@ public class RobotContainer {
   private final Intake coralIntake;
 
   private final Hang hang;
+
+  private final AddressableLEDSubsystem lights;
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -123,6 +125,8 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, IO devices, and commands. */
   public RobotContainer() {
+    final boolean lightsAreFake;
+
     switch (Constants.getRobot()) {
       case COMP_BOT_2025:
         // Real robot (Competition bot with mechanisms), instantiate hardware IO implementations
@@ -145,6 +149,8 @@ public class RobotContainer {
         hang = new Hang(new HangIOHardware(HangConstants.HANG_CONFIG));
         coralWrist = new Wrist(new WristIOHardware(WristConstants.WRIST_CONFIG));
         coralIntake = new Intake(new IntakeIOHardware(IntakeConstants.CORAL_INTAKE_CONFIG));
+
+        lightsAreFake = false;
         break;
 
       case WOOD_BOT_TWO_2025:
@@ -161,6 +167,8 @@ public class RobotContainer {
         hang = new Hang(new HangIO() {});
         coralWrist = new Wrist(new WristIO() {});
         coralIntake = new Intake(new IntakeIO() {});
+
+        lightsAreFake = false;
         break;
 
       case T_SHIRT_CANNON_CHASSIS:
@@ -177,6 +185,8 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
         coralWrist = new Wrist(new WristIO() {});
         coralIntake = new Intake(new IntakeIO() {});
+
+        lightsAreFake = true;
         break;
 
       case CRESCENDO_CHASSIS_2024:
@@ -196,6 +206,7 @@ public class RobotContainer {
 
         coralIntake = new Intake(new IntakeIO() {});
 
+        lightsAreFake = true;
         break;
 
       case SIM_BOT:
@@ -218,6 +229,8 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIOSim());
         coralWrist = new Wrist(new WristIOSim(WristConstants.WRIST_CONFIG));
         coralIntake = new Intake(new IntakeIOSim());
+
+        lightsAreFake = true;
         break;
 
       default:
@@ -235,11 +248,14 @@ public class RobotContainer {
         coralWrist = new Wrist(new WristIO() {});
         coralIntake = new Intake(new IntakeIO() {});
 
+        lightsAreFake = true;
         break;
     }
 
+    lights = new AddressableLEDSubsystem(lightsAreFake);
+
     // Superstructure
-    superstructure = new Superstructure(elevator, coralWrist, coralIntake);
+    superstructure = new Superstructure(elevator, coralWrist, coralIntake, lights);
 
     // Vision setup
     // vision.setLastRobotPoseSupplier(drive::getRobotPose);
