@@ -16,4 +16,8 @@ public class JoystickUtil {
   public static double applyDeadband(double value) {
     return MathUtil.applyDeadband(value, JOYSTICK_DEADBAND);
   }
+
+  public static boolean isDeadband(double value) {
+    return Math.abs(value) < JOYSTICK_DEADBAND;
+  }
 }
