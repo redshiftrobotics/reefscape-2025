@@ -407,8 +407,8 @@ public class RobotContainer {
         xbox.povRight(), ManualAlignCommands.alignToSourceRight(drive, input));
     configureAlignmentAuto.accept(
         xbox.povLeft(), ManualAlignCommands.alignToSourceLeft(drive, input));
-    configureAlignmentAuto.accept(xbox.povUp(), ManualAlignCommands.alignToCage(drive, input));
-    configureAlignmentAuto.accept(xbox.povDown(), ManualAlignCommands.alignToReef(drive, input));
+    configureAlignmentAuto.accept(xbox.povDown(), ManualAlignCommands.alignToCageAdv(drive, input));
+    configureAlignmentAuto.accept(xbox.povUp(), ManualAlignCommands.alignToReef(drive, input));
 
     if (includeAutoAlign) {
       // Align to reef
