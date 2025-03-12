@@ -122,10 +122,10 @@ public class Superstructure extends VirtualSubsystem {
   public static final Rotation2d STOW_CORAL_ANGLE = Rotation2d.fromDegrees(-90);
   public static final Rotation2d STOW_CORAL_ANGLE_HIGH = Rotation2d.fromDegrees(90);
 
+  // TODO: Integrate lightstrip commands into this stuff
   public Command prepareL1() {
     return Commands.parallel(
             elevator.runPositionPrepare(L1_HEIGHT), coralWrist.runPositionPrepare(L1_CORAL_ANGLE));
-        // .beforeStarting(new SetAddressableLEDPattern(lights, new Ligh));
   }
 
   public Command prepareL2() {
