@@ -480,28 +480,44 @@ public class RobotContainer {
     new Trigger(DriverStation::isEnabled)
         .onTrue(superstructure.runAction(Superstructure.State.STOW_HIGH));
 
-    xbox.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
-
-    // Primary scoring
-    xbox.leftTrigger()
-        .whileTrue(superstructure.run(State.INTAKE).alongWith(superstructure.intake()));
+    final double heightOffsetAdjustment = Units.inchesToMeters(1);
+    final Rotation2d angleOffsetAdjustment = Rotation2d.fromDegrees(5);
 
     final BiConsumer<Trigger, Superstructure.State> configureOperatorControllerBindingLevel =
         (trigger, level) -> {
-          trigger.whileTrue(
-              superstructure
-                  .run(level)
-                  .alongWith(
-                      Commands.waitUntil(superstructure::atGoal)
-                          .andThen(superstructure.runWheels(level).asProxy())));
+          trigger.whileTrue(superstructure.run(level));
+
+          if (level.isLevel()) {
+            trigger
+                .and(xbox.rightTrigger())
+                .and(superstructure::atGoal)
+                .whileTrue(superstructure.runWheels(level));
+          } else {
+            trigger.whileTrue(superstructure.runWheels(level));
+          }
+
+          trigger
+              .and(xbox.povUp())
+              .onTrue(Commands.runOnce(() -> level.adjustHeight(heightOffsetAdjustment)));
+          trigger
+              .and(xbox.povDown())
+              .onTrue(Commands.runOnce(() -> level.adjustHeight(-heightOffsetAdjustment)));
+          trigger
+              .and(xbox.povRight())
+              .onTrue(Commands.runOnce(() -> level.adjustAngle(angleOffsetAdjustment)));
+          trigger
+              .and(xbox.povLeft())
+              .onTrue(
+                  Commands.runOnce(() -> level.adjustAngle(angleOffsetAdjustment.unaryMinus())));
+          trigger.and(xbox.back()).onTrue(Commands.runOnce(level::adjustReset));
         };
+
+    configureOperatorControllerBindingLevel.accept(xbox.leftTrigger(), Superstructure.State.INTAKE);
 
     configureOperatorControllerBindingLevel.accept(xbox.y(), Superstructure.State.L4);
     configureOperatorControllerBindingLevel.accept(xbox.x(), Superstructure.State.L3);
     configureOperatorControllerBindingLevel.accept(xbox.a(), Superstructure.State.L2);
     configureOperatorControllerBindingLevel.accept(xbox.b(), Superstructure.State.L1);
-
-    xbox.povDown().onTrue(superstructure.stowLow());
 
     // Intake
 
@@ -514,6 +530,7 @@ public class RobotContainer {
                     + JoystickUtil.applyDeadband(-xbox.getLeftY()),
                 -1,
                 +1);
+
     new Trigger(() -> intakeSpeed.getAsDouble() != 0)
         .and(DriverStation::isTeleopEnabled)
         .whileTrue(coralIntake.run(() -> coralIntake.setMotors(intakeSpeed.getAsDouble())));
@@ -560,9 +577,9 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "l1",
         Commands.parallel(
-                Commands.runOnce(() -> elevator.setGoalHeightMeters(Superstructure.L2_HEIGHT)),
-                Commands.runOnce(() -> coralWrist.setGoalRotation(Superstructure.L2_CORAL_ANGLE)))
-            .andThen(Commands.waitSeconds(2))
+                Commands.runOnce(() -> elevator.setGoalHeightMeters(State.L1.getHeight())),
+                Commands.runOnce(() -> coralWrist.setGoalRotation(State.L1.getAngle())))
+            .andThen(Commands.waitUntil(superstructure::atGoal))
             .andThen(
                 Commands.runEnd(() -> coralIntake.setMotors(1), coralIntake::stopMotors)
                     .withTimeout(0.5)));
@@ -570,14 +587,14 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "stow",
         Commands.parallel(
-            Commands.runOnce(() -> elevator.setGoalHeightMeters(Superstructure.STOW_HEIGHT)),
-            Commands.runOnce(() -> coralWrist.setGoalRotation(Superstructure.STOW_CORAL_ANGLE))));
+            Commands.runOnce(() -> elevator.setGoalHeightMeters(State.STOW.getHeight())),
+            Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW.getAngle()))));
+
     NamedCommands.registerCommand(
         "intake",
         Commands.parallel(
-                Commands.runOnce(() -> elevator.setGoalHeightMeters(Superstructure.INTAKE_HEIGHT)),
-                Commands.runOnce(
-                    () -> coralWrist.setGoalRotation(Superstructure.INTAKE_CORAL_ANGLE)))
+                Commands.runOnce(() -> elevator.setGoalHeightMeters(State.INTAKE.getHeight())),
+                Commands.runOnce(() -> coralWrist.setGoalRotation(State.INTAKE.getAngle())))
             .andThen(
                 Commands.runEnd(
                     () -> coralIntake.setMotors(-0.6), () -> coralIntake.setMotors(0.05)))

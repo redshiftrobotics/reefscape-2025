@@ -12,7 +12,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utility.tunable.LoggedTunableNumber;
@@ -138,13 +137,17 @@ public class Wrist extends SubsystemBase {
     motorConnectedAlert.set(!inputs.motorConnected);
   }
 
+  // --- Commands ---
+
   public Command runPositionPrepare(Rotation2d position) {
     return runOnce(() -> setGoalRotation(position));
   }
 
-  public Command runPosition(Rotation2d position) {
-    return runPositionPrepare(position).andThen(Commands.waitUntil(this::atGoal));
+  public Command runPositionPrepare(Supplier<Rotation2d> position) {
+    return runOnce(() -> setGoalSupplier(() -> new State(position.get().getRadians(), 0)));
   }
+
+  // --- Methods ---
 
   public void setGoalRotation(Rotation2d position) {
     setGoalSupplier(() -> new State(position.getRadians(), 0));

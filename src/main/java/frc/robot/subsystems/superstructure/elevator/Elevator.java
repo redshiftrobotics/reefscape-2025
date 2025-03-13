@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -171,9 +172,17 @@ public class Elevator extends SubsystemBase {
     zeroingAlert.set(!zeroedHeightEncoder);
   }
 
+  // --- Commands ---
+
   public Command runPositionPrepare(double position) {
     return runOnce(() -> setGoalHeightMeters(position));
   }
+
+  public Command runPositionPrepare(DoubleSupplier position) {
+    return runOnce(() -> setGoalSupplier(() -> new State(position.getAsDouble(), 0)));
+  }
+
+  // --- Methods ---
 
   public void setGoalSupplier(Supplier<State> goal) {
     this.goalSupplier = goal;

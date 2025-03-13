@@ -18,42 +18,57 @@ public class Superstructure extends VirtualSubsystem {
   private final Intake coralIntake;
 
   public static enum State {
-    STOW,
-    STOW_HIGH,
-    INTAKE,
+    STOW(0.054886473109919, -90),
+    STOW_HIGH(0, 90),
+    INTAKE(0.218 + Units.inchesToMeters(1.5), 35),
 
-    L1(false),
-    L2(false),
-    L3(false),
-    L4(false);
+    L1(0.151148670108898, 0),
+    L2(0.469491383230037 + Units.inchesToMeters(3), -35),
+    L3(1.035 + Units.inchesToMeters(2), -35),
+    L4(L3.height, L3.angle.getDegrees());
 
-    // L2_ALGAE(true),
-    // L3_ALGAE(true);
+    private final double height;
+    private final Rotation2d angle;
+
+    private double offsetHeight = 0;
+    private Rotation2d offsetAngle = Rotation2d.kZero;
+
+    private State(double height, double angleDegrees) {
+      this.height = height;
+      this.angle = Rotation2d.fromDegrees(angleDegrees);
+    }
+
+    public void adjustHeight(double offset) {
+      offsetHeight += offset;
+    }
+
+    public void adjustAngle(Rotation2d offset) {
+      offsetAngle = offsetAngle.plus(offset);
+    }
+
+    public void adjustReset() {
+      offsetHeight = 0;
+      offsetAngle = Rotation2d.kZero;
+    }
 
     public boolean isLevel() {
       return this == L1 || this == L2 || this == L3 || this == L4;
     }
 
-    public boolean isAlgae() {
-      return algae;
+    public boolean isIntake() {
+      return this == INTAKE;
     }
 
-    public State asAlgae() {
-      return switch (this) {
-          // case L2 -> L2_ALGAE;
-          // case L3 -> L3_ALGAE;
-        default -> this;
-      };
+    public boolean isStow() {
+      return this == STOW || this == STOW_HIGH;
     }
 
-    public boolean algae;
-
-    private State() {
-      this.algae = false;
+    public double getHeight() {
+      return height + offsetHeight;
     }
 
-    private State(boolean algae) {
-      this.algae = algae;
+    public Rotation2d getAngle() {
+      return angle.plus(offsetAngle);
     }
   }
 
@@ -81,15 +96,9 @@ public class Superstructure extends VirtualSubsystem {
   }
 
   public Command runPrepare(State goal) {
-    return switch (goal) {
-      case STOW -> stowLow();
-      case STOW_HIGH -> stowHigh();
-      case L1 -> prepareL1();
-      case L2 -> prepareL2();
-      case L3 -> prepareL3();
-      case L4 -> prepareL4();
-      case INTAKE -> prepareIntake();
-    };
+    return Commands.parallel(
+        elevator.runPositionPrepare(goal::getHeight),
+        coralWrist.runPositionPrepare(goal::getAngle));
   }
 
   public Command runWheels(State goal) {
@@ -102,64 +111,6 @@ public class Superstructure extends VirtualSubsystem {
       case L4 -> outtake();
       case INTAKE -> intake();
     };
-  }
-
-  public static final double L1_HEIGHT = 0.151148670108898;
-  public static final Rotation2d L1_CORAL_ANGLE = Rotation2d.fromDegrees(0);
-
-  public static final double L2_HEIGHT = 0.469491383230037 + Units.inchesToMeters(3);
-  public static final Rotation2d L2_CORAL_ANGLE = Rotation2d.fromDegrees(-35);
-
-  public static final double L3_HEIGHT = 1.035 + Units.inchesToMeters(2);
-  public static final Rotation2d L3_CORAL_ANGLE = Rotation2d.fromDegrees(-35);
-
-  public static final double L4_HEIGHT = L3_HEIGHT;
-  public static final Rotation2d L4_CORAL_ANGLE = L3_CORAL_ANGLE;
-
-  public static final double INTAKE_HEIGHT = 0.218 + Units.inchesToMeters(1.5);
-  public static final Rotation2d INTAKE_CORAL_ANGLE = Rotation2d.fromDegrees(35);
-
-  public static final double STOW_HEIGHT = 0.054886473109919;
-  public static final Rotation2d STOW_CORAL_ANGLE = Rotation2d.fromDegrees(-90);
-
-  public static final double STOW_HEIGHT_HIGH = 0;
-  public static final Rotation2d STOW_CORAL_ANGLE_HIGH = Rotation2d.fromDegrees(90);
-
-  public Command prepareL1() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(L1_HEIGHT), coralWrist.runPositionPrepare(L1_CORAL_ANGLE));
-  }
-
-  public Command prepareL2() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(L2_HEIGHT), coralWrist.runPositionPrepare(L2_CORAL_ANGLE));
-  }
-
-  public Command prepareL3() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(L3_HEIGHT), coralWrist.runPositionPrepare(L3_CORAL_ANGLE));
-  }
-
-  public Command prepareL4() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(L4_HEIGHT), coralWrist.runPositionPrepare(L4_CORAL_ANGLE));
-  }
-
-  public Command prepareIntake() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(INTAKE_HEIGHT),
-        coralWrist.runPositionPrepare(INTAKE_CORAL_ANGLE));
-  }
-
-  public Command stowLow() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(STOW_HEIGHT), coralWrist.runPositionPrepare(STOW_CORAL_ANGLE));
-  }
-
-  public Command stowHigh() {
-    return Commands.parallel(
-        elevator.runPositionPrepare(STOW_HEIGHT_HIGH),
-        coralWrist.runPositionPrepare(STOW_CORAL_ANGLE_HIGH));
   }
 
   public Command intake() {
@@ -187,8 +138,8 @@ public class Superstructure extends VirtualSubsystem {
   }
 
   public void setPositionStow() {
-    elevator.setGoalHeightMeters(STOW_HEIGHT_HIGH);
-    coralWrist.setGoalRotation(STOW_CORAL_ANGLE_HIGH);
+    elevator.setGoalHeightMeters(State.STOW_HIGH.height);
+    coralWrist.setGoalRotation(State.STOW_HIGH.angle);
   }
 
   @Override
