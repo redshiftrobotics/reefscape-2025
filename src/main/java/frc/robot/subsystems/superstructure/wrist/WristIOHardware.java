@@ -18,7 +18,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.superstructure.wrist.WristConstants.WristConfig;
 import frc.robot.utility.SparkUtil;
 
@@ -31,7 +30,6 @@ public class WristIOHardware implements WristIO {
   private final Debouncer connectDebounce = new Debouncer(0.5);
 
   private boolean breakMode = true;
-  private double setpointRad;
 
   public WristIOHardware(WristConfig config) {
     motor = new SparkMax(config.motorId(), MotorType.kBrushless);
@@ -66,8 +64,6 @@ public class WristIOHardware implements WristIO {
 
     SparkUtil.clearStickyFault();
 
-    inputs.setpointRad = setpointRad;
-
     ifOk(
         motor, encoder::getPosition, value -> inputs.positionRad = Units.rotationsToRadians(value));
     ifOk(
@@ -86,7 +82,6 @@ public class WristIOHardware implements WristIO {
 
   @Override
   public void runPosition(double setpointRad, double feedforwardVolts) {
-    this.setpointRad = setpointRad;
     control.setReference(
         Units.radiansToRotations(setpointRad),
         ControlType.kPosition,
@@ -99,10 +94,6 @@ public class WristIOHardware implements WristIO {
   public void setPID(double kP, double kI, double kD) {
     SparkMaxConfig motorConfig = new SparkMaxConfig();
     motorConfig.closedLoop.pidf(kP, kI, kD, 0, ClosedLoopSlot.kSlot0);
-    System.out.println(kP + " " + kI + " " + kD);
-    SmartDashboard.putNumber("Kp", kP);
-    SmartDashboard.putNumber("Ki", kI);
-    SmartDashboard.putNumber("Kd", kD);
     motor.configure(motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 

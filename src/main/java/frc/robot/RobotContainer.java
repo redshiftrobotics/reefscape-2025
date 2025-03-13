@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.ManualAlignCommands;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.subsystems.addressableled.AddressableLEDSubsystem;
@@ -64,9 +65,11 @@ import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.utility.JoystickUtil;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
 import java.util.Arrays;
+import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -413,6 +416,18 @@ public class RobotContainer {
                 .ignoringDisable(true)
                 .withName("Reset Gyro Heading"));
 
+    final BiConsumer<Trigger, Command> configureAlignmentAuto =
+        (trigger, command) -> {
+          trigger.onTrue(command.until(() -> input.getOmegaRadiansPerSecond() != 0));
+        };
+
+    configureAlignmentAuto.accept(
+        xbox.povRight(), ManualAlignCommands.alignToSourceRight(drive, input));
+    configureAlignmentAuto.accept(
+        xbox.povLeft(), ManualAlignCommands.alignToSourceLeft(drive, input));
+    configureAlignmentAuto.accept(xbox.povDown(), ManualAlignCommands.alignToCageAdv(drive, input));
+    configureAlignmentAuto.accept(xbox.povUp(), ManualAlignCommands.alignToReef(drive, input));
+
     if (includeAutoAlign) {
       // Align to reef
 
@@ -479,10 +494,7 @@ public class RobotContainer {
   private void configureOperatorControllerBindings(CommandXboxController xbox) {
 
     new Trigger(DriverStation::isEnabled)
-        .onTrue(
-            Commands.runOnce(() -> coralWrist.setConstraints(3, 8))
-                .andThen(superstructure.runAction(Superstructure.State.STOW))
-                .finallyDo(coralWrist::resetContraints));
+        .onTrue(superstructure.runAction(Superstructure.State.STOW_HIGH));
 
     xbox.back().onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
@@ -490,35 +502,44 @@ public class RobotContainer {
     xbox.leftTrigger()
         .whileTrue(superstructure.run(State.INTAKE).alongWith(superstructure.intake()));
 
-    xbox.rightTrigger().and(xbox.a().negate()).whileTrue(superstructure.outtake());
-    xbox.rightTrigger().and(xbox.a()).whileTrue(superstructure.outtakeL1());
+    final BiConsumer<Trigger, Superstructure.State> configureOperatorControllerBindingLevel =
+        (trigger, level) -> {
+          trigger.whileTrue(
+              superstructure
+                  .run(level)
+                  .alongWith(
+                      Commands.waitUntil(superstructure::atGoal)
+                          .andThen(superstructure.runWheels(level).asProxy())));
+        };
 
-    configureOperatorControllerBindingLevel(xbox.y(), Superstructure.State.L4);
-    configureOperatorControllerBindingLevel(xbox.x(), Superstructure.State.L3);
-    configureOperatorControllerBindingLevel(xbox.a(), Superstructure.State.L2);
-
-    configureOperatorControllerBindingLevel(xbox.b(), Superstructure.State.L1);
+    configureOperatorControllerBindingLevel.accept(xbox.y(), Superstructure.State.L4);
+    configureOperatorControllerBindingLevel.accept(xbox.x(), Superstructure.State.L3);
+    configureOperatorControllerBindingLevel.accept(xbox.a(), Superstructure.State.L2);
+    configureOperatorControllerBindingLevel.accept(xbox.b(), Superstructure.State.L1);
 
     xbox.povDown().onTrue(superstructure.stowLow());
 
+    // Intake
+
     coralIntake.setDefaultCommand(superstructure.passiveIntake());
 
-    // Hang
-    hang.setDefaultCommand(hang.run(() -> hang.set(MathUtil.applyDeadband(xbox.getLeftX(), 0.2))));
-
-    DoubleSupplier hangSpeed = () -> MathUtil.applyDeadband(xbox.getRightX(), 0.2);
-    new Trigger(() -> hangSpeed.getAsDouble() != 0)
+    DoubleSupplier intakeSpeed =
+        () ->
+            MathUtil.clamp(
+                JoystickUtil.applyDeadband(-xbox.getLeftX())
+                    + JoystickUtil.applyDeadband(-xbox.getLeftY()),
+                -1,
+                +1);
+    new Trigger(() -> intakeSpeed.getAsDouble() != 0)
         .and(DriverStation::isTeleopEnabled)
-        .whileTrue(Commands.run(() -> hang.set(hangSpeed.getAsDouble())));
+        .whileTrue(coralIntake.run(() -> coralIntake.setMotors(intakeSpeed.getAsDouble())));
+
+    // Hang
+    hang.setDefaultCommand(hang.run(() -> hang.set(JoystickUtil.applyDeadband(xbox.getLeftX()))));
 
     xbox.rightBumper().and(xbox.leftBumper().negate()).onTrue(hang.deploy());
     xbox.leftBumper().and(xbox.rightBumper().negate()).onTrue(hang.retract());
     xbox.rightBumper().and(xbox.leftBumper()).onTrue(hang.stow());
-  }
-
-  private void configureOperatorControllerBindingLevel(
-      Trigger trigger, Superstructure.State state) {
-    trigger.whileTrue(superstructure.run(state));
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {

@@ -78,17 +78,11 @@ public class Superstructure extends VirtualSubsystem {
   public Command run(State goal) {
     return runPrepare(goal)
         .andThen(Commands.idle(elevator, coralWrist))
-        .finallyDo(
-            () -> {
-              elevator.setGoalHeightMeters(STOW_HEIGHT);
-              coralWrist.setGoalRotation(STOW_CORAL_ANGLE);
-            });
+        .finallyDo(this::setPositionStow);
   }
 
   public Command runAction(State newGoal) {
-    return runPrepare(newGoal)
-        .andThen(Commands.idle(elevator, coralWrist))
-        .until(() -> elevator.atGoalHeight() && coralWrist.atGoal());
+    return runPrepare(newGoal).andThen(Commands.idle(elevator, coralWrist)).until(this::atGoal);
   }
 
   public Command runPrepare(State goal) {
@@ -103,8 +97,20 @@ public class Superstructure extends VirtualSubsystem {
     };
   }
 
+  public Command runWheels(State goal) {
+    return switch (goal) {
+      case STOW -> stopIntake();
+      case STOW_HIGH -> stopIntake();
+      case L1 -> outtakeL1();
+      case L2 -> outtake();
+      case L3 -> outtake();
+      case L4 -> outtake();
+      case INTAKE -> intake();
+    };
+  }
+
   public static final double L1_HEIGHT = 0.151148670108898;
-  public static final Rotation2d L1_CORAL_ANGLE = Rotation2d.fromDegrees(70);
+  public static final Rotation2d L1_CORAL_ANGLE = Rotation2d.fromDegrees(0);
 
   public static final double L2_HEIGHT = 0.469491383230037 + Units.inchesToMeters(3);
   public static final Rotation2d L2_CORAL_ANGLE = Rotation2d.fromDegrees(-35);
@@ -120,6 +126,8 @@ public class Superstructure extends VirtualSubsystem {
 
   public static final double STOW_HEIGHT = 0.054886473109919;
   public static final Rotation2d STOW_CORAL_ANGLE = Rotation2d.fromDegrees(-90);
+
+  public static final double STOW_HEIGHT_HIGH = 0;
   public static final Rotation2d STOW_CORAL_ANGLE_HIGH = Rotation2d.fromDegrees(90);
 
   // TODO: Integrate lightstrip commands into this stuff
@@ -156,7 +164,7 @@ public class Superstructure extends VirtualSubsystem {
 
   public Command stowHigh() {
     return Commands.parallel(
-        elevator.runPositionPrepare(STOW_HEIGHT),
+        elevator.runPositionPrepare(STOW_HEIGHT_HIGH),
         coralWrist.runPositionPrepare(STOW_CORAL_ANGLE_HIGH));
   }
 
@@ -178,6 +186,15 @@ public class Superstructure extends VirtualSubsystem {
 
   public Command stopIntake() {
     return coralIntake.runMotors(0);
+  }
+
+  public boolean atGoal() {
+    return elevator.atGoalHeight() && coralWrist.atGoal();
+  }
+
+  public void setPositionStow() {
+    elevator.setGoalHeightMeters(STOW_HEIGHT_HIGH);
+    coralWrist.setGoalRotation(STOW_CORAL_ANGLE_HIGH);
   }
 
   @Override

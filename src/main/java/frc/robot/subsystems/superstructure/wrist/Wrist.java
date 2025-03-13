@@ -40,6 +40,9 @@ public class Wrist extends SubsystemBase {
   private static final LoggedTunableNumber kA =
       factory.getNumber("kA", WristConstants.FEEDFORWARD.kA());
 
+  private static final LoggedTunableNumber toleranceDegrees =
+      factory.getNumber("ToleranceDegrees", WristConstants.TOLERANCE_DEGREES);
+
   private static final LoggedTunableNumber maxVelocity =
       factory.getNumber("maxVelocity", WristConstants.MAX_VELOCITY);
   private static final LoggedTunableNumber maxAcceleration =
@@ -51,7 +54,7 @@ public class Wrist extends SubsystemBase {
   private TrapezoidProfile profile;
   private ArmFeedforward feedforward;
 
-  private State setpoint = new State();
+  private State setpoint = null;
   private Supplier<State> goalSupplier = State::new;
 
   private final Alert motorConnectedAlert =
@@ -67,7 +70,6 @@ public class Wrist extends SubsystemBase {
 
     io.setPID(kP.get(), kI.get(), kD.get());
     io.setBrakeMode(true);
-
     this.feedforward = new ArmFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
   }
 
@@ -79,20 +81,36 @@ public class Wrist extends SubsystemBase {
 
     io.setBrakeMode(!disabledDebouncer.calculate(DriverStation.isDisabled()));
 
-    setpoint = profile.calculate(Constants.LOOP_PERIOD_SECONDS, setpoint, goalSupplier.get());
+    if (DriverStation.isEnabled()) {
+      Logger.recordOutput("Elevator/shouldRunProfiled", true);
 
-    double feedforwardVolts = feedforward.calculate(setpoint.position, setpoint.velocity);
+      if (setpoint == null) {
+        setpoint = new State(inputs.positionRad, inputs.velocityRadPerSec);
+      }
 
-    io.runPosition(setpoint.position, feedforwardVolts);
+      setpoint = profile.calculate(Constants.LOOP_PERIOD_SECONDS, setpoint, goalSupplier.get());
 
-    Logger.recordOutput("Wrist/FeedForward/Volts", feedforwardVolts);
-    Logger.recordOutput(
-        "Wrist/FeedForward/MeasuredVolts[Test]", feedforward.calculate(inputs.positionRad, 0));
+      double feedforwardVolts = feedforward.calculate(setpoint.position, setpoint.velocity);
 
-    Logger.recordOutput("Wrist/Profile/SetpointPositionRotations", setpoint.position);
-    Logger.recordOutput("Wrist/Profile/SetpointVelocityRPM", setpoint.velocity);
-    Logger.recordOutput("Wrist/Profile/GoalPositionRotations", goalSupplier.get().position);
-    Logger.recordOutput("Wrist/Profile/GoalVelocityRPM", goalSupplier.get().velocity);
+      io.runPosition(setpoint.position, feedforwardVolts);
+
+      Logger.recordOutput("Wrist/Feedforward/Volts", feedforwardVolts);
+
+      Logger.recordOutput("Wrist/Profile/SetpointPositionRotations", setpoint.position);
+      Logger.recordOutput("Wrist/Profile/SetpointVelocityRPM", setpoint.velocity);
+      Logger.recordOutput("Wrist/Profile/GoalPositionRotations", goalSupplier.get().position);
+      Logger.recordOutput("Wrist/Profile/GoalVelocityRPM", goalSupplier.get().velocity);
+    } else {
+      Logger.recordOutput("Elevator/shouldRunProfiled", false);
+
+      Logger.recordOutput("Wrist/FeedForward/Volts", 0);
+      Logger.recordOutput("Elevator/Profile/SetpointPositionMeters", 0.0);
+      Logger.recordOutput("Elevator/Profile/SetpointVelocityMetersPerSec", 0.0);
+      Logger.recordOutput("Elevator/Profile/GoalPositionMeters", 0.0);
+      Logger.recordOutput("Elevator/Profile/GoalVelocityMetersPerSec", 0.0);
+
+      setpoint = new State(inputs.positionRad, inputs.velocityRadPerSec);
+    }
 
     LoggedTunableNumber.ifChanged(
         hashCode(),
@@ -140,7 +158,9 @@ public class Wrist extends SubsystemBase {
   @AutoLogOutput(key = "Wrist/atGoal")
   public boolean atGoal() {
     return MathUtil.isNear(
-        inputs.positionRad, goalSupplier.get().position, WristConstants.TOLERANCE_DEGREES);
+        inputs.positionRad,
+        goalSupplier.get().position,
+        Units.degreesToRadians(toleranceDegrees.get()));
   }
 
   /** Get position in rotations */
@@ -175,7 +195,7 @@ public class Wrist extends SubsystemBase {
     profile = new TrapezoidProfile(new Constraints(maxVelocity, maxAcceleration));
   }
 
-  public void resetContraints() {
+  public void resetConstraints() {
     setConstraints(WristConstants.MAX_VELOCITY, WristConstants.MAX_ACCELERATION);
   }
 }
