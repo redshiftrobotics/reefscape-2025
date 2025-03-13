@@ -43,6 +43,8 @@ import frc.robot.subsystems.hang.HangConstants;
 import frc.robot.subsystems.hang.HangIO;
 import frc.robot.subsystems.hang.HangIOHardware;
 import frc.robot.subsystems.hang.HangIOSim;
+import frc.robot.subsystems.led.LEDConstants;
+import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.Superstructure.State;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
@@ -91,6 +93,8 @@ public class RobotContainer {
   private final Intake coralIntake;
 
   private final Hang hang;
+
+  private final LEDSubsystem ledSubsystem = new LEDSubsystem(LEDConstants.PWM_PORTS);
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -150,21 +154,22 @@ public class RobotContainer {
         coralIntake = new Intake(new IntakeIOHardware(IntakeConstants.CORAL_INTAKE_CONFIG));
         break;
 
-      case WOOD_BOT_TWO_2025:
-        // Real robot (Wood bot test chassis), instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
-        vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
-        elevator = new Elevator(new ElevatorIO() {});
-        hang = new Hang(new HangIO() {});
-        coralWrist = new Wrist(new WristIO() {});
-        coralIntake = new Intake(new IntakeIO() {});
-        break;
+        // case WOOD_BOT_TWO_2025:
+        //   // Real robot (Wood bot test chassis), instantiate hardware IO implementations
+        //   drive =
+        //       new Drive(
+        //           new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
+        //           new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+        //           new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+        //           new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+        //           new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+        //   vision = new AprilTagVision(new
+        // CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
+        //   elevator = new Elevator(new ElevatorIO() {});
+        //   hang = new Hang(new HangIO() {});
+        //   coralWrist = new Wrist(new WristIO() {});
+        //   coralIntake = new Intake(new IntakeIO() {});
+        //   break;
 
       case T_SHIRT_CANNON_CHASSIS:
         // Real robot (T-Shirt cannon chassis), instantiate hardware IO implementations

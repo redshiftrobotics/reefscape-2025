@@ -19,7 +19,7 @@ public final class Constants {
   public static final double LOOP_PERIOD_SECONDS = Robot.defaultPeriodSecs; // 0.02
 
   public static final RobotType PRIMARY_ROBOT_TYPE = RobotType.COMP_BOT_2025;
-  private static RobotType robotType = RobotType.COMP_BOT_2025;
+  private static RobotType robotType;
 
   public static final boolean TUNING_MODE = true;
 
