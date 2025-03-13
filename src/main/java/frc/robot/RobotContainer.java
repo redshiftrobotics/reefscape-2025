@@ -57,6 +57,10 @@ import frc.robot.subsystems.superstructure.intake.IntakeConstants;
 import frc.robot.subsystems.superstructure.intake.IntakeIO;
 import frc.robot.subsystems.superstructure.intake.IntakeIOHardware;
 import frc.robot.subsystems.superstructure.intake.IntakeIOSim;
+import frc.robot.subsystems.superstructure.intake.sensor.Sensor;
+import frc.robot.subsystems.superstructure.intake.sensor.SensorIO;
+import frc.robot.subsystems.superstructure.intake.sensor.SensorIOBeam;
+import frc.robot.subsystems.superstructure.intake.sensor.SensorIOSim;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
 import frc.robot.subsystems.superstructure.wrist.WristConstants;
 import frc.robot.subsystems.superstructure.wrist.WristIO;
@@ -91,6 +95,8 @@ public class RobotContainer {
 
   private final Wrist coralWrist;
   private final Intake coralIntake;
+
+  private Sensor sensor = new Sensor(new SensorIO() {});
 
   private final Hang hang;
 
@@ -151,25 +157,25 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIOHardware(ElevatorConstants.ELEVATOR_CONFIG));
         hang = new Hang(new HangIOHardware(HangConstants.HANG_CONFIG));
         coralWrist = new Wrist(new WristIOHardware(WristConstants.WRIST_CONFIG));
-        coralIntake = new Intake(new IntakeIOHardware(IntakeConstants.CORAL_INTAKE_CONFIG));
+        sensor = new Sensor(new SensorIOBeam());
+        coralIntake = new Intake(new IntakeIOHardware(IntakeConstants.CORAL_INTAKE_CONFIG), sensor);
         break;
 
-        // case WOOD_BOT_TWO_2025:
-        //   // Real robot (Wood bot test chassis), instantiate hardware IO implementations
-        //   drive =
-        //       new Drive(
-        //           new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-        //           new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-        //           new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-        //           new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-        //           new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
-        //   vision = new AprilTagVision(new
-        // CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
-        //   elevator = new Elevator(new ElevatorIO() {});
-        //   hang = new Hang(new HangIO() {});
-        //   coralWrist = new Wrist(new WristIO() {});
-        //   coralIntake = new Intake(new IntakeIO() {});
-        //   break;
+      case WOOD_BOT_TWO_2025:
+        // Real robot (Wood bot test chassis), instantiate hardware IO implementations
+        drive =
+            new Drive(
+                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
+                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
+        vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
+        elevator = new Elevator(new ElevatorIO() {});
+        hang = new Hang(new HangIO() {});
+        coralWrist = new Wrist(new WristIO() {});
+        coralIntake = new Intake(new IntakeIO() {});
+        break;
 
       case T_SHIRT_CANNON_CHASSIS:
         // Real robot (T-Shirt cannon chassis), instantiate hardware IO implementations
@@ -225,7 +231,8 @@ public class RobotContainer {
         hang = new Hang(new HangIOSim());
         elevator = new Elevator(new ElevatorIOSim());
         coralWrist = new Wrist(new WristIOSim(WristConstants.WRIST_CONFIG));
-        coralIntake = new Intake(new IntakeIOSim());
+        sensor = new Sensor(new SensorIOSim());
+        coralIntake = new Intake(new IntakeIOSim(), sensor);
         break;
 
       default:
@@ -296,7 +303,10 @@ public class RobotContainer {
 
     dashboard.setAutoAlignPoseSupplier(AdaptiveAutoAlignCommands::getCurrentAutoAlignGoal);
 
-    dashboard.setHasVisionEstimate(vision::hasVisionEstimate);
+    dashboard.setHasVisionEstimateSupplier(vision::hasVisionEstimate);
+
+    dashboard.setHasCoralSupplier(() -> coralIntake.hasCoral().orElse(false));
+    dashboard.setUsingIntakeSensorCoralSensor(coralIntake::usingSensor);
 
     dashboard.addCommand("Reset Pose", () -> drive.resetPose(new Pose2d()), true);
     dashboard.addCommand(
@@ -424,10 +434,8 @@ public class RobotContainer {
           new AdaptiveAutoAlignCommands(
               Arrays.asList(FieldConstants.Reef.alignmentFaces),
               new Transform2d(
-                  DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0 + Units.inchesToMeters(10),
-                  0,
-                  Rotation2d.k180deg),
-              new Transform2d(0, 0, Rotation2d.k180deg),
+                  DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
+              new Transform2d(Units.inchesToMeters(-10), 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(6), 0));
 
       reefAlignmentCommands.setEndCommand(() -> rumbleController(xbox, 0.5).withTimeout(0.1));
@@ -454,10 +462,8 @@ public class RobotContainer {
           new AdaptiveAutoAlignCommands(
               Arrays.asList(FieldConstants.CoralStation.alignmentFaces),
               new Transform2d(
-                  DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0 + Units.inchesToMeters(14),
-                  0,
-                  Rotation2d.k180deg),
-              new Transform2d(0, 0, Rotation2d.k180deg),
+                  DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
+              new Transform2d(Units.inchesToMeters(-14), 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(4), 0));
 
       intakeAlignmentCommands.setEndCommand(() -> rumbleController(xbox, 0.3).withTimeout(0.1));
@@ -482,24 +488,37 @@ public class RobotContainer {
 
   private void configureOperatorControllerBindings(CommandXboxController xbox) {
 
+    // Enable
+
     new Trigger(DriverStation::isEnabled)
         .onTrue(superstructure.runAction(Superstructure.State.STOW_HIGH))
         .onTrue(hang.stow());
+
+    // Intake and score
 
     final double heightOffsetAdjustment = Units.inchesToMeters(1);
     final Rotation2d angleOffsetAdjustment = Rotation2d.fromDegrees(5);
 
     final BiConsumer<Trigger, Superstructure.State> configureOperatorControllerBindingLevel =
         (trigger, level) -> {
-          trigger.whileTrue(superstructure.run(level));
+          if (level.isLevel()) {
+            trigger.whileTrue(superstructure.run(level));
+          } else if (level.isIntake()) {
+            trigger.whileTrue(
+                superstructure.run(level).until(() -> coralIntake.hasCoral().orElse(false)));
+          }
 
           if (level.isLevel()) {
             trigger
                 .and(xbox.rightTrigger())
                 .and(superstructure::atGoal)
-                .whileTrue(superstructure.runWheels(level));
-          } else {
+                .whileTrue(superstructure.runWheels(level))
+                .onTrue(Commands.runOnce(sensor::simulateItemEjection));
+          } else if (level.isIntake()) {
             trigger.whileTrue(superstructure.runWheels(level));
+            trigger
+                .and(superstructure::atGoal)
+                .onTrue(Commands.runOnce(sensor::simulateItemRequest));
           }
 
           trigger
@@ -520,14 +539,14 @@ public class RobotContainer {
 
     configureOperatorControllerBindingLevel.accept(xbox.leftTrigger(), Superstructure.State.INTAKE);
 
-    Trigger anyButton = xbox.a().or(xbox.x()).or(xbox.y()).or(xbox.b());
+    final Trigger anyButton = xbox.a().or(xbox.x()).or(xbox.y()).or(xbox.b());
 
     configureOperatorControllerBindingLevel.accept(xbox.y(), Superstructure.State.L4);
     configureOperatorControllerBindingLevel.accept(xbox.x(), Superstructure.State.L3);
     configureOperatorControllerBindingLevel.accept(xbox.a(), Superstructure.State.L2);
     configureOperatorControllerBindingLevel.accept(xbox.b(), Superstructure.State.L1);
 
-    anyButton.and(xbox.leftBumper()).whileTrue(coralIntake.runMotors(+1));
+    anyButton.and(xbox.rightBumper()).whileTrue(coralIntake.runMotors(+1));
     anyButton.and(xbox.leftBumper()).whileTrue(coralIntake.runMotors(-1));
 
     // Intake
@@ -563,12 +582,14 @@ public class RobotContainer {
     xbox.rightBumper()
         .and(xbox.leftBumper().negate().debounce(0.1))
         .and(anyButton.negate())
-        .onTrue(hang.deploy());
+        .onTrue(hang.retract());
     xbox.leftBumper()
         .and(xbox.rightBumper().negate().debounce(0.1))
         .and(anyButton.negate())
-        .onTrue(hang.retract());
+        .onTrue(hang.deploy());
     xbox.rightBumper().and(xbox.leftBumper()).and(anyButton.negate()).onTrue(hang.stow());
+
+    xbox.start().onTrue(Commands.runOnce(coralIntake::toggleUseSensor));
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
@@ -605,8 +626,8 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "l1",
         Commands.parallel(
-                Commands.runOnce(() -> elevator.setGoalHeightMeters(State.L1.getHeight())),
-                Commands.runOnce(() -> coralWrist.setGoalRotation(State.L1.getAngle())))
+                Commands.runOnce(() -> elevator.setGoalHeightMeters(State.L4.getHeight())),
+                Commands.runOnce(() -> coralWrist.setGoalRotation(State.L4.getAngle())))
             .andThen(Commands.waitUntil(superstructure::atGoal))
             .andThen(
                 Commands.runEnd(() -> coralIntake.setMotors(1), coralIntake::stopMotors)
@@ -615,8 +636,8 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "stow",
         Commands.parallel(
-            Commands.runOnce(() -> elevator.setGoalHeightMeters(State.STOW.getHeight())),
-            Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW.getAngle()))));
+            Commands.runOnce(() -> elevator.setGoalHeightMeters(State.STOW_HIGH.getHeight())),
+            Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW_HIGH.getAngle()))));
 
     NamedCommands.registerCommand(
         "intake",
@@ -626,7 +647,7 @@ public class RobotContainer {
             .andThen(
                 Commands.runEnd(
                     () -> coralIntake.setMotors(-0.6), () -> coralIntake.setMotors(0.05)))
-            .withTimeout(4));
+            .withTimeout(2));
   }
 
   private void configureAutos(LoggedDashboardChooser<Command> dashboardChooser) {

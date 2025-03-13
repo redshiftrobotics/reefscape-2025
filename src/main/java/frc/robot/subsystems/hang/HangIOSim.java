@@ -20,8 +20,8 @@ public class HangIOSim implements HangIO {
           HangConstants.GEAR_REDUCTION,
           0.0025,
           Units.inchesToMeters(18),
-          -Math.PI * 2,
-          +Math.PI * 2,
+          -Math.PI,
+          +Math.PI,
           false,
           0);
 
@@ -50,7 +50,8 @@ public class HangIOSim implements HangIO {
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(arm.getCurrentDrawAmps()));
 
-    inputs.positionRotations = inputs.absPositionRotations = Units.radiansToRotations(arm.getAngleRads());
+    inputs.positionRotations =
+        inputs.absPositionRotations = Units.radiansToRotations(arm.getAngleRads());
     inputs.velocityRPM = Units.radiansPerSecondToRotationsPerMinute(arm.getVelocityRadPerSec());
 
     inputs.appliedVolts = new double[] {appliedVolts};

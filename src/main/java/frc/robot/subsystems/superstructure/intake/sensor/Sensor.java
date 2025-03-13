@@ -2,26 +2,31 @@ package frc.robot.subsystems.superstructure.intake.sensor;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
-public class Sensor {
+public class Sensor extends SubsystemBase {
 
   private final SensorIO io;
-  private final SensorIO.SensorIOInputs inputs = new SensorIO.SensorIOInputs();
+  private final SensorIOInputsAutoLogged inputs = new SensorIOInputsAutoLogged();
 
   private final Alert disconnectedAlert =
       new Alert("Intake sensor disconnected!", Alert.AlertType.kWarning);
 
-  private final Debouncer debouncer = new Debouncer(0.1);
+  private final Debouncer debouncer = new Debouncer(0.02);
   private boolean hasItem = false;
 
   public Sensor(SensorIO io) {
     this.io = io;
   }
 
+  @Override
   public void periodic() {
     io.updateInputs(inputs);
 
     hasItem = debouncer.calculate(inputs.detected);
+
+    Logger.processInputs("Sensor", inputs);
 
     disconnectedAlert.set(!inputs.connected);
   }

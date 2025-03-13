@@ -18,7 +18,7 @@ public class Superstructure extends VirtualSubsystem {
   private final Intake coralIntake;
 
   public static enum State {
-    STOW(0.054886473109919, -90),
+    STOW_LOW(0.054886473109919, -90),
     STOW_HIGH(0, 90),
     INTAKE(0.218 + Units.inchesToMeters(1.5), 35),
 
@@ -60,7 +60,7 @@ public class Superstructure extends VirtualSubsystem {
     }
 
     public boolean isStow() {
-      return this == STOW || this == STOW_HIGH;
+      return this == STOW_LOW || this == STOW_HIGH;
     }
 
     public double getHeight() {
@@ -103,7 +103,7 @@ public class Superstructure extends VirtualSubsystem {
 
   public Command runWheels(State goal) {
     return switch (goal) {
-      case STOW -> stopIntake();
+      case STOW_LOW -> stopIntake();
       case STOW_HIGH -> stopIntake();
       case L1 -> outtakeL1();
       case L2 -> outtake();
@@ -138,8 +138,13 @@ public class Superstructure extends VirtualSubsystem {
   }
 
   public void setPositionStow() {
-    elevator.setGoalHeightMeters(State.STOW_HIGH.height);
-    coralWrist.setGoalRotation(State.STOW_HIGH.angle);
+    if (coralIntake.hasCoral().orElse(true)) {
+      elevator.setGoalHeightMeters(State.STOW_HIGH.height);
+      coralWrist.setGoalRotation(State.STOW_HIGH.angle);
+    } else {
+      elevator.setGoalHeightMeters(State.STOW_LOW.height);
+      coralWrist.setGoalRotation(State.STOW_LOW.angle);
+    }
   }
 
   @Override

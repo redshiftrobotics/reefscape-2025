@@ -4,9 +4,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.superstructure.intake.sensor.Sensor;
-
 import java.util.Optional;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
@@ -25,7 +23,7 @@ public class Intake extends SubsystemBase {
 
   public Intake(IntakeIO io, Sensor sensor) {
     this.io = io;
-    
+
     this.sensor = sensor;
 
     motorDisconnectedAlert = new Alert("Intake motor/s disconnected!", Alert.AlertType.kError);
@@ -81,7 +79,7 @@ public class Intake extends SubsystemBase {
     io.stopMotors();
   }
 
-  public boolean hasSensor() {
+  public boolean usingSensor() {
     return sensor != null && useSensor;
   }
 
@@ -89,7 +87,11 @@ public class Intake extends SubsystemBase {
     this.useSensor = useSensor;
   }
 
-  public Optional<Boolean> isSensorOccupied() {
-    return hasSensor() ? Optional.of(sensor.isDetected()) : Optional.empty();
+  public void toggleUseSensor() {
+    this.useSensor = !useSensor;
+  }
+
+  public Optional<Boolean> hasCoral() {
+    return usingSensor() ? Optional.of(sensor.isDetected()) : Optional.empty();
   }
 }

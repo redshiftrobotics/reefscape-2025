@@ -45,6 +45,9 @@ public class DriverDashboard extends SubsystemBase {
   private Supplier<ChassisSpeeds> speedsSupplier;
   private BooleanSupplier hasVisionEstimate;
 
+  private BooleanSupplier usingIntakeSensor;
+  private BooleanSupplier hasCoral;
+
   private final Field2d field = new Field2d();
 
   // --- Setters ---
@@ -81,8 +84,16 @@ public class DriverDashboard extends SubsystemBase {
     this.headingControlledSupplier = headingControlledSupplier;
   }
 
-  public void setHasVisionEstimate(BooleanSupplier hasVisionEstimate) {
+  public void setHasVisionEstimateSupplier(BooleanSupplier hasVisionEstimate) {
     this.hasVisionEstimate = hasVisionEstimate;
+  }
+
+  public void setUsingIntakeSensorCoralSensor(BooleanSupplier usingIntakeSensor) {
+    this.usingIntakeSensor = usingIntakeSensor;
+  }
+
+  public void setHasCoralSupplier(BooleanSupplier hasCoral) {
+    this.hasCoral = hasCoral;
   }
 
   @Override
@@ -133,6 +144,14 @@ public class DriverDashboard extends SubsystemBase {
     if (hasVisionEstimate != null) {
       SmartDashboard.putBoolean(
           "Has Vision", debouncer.calculate(hasVisionEstimate.getAsBoolean()));
+    }
+
+    if (usingIntakeSensor != null) {
+      SmartDashboard.putBoolean("Intake Sensor?", usingIntakeSensor.getAsBoolean());
+    }
+
+    if (hasCoral != null) {
+      SmartDashboard.putBoolean("Has Coral?", hasCoral.getAsBoolean());
     }
   }
 }

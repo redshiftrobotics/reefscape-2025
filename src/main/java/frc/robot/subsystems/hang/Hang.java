@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -32,7 +31,7 @@ public class Hang extends SubsystemBase {
 
   private final Alert motorConnectedAlert = new Alert("Hang Motor Disconnected", AlertType.kError);
 
-  private Rotation2d lastGoal;
+  private Rotation2d lastGoal = Rotation2d.kZero;
 
   public Hang(HangIO io) {
     this.io = io;
@@ -75,7 +74,7 @@ public class Hang extends SubsystemBase {
 
   @AutoLogOutput(key = "Hang/LastGoalDegrees")
   public double getLastGoalDegrees() {
-    return getLastGoal().getDegrees();
+    return lastGoal.getDegrees();
   }
 
   public Command stow() {
