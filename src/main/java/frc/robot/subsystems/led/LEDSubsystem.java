@@ -22,6 +22,10 @@ public class LEDSubsystem extends SubsystemBase {
       pulse = initialPattern;
     }
 
+    public void setPulse(int pulse) {
+      this.pulse = pulse;
+    }
+
     public void update() {
       pwm.setPulseTimeMicroseconds(pulse);
     }
@@ -30,6 +34,7 @@ public class LEDSubsystem extends SubsystemBase {
   private LEDStrip[] strips;
 
   public LEDSubsystem(int... pwmPorts) {
+
     // Create all the strip objects
     strips = new LEDStrip[pwmPorts.length];
     for (int i = 0; i < pwmPorts.length; i++) {
@@ -44,7 +49,7 @@ public class LEDSubsystem extends SubsystemBase {
 
     if (DriverStation.isEnabled() && !startupTimer.isRunning()) {
       startupTimer.restart();
-    } else if (startupTimer.hasElapsed(0.02)) {
+    } else if (startupTimer.hasElapsed(0.08)) {
       startupTimer.stop();
     }
 
@@ -81,7 +86,7 @@ public class LEDSubsystem extends SubsystemBase {
    * @link https://www.revrobotics.com/content/docs/REV-11-1105-UM.pdf
    */
   public void apply(int strip, int pattern) {
-    if (strip >= 0 && strip < strips.length) strips[strip].pulse = pattern;
+    if (strip >= 0 && strip < strips.length) strips[strip].setPulse(pattern);
   }
 
   /**
@@ -93,8 +98,12 @@ public class LEDSubsystem extends SubsystemBase {
    */
   public void applyAll(int pattern) {
     for (LEDStrip strip : strips) {
-      strip.pulse = pattern;
+      strip.setPulse(pattern);
     }
+  }
+
+  public boolean hasSetUp() {
+    return !startupTimer.isRunning();
   }
 
   /**
