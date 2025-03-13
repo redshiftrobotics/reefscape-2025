@@ -1,14 +1,16 @@
 package frc.robot.subsystems.hang;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Hang extends SubsystemBase {
@@ -30,6 +32,8 @@ public class Hang extends SubsystemBase {
 
   private final Alert motorConnectedAlert = new Alert("Hang Motor Disconnected", AlertType.kError);
 
+  private Rotation2d lastGoal;
+
   public Hang(HangIO io) {
     this.io = io;
 
@@ -42,8 +46,6 @@ public class Hang extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Hang", inputs);
 
-    SmartDashboard.putNumber("Hang Rotations", inputs.positionRotations);
-
     motorConnectedAlert.set(!inputs.motorConnected);
 
     LoggedTunableNumber.ifChanged(
@@ -52,21 +54,40 @@ public class Hang extends SubsystemBase {
     measuredVisualizer.update(Rotation2d.fromRotations(inputs.positionRotations));
   }
 
-  private void setGoal(Rotation2d goal) {
+  private void setLastGoal(Rotation2d goal) {
     io.runPosition(goal.getRotations());
+    lastGoal = goal;
     setpointVisualizer.update(goal);
   }
 
+  public Rotation2d getMeasuredPosition() {
+    return Rotation2d.fromRotations(inputs.positionRotations);
+  }
+
+  public Rotation2d getLastGoal() {
+    return lastGoal;
+  }
+
+  @AutoLogOutput(key = "Hang/MeasuredPositionDegrees")
+  public double getMeasuredPositionDegrees() {
+    return Units.rotationsToDegrees(inputs.positionRotations);
+  }
+
+  @AutoLogOutput(key = "Hang/LastGoalDegrees")
+  public double getLastGoalDegrees() {
+    return getLastGoal().getDegrees();
+  }
+
   public Command stow() {
-    return runOnce(() -> setGoal(HangConstants.STOWED_POSITION_ROTATIONS));
+    return runOnce(() -> setLastGoal(HangConstants.STOWED_POSITION_ROTATIONS));
   }
 
   public Command deploy() {
-    return runOnce(() -> setGoal(HangConstants.DEPLOY_POSITION_ROTATIONS));
+    return runOnce(() -> setLastGoal(HangConstants.DEPLOY_POSITION_ROTATIONS));
   }
 
   public Command retract() {
-    return runOnce(() -> setGoal(HangConstants.RETRACT_POSITION_ROTATIONS));
+    return runOnce(() -> setLastGoal(HangConstants.RETRACT_POSITION_ROTATIONS));
   }
 
   public Command runSet(double speed) {

@@ -50,7 +50,7 @@ public class HangIOSim implements HangIO {
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(arm.getCurrentDrawAmps()));
 
-    inputs.positionRotations = Units.radiansToRotations(arm.getAngleRads());
+    inputs.positionRotations = inputs.absPositionRotations = Units.radiansToRotations(arm.getAngleRads());
     inputs.velocityRPM = Units.radiansPerSecondToRotationsPerMinute(arm.getVelocityRadPerSec());
 
     inputs.appliedVolts = new double[] {appliedVolts};

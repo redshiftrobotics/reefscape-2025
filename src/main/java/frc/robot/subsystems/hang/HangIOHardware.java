@@ -64,6 +64,7 @@ public class HangIOHardware implements HangIO {
     SparkUtil.clearStickyFault();
 
     ifOk(motor, encoder::getPosition, value -> inputs.positionRotations = value);
+    ifOk(motor, absEncoder::getPosition, value -> inputs.absPositionRotations = value);
     ifOk(motor, encoder::getVelocity, value -> inputs.velocityRPM = value);
 
     ifOk(

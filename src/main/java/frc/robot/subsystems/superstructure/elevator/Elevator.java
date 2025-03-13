@@ -151,7 +151,7 @@ public class Elevator extends SubsystemBase {
 
       io.runPosition(setpoint.position / ElevatorConstants.drumRadius, feedforwardVolts);
 
-      Logger.recordOutput("Wrist/Feedforward/Volts", feedforwardVolts);
+      Logger.recordOutput("Elevator/Feedforward/Volts", feedforwardVolts);
       Logger.recordOutput("Elevator/Profile/SetpointPositionMeters", setpoint.position);
       Logger.recordOutput("Elevator/Profile/SetpointVelocityMetersPerSec", setpoint.velocity);
       Logger.recordOutput("Elevator/Profile/GoalPositionMeters", goal.position);
@@ -160,7 +160,7 @@ public class Elevator extends SubsystemBase {
     } else {
       Logger.recordOutput("Elevator/Profile/ShouldRunProfiled", false);
 
-      Logger.recordOutput("Wrist/FeedForward/Volts", 0);
+      Logger.recordOutput("Elevator/FeedForward/Volts", 0);
       Logger.recordOutput("Elevator/Profile/SetpointPositionMeters", 0.0);
       Logger.recordOutput("Elevator/Profile/SetpointVelocityMetersPerSec", 0.0);
       Logger.recordOutput("Elevator/Profile/GoalPositionMeters", 0.0);

@@ -40,7 +40,7 @@ public class WristIOSim implements WristIO {
     arm.setInputVoltage(appliedVolts);
     arm.update(Constants.LOOP_PERIOD_SECONDS);
 
-    inputs.positionRad = arm.getAngleRads();
+    inputs.absPositionRad = inputs.positionRad = arm.getAngleRads();
     inputs.velocityRadPerSec = arm.getVelocityRadPerSec();
 
     inputs.appliedVolts = appliedVolts;

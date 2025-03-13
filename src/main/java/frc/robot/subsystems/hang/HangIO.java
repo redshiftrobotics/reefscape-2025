@@ -11,6 +11,8 @@ public interface HangIO {
     double positionRotations = 0.0;
     double velocityRPM = 0.0;
 
+    double absPositionRotations = 0.0;
+
     double[] appliedVolts = new double[] {0.0};
     double[] supplyCurrentAmps = new double[] {0.0};
   }
