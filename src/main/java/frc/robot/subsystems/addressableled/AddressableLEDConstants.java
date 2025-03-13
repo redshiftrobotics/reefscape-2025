@@ -6,8 +6,9 @@ import edu.wpi.first.units.measure.Distance;
 
 public class AddressableLEDConstants {
   /**
-   * @param low The lower bound of the range
-   * @param high The upper bound of the range
+   * This record is used to represent a range of LEDs that are grouped together and exhibit one pattern
+   * @param low The lowest index LED in the range
+   * @param high The highest index LED in the range
    */
   public record Range(int low, int high) {}
 

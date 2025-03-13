@@ -48,7 +48,7 @@ public class AddressableLEDTestCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return testCount < (AddressableLEDConstants.SECTIONS.length + 1);
+    return testCount >= (AddressableLEDConstants.SECTIONS.length + 1);
   }
 
   @Override
