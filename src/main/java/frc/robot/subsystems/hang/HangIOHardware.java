@@ -3,6 +3,7 @@ package frc.robot.subsystems.hang;
 import static frc.robot.utility.SparkUtil.ifOk;
 import static frc.robot.utility.SparkUtil.tryUntilOk;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -19,7 +20,8 @@ import frc.robot.utility.SparkUtil;
 
 public class HangIOHardware implements HangIO {
   private final SparkMax motor;
-  private final SparkAbsoluteEncoder encoder;
+  private final RelativeEncoder encoder;
+  private final SparkAbsoluteEncoder absEncoder;
   private final SparkClosedLoopController control;
 
   private boolean breakMode = true;
@@ -28,7 +30,8 @@ public class HangIOHardware implements HangIO {
 
   public HangIOHardware(HangConfig config) {
     motor = new SparkMax(config.motorId(), MotorType.kBrushless);
-    encoder = motor.getAbsoluteEncoder();
+    encoder = motor.getEncoder();
+    absEncoder = motor.getAbsoluteEncoder();
     control = motor.getClosedLoopController();
 
     final SparkMaxConfig motorConfig = new SparkMaxConfig();
@@ -38,10 +41,15 @@ public class HangIOHardware implements HangIO {
         .smartCurrentLimit(HangConstants.MOTOR_CURRENT_LIMIT)
         .voltageCompensation(12.0);
     motorConfig
+        .encoder
+        .positionConversionFactor(1.0 / HangConstants.GEAR_REDUCTION)
+        .velocityConversionFactor(1.0 / HangConstants.GEAR_REDUCTION);
+    motorConfig
         .absoluteEncoder
         .inverted(config.encoderInverted())
-        .zeroOffset(config.absoluteEncoderOffset());
-    motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
+        .zeroOffset(config.absoluteEncoderOffset())
+        .zeroCentered(true);
+    motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kPrimaryEncoder);
 
     tryUntilOk(
         motor,
@@ -87,8 +95,8 @@ public class HangIOHardware implements HangIO {
   }
 
   @Override
-  public void runPosition(double setpoint) {
-    control.setReference(setpoint, ControlType.kPosition);
+  public void runPosition(double setpointRotations) {
+    control.setReference(setpointRotations, ControlType.kPosition);
   }
 
   @Override

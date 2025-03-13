@@ -15,7 +15,7 @@ public class Intake extends SubsystemBase {
   public Intake(IntakeIO io) {
     this.io = io;
 
-    motorDisconnectedAlert = new Alert("Intake motor/s disconnected!", Alert.AlertType.kWarning);
+    motorDisconnectedAlert = new Alert("Intake motor/s disconnected!", Alert.AlertType.kError);
   }
 
   @Override

@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -17,11 +18,11 @@ public class HangIOSim implements HangIO {
       new SingleJointedArmSim(
           MOTOR,
           HangConstants.GEAR_REDUCTION,
-          1,
+          0.0025,
           Units.inchesToMeters(18),
-          0,
-          Math.PI * 2,
-          true,
+          -Math.PI * 2,
+          +Math.PI * 2,
+          false,
           0);
 
   private double appliedVolts = 0.0;
@@ -32,9 +33,14 @@ public class HangIOSim implements HangIO {
 
   @Override
   public void updateInputs(HangIOInputs inputs) {
+    inputs.motorConnected = true;
 
     if (runClosedLoop) {
       appliedVolts = controller.calculate(inputs.positionRotations) + feedForwardVolts;
+    }
+
+    if (DriverStation.isDisabled()) {
+      appliedVolts = 0;
     }
 
     arm.setInputVoltage(appliedVolts);
@@ -60,7 +66,7 @@ public class HangIOSim implements HangIO {
 
   @Override
   public void runOpenLoop(double output) {
-    runVolts(MathUtil.inverseInterpolate(-12.0, 12.0, output));
+    runVolts(output * 12.0);
   }
 
   @Override

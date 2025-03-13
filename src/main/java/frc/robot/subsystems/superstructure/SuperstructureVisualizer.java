@@ -46,7 +46,7 @@ public class SuperstructureVisualizer {
         carriage.append(
             new LoggedMechanismLigament2d(
                 name + " Carriage Joint",
-                Units.inchesToMeters(4),
+                Units.inchesToMeters(2),
                 90.0,
                 4.0,
                 new Color8Bit(color)));

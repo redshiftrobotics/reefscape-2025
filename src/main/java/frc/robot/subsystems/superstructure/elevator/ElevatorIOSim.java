@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.Constants;
 
@@ -41,6 +42,10 @@ public class ElevatorIOSim implements ElevatorIO {
       appliedVolts = controller.calculate(inputs.positionRad) + feedForwardVolts;
     }
 
+    if (DriverStation.isDisabled()) {
+      appliedVolts = 0;
+    }
+
     sim.setInputVoltage(appliedVolts);
     sim.update(Constants.LOOP_PERIOD_SECONDS);
 
@@ -66,7 +71,7 @@ public class ElevatorIOSim implements ElevatorIO {
 
   @Override
   public void runOpenLoop(double output) {
-    runVolts(MathUtil.inverseInterpolate(-12.0, +12.0, output));
+    runVolts(output * 12.0);
   }
 
   @Override

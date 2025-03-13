@@ -1,5 +1,8 @@
 package frc.robot.subsystems.hang;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,10 +25,10 @@ public class Hang extends SubsystemBase {
   private static final LoggedTunableNumber kD =
       hangFactory.getNumber("kD", HangConstants.FEEDBACK.kD());
 
-  private HangVisualization measuredVisualizer =
-      new HangVisualization("Hang/Mechanism2d/Measured", Color.kYellow);
-  private HangVisualization setpointVisualizer =
-      new HangVisualization("Hang/Mechanism2d/Goal", Color.kGreen);
+  private HangVisualization measuredVisualizer = new HangVisualization("Measured", Color.kYellow);
+  private HangVisualization setpointVisualizer = new HangVisualization("Goal", Color.kGreen);
+
+  private final Alert motorConnectedAlert = new Alert("Hang Motor Disconnected", AlertType.kError);
 
   public Hang(HangIO io) {
     this.io = io;
@@ -41,15 +44,17 @@ public class Hang extends SubsystemBase {
 
     SmartDashboard.putNumber("Hang Rotations", inputs.positionRotations);
 
+    motorConnectedAlert.set(!inputs.motorConnected);
+
     LoggedTunableNumber.ifChanged(
         hashCode(), (values) -> io.setPID(values[0], values[1], values[2]), kP, kI, kD);
 
-    measuredVisualizer.update(inputs.positionRotations);
+    measuredVisualizer.update(Rotation2d.fromRotations(inputs.positionRotations));
   }
 
-  private void setGoal(double goalRotations) {
-    io.runPosition(goalRotations);
-    setpointVisualizer.update(goalRotations);
+  private void setGoal(Rotation2d goal) {
+    io.runPosition(goal.getRotations());
+    setpointVisualizer.update(goal);
   }
 
   public Command stow() {
@@ -61,7 +66,7 @@ public class Hang extends SubsystemBase {
   }
 
   public Command retract() {
-    return runOnce(() -> setGoal(HangConstants.STOWED_POSITION_ROTATIONS));
+    return runOnce(() -> setGoal(HangConstants.RETRACT_POSITION_ROTATIONS));
   }
 
   public Command runSet(double speed) {

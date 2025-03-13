@@ -483,7 +483,8 @@ public class RobotContainer {
   private void configureOperatorControllerBindings(CommandXboxController xbox) {
 
     new Trigger(DriverStation::isEnabled)
-        .onTrue(superstructure.runAction(Superstructure.State.STOW_HIGH));
+        .onTrue(superstructure.runAction(Superstructure.State.STOW_HIGH))
+        .onTrue(hang.stow());
 
     final double heightOffsetAdjustment = Units.inchesToMeters(1);
     final Rotation2d angleOffsetAdjustment = Rotation2d.fromDegrees(5);
@@ -519,10 +520,15 @@ public class RobotContainer {
 
     configureOperatorControllerBindingLevel.accept(xbox.leftTrigger(), Superstructure.State.INTAKE);
 
+    Trigger anyButton = xbox.a().or(xbox.x()).or(xbox.y()).or(xbox.b());
+
     configureOperatorControllerBindingLevel.accept(xbox.y(), Superstructure.State.L4);
     configureOperatorControllerBindingLevel.accept(xbox.x(), Superstructure.State.L3);
     configureOperatorControllerBindingLevel.accept(xbox.a(), Superstructure.State.L2);
     configureOperatorControllerBindingLevel.accept(xbox.b(), Superstructure.State.L1);
+
+    anyButton.and(xbox.leftBumper()).whileTrue(coralIntake.runMotors(+1));
+    anyButton.and(xbox.leftBumper()).whileTrue(coralIntake.runMotors(-1));
 
     // Intake
 
@@ -541,11 +547,28 @@ public class RobotContainer {
         .whileTrue(coralIntake.run(() -> coralIntake.setMotors(intakeSpeed.getAsDouble())));
 
     // Hang
-    hang.setDefaultCommand(hang.run(() -> hang.set(JoystickUtil.applyDeadband(xbox.getLeftX()))));
 
-    xbox.rightBumper().and(xbox.leftBumper().negate()).onTrue(hang.deploy());
-    xbox.leftBumper().and(xbox.rightBumper().negate()).onTrue(hang.retract());
-    xbox.rightBumper().and(xbox.leftBumper()).onTrue(hang.stow());
+    DoubleSupplier hangSpeed =
+        () ->
+            MathUtil.clamp(
+                JoystickUtil.applyDeadband(-xbox.getRightX())
+                    + JoystickUtil.applyDeadband(-xbox.getRightY()),
+                -1,
+                +1);
+
+    new Trigger(() -> hangSpeed.getAsDouble() != 0)
+        .and(DriverStation::isTeleopEnabled)
+        .whileTrue(hang.run(() -> hang.set(hangSpeed.getAsDouble())).finallyDo(hang::stop));
+
+    xbox.rightBumper()
+        .and(xbox.leftBumper().negate().debounce(0.1))
+        .and(anyButton.negate())
+        .onTrue(hang.deploy());
+    xbox.leftBumper()
+        .and(xbox.rightBumper().negate().debounce(0.1))
+        .and(anyButton.negate())
+        .onTrue(hang.retract());
+    xbox.rightBumper().and(xbox.leftBumper()).and(anyButton.negate()).onTrue(hang.stow());
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {

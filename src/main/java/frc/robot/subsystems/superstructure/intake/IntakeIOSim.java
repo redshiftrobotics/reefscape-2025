@@ -13,6 +13,8 @@ public class IntakeIOSim implements IntakeIO {
 
     inputs.appliedVolts = new double[] {leftSpeed * 12.0, rightSpeed * 12.0};
     inputs.supplyCurrentAmps = new double[] {0.0, 0.0};
+
+    inputs.motorConnected = true;
   }
 
   @Override

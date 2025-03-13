@@ -45,6 +45,8 @@ public class WristIOSim implements WristIO {
 
     inputs.appliedVolts = appliedVolts;
     inputs.supplyCurrentAmps = arm.getCurrentDrawAmps();
+
+    inputs.motorConnected = true;
   }
 
   @Override
