@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.SetAddressableLEDPattern;
+import frc.robot.subsystems.addressableled.AddressableLEDSubsystem;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
@@ -16,6 +18,7 @@ public class Superstructure extends VirtualSubsystem {
   private final Elevator elevator;
   private final Wrist coralWrist;
   private final Intake coralIntake;
+  private final AddressableLEDSubsystem lights;
 
   public static enum State {
     STOW,
@@ -64,10 +67,12 @@ public class Superstructure extends VirtualSubsystem {
   private final SuperstructureVisualizer goalVisualizer =
       new SuperstructureVisualizer("Goal", Color.kLime);
 
-  public Superstructure(Elevator elevator, Wrist coralWrist, Intake coralIntake) {
+  public Superstructure(
+      Elevator elevator, Wrist coralWrist, Intake coralIntake, AddressableLEDSubsystem lights) {
     this.elevator = elevator;
     this.coralWrist = coralWrist;
     this.coralIntake = coralIntake;
+    this.lights = lights;
   }
 
   public Command run(State goal) {
@@ -125,9 +130,10 @@ public class Superstructure extends VirtualSubsystem {
   public static final double STOW_HEIGHT_HIGH = 0;
   public static final Rotation2d STOW_CORAL_ANGLE_HIGH = Rotation2d.fromDegrees(90);
 
+  // TODO: Integrate lightstrip commands into this stuff
   public Command prepareL1() {
     return Commands.parallel(
-        elevator.runPositionPrepare(L1_HEIGHT), coralWrist.runPositionPrepare(L1_CORAL_ANGLE));
+            elevator.runPositionPrepare(L1_HEIGHT), coralWrist.runPositionPrepare(L1_CORAL_ANGLE));
   }
 
   public Command prepareL2() {

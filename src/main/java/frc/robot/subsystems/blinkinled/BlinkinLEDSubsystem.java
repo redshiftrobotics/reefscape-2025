@@ -1,10 +1,10 @@
-package frc.robot.subsystems.led;
+package frc.robot.subsystems.blinkinled;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.led.LEDConstants.LEDPatterns;
+import frc.robot.subsystems.blinkinled.BlinkinLEDConstants.Patterns;
 
-public class LEDSubsystem extends SubsystemBase {
+public class BlinkinLEDSubsystem extends SubsystemBase {
   private class LEDStrip {
     public Spark pwm;
     public double pattern;
@@ -16,12 +16,14 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   private LEDStrip[] strips;
+  public final int stripCount;
 
-  public LEDSubsystem(int... pwmPorts) {
+  public BlinkinLEDSubsystem(int... pwmPorts) {
     // Create all the strip objects
+    stripCount = pwmPorts.length;
     strips = new LEDStrip[pwmPorts.length];
     for (int i = pwmPorts.length; i >= 0; i--) {
-      strips[i] = new LEDStrip(new Spark(pwmPorts[i]), LEDPatterns.BLACK);
+      strips[i] = new LEDStrip(new Spark(pwmPorts[i]), Patterns.BLACK);
     }
   }
 
