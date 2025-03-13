@@ -25,6 +25,7 @@ import frc.robot.Constants.Mode;
 import frc.robot.commands.AdaptiveAutoAlignCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ManualAlignCommands;
+import frc.robot.commands.SourceStrafingCommands;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.subsystems.dashboard.DriverDashboard;
@@ -456,7 +457,7 @@ public class RobotContainer {
       intakeAlignmentCommands.setEndCommand(() -> rumbleController(xbox, 0.3).withTimeout(0.1));
 
       xbox.leftTrigger()
-          .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Align INTAKE"))
+          .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Align INTAKE").andThen(SourceStrafingCommands.takeAction(drive, xbox)))
           .onFalse(intakeAlignmentCommands.stop(drive));
 
       xbox.leftTrigger()
