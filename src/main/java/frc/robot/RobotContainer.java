@@ -548,8 +548,8 @@ public class RobotContainer {
     configureOperatorControllerBindingLevel.accept(xbox.a(), Superstructure.State.L2);
     configureOperatorControllerBindingLevel.accept(xbox.b(), Superstructure.State.L1);
 
-    anyButton.and(xbox.rightBumper()).whileTrue(coralIntake.runMotors(+1));
-    anyButton.and(xbox.leftBumper()).whileTrue(coralIntake.runMotors(-1));
+    anyButton.and(xbox.rightBumper()).whileTrue(coralIntake.runMotors(-0.2));
+    anyButton.and(xbox.leftBumper()).whileTrue(coralIntake.runMotors(+0.2));
 
     // Intake
 
@@ -582,14 +582,37 @@ public class RobotContainer {
         .whileTrue(hang.run(() -> hang.set(hangSpeed.getAsDouble())).finallyDo(hang::stop));
 
     xbox.rightBumper()
+        .debounce(0.1)
         .and(xbox.leftBumper().negate().debounce(0.1))
         .and(anyButton.negate())
-        .onTrue(hang.retract());
+        .onTrue(
+            hang.retract()
+                .andThen(
+                    Commands.runEnd(
+                            () -> xbox.setRumble(RumbleType.kRightRumble, 1),
+                            () -> xbox.setRumble(RumbleType.kRightRumble, 0))
+                        .withTimeout(0.2)));
     xbox.leftBumper()
+        .debounce(0.1)
         .and(xbox.rightBumper().negate().debounce(0.1))
         .and(anyButton.negate())
-        .onTrue(hang.deploy());
-    xbox.rightBumper().and(xbox.leftBumper()).and(anyButton.negate()).onTrue(hang.stow());
+        .onTrue(
+            hang.deploy()
+                .andThen(
+                    Commands.runEnd(
+                            () -> xbox.setRumble(RumbleType.kLeftRumble, 1),
+                            () -> xbox.setRumble(RumbleType.kLeftRumble, 0))
+                        .withTimeout(0.2)));
+    xbox.rightBumper()
+        .and(xbox.leftBumper())
+        .and(anyButton.negate())
+        .onTrue(
+            hang.stow()
+                .andThen(
+                    Commands.runEnd(
+                            () -> xbox.setRumble(RumbleType.kBothRumble, 1),
+                            () -> xbox.setRumble(RumbleType.kBothRumble, 0))
+                        .withTimeout(0.2)));
 
     xbox.start().onTrue(Commands.runOnce(coralIntake::toggleUseSensor));
   }

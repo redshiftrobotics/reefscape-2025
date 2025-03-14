@@ -15,7 +15,7 @@ public class SuperstructureVisualizer {
 
   private final LoggedMechanism2d mechanism =
       new LoggedMechanism2d(
-          Units.inchesToMeters(28.0), Units.feetToMeters(5.0), new Color8Bit(Color.kDarkGray));
+          Units.inchesToMeters(28.0), Units.feetToMeters(7.0), new Color8Bit(Color.kDarkGray));
 
   private final LoggedMechanismRoot2d root;
   private final LoggedMechanismLigament2d elevatorMechanism;
@@ -59,7 +59,7 @@ public class SuperstructureVisualizer {
     coralIntake =
         coralWristLigament.append(
             new LoggedMechanismLigament2d(
-                name + " Coral Intake", 0.0, -4.0, 10.0, new Color8Bit(235, 137, 52)));
+                name + " Coral Intake", 0.0, -90, 10.0, new Color8Bit(235, 137, 52)));
   }
 
   public void update(double carriageHeight, double wristRadians, double coralIntakeOutput) {

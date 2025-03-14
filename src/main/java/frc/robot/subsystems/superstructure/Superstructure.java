@@ -26,7 +26,7 @@ public class Superstructure extends VirtualSubsystem {
     L1(0.151148670108898, 0),
     L2(0, 55),
     L3(0.478, 55),
-    L4(1.248 + Units.metersToInches(3), 36);
+    L4(1.445, 36);
 
     private final double height;
     private final Rotation2d angle;
@@ -123,7 +123,7 @@ public class Superstructure extends VirtualSubsystem {
   }
 
   public Command outtake() {
-    return coralIntake.runMotors(1);
+    return coralIntake.runMotors(-1);
   }
 
   public Command outtakeL1() {
