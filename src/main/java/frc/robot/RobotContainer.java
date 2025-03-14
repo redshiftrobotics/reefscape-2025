@@ -75,6 +75,7 @@ import frc.robot.utility.commands.CustomCommands;
 import java.util.Arrays;
 import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
+import java.util.function.Function;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -433,7 +434,7 @@ public class RobotContainer {
               new Transform2d(Units.inchesToMeters(-1), 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(4), 0));
 
-      intakeAlignmentCommands.setEndCommand(() -> rumbleController(xbox, 0.3).withTimeout(0.1));
+      intakeAlignmentCommands.setEndCommand(() -> rumbleController(xbox, 0.5).withTimeout(0.1));
 
       xbox.leftTrigger()
           .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Align INTAKE"))
@@ -462,6 +463,9 @@ public class RobotContainer {
         .onTrue(hang.stow());
 
     coralWrist.setSlowModeSupplier(() -> coralIntake.hasCoral().orElse(false));
+
+    new Trigger(() -> coralIntake.hasCoral().orElse(false))
+        .onChange(rumbleControllers(0.3).withTimeout(0.1));
 
     // Intake and score
 
@@ -548,38 +552,26 @@ public class RobotContainer {
         .and(DriverStation::isTeleopEnabled)
         .whileTrue(hang.run(() -> hang.set(hangSpeed.getAsDouble())).finallyDo(hang::stop));
 
+    Function<RumbleType, Command> rumble =
+        (rumbleType) ->
+            Commands.runEnd(
+                    () -> xbox.setRumble(rumbleType, 1), () -> xbox.setRumble(rumbleType, 0))
+                .withTimeout(0.2);
+
     xbox.rightBumper()
         .debounce(0.1)
         .and(xbox.leftBumper().negate().debounce(0.1))
         .and(anyButton.negate())
-        .onTrue(
-            hang.retract()
-                .andThen(
-                    Commands.runEnd(
-                            () -> xbox.setRumble(RumbleType.kRightRumble, 1),
-                            () -> xbox.setRumble(RumbleType.kRightRumble, 0))
-                        .withTimeout(0.2)));
+        .onTrue(hang.retract().andThen(rumble.apply(RumbleType.kRightRumble)));
     xbox.leftBumper()
         .debounce(0.1)
         .and(xbox.rightBumper().negate().debounce(0.1))
         .and(anyButton.negate())
-        .onTrue(
-            hang.deploy()
-                .andThen(
-                    Commands.runEnd(
-                            () -> xbox.setRumble(RumbleType.kLeftRumble, 1),
-                            () -> xbox.setRumble(RumbleType.kLeftRumble, 0))
-                        .withTimeout(0.2)));
+        .onTrue(hang.deploy().andThen(rumble.apply(RumbleType.kLeftRumble)));
     xbox.rightBumper()
         .and(xbox.leftBumper())
         .and(anyButton.negate())
-        .onTrue(
-            hang.stow()
-                .andThen(
-                    Commands.runEnd(
-                            () -> xbox.setRumble(RumbleType.kBothRumble, 1),
-                            () -> xbox.setRumble(RumbleType.kBothRumble, 0))
-                        .withTimeout(0.2)));
+        .onTrue(hang.stow().andThen(rumble.apply(RumbleType.kBothRumble)));
 
     xbox.start().onTrue(Commands.runOnce(coralIntake::toggleUseSensor));
   }
