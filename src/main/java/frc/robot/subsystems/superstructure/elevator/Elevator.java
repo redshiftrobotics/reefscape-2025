@@ -65,7 +65,7 @@ public class Elevator extends SubsystemBase {
   private final Alert followMotorFollowingAlert =
       new Alert("Elevator follower not following!", Alert.AlertType.kError);
 
-  private final Alert zeroingAlert = new Alert("Elevator needs zeroing!", Alert.AlertType.kInfo);
+  // private final Alert zeroingAlert = new Alert("Elevator needs zeroing!", Alert.AlertType.kInfo);
 
   private Debouncer disabledDebouncer = new Debouncer(3, DebounceType.kRising);
 
@@ -169,7 +169,7 @@ public class Elevator extends SubsystemBase {
 
     motorDisconnectedAlert.set(!inputs.motorConnected);
     followMotorFollowingAlert.set(!inputs.followerMotorFollowing);
-    zeroingAlert.set(!zeroedHeightEncoder);
+    // zeroingAlert.set(!zeroedHeightEncoder);
   }
 
   // --- Commands ---

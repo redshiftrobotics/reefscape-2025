@@ -21,7 +21,7 @@ public final class Constants {
   public static final RobotType PRIMARY_ROBOT_TYPE = RobotType.COMP_BOT_2025;
   private static RobotType robotType;
 
-  public static final boolean TUNING_MODE = true;
+  public static final boolean TUNING_MODE = false;
 
   public static final boolean HIDE_COMMAND_LOOP_OVERRUN = true;
 
@@ -98,18 +98,18 @@ public final class Constants {
       new Alert(
           String.format(
               "Invalid robot selected, using %s robot as default.", PRIMARY_ROBOT_TYPE.toString()),
-          Alert.AlertType.kWarning);
+          Alert.AlertType.kInfo);
 
   private static final Alert wrongRobotTypeAlertSim =
       new Alert(
           String.format(
               "Invalid robot selected for simulation robot, using simulation robot as default."),
-          AlertType.kError);
+          AlertType.kInfo);
 
   private static final Alert wrongRobotTypeFailedDetermination =
       new Alert(
           String.format(
               "Failed to determine robot from RoboRio serial number, using %s robot as default.",
               PRIMARY_ROBOT_TYPE.toString()),
-          AlertType.kError);
+          AlertType.kInfo);
 }

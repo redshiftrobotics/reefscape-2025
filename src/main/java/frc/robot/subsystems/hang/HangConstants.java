@@ -25,7 +25,7 @@ public class HangConstants {
       };
 
   public static final int MOTOR_CURRENT_LIMIT = 40;
-  public static final double GEAR_REDUCTION = Math.pow(5, 3);
+  public static final double GEAR_REDUCTION = 5 * 5 * 5;
 
   public static final Rotation2d STOWED_POSITION_ROTATIONS = Rotation2d.fromDegrees(0);
   public static final Rotation2d DEPLOY_POSITION_ROTATIONS = Rotation2d.fromDegrees(60);

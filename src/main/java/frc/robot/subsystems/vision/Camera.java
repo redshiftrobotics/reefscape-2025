@@ -76,7 +76,7 @@ public class Camera {
         new Alert(
             String.format(
                 "Missing cameras %s (Real Position %s)", getCameraName(), io.getCameraPosition()),
-            Alert.AlertType.kError);
+            Alert.AlertType.kWarning);
   }
 
   /** Get name of camera as specified by IO */
