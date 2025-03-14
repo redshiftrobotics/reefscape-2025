@@ -32,7 +32,6 @@ import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleConstants;
 import frc.robot.subsystems.drive.ModuleIO;
@@ -96,7 +95,7 @@ public class RobotContainer {
   private final Wrist coralWrist;
   private final Intake coralIntake;
 
-  private Sensor sensor = new Sensor(new SensorIO() {});
+  private final Sensor sensor;
 
   private final Hang hang;
 
@@ -162,7 +161,9 @@ public class RobotContainer {
         break;
 
       case WOOD_BOT_TWO_2025:
-        // Real robot (Wood bot test chassis), instantiate hardware IO implementations
+      case T_SHIRT_CANNON_CHASSIS:
+      case CRESCENDO_CHASSIS_2024:
+        // Various other chassis we have
         drive =
             new Drive(
                 new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
@@ -174,42 +175,8 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
         coralWrist = new Wrist(new WristIO() {});
-        coralIntake = new Intake(new IntakeIO() {});
-        break;
-
-      case T_SHIRT_CANNON_CHASSIS:
-        // Real robot (T-Shirt cannon chassis), instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(DriveConstants.GYRO_CAN_ID),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
-        vision = new AprilTagVision();
-        hang = new Hang(new HangIO() {});
-        elevator = new Elevator(new ElevatorIO() {});
-        coralWrist = new Wrist(new WristIO() {});
-        coralIntake = new Intake(new IntakeIO() {});
-        break;
-
-      case CRESCENDO_CHASSIS_2024:
-        // Real robot (robot from last year chassis), instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIONavX(),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
-                new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
-        vision = new AprilTagVision();
-        hang = new Hang(new HangIO() {});
-        elevator = new Elevator(new ElevatorIO() {});
-
-        coralWrist = new Wrist(new WristIO() {});
-
-        coralIntake = new Intake(new IntakeIO() {});
-
+        sensor = new Sensor(new SensorIO() {});
+        coralIntake = new Intake(new IntakeIO() {}, sensor);
         break;
 
       case SIM_BOT:
@@ -248,8 +215,8 @@ public class RobotContainer {
         vision = new AprilTagVision();
         elevator = new Elevator(new ElevatorIO() {});
         coralWrist = new Wrist(new WristIO() {});
-        coralIntake = new Intake(new IntakeIO() {});
-
+        sensor = new Sensor(new SensorIO() {});
+        coralIntake = new Intake(new IntakeIO() {}, sensor);
         break;
     }
 
