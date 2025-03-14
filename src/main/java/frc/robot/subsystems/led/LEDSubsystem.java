@@ -8,13 +8,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.led.LEDConstants.FixedPalettePattern;
 import frc.robot.subsystems.led.LEDConstants.SolidColors;
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class LEDSubsystem extends SubsystemBase {
 
   private final Timer startupTimer = new Timer();
 
   private class LEDStrip {
-    private PWM pwm;
+    private final PWM pwm;
     private int pulse;
 
     public LEDStrip(PWM pwmController, int initialPattern) {
@@ -71,9 +75,9 @@ public class LEDSubsystem extends SubsystemBase {
     }
 
     // Update all the strips
-    for (LEDStrip strip : strips) {
-      strip.update();
-    }
+    strips().forEach(LEDStrip::update);
+
+    Logger.recordOutput("LED/pulses", strips().mapToInt(strip -> strip.pulse).toArray());
   }
 
   /**
@@ -102,6 +106,7 @@ public class LEDSubsystem extends SubsystemBase {
     }
   }
 
+  @AutoLogOutput(key = "LED/hasSetUp")
   public boolean hasSetUp() {
     return !startupTimer.isRunning();
   }
@@ -115,5 +120,9 @@ public class LEDSubsystem extends SubsystemBase {
    */
   private void applyAll(int blue, int red, int backup) {
     applyAll(alliance.map(a -> a == Alliance.Blue ? blue : red).orElse(backup));
+  }
+
+  private Stream<LEDStrip> strips() {
+    return Stream.of(strips);
   }
 }
