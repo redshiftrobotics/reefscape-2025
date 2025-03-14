@@ -61,7 +61,7 @@ public class VisionConstants {
   public static final CameraConfig COMP_FRONT_LEFT_CAMERA =
       new CameraConfig(
           "FrontRight8032",
-          "front left",
+          "Front Left",
           new Transform3d(
               new Translation3d(+CAMERA_OFFSET_X, +CAMERA_OFFSET_Y, FRONT_CAMERA_OFFSET_Z),
               new Rotation3d(0, -FRONT_CAMERA_PITCH, +FRONT_CAMERA_YAW)));
@@ -69,7 +69,7 @@ public class VisionConstants {
   public static final CameraConfig COMP_FRONT_RIGHT_CAMERA =
       new CameraConfig(
           "plzwork",
-          "front right",
+          "Front Right",
           new Transform3d(
               new Translation3d(+CAMERA_OFFSET_X, -CAMERA_OFFSET_Y, FRONT_CAMERA_OFFSET_Z),
               new Rotation3d(0, -FRONT_CAMERA_PITCH, -FRONT_CAMERA_YAW)));
@@ -77,7 +77,7 @@ public class VisionConstants {
   public static final CameraConfig COMP_BACK_LEFT_CAMERA =
       new CameraConfig(
           "jessiecam",
-          "back left",
+          "Back Left",
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, +CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
               new Rotation3d(0, -BACK_CAMERA_PITCH, Units.degreesToRadians(180 + 32.21))));
@@ -85,7 +85,7 @@ public class VisionConstants {
   public static final CameraConfig COMP_BACK_RIGHT_CAMERA =
       new CameraConfig(
           "BackRightCamera8032",
-          "back right",
+          "Back Right",
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, -CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
               new Rotation3d(0, -BACK_CAMERA_PITCH, Units.degreesToRadians(180 - 30.8))));
