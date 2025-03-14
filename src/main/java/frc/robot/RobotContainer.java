@@ -457,7 +457,11 @@ public class RobotContainer {
       intakeAlignmentCommands.setEndCommand(() -> rumbleController(xbox, 0.3).withTimeout(0.1));
 
       xbox.leftTrigger()
-          .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Align INTAKE").andThen(SourceStrafingCommands.takeAction(drive, xbox)))
+          .onTrue(
+              intakeAlignmentCommands
+                  .driveToClosest(drive)
+                  .withName("Align INTAKE")
+                  .andThen(SourceStrafingCommands.takeAction(drive, xbox)))
           .onFalse(intakeAlignmentCommands.stop(drive));
 
       xbox.leftTrigger()
