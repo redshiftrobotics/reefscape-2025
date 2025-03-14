@@ -435,7 +435,7 @@ public class RobotContainer {
               Arrays.asList(FieldConstants.Reef.alignmentFaces),
               new Transform2d(
                   DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
-              new Transform2d(Units.inchesToMeters(-10), 0, Rotation2d.k180deg),
+              new Transform2d(Units.inchesToMeters(-5), 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(6), 0));
 
       reefAlignmentCommands.setEndCommand(() -> rumbleController(xbox, 0.5).withTimeout(0.1));
@@ -463,7 +463,7 @@ public class RobotContainer {
               Arrays.asList(FieldConstants.CoralStation.alignmentFaces),
               new Transform2d(
                   DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
-              new Transform2d(Units.inchesToMeters(-14), 0, Rotation2d.k180deg),
+              new Transform2d(Units.inchesToMeters(-1), 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(4), 0));
 
       intakeAlignmentCommands.setEndCommand(() -> rumbleController(xbox, 0.3).withTimeout(0.1));
@@ -506,8 +506,7 @@ public class RobotContainer {
           if (level.isLevel()) {
             trigger.whileTrue(superstructure.run(level));
           } else if (level.isIntake()) {
-            trigger.whileTrue(
-                superstructure.run(level).until(() -> coralIntake.hasCoral().orElse(false)));
+            trigger.whileTrue(superstructure.run(level));
           }
 
           if (level.isLevel()) {
@@ -517,7 +516,8 @@ public class RobotContainer {
                 .whileTrue(superstructure.runWheels(level))
                 .onTrue(Commands.runOnce(sensor::simulateItemEjection));
           } else if (level.isIntake()) {
-            trigger.whileTrue(superstructure.runWheels(level));
+            trigger.whileTrue(
+                superstructure.runWheels(level).until(() -> coralIntake.hasCoral().orElse(false)));
             trigger
                 .and(superstructure::atGoal)
                 .onTrue(Commands.runOnce(sensor::simulateItemRequest));

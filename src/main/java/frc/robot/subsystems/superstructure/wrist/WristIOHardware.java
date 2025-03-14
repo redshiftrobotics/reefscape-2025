@@ -52,7 +52,7 @@ public class WristIOHardware implements WristIO {
         .inverted(config.encoderInverted())
         .zeroOffset(config.absoluteEncoderOffset())
         .zeroCentered(true);
-    motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kPrimaryEncoder);
+    motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
 
     motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 

@@ -13,7 +13,7 @@ public class HangConstants {
 
   public static final HangConfig HANG_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new HangConfig(16, 0.0, false, false);
+        case COMP_BOT_2025 -> new HangConfig(16, 0.304, false, false);
         default -> new HangConfig(0, 0.0, false, false);
       };
 

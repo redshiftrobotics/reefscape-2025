@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
-
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -76,7 +75,8 @@ public class Wrist extends SubsystemBase {
     this.io = io;
 
     profile = new TrapezoidProfile(new Constraints(maxVelocity.get(), maxAcceleration.get()));
-    profileSlow = new TrapezoidProfile(new Constraints(maxVelocitySlow.get(), maxAccelerationSlow.get()));
+    profileSlow =
+        new TrapezoidProfile(new Constraints(maxVelocitySlow.get(), maxAccelerationSlow.get()));
 
     io.setPID(kP.get(), kI.get(), kD.get());
     io.setBrakeMode(true);
@@ -89,7 +89,7 @@ public class Wrist extends SubsystemBase {
 
     Logger.processInputs("Wrist", inputs);
 
-    Logger.recordOutput("Wrist/SlowMode", slowModeSupplier.getAsBoolean());
+    Logger.recordOutput("Wrist/slowMode", slowModeSupplier.getAsBoolean());
 
     io.setBrakeMode(!disabledDebouncer.calculate(DriverStation.isDisabled()));
 
@@ -100,9 +100,11 @@ public class Wrist extends SubsystemBase {
         setpoint = new State(inputs.positionRad, inputs.velocityRadPerSec);
       }
 
-      final TrapezoidProfile currentProfile = slowModeSupplier.getAsBoolean() ? profileSlow : profile;
+      final TrapezoidProfile currentProfile =
+          slowModeSupplier.getAsBoolean() ? profileSlow : profile;
 
-      setpoint = currentProfile.calculate(Constants.LOOP_PERIOD_SECONDS, setpoint, goalSupplier.get());
+      setpoint =
+          currentProfile.calculate(Constants.LOOP_PERIOD_SECONDS, setpoint, goalSupplier.get());
 
       double feedforwardVolts = feedforward.calculate(setpoint.position, setpoint.velocity);
 

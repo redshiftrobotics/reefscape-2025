@@ -18,14 +18,15 @@ public class Superstructure extends VirtualSubsystem {
   private final Intake coralIntake;
 
   public static enum State {
-    STOW_LOW(0.054886473109919, -90),
-    STOW_HIGH(0, 90),
-    INTAKE(0.218 + Units.inchesToMeters(1.5), 35),
+    STOW_LOW(0.054886473109919, -80),
+    STOW_HIGH(0, 80),
+
+    INTAKE(0.712 - Units.inchesToMeters(4), -78 + 10),
 
     L1(0.151148670108898, 0),
-    L2(0.469491383230037 + Units.inchesToMeters(3), -35),
-    L3(1.035 + Units.inchesToMeters(2), -35),
-    L4(L3.height, L3.angle.getDegrees());
+    L2(0, 55),
+    L3(0.478, 55),
+    L4(1.248 + Units.metersToInches(3), 36);
 
     private final double height;
     private final Rotation2d angle;
@@ -114,11 +115,11 @@ public class Superstructure extends VirtualSubsystem {
   }
 
   public Command intake() {
-    return coralIntake.runMotors(-0.6);
+    return coralIntake.runMotors(-0.3);
   }
 
   public Command passiveIntake() {
-    return coralIntake.runMotors(-0.05);
+    return coralIntake.runMotors(0);
   }
 
   public Command outtake() {

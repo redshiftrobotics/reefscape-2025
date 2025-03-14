@@ -1,6 +1,7 @@
 package frc.robot.subsystems.superstructure.wrist;
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.utility.records.ArmFeedForwardConstants;
 import frc.robot.utility.records.PIDConstants;
@@ -23,15 +24,15 @@ public class WristConstants {
 
   public static final WristConfig WRIST_CONFIG =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new WristConfig(6, 0.637 + 0.25, false, false);
+        case COMP_BOT_2025 -> new WristConfig(6, Units.radiansToRotations(1.316), false, false);
         default -> new WristConfig(0, 0, false, false);
       };
 
-  public static final double MAX_VELOCITY = 10.0;
-  public static final double MAX_ACCELERATION = 20.0;
+  public static final double MAX_VELOCITY = 7.0;
+  public static final double MAX_ACCELERATION = 10.0;
 
-  public static final double MAX_VELOCITY_SLOW = 9.0;
-  public static final double MAX_ACCELERATION_SLOW = 10.0;
+  public static final double MAX_VELOCITY_SLOW = 6.0;
+  public static final double MAX_ACCELERATION_SLOW = 5.0;
 
   public static final PIDConstants FEEDBACK =
       switch (Constants.getRobot()) {
