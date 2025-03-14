@@ -42,6 +42,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "stow"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "PR-C0"

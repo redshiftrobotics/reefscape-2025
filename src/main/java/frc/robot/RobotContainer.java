@@ -617,13 +617,14 @@ public class RobotContainer {
 
     NamedCommands.registerCommand(
         "l1",
-        Commands.parallel(
+        Commands.sequence(
+            Commands.parallel(
                 Commands.runOnce(() -> elevator.setGoalHeightMeters(State.L4.getHeight())),
-                Commands.runOnce(() -> coralWrist.setGoalRotation(State.L4.getAngle())))
-            .andThen(Commands.waitUntil(superstructure::atGoal))
-            .andThen(
-                Commands.runEnd(() -> coralIntake.setMotors(1), coralIntake::stopMotors)
-                    .withTimeout(0.5)));
+                Commands.runOnce(() -> coralWrist.setGoalRotation(State.L4.getAngle()))),
+            Commands.waitUntil(superstructure::atGoal),
+            Commands.waitSeconds(0.1),
+            Commands.runEnd(() -> coralIntake.setMotors(-1), coralIntake::stopMotors)
+                .withTimeout(0.5)));
 
     NamedCommands.registerCommand(
         "stow",
@@ -633,13 +634,15 @@ public class RobotContainer {
 
     NamedCommands.registerCommand(
         "intake",
-        Commands.parallel(
-                Commands.runOnce(() -> elevator.setGoalHeightMeters(State.INTAKE.getHeight())),
-                Commands.runOnce(() -> coralWrist.setGoalRotation(State.INTAKE.getAngle())))
-            .andThen(
-                Commands.runEnd(
-                    () -> coralIntake.setMotors(-0.6), () -> coralIntake.setMotors(0.05)))
-            .withTimeout(2));
+        Commands.deadline(
+            Commands.parallel(
+                    Commands.runOnce(() -> elevator.setGoalHeightMeters(State.INTAKE.getHeight())),
+                    Commands.runOnce(() -> coralWrist.setGoalRotation(State.INTAKE.getAngle())),
+                    Commands.runEnd(
+                            () -> coralIntake.setMotors(-0.6), () -> coralIntake.setMotors(0.0))
+                        .until(() -> coralIntake.hasCoral().orElse(false)))
+                .withTimeout(3),
+            Commands.waitUntil(superstructure::atGoal).andThen(sensor::simulateItemRequest)));
   }
 
   private void configureAutos(LoggedDashboardChooser<Command> dashboardChooser) {

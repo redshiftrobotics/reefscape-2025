@@ -9,7 +9,6 @@ import frc.robot.subsystems.led.LEDConstants.FixedPalettePattern;
 import frc.robot.subsystems.led.LEDConstants.SolidColors;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
