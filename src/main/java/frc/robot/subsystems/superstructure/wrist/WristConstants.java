@@ -14,7 +14,7 @@ public class WristConstants {
   public static final double GEAR_REDUCTION = 20.0;
   public static final int MOTOR_CURRENT_LIMIT = 40;
 
-  public static final double TOLERANCE_DEGREES = 1.6;
+  public static final double TOLERANCE_DEGREES = 5;
 
   public static final double MAX_POSITION_DEGREES = 100.0;
   public static final double MIN_POSITION_DEGREES = -90.0;
