@@ -29,15 +29,18 @@ public class Superstructure extends VirtualSubsystem {
     L3(0.478, 55),
     L4(1.445, 36);
 
-    private final double height;
-    private final Rotation2d angle;
+    private static final double elevatorHeightDamageOffset = 0;
+    private static final Rotation2d wristAngleDamageOffset = Rotation2d.kZero;
+
+    private final double baseHeight;
+    private final Rotation2d baseAngle;
 
     private double offsetHeight = 0;
     private Rotation2d offsetAngle = Rotation2d.kZero;
 
     private State(double height, double angleDegrees) {
-      this.height = height;
-      this.angle = Rotation2d.fromDegrees(angleDegrees);
+      this.baseHeight = height;
+      this.baseAngle = Rotation2d.fromDegrees(angleDegrees);
     }
 
     public void adjustHeight(double offset) {
@@ -66,11 +69,11 @@ public class Superstructure extends VirtualSubsystem {
     }
 
     public double getHeight() {
-      return height + offsetHeight;
+      return baseHeight + offsetHeight + elevatorHeightDamageOffset;
     }
 
     public Rotation2d getAngle() {
-      return angle.plus(offsetAngle);
+      return baseAngle.plus(offsetAngle).plus(wristAngleDamageOffset);
     }
   }
 
@@ -141,11 +144,11 @@ public class Superstructure extends VirtualSubsystem {
 
   public void setPositionStow() {
     if (coralIntake.hasCoral().orElse(true)) {
-      elevator.setGoalHeightMeters(State.STOW_HIGH.height);
-      coralWrist.setGoalRotation(State.STOW_HIGH.angle);
+      elevator.setGoalHeightMeters(State.STOW_HIGH.getHeight());
+      coralWrist.setGoalRotation(State.STOW_HIGH.getAngle());
     } else {
-      elevator.setGoalHeightMeters(State.STOW_LOW.height);
-      coralWrist.setGoalRotation(State.STOW_LOW.angle);
+      elevator.setGoalHeightMeters(State.STOW_LOW.getHeight());
+      coralWrist.setGoalRotation(State.STOW_LOW.getAngle());
     }
   }
 
