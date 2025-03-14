@@ -465,7 +465,7 @@ public class RobotContainer {
     coralWrist.setSlowModeSupplier(() -> coralIntake.hasCoral().orElse(false));
 
     new Trigger(() -> coralIntake.hasCoral().orElse(false))
-        .onChange(rumbleControllers(0.3).withTimeout(0.1));
+        .onChange(rumbleControllers(0.5).withTimeout(0.1));
 
     // Intake and score
 
@@ -519,12 +519,22 @@ public class RobotContainer {
     configureOperatorControllerBindingLevel.accept(xbox.a(), Superstructure.State.L2);
     configureOperatorControllerBindingLevel.accept(xbox.b(), Superstructure.State.L1);
 
-    anyButton.and(xbox.rightBumper()).whileTrue(coralIntake.runMotors(-0.2));
-    anyButton.and(xbox.leftBumper()).whileTrue(coralIntake.runMotors(+0.2));
+    final double intakeManualSpeed = 0.24;
+    anyButton.and(xbox.rightBumper()).whileTrue(coralIntake.runMotors(-intakeManualSpeed));
+    anyButton.and(xbox.leftBumper()).whileTrue(coralIntake.runMotors(+intakeManualSpeed));
 
     // Intake
 
     coralIntake.setDefaultCommand(superstructure.passiveIntake());
+
+    xbox.start()
+        .debounce(0.3)
+        .onTrue(
+            drive
+                .runOnce(coralIntake::toggleUseSensor)
+                .andThen(rumbleController(xbox, 0.3).withTimeout(0.25))
+                .ignoringDisable(true)
+                .withName("Toggle Sensor Use"));
 
     DoubleSupplier intakeSpeed =
         () ->
@@ -572,8 +582,6 @@ public class RobotContainer {
         .and(xbox.leftBumper())
         .and(anyButton.negate())
         .onTrue(hang.stow().andThen(rumble.apply(RumbleType.kBothRumble)));
-
-    xbox.start().onTrue(Commands.runOnce(coralIntake::toggleUseSensor));
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {

@@ -10,6 +10,7 @@ import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
 import frc.robot.utility.VirtualSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 public class Superstructure extends VirtualSubsystem {
 
@@ -152,6 +153,15 @@ public class Superstructure extends VirtualSubsystem {
   public void periodic() {
     SmartDashboard.putNumber("Elevator Height Meters", elevator.getMeasuredHeightMeters());
     SmartDashboard.putNumber("Coral Wrist Degrees", coralWrist.getGoalRotations().getDegrees());
+
+    for (State state : State.values()) {
+      Logger.recordOutput("Superstructure/" + state.name() + "/Height", state.getHeight());
+      Logger.recordOutput(
+          "Superstructure/" + state.name() + "/AngleDegrees", state.getAngle().getDegrees());
+      Logger.recordOutput("Superstructure/" + state.name() + "/OffsetHeight", state.offsetHeight);
+      Logger.recordOutput(
+          "Superstructure/" + state.name() + "/OffsetAngleDegrees", state.offsetAngle.getDegrees());
+    }
 
     measuredVisualizer.update(
         elevator.getMeasuredHeightMeters(),
