@@ -73,10 +73,7 @@ public class Camera {
         VisionConstants.FIELD.getTags().stream().map((tag) -> tag.ID).collect(Collectors.toSet());
 
     this.missingCameraAlert =
-        new Alert(
-            String.format(
-                "Missing cameras %s", getCameraName()),
-            Alert.AlertType.kWarning);
+        new Alert(String.format("Missing cameras %s", getCameraName()), Alert.AlertType.kWarning);
   }
 
   /** Get name of camera as specified by IO */
