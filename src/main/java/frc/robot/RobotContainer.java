@@ -494,6 +494,8 @@ public class RobotContainer {
         .onTrue(superstructure.runAction(Superstructure.State.STOW_HIGH))
         .onTrue(hang.stow());
 
+    coralWrist.setSlowModeSupplier(() -> coralIntake.hasCoral().orElse(false));
+
     // Intake and score
 
     final double heightOffsetAdjustment = Units.inchesToMeters(1);

@@ -27,8 +27,11 @@ public class WristConstants {
         default -> new WristConfig(0, 0, false, false);
       };
 
-  public static final double MAX_VELOCITY = 10;
-  public static final double MAX_ACCELERATION = 20;
+  public static final double MAX_VELOCITY = 10.0;
+  public static final double MAX_ACCELERATION = 20.0;
+
+  public static final double MAX_VELOCITY_SLOW = 9.0;
+  public static final double MAX_ACCELERATION_SLOW = 10.0;
 
   public static final PIDConstants FEEDBACK =
       switch (Constants.getRobot()) {

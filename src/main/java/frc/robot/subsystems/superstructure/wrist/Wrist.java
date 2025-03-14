@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
+
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -47,10 +49,18 @@ public class Wrist extends SubsystemBase {
   private static final LoggedTunableNumber maxAcceleration =
       factory.getNumber("maxAcceleration", WristConstants.MAX_ACCELERATION);
 
+  private static final LoggedTunableNumber maxVelocitySlow =
+      factory.getNumber("maxVelocitySlow", WristConstants.MAX_VELOCITY_SLOW);
+  private static final LoggedTunableNumber maxAccelerationSlow =
+      factory.getNumber("maxAccelerationSlow", WristConstants.MAX_ACCELERATION_SLOW);
+
   private final WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
 
   private TrapezoidProfile profile;
+  private TrapezoidProfile profileSlow;
+  private BooleanSupplier slowModeSupplier = () -> false;
+
   private ArmFeedforward feedforward;
 
   private State setpoint = null;
@@ -66,6 +76,7 @@ public class Wrist extends SubsystemBase {
     this.io = io;
 
     profile = new TrapezoidProfile(new Constraints(maxVelocity.get(), maxAcceleration.get()));
+    profileSlow = new TrapezoidProfile(new Constraints(maxVelocitySlow.get(), maxAccelerationSlow.get()));
 
     io.setPID(kP.get(), kI.get(), kD.get());
     io.setBrakeMode(true);
@@ -78,16 +89,20 @@ public class Wrist extends SubsystemBase {
 
     Logger.processInputs("Wrist", inputs);
 
+    Logger.recordOutput("Wrist/SlowMode", slowModeSupplier.getAsBoolean());
+
     io.setBrakeMode(!disabledDebouncer.calculate(DriverStation.isDisabled()));
 
     if (DriverStation.isEnabled()) {
-      Logger.recordOutput("Elevator/shouldRunProfiled", true);
+      Logger.recordOutput("Wrist/shouldRunProfiled", true);
 
       if (setpoint == null) {
         setpoint = new State(inputs.positionRad, inputs.velocityRadPerSec);
       }
 
-      setpoint = profile.calculate(Constants.LOOP_PERIOD_SECONDS, setpoint, goalSupplier.get());
+      final TrapezoidProfile currentProfile = slowModeSupplier.getAsBoolean() ? profileSlow : profile;
+
+      setpoint = currentProfile.calculate(Constants.LOOP_PERIOD_SECONDS, setpoint, goalSupplier.get());
 
       double feedforwardVolts = feedforward.calculate(setpoint.position, setpoint.velocity);
 
@@ -100,7 +115,7 @@ public class Wrist extends SubsystemBase {
       Logger.recordOutput("Wrist/Profile/GoalPositionRotations", goalSupplier.get().position);
       Logger.recordOutput("Wrist/Profile/GoalVelocityRPM", goalSupplier.get().velocity);
     } else {
-      Logger.recordOutput("Elevator/shouldRunProfiled", false);
+      Logger.recordOutput("Wrist/shouldRunProfiled", false);
 
       Logger.recordOutput("Wrist/FeedForward/Volts", 0);
       Logger.recordOutput("Elevator/Profile/SetpointPositionMeters", 0.0);
@@ -133,6 +148,12 @@ public class Wrist extends SubsystemBase {
         (values) -> profile = new TrapezoidProfile(new Constraints(values[0], values[1])),
         maxVelocity,
         maxAcceleration);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> profileSlow = new TrapezoidProfile(new Constraints(values[0], values[1])),
+        maxVelocitySlow,
+        maxAccelerationSlow);
 
     motorConnectedAlert.set(!inputs.motorConnected);
   }
@@ -194,11 +215,7 @@ public class Wrist extends SubsystemBase {
     return setpoint;
   }
 
-  public void setConstraints(double maxVelocity, double maxAcceleration) {
-    profile = new TrapezoidProfile(new Constraints(maxVelocity, maxAcceleration));
-  }
-
-  public void resetConstraints() {
-    setConstraints(WristConstants.MAX_VELOCITY, WristConstants.MAX_ACCELERATION);
+  public void setSlowModeSupplier(BooleanSupplier slowModeSupplier) {
+    this.slowModeSupplier = slowModeSupplier;
   }
 }
