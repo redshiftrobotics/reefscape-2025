@@ -56,11 +56,11 @@ public class VisionConstants {
 
   private static final double BACK_CAMERA_OFFSET_Z = Units.inchesToMeters(8.0);
   private static final double BACK_CAMERA_PITCH =
-      Units.degreesToRadians(10); // less bent back mount
+      Units.degreesToRadians(11); // less bent back mount
 
   public static final CameraConfig COMP_FRONT_LEFT_CAMERA =
       new CameraConfig(
-          "FrontRight8032",
+          "plzwork",
           "Front Left",
           new Transform3d(
               new Translation3d(+CAMERA_OFFSET_X, +CAMERA_OFFSET_Y, FRONT_CAMERA_OFFSET_Z),
@@ -68,7 +68,7 @@ public class VisionConstants {
 
   public static final CameraConfig COMP_FRONT_RIGHT_CAMERA =
       new CameraConfig(
-          "plzwork",
+          "FrontRight8032",
           "Front Right",
           new Transform3d(
               new Translation3d(+CAMERA_OFFSET_X, -CAMERA_OFFSET_Y, FRONT_CAMERA_OFFSET_Z),
@@ -80,7 +80,7 @@ public class VisionConstants {
           "Back Left",
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, +CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
-              new Rotation3d(0, -BACK_CAMERA_PITCH, Units.degreesToRadians(180 + 32.21))));
+              new Rotation3d(0, -BACK_CAMERA_PITCH, Units.degreesToRadians(180 + 30))));
 
   public static final CameraConfig COMP_BACK_RIGHT_CAMERA =
       new CameraConfig(
@@ -88,5 +88,5 @@ public class VisionConstants {
           "Back Right",
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, -CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
-              new Rotation3d(0, -BACK_CAMERA_PITCH, Units.degreesToRadians(180 - 30.8))));
+              new Rotation3d(0, -BACK_CAMERA_PITCH, Units.degreesToRadians(180 - 30))));
 }
