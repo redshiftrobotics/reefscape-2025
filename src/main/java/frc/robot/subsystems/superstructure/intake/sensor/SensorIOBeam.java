@@ -11,7 +11,7 @@ public class SensorIOBeam implements SensorIO {
   public void updateInputs(SensorIOInputs inputs) {
     inputs.rawVolts = input.getVoltage();
     inputs.rawValue = input.getValue();
-    
+
     inputs.connected = inputs.rawValue > 10;
     inputs.detected = inputs.rawValue < 200;
 
