@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -309,7 +310,7 @@ public class RobotContainer {
   private void configureControllerBindings() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     configureDriverControllerBindings(driverController, true);
-    configureOperatorControllerBindings(operatorController);
+    configureOperatorControllerBindings(operatorController, false);
     configureAlertTriggers();
   }
 
@@ -454,7 +455,8 @@ public class RobotContainer {
     }
   }
 
-  private void configureOperatorControllerBindings(CommandXboxController xbox) {
+  private void configureOperatorControllerBindings(
+      CommandXboxController xbox, boolean hangSetpoints) {
 
     // Enable
 
@@ -568,20 +570,30 @@ public class RobotContainer {
                     () -> xbox.setRumble(rumbleType, 1), () -> xbox.setRumble(rumbleType, 0))
                 .withTimeout(0.2);
 
-    xbox.rightBumper()
-        .debounce(0.1)
-        .and(xbox.leftBumper().negate().debounce(0.1))
-        .and(anyButton.negate())
-        .onTrue(hang.retract().andThen(rumble.apply(RumbleType.kRightRumble)));
-    xbox.leftBumper()
-        .debounce(0.1)
-        .and(xbox.rightBumper().negate().debounce(0.1))
-        .and(anyButton.negate())
-        .onTrue(hang.deploy().andThen(rumble.apply(RumbleType.kLeftRumble)));
-    xbox.rightBumper()
-        .and(xbox.leftBumper())
-        .and(anyButton.negate())
-        .onTrue(hang.stow().andThen(rumble.apply(RumbleType.kBothRumble)));
+    if (hangSetpoints) {
+      // TODO for district comps!
+      xbox.rightBumper()
+          .debounce(0.1)
+          .and(xbox.leftBumper().negate().debounce(0.1))
+          .and(anyButton.negate())
+          .onTrue(hang.retract().andThen(rumble.apply(RumbleType.kRightRumble)));
+      xbox.leftBumper()
+          .debounce(0.1)
+          .and(xbox.rightBumper().negate().debounce(0.1))
+          .and(anyButton.negate())
+          .onTrue(hang.deploy().andThen(rumble.apply(RumbleType.kLeftRumble)));
+      xbox.rightBumper()
+          .and(xbox.leftBumper())
+          .and(anyButton.negate())
+          .onTrue(hang.stow().andThen(rumble.apply(RumbleType.kBothRumble)));
+    } else {
+      xbox.rightBumper()
+          .and(anyButton.negate())
+          .whileTrue(hang.runSet(-1).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+      xbox.leftBumper()
+          .and(anyButton.negate())
+          .whileTrue(hang.runSet(+1).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+    }
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
