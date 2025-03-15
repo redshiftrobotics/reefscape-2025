@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class DriverDashboard extends SubsystemBase {
@@ -47,6 +48,11 @@ public class DriverDashboard extends SubsystemBase {
 
   private BooleanSupplier usingIntakeSensor;
   private BooleanSupplier hasCoral;
+
+  private BooleanSupplier superstructureAtGoal;
+
+  private BooleanSupplier hangWithinTolerance;
+  private DoubleSupplier hangValue;
 
   private final Field2d field = new Field2d();
 
@@ -88,12 +94,18 @@ public class DriverDashboard extends SubsystemBase {
     this.hasVisionEstimate = hasVisionEstimate;
   }
 
-  public void setUsingIntakeSensorCoralSensor(BooleanSupplier usingIntakeSensor) {
+  public void setSensorSuppliers(BooleanSupplier usingIntakeSensor, BooleanSupplier hasCoral) {
     this.usingIntakeSensor = usingIntakeSensor;
+    this.hasCoral = hasCoral;
   }
 
-  public void setHasCoralSupplier(BooleanSupplier hasCoral) {
-    this.hasCoral = hasCoral;
+  public void setHangSuppliers(DoubleSupplier hangValue, BooleanSupplier hangWithTolerance) {
+    this.hangValue = hangValue;
+    this.hangWithinTolerance = hangWithTolerance;
+  }
+
+  public void setSuperstructureAtGoal(BooleanSupplier superstructureAtGoal) {
+    this.superstructureAtGoal = superstructureAtGoal;
   }
 
   @Override
@@ -152,6 +164,18 @@ public class DriverDashboard extends SubsystemBase {
 
     if (hasCoral != null) {
       SmartDashboard.putBoolean("Has Coral?", hasCoral.getAsBoolean());
+    }
+
+    if (superstructureAtGoal != null) {
+      SmartDashboard.putBoolean("At Goal?", superstructureAtGoal.getAsBoolean());
+    }
+
+    if (hangValue != null) {
+      SmartDashboard.putNumber("Hang Value", hangValue.getAsDouble());
+    }
+
+    if (hangWithinTolerance != null) {
+      SmartDashboard.putBoolean("Hang Good?", hangWithinTolerance.getAsBoolean());
     }
   }
 }
