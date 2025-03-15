@@ -158,6 +158,9 @@ public class Elevator extends SubsystemBase {
       Logger.recordOutput("Elevator/Profile/GoalVelocityMetersPerSec", goal.velocity);
 
     } else {
+
+      setpoint = new State(inputs.positionRad, inputs.velocityRadPerSec);
+
       Logger.recordOutput("Elevator/Profile/ShouldRunProfiled", false);
 
       Logger.recordOutput("Elevator/Feedforward/Volts", 0);
@@ -214,6 +217,14 @@ public class Elevator extends SubsystemBase {
   public boolean atGoalHeight() {
     return MathUtil.isNear(
         getMeasuredHeightMeters(), getGoalHeightMeters(), Units.inchesToMeters(tolerance.get()));
+  }
+
+  @AutoLogOutput(key = "Elevator/atGoalRough")
+  public boolean atGoalHeightRough() {
+    return MathUtil.isNear(
+        getMeasuredHeightMeters(),
+        getGoalHeightMeters(),
+        Units.inchesToMeters(tolerance.get() * 8));
   }
 
   public State getGoal() {

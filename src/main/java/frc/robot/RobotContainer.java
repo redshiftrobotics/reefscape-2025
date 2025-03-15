@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -238,9 +239,9 @@ public class RobotContainer {
         });
 
     // Can also use AutoBuilder.buildAutoChooser(); instead of SendableChooser to auto populate
-    // autoChooser = new LoggedDashboardChooser<>("Auto Chooser", new SendableChooser<Command>());
     registerNamedCommands();
-    autoChooser = new LoggedDashboardChooser<>("Auto Chooser", AutoBuilder.buildAutoChooser());
+    autoChooser = new LoggedDashboardChooser<>("Auto Chooser", new SendableChooser<Command>());
+    // autoChooser = new LoggedDashboardChooser<>("Auto Chooser", AutoBuilder.buildAutoChooser());
     autoChooser.addDefaultOption("None", Commands.none());
 
     // Configure autos
@@ -274,8 +275,8 @@ public class RobotContainer {
 
     dashboard.setHasVisionEstimateSupplier(vision::hasVisionEstimate);
 
-    dashboard.setSensorSuppliers(coralIntake::usingSensor, 
-        () -> coralIntake.hasCoral().orElse(false));
+    dashboard.setSensorSuppliers(
+        coralIntake::usingSensor, () -> coralIntake.hasCoral().orElse(false));
     dashboard.setHangSuppliers(hang::getRawValue, hang::withinSafeToleranceSoftLimits);
     dashboard.setSuperstructureAtGoal(superstructure::atGoal);
 
@@ -478,7 +479,12 @@ public class RobotContainer {
     final BiConsumer<Trigger, Superstructure.State> configureOperatorControllerBindingLevel =
         (trigger, level) -> {
           if (level.isLevel()) {
-            trigger.whileTrue(superstructure.run(level));
+            if (level.equals(Superstructure.State.L1)) {
+              trigger.whileTrue(superstructure.run(level));
+            } else {
+              trigger.whileTrue(superstructure.run2(level));
+            }
+            // trigger.whileTrue(superstructure.run(level));
           } else if (level.isIntake()) {
             trigger.whileTrue(superstructure.run(level));
           }
@@ -589,10 +595,8 @@ public class RobotContainer {
           .onTrue(hang.stow().andThen(rumble.apply(RumbleType.kBothRumble)));
     } else {
       xbox.rightBumper()
-          .and(anyButton.negate())
           .whileTrue(hang.runSet(-1).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
       xbox.leftBumper()
-          .and(anyButton.negate())
           .whileTrue(hang.runSet(+1).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
     }
   }
@@ -631,21 +635,30 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "l1",
         Commands.sequence(
-            Commands.parallel(
-                Commands.runOnce(() -> elevator.setGoalHeightMeters(State.L4.getHeight())),
-                Commands.runOnce(() -> coralWrist.setGoalRotation(State.L4.getAngle()))),
-            Commands.waitUntil(superstructure::atGoal)
-                .withTimeout(3)
-                .andThen(Commands.runOnce(sensor::simulateItemEjection)),
-            Commands.waitSeconds(0.1),
-            Commands.runEnd(() -> coralIntake.setMotors(-1), coralIntake::stopMotors)
-                .withTimeout(0.5)));
+                Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle())),
+                Commands.waitUntil(coralWrist::atGoal).withTimeout(0.6),
+                Commands.parallel(
+                    Commands.runOnce(() -> elevator.setGoalHeightMeters(State.L4.getHeight())),
+                    Commands.runOnce(
+                        () -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle()))),
+                Commands.waitUntil(elevator::atGoalHeightRough).withTimeout(2),
+                Commands.parallel(
+                    Commands.runOnce(() -> elevator.setGoalHeightMeters(State.L4.getHeight())),
+                    Commands.runOnce(() -> coralWrist.setGoalRotation(State.L4.getAngle()))),
+                Commands.waitUntil(superstructure::atGoal).withTimeout(2),
+                Commands.waitSeconds(0.1),
+                Commands.runEnd(() -> coralIntake.setMotors(-1), coralIntake::stopMotors)
+                    .withTimeout(0.5)
+                    .alongWith(Commands.runOnce(sensor::simulateItemEjection)),
+                Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle())),
+                Commands.waitUntil(coralWrist::atGoal).withTimeout(0.6))
+            .finallyDo(() -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle())));
 
     NamedCommands.registerCommand(
         "stow",
         Commands.parallel(
-            Commands.runOnce(() -> elevator.setGoalHeightMeters(State.STOW_HIGH.getHeight())),
-            Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW_HIGH.getAngle()))));
+            Commands.runOnce(() -> elevator.setGoalHeightMeters(State.STOW_HIGHER.getHeight())),
+            Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle()))));
 
     NamedCommands.registerCommand(
         "intake",
@@ -666,9 +679,10 @@ public class RobotContainer {
 
     // Path planner Autos
     // https://pathplanner.dev/gui-editing-paths-and-autos.html#autos
-    // dashboardChooser.addOption("Center Test", AutoBuilder.buildAuto("Center-Auto"));
-    // dashboardChooser.addOption("Right Test", AutoBuilder.buildAuto("Right-Auto"));
-    // dashboardChooser.addOption("Left Test", AutoBuilder.buildAuto("Left-Auto"));
+    dashboardChooser.addOption("Center Test", AutoBuilder.buildAuto("Center-Auto"));
+    dashboardChooser.addOption("Right Test", AutoBuilder.buildAuto("Right-Auto"));
+    dashboardChooser.addOption("Left Test", AutoBuilder.buildAuto("Left-Auto"));
+    // dashboardChooser.addOption("SAFE-SAFE-SAFE", AutoBuilder.buildAuto("TEST SAFE AUTO"));
 
     // // Choreo Autos
     // //

@@ -20,14 +20,15 @@ public class Superstructure extends VirtualSubsystem {
 
   public static enum State {
     STOW_LOW(0.054886473109919, -80),
-    STOW_HIGH(0, 80),
+    STOW_HIGH(0, 75),
+    STOW_HIGHER(0, 80),
 
-    INTAKE(0.712 - Units.inchesToMeters(4), -78 + 10),
+    INTAKE(0.712 - Units.inchesToMeters(4) + 0.178, -78 + 10),
 
-    L1(0.151148670108898, 0),
+    L1(0.29, -82),
     L2(0, 55),
     L3(0.478, 55),
-    L4(1.445, 36);
+    L4(1.445 - Units.inchesToMeters(3), 36);
 
     private static final double elevatorHeightDamageOffset = 0;
     private static final Rotation2d wristAngleDamageOffset = Rotation2d.kZero;
@@ -96,6 +97,16 @@ public class Superstructure extends VirtualSubsystem {
         .finallyDo(this::setPositionStow);
   }
 
+  public Command run2(State goal) {
+    return Commands.parallel(
+            elevator.runPositionPrepare(goal::getHeight),
+            coralWrist.runPositionPrepare(State.STOW_HIGH.getAngle()))
+        .andThen(Commands.waitUntil(elevator::atGoalHeightRough))
+        .andThen(coralWrist.runPositionPrepare(goal.getAngle()))
+        .andThen(Commands.idle(elevator, coralWrist))
+        .finallyDo(this::setPositionStow);
+  }
+
   public Command runAction(State newGoal) {
     return runPrepare(newGoal).andThen(Commands.idle(elevator, coralWrist)).until(this::atGoal);
   }
@@ -110,6 +121,7 @@ public class Superstructure extends VirtualSubsystem {
     return switch (goal) {
       case STOW_LOW -> stopIntake();
       case STOW_HIGH -> stopIntake();
+      case STOW_HIGHER -> stopIntake();
       case L1 -> outtakeL1();
       case L2 -> outtake();
       case L3 -> outtake();
@@ -131,7 +143,7 @@ public class Superstructure extends VirtualSubsystem {
   }
 
   public Command outtakeL1() {
-    return coralIntake.runMotors(-0.5, -0.3);
+    return coralIntake.runMotors(0.5, 0.3);
   }
 
   public Command stopIntake() {

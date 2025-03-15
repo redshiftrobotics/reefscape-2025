@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "stow"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "SL-C4"

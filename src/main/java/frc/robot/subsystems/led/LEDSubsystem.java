@@ -69,7 +69,7 @@ public class LEDSubsystem extends SubsystemBase {
       } else {
         applyAll(
             FixedPalettePattern.ColorWaves.OCEAN_PALETTE,
-            FixedPalettePattern.Fire.LARGE,
+            FixedPalettePattern.ColorWaves.LAVA_PALETTE,
             FixedPalettePattern.ColorWaves.FOREST_PALETTE);
       }
     }

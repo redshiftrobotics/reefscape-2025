@@ -11,9 +11,9 @@
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "SC-C6"
+            "waitTime": 2.0
           }
         },
         {
@@ -31,7 +31,7 @@
       ]
     }
   },
-  "resetOdom": true,
-  "folder": "No Algae Clear",
+  "resetOdom": false,
+  "folder": null,
   "choreoAuto": false
 }
