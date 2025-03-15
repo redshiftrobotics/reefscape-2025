@@ -16,6 +16,7 @@ public class LEDSubsystem extends SubsystemBase {
 
   private final Timer startupTimer = new Timer();
 
+  // In future, this could be an IO layer
   private class LEDStrip {
     private final PWM pwm;
     private int pulse;

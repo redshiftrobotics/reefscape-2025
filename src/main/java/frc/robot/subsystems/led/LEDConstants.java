@@ -11,7 +11,7 @@ public class LEDConstants {
 
   public static final int[] PWM_PORTS =
       switch (Constants.getRobot()) {
-        case COMP_BOT_2025 -> new int[] {};
+        case COMP_BOT_2025 -> new int[] {0, 1};
         case T_SHIRT_CANNON_CHASSIS -> new int[] {0};
         case WOOD_BOT_TWO_2025 -> new int[] {0};
         default -> new int[] {};
