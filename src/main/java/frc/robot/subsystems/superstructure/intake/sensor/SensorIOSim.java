@@ -27,8 +27,9 @@ public class SensorIOSim implements SensorIO {
       hasItem = false;
     }
 
-    inputs.detected = hasItem;
+    inputs.altDetected = inputs.detected = hasItem;
     inputs.rawValue = inputs.detected ? 1.0 : 0.0;
+    inputs.rawVolts = inputs.detected ? 5.0 : 4.0;
   }
 
   @Override
