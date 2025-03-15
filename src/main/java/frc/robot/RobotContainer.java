@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -273,8 +274,10 @@ public class RobotContainer {
 
     dashboard.setHasVisionEstimateSupplier(vision::hasVisionEstimate);
 
-    dashboard.setHasCoralSupplier(() -> coralIntake.hasCoral().orElse(false));
-    dashboard.setUsingIntakeSensorCoralSensor(coralIntake::usingSensor);
+    dashboard.setSensorSuppliers(coralIntake::usingSensor, 
+        () -> coralIntake.hasCoral().orElse(false));
+    dashboard.setHangSuppliers(hang::getRawValue, hang::withinSafeToleranceSoftLimits);
+    dashboard.setSuperstructureAtGoal(superstructure::atGoal);
 
     dashboard.addCommand("Reset Pose", () -> drive.resetPose(new Pose2d()), true);
     dashboard.addCommand(
@@ -309,7 +312,7 @@ public class RobotContainer {
   private void configureControllerBindings() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     configureDriverControllerBindings(driverController, true);
-    configureOperatorControllerBindings(operatorController);
+    configureOperatorControllerBindings(operatorController, false);
     configureAlertTriggers();
   }
 
@@ -454,13 +457,13 @@ public class RobotContainer {
     }
   }
 
-  private void configureOperatorControllerBindings(CommandXboxController xbox) {
+  private void configureOperatorControllerBindings(
+      CommandXboxController xbox, boolean hangSetpoints) {
 
     // Enable
 
     new Trigger(DriverStation::isEnabled)
-        .onTrue(superstructure.runAction(Superstructure.State.STOW_HIGH))
-        .onTrue(hang.stow());
+        .onTrue(superstructure.runAction(Superstructure.State.STOW_HIGH));
 
     coralWrist.setSlowModeSupplier(() -> coralIntake.hasCoral().orElse(false));
 
@@ -568,20 +571,30 @@ public class RobotContainer {
                     () -> xbox.setRumble(rumbleType, 1), () -> xbox.setRumble(rumbleType, 0))
                 .withTimeout(0.2);
 
-    xbox.rightBumper()
-        .debounce(0.1)
-        .and(xbox.leftBumper().negate().debounce(0.1))
-        .and(anyButton.negate())
-        .onTrue(hang.retract().andThen(rumble.apply(RumbleType.kRightRumble)));
-    xbox.leftBumper()
-        .debounce(0.1)
-        .and(xbox.rightBumper().negate().debounce(0.1))
-        .and(anyButton.negate())
-        .onTrue(hang.deploy().andThen(rumble.apply(RumbleType.kLeftRumble)));
-    xbox.rightBumper()
-        .and(xbox.leftBumper())
-        .and(anyButton.negate())
-        .onTrue(hang.stow().andThen(rumble.apply(RumbleType.kBothRumble)));
+    if (hangSetpoints) {
+      // TODO for district comps!
+      xbox.rightBumper()
+          .debounce(0.1)
+          .and(xbox.leftBumper().negate().debounce(0.1))
+          .and(anyButton.negate())
+          .onTrue(hang.retract().andThen(rumble.apply(RumbleType.kRightRumble)));
+      xbox.leftBumper()
+          .debounce(0.1)
+          .and(xbox.rightBumper().negate().debounce(0.1))
+          .and(anyButton.negate())
+          .onTrue(hang.deploy().andThen(rumble.apply(RumbleType.kLeftRumble)));
+      xbox.rightBumper()
+          .and(xbox.leftBumper())
+          .and(anyButton.negate())
+          .onTrue(hang.stow().andThen(rumble.apply(RumbleType.kBothRumble)));
+    } else {
+      xbox.rightBumper()
+          .and(anyButton.negate())
+          .whileTrue(hang.runSet(-1).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+      xbox.leftBumper()
+          .and(anyButton.negate())
+          .whileTrue(hang.runSet(+1).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+    }
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
@@ -621,7 +634,9 @@ public class RobotContainer {
             Commands.parallel(
                 Commands.runOnce(() -> elevator.setGoalHeightMeters(State.L4.getHeight())),
                 Commands.runOnce(() -> coralWrist.setGoalRotation(State.L4.getAngle()))),
-            Commands.waitUntil(superstructure::atGoal),
+            Commands.waitUntil(superstructure::atGoal)
+                .withTimeout(3)
+                .andThen(Commands.runOnce(sensor::simulateItemEjection)),
             Commands.waitSeconds(0.1),
             Commands.runEnd(() -> coralIntake.setMotors(-1), coralIntake::stopMotors)
                 .withTimeout(0.5)));
@@ -642,7 +657,9 @@ public class RobotContainer {
                             () -> coralIntake.setMotors(-0.6), () -> coralIntake.setMotors(0.0))
                         .until(() -> coralIntake.hasCoral().orElse(false)))
                 .withTimeout(3),
-            Commands.waitUntil(superstructure::atGoal).andThen(sensor::simulateItemRequest)));
+            Commands.waitUntil(superstructure::atGoal)
+                .withTimeout(3)
+                .andThen(sensor::simulateItemRequest)));
   }
 
   private void configureAutos(LoggedDashboardChooser<Command> dashboardChooser) {

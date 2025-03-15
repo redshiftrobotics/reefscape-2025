@@ -32,4 +32,7 @@ public class HangConstants {
   public static final Rotation2d RETRACT_POSITION_ROTATIONS = Rotation2d.fromDegrees(-30);
 
   public static final double TOLERANCE = Units.degreesToRotations(0.3);
+
+  public static final double MIN_SAFE_RAW_VALUE_SOFT_LIMIT = -1;
+  public static final double MAX_SAFE_RAW_VALUE_SOFT_LIMIT = +1;
 }
