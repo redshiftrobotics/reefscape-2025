@@ -42,15 +42,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "stow"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "PL-C1"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "stow"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "PL-C3"
+                }
+              }
+            ]
           }
         },
         {
@@ -60,9 +67,47 @@
           }
         },
         {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "stow"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "C3-PL"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "stow"
+            "name": "intake"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "stow"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "PL-C2"
+                }
+              }
+            ]
           }
         }
       ]
