@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superstructure.intake.sensor;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.AnalogInput;
 
 public class SensorIOBeam implements SensorIO {
@@ -8,8 +9,12 @@ public class SensorIOBeam implements SensorIO {
 
   @Override
   public void updateInputs(SensorIOInputs inputs) {
+    inputs.rawVolts = input.getVoltage();
     inputs.rawValue = input.getValue();
+
     inputs.connected = inputs.rawValue > 10;
-    inputs.detected = inputs.rawValue < 200;
+    inputs.detected = inputs.rawValue < 175;
+
+    inputs.altDetected = MathUtil.isNear(inputs.rawVolts, 5, 0.1);
   }
 }

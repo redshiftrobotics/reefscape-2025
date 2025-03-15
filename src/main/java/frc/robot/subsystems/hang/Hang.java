@@ -77,6 +77,17 @@ public class Hang extends SubsystemBase {
     return lastGoal.getDegrees();
   }
 
+  // TEMP FOR QUICK FIX
+  public double getRawValue() {
+    return inputs.positionRotations;
+  }
+
+  // TEMP FOR QUICK FIX
+  public boolean withinSafeToleranceSoftLimits() {
+    return inputs.positionRotations > HangConstants.MIN_SAFE_RAW_VALUE_SOFT_LIMIT
+        && inputs.positionRotations < HangConstants.MAX_SAFE_RAW_VALUE_SOFT_LIMIT;
+  }
+
   public Command stow() {
     return runOnce(() -> setLastGoal(HangConstants.STOWED_POSITION_ROTATIONS));
   }

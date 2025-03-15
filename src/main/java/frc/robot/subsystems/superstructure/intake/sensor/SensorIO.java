@@ -7,8 +7,11 @@ public interface SensorIO {
   public static class SensorIOInputs {
     boolean connected = false;
 
+    double rawVolts = 0.0;
     double rawValue = 0.0;
+
     boolean detected = false;
+    boolean altDetected = false;
   }
 
   /** Updates the set of loggable inputs. */
