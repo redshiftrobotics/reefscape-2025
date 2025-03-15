@@ -30,6 +30,9 @@ public class Superstructure extends VirtualSubsystem {
     L3(0.478, 55),
     L4(1.445 - Units.inchesToMeters(3), 36);
 
+    // L2_ALGEA(0.29, 0),
+    // L3_ALGEA(0.478, 0);
+
     private static final double elevatorHeightDamageOffset = 0;
     private static final Rotation2d wristAngleDamageOffset = Rotation2d.kZero;
 

@@ -65,14 +65,16 @@ public class WristIOHardware implements WristIO {
     SparkUtil.clearStickyFault();
 
     ifOk(
-        motor, encoder::getPosition, value -> inputs.positionRad = Units.rotationsToRadians(value));
+        motor,
+        absEncoder::getPosition,
+        value -> inputs.positionRad = Units.rotationsToRadians(value));
     ifOk(
         motor,
         absEncoder::getPosition,
         value -> inputs.absPositionRad = Units.rotationsToRadians(value));
     ifOk(
         motor,
-        encoder::getVelocity,
+        absEncoder::getVelocity,
         value -> inputs.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(value));
 
     ifOk(

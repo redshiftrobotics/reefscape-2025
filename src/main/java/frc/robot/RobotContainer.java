@@ -567,9 +567,9 @@ public class RobotContainer {
                 -1,
                 +1);
 
-    new Trigger(() -> hangSpeed.getAsDouble() != 0)
-        .and(DriverStation::isTeleopEnabled)
-        .whileTrue(hang.run(() -> hang.set(hangSpeed.getAsDouble())).finallyDo(hang::stop));
+    // new Trigger(() -> hangSpeed.getAsDouble() != 0)
+    //     .and(DriverStation::isTeleopEnabled)
+    //     .whileTrue(hang.run(() -> hang.set(hangSpeed.getAsDouble())).finallyDo(hang::stop));
 
     Function<RumbleType, Command> rumble =
         (rumbleType) ->
