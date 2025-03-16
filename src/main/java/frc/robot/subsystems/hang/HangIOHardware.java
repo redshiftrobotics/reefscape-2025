@@ -33,6 +33,8 @@ public class HangIOHardware implements HangIO {
     // absEncoder = motor.getAbsoluteEncoder();
     control = motor.getClosedLoopController();
 
+    SmartDashboard.putString("Hang", "init");
+
     final SparkMaxConfig motorConfig = new SparkMaxConfig();
     motorConfig
         .inverted(config.motorInverted())

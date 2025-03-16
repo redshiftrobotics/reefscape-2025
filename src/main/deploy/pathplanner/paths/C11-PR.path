@@ -21,7 +21,7 @@
       },
       "prevControl": {
         "x": 2.081929744999999,
-        "y": 1.7347990319999995
+        "y": 1.7347990319999997
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,7 @@
   "folder": "C-P",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 240.0
+    "rotation": 239.99999999999997
   },
   "useDefaultConstraints": true
 }

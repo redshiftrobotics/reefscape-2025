@@ -26,9 +26,9 @@ public class Camera {
       new LoggedTunableNumberFactory("VisionResultsStatus");
 
   private static final LoggedTunableNumber xyStdDevCoefficient =
-      group.getNumber("xyStdDevCoefficient", 0.075 * 10);
+      group.getNumber("xyStdDevCoefficient", 0.075);
   private static final LoggedTunableNumber thetaStdDevCoefficient =
-      group.getNumber("thetaStdDevCoefficient", 0.085 * 10);
+      group.getNumber("thetaStdDevCoefficient", 0.085);
 
   private static final LoggedTunableNumber zHeightToleranceMeters =
       group.getNumber("zHeightToleranceMeters", 0.6);

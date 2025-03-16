@@ -43,7 +43,7 @@
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": "No Algae Clear",
   "choreoAuto": false
 }

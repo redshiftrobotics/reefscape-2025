@@ -48,15 +48,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "stow"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "PL-C1"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "PL-C1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stow_delay"
+                }
+              }
+            ]
           }
         },
         {
@@ -66,15 +73,53 @@
           }
         },
         {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "C1-PL"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intake_prep_delay"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "stow"
+            "name": "intake"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "PL-C2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stow_delay"
+                }
+              }
+            ]
           }
         }
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": "No Algae Clear",
   "choreoAuto": false
 }

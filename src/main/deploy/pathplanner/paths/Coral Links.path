@@ -202,7 +202,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 240.0
+    "rotation": 239.99999999999997
   },
   "reversed": false,
   "folder": "Linked Waypoints",

@@ -48,7 +48,7 @@
   "folder": "S-C",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -30.0
+    "rotation": -29.999999999999996
   },
   "useDefaultConstraints": true
 }

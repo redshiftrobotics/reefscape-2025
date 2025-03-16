@@ -60,7 +60,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "stow"
+                  "name": "stow_delay"
                 }
               }
             ]
@@ -85,10 +85,16 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "intake_prep"
+                  "name": "intake_prep_delay"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intake"
           }
         },
         {
@@ -104,7 +110,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "stow"
+                  "name": "stow_delay"
                 }
               }
             ]
@@ -113,7 +119,7 @@
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": "No Algae Clear",
   "choreoAuto": false
 }

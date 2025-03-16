@@ -1,6 +1,6 @@
 {
   "version": 1.0,
-  "grid_size": 128,
+  "grid_size": 64,
   "tabs": [
     {
       "name": "Teleoperated",
@@ -8,20 +8,8 @@
         "layouts": [],
         "containers": [
           {
-            "title": "Alerts",
-            "x": 1280.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Alerts",
-            "properties": {
-              "topic": "/SmartDashboard/Alerts",
-              "period": 0.06
-            }
-          },
-          {
             "title": "Field Relative",
-            "x": 0.0,
+            "x": 128.0,
             "y": 256.0,
             "width": 128.0,
             "height": 128.0,
@@ -37,49 +25,10 @@
             }
           },
           {
-            "title": "Speed MPH",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 256.0,
-            "type": "Number Bar",
-            "properties": {
-              "topic": "/SmartDashboard/Speed MPH",
-              "period": 0.06,
-              "data_type": "double",
-              "min_value": 0.0,
-              "max_value": 15.0,
-              "divisions": 6,
-              "inverted": false,
-              "orientation": "vertical"
-            }
-          },
-          {
-            "title": "Heading Degrees",
-            "x": 128.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Radial Gauge",
-            "properties": {
-              "topic": "/SmartDashboard/Heading Degrees",
-              "period": 0.06,
-              "data_type": "double",
-              "start_angle": 0.0,
-              "end_angle": 360.0,
-              "min_value": 0.0,
-              "max_value": 360.0,
-              "number_of_labels": 8,
-              "wrap_value": true,
-              "show_pointer": true,
-              "show_ticks": false
-            }
-          },
-          {
             "title": "Drive",
-            "x": 128.0,
-            "y": 256.0,
-            "width": 256.0,
+            "x": 256.0,
+            "y": 0.0,
+            "width": 320.0,
             "height": 128.0,
             "type": "Subsystem",
             "properties": {
@@ -100,26 +49,10 @@
             }
           },
           {
-            "title": "BatteryVoltage",
-            "x": 1024.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Graph",
-            "properties": {
-              "topic": "/AdvantageKit/SystemStats/BatteryVoltage",
-              "period": 0.033,
-              "data_type": "double",
-              "time_displayed": 5.0,
-              "color": 4278238420,
-              "line_width": 2.0
-            }
-          },
-          {
             "title": "Auto Chooser",
-            "x": 1024.0,
+            "x": 960.0,
             "y": 0.0,
-            "width": 256.0,
+            "width": 320.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -129,35 +62,53 @@
             }
           },
           {
-            "title": "Gyro Rotation Reset (Zero)",
-            "x": 1280.0,
-            "y": 0.0,
-            "width": 256.0,
+            "title": "Game Time",
+            "x": 768.0,
+            "y": 384.0,
+            "width": 192.0,
             "height": 128.0,
-            "type": "Command",
+            "type": "Match Time",
             "properties": {
-              "topic": "/SmartDashboard/Reset Rotation",
+              "topic": "/SmartDashboard/Game Time",
               "period": 0.06,
-              "show_type": false
+              "data_type": "double",
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 15,
+              "yellow_start_time": 30
             }
           },
           {
-            "title": "CommsDisableCount",
-            "x": 1280.0,
-            "y": 384.0,
+            "title": "Heading Controlled",
+            "x": 0.0,
+            "y": 256.0,
             "width": 128.0,
             "height": 128.0,
-            "type": "Text Display",
+            "type": "Boolean Box",
             "properties": {
-              "topic": "/AdvantageKit/SystemStats/CommsDisableCount",
+              "topic": "/SmartDashboard/Heading Controlled",
               "period": 0.06,
-              "data_type": "int",
-              "show_submit_button": false
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Alerts",
+            "x": 960.0,
+            "y": 128.0,
+            "width": 320.0,
+            "height": 448.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/SmartDashboard/Alerts",
+              "period": 0.06
             }
           },
           {
             "title": "BrownedOut",
-            "x": 1408.0,
+            "x": 384.0,
             "y": 384.0,
             "width": 128.0,
             "height": 128.0,
@@ -173,26 +124,120 @@
             }
           },
           {
-            "title": "Game Time",
-            "x": 1024.0,
+            "title": "CommsDisableCount",
+            "x": 512.0,
             "y": 384.0,
-            "width": 256.0,
+            "width": 128.0,
             "height": 128.0,
-            "type": "Match Time",
+            "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/Game Time",
+              "topic": "/AdvantageKit/SystemStats/CommsDisableCount",
+              "period": 0.06,
+              "data_type": "int",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Has Vision",
+            "x": 576.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Has Vision",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "RobotName",
+            "x": 640.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/RobotName",
+              "period": 0.06,
+              "data_type": "string",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Has Coral?",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Has Coral?",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Intake Sensor?",
+            "x": 704.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Intake Sensor?",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Hang Value",
+            "x": 832.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Hang Value",
               "period": 0.06,
               "data_type": "double",
-              "time_display_mode": "Minutes and Seconds",
-              "red_start_time": 15,
-              "yellow_start_time": 30
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "At Goal?",
+            "x": 832.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/At Goal?",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           },
           {
             "title": "Field",
-            "x": 512.0,
-            "y": 0.0,
-            "width": 384.0,
+            "x": 256.0,
+            "y": 128.0,
+            "width": 576.0,
             "height": 256.0,
             "type": "Field",
             "properties": {
@@ -209,20 +254,17 @@
             }
           },
           {
-            "title": "Has Vision",
-            "x": 768.0,
+            "title": "Hang",
+            "x": 832.0,
             "y": 256.0,
             "width": 128.0,
             "height": 128.0,
-            "type": "Boolean Box",
+            "type": "Text Display",
             "properties": {
-              "topic": "/SmartDashboard/Has Vision",
+              "topic": "/SmartDashboard/Hang",
               "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
+              "data_type": "string",
+              "show_submit_button": false
             }
           }
         ]

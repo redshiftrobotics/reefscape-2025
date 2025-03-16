@@ -177,6 +177,8 @@ public class Superstructure extends VirtualSubsystem {
     SmartDashboard.putNumber("Elevator Height Meters", elevator.getMeasuredHeightMeters());
     SmartDashboard.putNumber("Coral Wrist Degrees", coralWrist.getGoalRotations().getDegrees());
 
+    SmartDashboard.putString("StartState", startState.toString());
+
     for (State state : State.values()) {
       Logger.recordOutput("Superstructure/" + state.name() + "/Height", state.getHeight());
       Logger.recordOutput(
