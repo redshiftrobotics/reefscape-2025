@@ -27,6 +27,18 @@
           "data": {
             "name": "l4"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SC-C6 Leave"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stow"
+          }
         }
       ]
     }

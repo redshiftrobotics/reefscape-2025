@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "l1_stow"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "SR-C9"
@@ -29,7 +35,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "stow"
+                  "name": "intake_prep"
                 }
               }
             ]
@@ -63,7 +69,7 @@
         {
           "type": "named",
           "data": {
-            "name": "l1"
+            "name": "l4"
           }
         },
         {
@@ -79,7 +85,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "stow"
+                  "name": "intake_prep"
                 }
               }
             ]
@@ -102,12 +108,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "l1"
           }
         }
       ]

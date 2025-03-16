@@ -646,8 +646,9 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "l1_stow",
         Commands.sequence(
-            Commands.runOnce(() -> elevator.setGoalHeightMeters(State.L1.getHeight())),
-            Commands.runOnce(() -> coralWrist.setGoalRotation(State.L1.getAngle()))));
+                Commands.runOnce(() -> elevator.setGoalHeightMeters(State.L1.getHeight())),
+                Commands.runOnce(() -> coralWrist.setGoalRotation(State.L1.getAngle())))
+            .finallyDo(() -> superstructure.startState = State.L1));
     NamedCommands.registerCommand(
         "l1",
         Commands.sequence(
@@ -691,28 +692,32 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "intake_prep",
         Commands.parallel(
-            Commands.runOnce(() -> elevator.setGoalHeightMeters(State.INTAKE.getHeight())),
-            Commands.runOnce(() -> coralWrist.setGoalRotation(State.INTAKE.getAngle()))));
+                Commands.runOnce(() -> elevator.setGoalHeightMeters(State.INTAKE.getHeight())),
+                Commands.runOnce(() -> coralWrist.setGoalRotation(State.INTAKE.getAngle())))
+            .finallyDo(() -> superstructure.startState = State.INTAKE));
 
     NamedCommands.registerCommand(
         "stow",
         Commands.parallel(
-            Commands.runOnce(() -> elevator.setGoalHeightMeters(State.STOW_HIGHER.getHeight())),
-            Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle()))));
+                Commands.runOnce(() -> elevator.setGoalHeightMeters(State.STOW_HIGHER.getHeight())),
+                Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle())))
+            .finallyDo(() -> superstructure.startState = State.STOW_HIGH));
 
     NamedCommands.registerCommand(
         "intake",
         Commands.deadline(
-            Commands.parallel(
-                    Commands.runOnce(() -> elevator.setGoalHeightMeters(State.INTAKE.getHeight())),
-                    Commands.runOnce(() -> coralWrist.setGoalRotation(State.INTAKE.getAngle())),
-                    Commands.runEnd(
-                            () -> coralIntake.setMotors(-0.6), () -> coralIntake.setMotors(0.0))
-                        .until(() -> coralIntake.hasCoral().orElse(false)))
-                .withTimeout(3),
-            Commands.waitUntil(superstructure::atGoal)
-                .withTimeout(3)
-                .andThen(sensor::simulateItemRequest)));
+                Commands.parallel(
+                        Commands.runOnce(
+                            () -> elevator.setGoalHeightMeters(State.INTAKE.getHeight())),
+                        Commands.runOnce(() -> coralWrist.setGoalRotation(State.INTAKE.getAngle())),
+                        Commands.runEnd(
+                                () -> coralIntake.setMotors(-0.6), () -> coralIntake.setMotors(0.0))
+                            .until(() -> coralIntake.hasCoral().orElse(false)))
+                    .withTimeout(3),
+                Commands.waitUntil(superstructure::atGoal)
+                    .withTimeout(3)
+                    .andThen(sensor::simulateItemRequest))
+            .finallyDo(() -> superstructure.startState = State.STOW_HIGH));
   }
 
   private void configureAutos(LoggedDashboardChooser<Command> dashboardChooser) {
