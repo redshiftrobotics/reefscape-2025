@@ -5,12 +5,6 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "l1_stow"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "SR-C9"
@@ -35,7 +29,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "intake_prep"
+                  "name": "stow"
                 }
               }
             ]
@@ -48,15 +42,72 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "PR-C11"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "PR-C10"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stow"
+                }
+              }
+            ]
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "l4"
+            "name": "l1"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "C10-PR"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stow"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "PR-C11"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stow"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "l1"
           }
         }
       ]

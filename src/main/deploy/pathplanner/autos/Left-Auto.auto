@@ -56,13 +56,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "PL-C2"
+            "pathName": "PL-C1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "l4"
+            "name": "l1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stow"
           }
         }
       ]
