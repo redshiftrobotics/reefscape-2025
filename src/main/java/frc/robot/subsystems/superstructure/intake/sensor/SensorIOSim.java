@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class SensorIOSim implements SensorIO {
 
-  public static final double MAX_TIME_TILL_ITEM_SECONDS = 2.0;
+  public static final double MAX_TIME_TILL_ITEM_SECONDS = 5.0;
 
   private final Timer timer = new Timer();
   private final Random random = new Random();
@@ -35,7 +35,8 @@ public class SensorIOSim implements SensorIO {
   @Override
   public void simulateItemDesire() {
     timer.start();
-    timeTillItem = random.nextDouble() * MAX_TIME_TILL_ITEM_SECONDS;
+    // timeTillItem = random.nextDouble() * MAX_TIME_TILL_ITEM_SECONDS;
+    timeTillItem = 1.7 * MAX_TIME_TILL_ITEM_SECONDS;
     itemRequested = true;
   }
 

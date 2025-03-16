@@ -7,7 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "stow"
+            "name": "l1_stow"
           }
         },
         {
@@ -35,7 +35,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "stow"
+                  "name": "intake_prep"
                 }
               }
             ]
@@ -48,27 +48,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "stow"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "PR-C0"
+            "pathName": "PR-C11"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "l1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "stow"
+            "name": "l4"
           }
         }
       ]

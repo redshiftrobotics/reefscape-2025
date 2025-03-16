@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "SC-C6"
@@ -19,13 +25,7 @@
         {
           "type": "named",
           "data": {
-            "name": "l1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "stow"
+            "name": "l4"
           }
         }
       ]

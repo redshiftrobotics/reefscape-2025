@@ -18,17 +18,21 @@ public class Superstructure extends VirtualSubsystem {
   private final Wrist coralWrist;
   private final Intake coralIntake;
 
+  public State startState = State.STOW_HIGH;
+
   public static enum State {
     STOW_LOW(0.054886473109919, -80),
     STOW_HIGH(0, 75),
     STOW_HIGHER(0, 80),
 
-    INTAKE(0.712 - Units.inchesToMeters(4) + 0.178, -78 + 10),
+    INTAKE(0.712 - Units.inchesToMeters(6) + 0.178, -78 + 10),
 
     L1(0.29, -82),
     L2(0, 55),
     L3(0.478, 55),
-    L4(1.445 - Units.inchesToMeters(3), 36);
+    L4(1.445 - Units.inchesToMeters(3), 36),
+
+    L4_STOW(1.445 - Units.inchesToMeters(3), 60);
 
     // L2_ALGEA(0.29, 0),
     // L3_ALGEA(0.478, 0);
@@ -125,6 +129,7 @@ public class Superstructure extends VirtualSubsystem {
       case STOW_LOW -> stopIntake();
       case STOW_HIGH -> stopIntake();
       case STOW_HIGHER -> stopIntake();
+      case L4_STOW -> stopIntake();
       case L1 -> outtakeL1();
       case L2 -> outtake();
       case L3 -> outtake();

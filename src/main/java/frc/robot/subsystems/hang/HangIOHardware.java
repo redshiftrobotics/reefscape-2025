@@ -4,8 +4,6 @@ import static frc.robot.utility.SparkUtil.ifOk;
 import static frc.robot.utility.SparkUtil.tryUntilOk;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -15,13 +13,14 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.hang.HangConstants.HangConfig;
 import frc.robot.utility.SparkUtil;
 
 public class HangIOHardware implements HangIO {
   private final SparkMax motor;
   private final RelativeEncoder encoder;
-  private final SparkAbsoluteEncoder absEncoder;
+  // private final SparkAbsoluteEncoder absEncoder;
   private final SparkClosedLoopController control;
 
   private boolean breakMode = true;
@@ -31,7 +30,7 @@ public class HangIOHardware implements HangIO {
   public HangIOHardware(HangConfig config) {
     motor = new SparkMax(config.motorId(), MotorType.kBrushless);
     encoder = motor.getEncoder();
-    absEncoder = motor.getAbsoluteEncoder();
+    // absEncoder = motor.getAbsoluteEncoder();
     control = motor.getClosedLoopController();
 
     final SparkMaxConfig motorConfig = new SparkMaxConfig();
@@ -64,7 +63,7 @@ public class HangIOHardware implements HangIO {
     SparkUtil.clearStickyFault();
 
     ifOk(motor, encoder::getPosition, value -> inputs.positionRotations = value);
-    ifOk(motor, absEncoder::getPosition, value -> inputs.absPositionRotations = value);
+    // ifOk(motor, absEncoder::getPosition, value -> inputs.absPositionRotations = value);
     ifOk(motor, encoder::getVelocity, value -> inputs.velocityRPM = value);
 
     ifOk(
@@ -97,21 +96,24 @@ public class HangIOHardware implements HangIO {
 
   @Override
   public void runPosition(double setpointRotations) {
-    control.setReference(setpointRotations, ControlType.kPosition);
+    // control.setReference(setpointRotations, ControlType.kPosition);
   }
 
   @Override
   public void runOpenLoop(double output) {
+    SmartDashboard.putString("Hang", String.valueOf(output));
     motor.set(output);
   }
 
   @Override
   public void runVolts(double volts) {
+    SmartDashboard.putString("Hang", "Volts " + volts);
     motor.setVoltage(volts);
   }
 
   @Override
   public void stop() {
+    SmartDashboard.putString("Hang", "STOP");
     motor.stopMotor();
   }
 

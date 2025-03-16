@@ -1,6 +1,8 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N1;
@@ -22,6 +24,8 @@ public class AprilTagVision extends SubsystemBase {
   public static final boolean DO_CAMERA_LOGGING = true;
 
   private final Camera[] cameras;
+
+  private final Debouncer debouncer = new Debouncer(0.2, DebounceType.kFalling);
 
   private List<Consumer<TimestampedRobotPoseEstimate>> timestampRobotPoseEstimateConsumers =
       new ArrayList<>();
@@ -116,6 +120,10 @@ public class AprilTagVision extends SubsystemBase {
   /** Get whether or not the vision system has a valid estimate */
   public boolean hasVisionEstimate() {
     return hasVisionEstimate;
+  }
+
+  public boolean hasVisionEstimateDebounce() {
+    return debouncer.calculate(hasVisionEstimate);
   }
 
   /**

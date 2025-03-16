@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -75,6 +74,7 @@ import frc.robot.utility.JoystickUtil;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
@@ -273,7 +273,7 @@ public class RobotContainer {
 
     dashboard.setAutoAlignPoseSupplier(AdaptiveAutoAlignCommands::getCurrentAutoAlignGoal);
 
-    dashboard.setHasVisionEstimateSupplier(vision::hasVisionEstimate);
+    dashboard.setHasVisionEstimateSupplier(vision::hasVisionEstimateDebounce);
 
     dashboard.setSensorSuppliers(
         coralIntake::usingSensor, () -> coralIntake.hasCoral().orElse(false));
@@ -407,14 +407,16 @@ public class RobotContainer {
               Arrays.asList(FieldConstants.Reef.alignmentFaces),
               new Transform2d(
                   DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0, 0, Rotation2d.k180deg),
-              new Transform2d(Units.inchesToMeters(-5), 0, Rotation2d.k180deg),
+              new Transform2d(Units.inchesToMeters(-4.5), 0, Rotation2d.k180deg),
               new Translation2d(Units.inchesToMeters(6), 0));
 
       reefAlignmentCommands.setEndCommand(() -> rumbleController(xbox, 0.5).withTimeout(0.1));
 
       xbox.rightTrigger()
-          .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Algin REEF"))
-          .onFalse(reefAlignmentCommands.stop(drive));
+          .and(vision::hasVisionEstimateDebounce)
+          .onTrue(reefAlignmentCommands.driveToClosest(drive).withName("Algin REEF"));
+
+      xbox.rightTrigger().onFalse(reefAlignmentCommands.stop(drive));
 
       xbox.rightTrigger()
           .and(xbox.leftBumper())
@@ -441,8 +443,10 @@ public class RobotContainer {
       intakeAlignmentCommands.setEndCommand(() -> rumbleController(xbox, 0.5).withTimeout(0.1));
 
       xbox.leftTrigger()
-          .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Align INTAKE"))
-          .onFalse(intakeAlignmentCommands.stop(drive));
+          .and(vision::hasVisionEstimateDebounce)
+          .onTrue(intakeAlignmentCommands.driveToClosest(drive).withName("Align INTAKE"));
+
+      xbox.leftTrigger().onFalse(intakeAlignmentCommands.stop(drive));
 
       xbox.leftTrigger()
           .and(xbox.leftBumper())
@@ -463,8 +467,11 @@ public class RobotContainer {
 
     // Enable
 
-    new Trigger(DriverStation::isEnabled)
-        .onTrue(superstructure.runAction(Superstructure.State.STOW_HIGH));
+    new Trigger(DriverStation::isTeleopEnabled)
+        .onTrue(
+            Commands.defer(
+                () -> superstructure.runAction(superstructure.startState),
+                Set.of(elevator, coralWrist)));
 
     coralWrist.setSlowModeSupplier(() -> coralIntake.hasCoral().orElse(false));
 
@@ -532,6 +539,12 @@ public class RobotContainer {
     anyButton.and(xbox.rightBumper()).whileTrue(coralIntake.runMotors(-intakeManualSpeed));
     anyButton.and(xbox.leftBumper()).whileTrue(coralIntake.runMotors(+intakeManualSpeed));
 
+    xbox.rightStick()
+        .onTrue(
+            Commands.parallel(
+                Commands.runOnce(() -> elevator.setGoalHeightMeters(State.STOW_HIGH.getHeight())),
+                Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW_HIGH.getAngle()))));
+
     // Intake
 
     coralIntake.setDefaultCommand(superstructure.passiveIntake());
@@ -594,10 +607,8 @@ public class RobotContainer {
           .and(anyButton.negate())
           .onTrue(hang.stow().andThen(rumble.apply(RumbleType.kBothRumble)));
     } else {
-      xbox.rightBumper()
-          .whileTrue(hang.runSet(-1).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
-      xbox.leftBumper()
-          .whileTrue(hang.runSet(+1).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+      xbox.rightBumper().whileTrue(hang.runSet(-1));
+      xbox.leftBumper().whileTrue(hang.runSet(+1));
     }
   }
 
@@ -633,7 +644,28 @@ public class RobotContainer {
     // https://pathplanner.dev/pplib-named-commands.html
 
     NamedCommands.registerCommand(
+        "l1_stow",
+        Commands.sequence(
+            Commands.runOnce(() -> elevator.setGoalHeightMeters(State.L1.getHeight())),
+            Commands.runOnce(() -> coralWrist.setGoalRotation(State.L1.getAngle()))));
+    NamedCommands.registerCommand(
         "l1",
+        Commands.sequence(
+                Commands.parallel(
+                    Commands.runOnce(() -> elevator.setGoalHeightMeters(State.L1.getHeight())),
+                    Commands.runOnce(() -> coralWrist.setGoalRotation(State.L1.getAngle()))),
+                Commands.waitUntil(superstructure::atGoal).withTimeout(3),
+                Commands.runEnd(
+                        () -> {
+                          coralIntake.setLeftMotor(0.8);
+                          coralIntake.setRightMotor(0.6);
+                        },
+                        coralIntake::stopMotors)
+                    .withTimeout(0.5))
+            .finallyDo(() -> superstructure.startState = State.L1));
+
+    NamedCommands.registerCommand(
+        "l4",
         Commands.sequence(
                 Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle())),
                 Commands.waitUntil(coralWrist::atGoal).withTimeout(0.6),
@@ -652,7 +684,15 @@ public class RobotContainer {
                     .alongWith(Commands.runOnce(sensor::simulateItemEjection)),
                 Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle())),
                 Commands.waitUntil(coralWrist::atGoal).withTimeout(0.6))
-            .finallyDo(() -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle())));
+            .finallyDo(() -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle()))
+            .finallyDo(() -> elevator.setGoalHeightMeters(State.L4.getHeight()))
+            .finallyDo(() -> superstructure.startState = State.L4_STOW));
+
+    NamedCommands.registerCommand(
+        "intake_prep",
+        Commands.parallel(
+            Commands.runOnce(() -> elevator.setGoalHeightMeters(State.INTAKE.getHeight())),
+            Commands.runOnce(() -> coralWrist.setGoalRotation(State.INTAKE.getAngle()))));
 
     NamedCommands.registerCommand(
         "stow",

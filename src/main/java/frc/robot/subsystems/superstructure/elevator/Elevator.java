@@ -159,7 +159,7 @@ public class Elevator extends SubsystemBase {
 
     } else {
 
-      setpoint = new State(inputs.positionRad, inputs.velocityRadPerSec);
+      // setpoint = new State();
 
       Logger.recordOutput("Elevator/Profile/ShouldRunProfiled", false);
 

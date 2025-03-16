@@ -76,11 +76,11 @@ public class VisionConstants {
 
   public static final CameraConfig COMP_BACK_LEFT_CAMERA =
       new CameraConfig(
-          "jessiecam",
+          "jarreaucam",
           "Back Left",
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, +CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
-              new Rotation3d(0, -BACK_CAMERA_PITCH, Units.degreesToRadians(180 + 30))));
+              new Rotation3d(0, -BACK_CAMERA_PITCH, Units.degreesToRadians(180 + 32.46))));
 
   public static final CameraConfig COMP_BACK_RIGHT_CAMERA =
       new CameraConfig(
