@@ -7,7 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "l1_stow"
+            "name": "stow"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "named",
           "data": {
-            "name": "l1"
+            "name": "l4"
           }
         },
         {
@@ -35,7 +35,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "intake_prep"
+                  "name": "intake_prep_delay"
                 }
               }
             ]

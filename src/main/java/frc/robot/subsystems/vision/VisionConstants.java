@@ -46,12 +46,12 @@ public class VisionConstants {
                   0, -Units.inchesToMeters(27.5 / 2.0 + 1.0), Units.inchesToMeters(3)),
               new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(-90))));
 
-  private static final double CAMERA_OFFSET_X = Units.inchesToMeters(9.922 + 0.6);
+  private static final double CAMERA_OFFSET_X = Units.inchesToMeters(8);
   private static final double CAMERA_OFFSET_Y = Units.inchesToMeters(9.906);
 
   private static final double FRONT_CAMERA_YAW = Units.degreesToRadians(45); // 45 degrees outward
   private static final double FRONT_CAMERA_PITCH =
-      Units.degreesToRadians(20); // more bent back mount
+      Units.degreesToRadians(10); // more bent back mount
   private static final double FRONT_CAMERA_OFFSET_Z = Units.inchesToMeters(8.0);
 
   private static final double BACK_CAMERA_OFFSET_Z = Units.inchesToMeters(8.0);
