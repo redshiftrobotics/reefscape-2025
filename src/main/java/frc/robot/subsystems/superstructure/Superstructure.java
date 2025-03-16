@@ -32,10 +32,10 @@ public class Superstructure extends VirtualSubsystem {
     L3(0.478, 55),
     L4(1.445 - Units.inchesToMeters(3), 36),
 
-    L4_STOW(1.445 - Units.inchesToMeters(3), 60);
+    L4_STOW(1.445 - Units.inchesToMeters(3), 60),
 
-    // L2_ALGEA(0.29, 0),
-    // L3_ALGEA(0.478, 0);
+    L2_ALGEA(0.29, 0),
+    L3_ALGEA(0.478, 0);
 
     private static final double elevatorHeightDamageOffset = 0;
     private static final Rotation2d wristAngleDamageOffset = Rotation2d.kZero;
@@ -130,6 +130,8 @@ public class Superstructure extends VirtualSubsystem {
       case STOW_HIGH -> stopIntake();
       case STOW_HIGHER -> stopIntake();
       case L4_STOW -> stopIntake();
+      case L2_ALGEA -> algeaKnockOffCommand();
+      case L3_ALGEA -> algeaKnockOffCommand();
       case L1 -> outtakeL1();
       case L2 -> outtake();
       case L3 -> outtake();
@@ -148,6 +150,10 @@ public class Superstructure extends VirtualSubsystem {
 
   public Command outtake() {
     return coralIntake.runMotors(-1);
+  }
+
+  public Command algeaKnockOffCommand() {
+    return coralIntake.runMotors(-0.2);
   }
 
   public Command outtakeL1() {
