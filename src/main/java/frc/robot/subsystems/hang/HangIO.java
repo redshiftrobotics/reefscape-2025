@@ -19,13 +19,9 @@ public interface HangIO {
 
   public default void updateInputs(HangIOInputs inputs) {}
 
-  public default void runPosition(double positionRotations) {}
-
   public default void runOpenLoop(double output) {}
 
   public default void runVolts(double volts) {}
-
-  public default void setPID(double kP, double kI, double kD) {}
 
   public default void setBrakeMode(boolean enable) {}
 

@@ -56,7 +56,7 @@ public class VisionConstants {
 
   private static final double BACK_CAMERA_OFFSET_Z = Units.inchesToMeters(8.0);
   private static final double BACK_CAMERA_PITCH =
-      Units.degreesToRadians(11); // less bent back mount
+      Units.degreesToRadians(10); // less bent back mount
 
   public static final CameraConfig COMP_FRONT_LEFT_CAMERA =
       new CameraConfig(

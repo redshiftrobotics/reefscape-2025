@@ -51,7 +51,6 @@ public class DriverDashboard extends SubsystemBase {
 
   private BooleanSupplier superstructureAtGoal;
 
-  private BooleanSupplier hangWithinTolerance;
   private DoubleSupplier hangValue;
 
   private final Field2d field = new Field2d();
@@ -99,9 +98,8 @@ public class DriverDashboard extends SubsystemBase {
     this.hasCoral = hasCoral;
   }
 
-  public void setHangSuppliers(DoubleSupplier hangValue, BooleanSupplier hangWithTolerance) {
+  public void setHangSuppliers(DoubleSupplier hangValue) {
     this.hangValue = hangValue;
-    this.hangWithinTolerance = hangWithTolerance;
   }
 
   public void setSuperstructureAtGoal(BooleanSupplier superstructureAtGoal) {
@@ -172,10 +170,6 @@ public class DriverDashboard extends SubsystemBase {
 
     if (hangValue != null) {
       SmartDashboard.putNumber("Hang Value", hangValue.getAsDouble());
-    }
-
-    if (hangWithinTolerance != null) {
-      SmartDashboard.putBoolean("Hang Good?", hangWithinTolerance.getAsBoolean());
     }
   }
 }

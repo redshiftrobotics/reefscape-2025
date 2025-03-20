@@ -59,13 +59,6 @@ public class HangIOSim implements HangIO {
   }
 
   @Override
-  public void runPosition(double positionRotations) {
-    controller.setSetpoint(positionRotations);
-    feedForwardVolts = 0;
-    runClosedLoop = true;
-  }
-
-  @Override
   public void runOpenLoop(double output) {
     runVolts(output * 12.0);
   }
@@ -79,10 +72,5 @@ public class HangIOSim implements HangIO {
   @Override
   public void stop() {
     runOpenLoop(0);
-  }
-
-  @Override
-  public void setPID(double kP, double kI, double kD) {
-    controller.setPID(kP, kI, kD);
   }
 }

@@ -20,35 +20,65 @@ public class Superstructure extends VirtualSubsystem {
 
   public State startState = State.STOW_HIGH;
 
+  public enum WheelState {
+    INTAKE(-0.3),
+    OUTTAKE(-1),
+    OUTTAKE_L1(0.5, 0.3),
+    ALGAE(-0.2),
+    STOP(0, 0);
+
+    private final double leftSpeed;
+    private final double rightSpeed;
+
+    private WheelState(double speed) {
+      this(speed, speed);
+    }
+
+    private WheelState(double leftSpeed, double rightSpeed) {
+      this.leftSpeed = leftSpeed;
+      this.rightSpeed = rightSpeed;
+    }
+
+    public double getLeftSpeed() {
+      return leftSpeed;
+    }
+
+    public double getRightSpeed() {
+      return rightSpeed;
+    }
+  }
+
   public static enum State {
-    STOW_LOW(0.054886473109919, -80),
-    STOW_HIGH(0, 75),
-    STOW_HIGHER(0, 80),
+    STOW_LOW(0.054886473109919, -80, WheelState.STOP),
+    STOW_HIGH(0, 75, WheelState.STOP),
+    STOW_HIGHER(0, 80, WheelState.STOP),
 
-    INTAKE(0.712 - Units.inchesToMeters(6) + 0.178, -78 + 10),
+    INTAKE(0.712 - Units.inchesToMeters(6) + 0.178, -78 + 10, WheelState.INTAKE),
 
-    L1(0.29, -82),
-    L2(0, 55),
-    L3(0.478, 55),
-    L4(1.445 - Units.inchesToMeters(3), 36),
+    L1(0.29, -82, WheelState.OUTTAKE_L1),
+    L2(0, 55, WheelState.OUTTAKE),
+    L3(0.478, 55, WheelState.OUTTAKE),
+    L4(1.445 - Units.inchesToMeters(3), 36, WheelState.OUTTAKE),
 
-    L4_STOW(1.445 - Units.inchesToMeters(3), 60),
+    L4_STOW(1.445 - Units.inchesToMeters(3), 60, WheelState.STOP),
 
-    L2_ALGEA(0.29, 0),
-    L3_ALGEA(0.478, 0);
+    L2_ALGAE(0.29, 0, WheelState.ALGAE),
+    L3_ALGAE(0.478, 0, WheelState.ALGAE);
 
     private static final double elevatorHeightDamageOffset = 0;
     private static final Rotation2d wristAngleDamageOffset = Rotation2d.kZero;
 
     private final double baseHeight;
     private final Rotation2d baseAngle;
+    private final WheelState wheelState;
 
     private double offsetHeight = 0;
     private Rotation2d offsetAngle = Rotation2d.kZero;
 
-    private State(double height, double angleDegrees) {
+    private State(double height, double angleDegrees, WheelState wheelState) {
       this.baseHeight = height;
       this.baseAngle = Rotation2d.fromDegrees(angleDegrees);
+      this.wheelState = wheelState;
     }
 
     public void adjustHeight(double offset) {
@@ -83,6 +113,10 @@ public class Superstructure extends VirtualSubsystem {
     public Rotation2d getAngle() {
       return baseAngle.plus(offsetAngle).plus(wristAngleDamageOffset);
     }
+
+    public WheelState wheels() {
+      return wheelState;
+    }
   }
 
   private final SuperstructureVisualizer measuredVisualizer =
@@ -104,7 +138,7 @@ public class Superstructure extends VirtualSubsystem {
         .finallyDo(this::setPositionStow);
   }
 
-  public Command run2(State goal) {
+  public Command runSequenced(State goal) {
     return Commands.parallel(
             elevator.runPositionPrepare(goal::getHeight),
             coralWrist.runPositionPrepare(State.STOW_HIGH.getAngle()))
@@ -125,43 +159,11 @@ public class Superstructure extends VirtualSubsystem {
   }
 
   public Command runWheels(State goal) {
-    return switch (goal) {
-      case STOW_LOW -> stopIntake();
-      case STOW_HIGH -> stopIntake();
-      case STOW_HIGHER -> stopIntake();
-      case L4_STOW -> stopIntake();
-      case L2_ALGEA -> algeaKnockOffCommand();
-      case L3_ALGEA -> algeaKnockOffCommand();
-      case L1 -> outtakeL1();
-      case L2 -> outtake();
-      case L3 -> outtake();
-      case L4 -> outtake();
-      case INTAKE -> intake();
-    };
+    return coralIntake.runMotors(goal.wheels().leftSpeed, goal.wheels().rightSpeed);
   }
 
-  public Command intake() {
-    return coralIntake.runMotors(-0.3);
-  }
-
-  public Command passiveIntake() {
-    return coralIntake.runMotors(0);
-  }
-
-  public Command outtake() {
-    return coralIntake.runMotors(-1);
-  }
-
-  public Command algeaKnockOffCommand() {
-    return coralIntake.runMotors(-0.2);
-  }
-
-  public Command outtakeL1() {
-    return coralIntake.runMotors(0.5, 0.3);
-  }
-
-  public Command stopIntake() {
-    return coralIntake.runMotors(0);
+  public Command stopWheels() {
+    return coralIntake.runOnce(coralIntake::stopMotors);
   }
 
   public boolean atGoal() {

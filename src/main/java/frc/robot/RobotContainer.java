@@ -277,7 +277,7 @@ public class RobotContainer {
 
     dashboard.setSensorSuppliers(
         coralIntake::usingSensor, () -> coralIntake.hasCoral().orElse(false));
-    dashboard.setHangSuppliers(hang::getRawValue, hang::withinSafeToleranceSoftLimits);
+    dashboard.setHangSuppliers(hang::getMeasuredPosition);
     dashboard.setSuperstructureAtGoal(superstructure::atGoal);
 
     dashboard.addCommand("Reset Pose", () -> drive.resetPose(new Pose2d()), true);
@@ -313,7 +313,7 @@ public class RobotContainer {
   private void configureControllerBindings() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     configureDriverControllerBindings(driverController, true);
-    configureOperatorControllerBindings(operatorController, false);
+    configureOperatorControllerBindings(operatorController, true);
     configureAlertTriggers();
   }
 
@@ -472,9 +472,9 @@ public class RobotContainer {
     coralWrist.setSlowModeSupplier(() -> coralIntake.hasCoral().orElse(false));
 
     new Trigger(() -> coralIntake.hasCoral().orElse(false))
-        .onChange(rumbleControllers(0.5).withTimeout(0.1));
+        .onChange(rumbleControllers(0.8).withTimeout(0.15));
 
-    // Intake and score
+    // Main superstructure control
 
     final double heightOffsetAdjustment = Units.inchesToMeters(1);
     final Rotation2d angleOffsetAdjustment = Rotation2d.fromDegrees(5);
@@ -485,9 +485,8 @@ public class RobotContainer {
             if (level.equals(Superstructure.State.L1)) {
               trigger.whileTrue(superstructure.run(level));
             } else {
-              trigger.whileTrue(superstructure.run2(level));
+              trigger.whileTrue(superstructure.runSequenced(level));
             }
-            // trigger.whileTrue(superstructure.run(level));
           } else if (level.isIntake()) {
             trigger.whileTrue(superstructure.run(level));
           }
@@ -498,6 +497,7 @@ public class RobotContainer {
                 .and(superstructure::atGoal)
                 .whileTrue(superstructure.runWheels(level))
                 .onTrue(Commands.runOnce(sensor::simulateItemEjection));
+            trigger.and(xbox.rightBumper().whileTrue(superstructure.runWheels(level)));
           } else if (level.isIntake()) {
             trigger.whileTrue(
                 superstructure.runWheels(level).until(() -> coralIntake.hasCoral().orElse(false)));
@@ -526,24 +526,23 @@ public class RobotContainer {
 
     final Trigger anyButton = xbox.a().or(xbox.x()).or(xbox.y()).or(xbox.b());
 
+    final Trigger algae = xbox.leftBumper();
     configureOperatorControllerBindingLevel.accept(xbox.y(), Superstructure.State.L4);
-    configureOperatorControllerBindingLevel.accept(xbox.x(), Superstructure.State.L3);
-    configureOperatorControllerBindingLevel.accept(xbox.a(), Superstructure.State.L2);
+    configureOperatorControllerBindingLevel.accept(xbox.x().and(algae.negate()), Superstructure.State.L3);
+    configureOperatorControllerBindingLevel.accept(xbox.a().and(algae.negate()), Superstructure.State.L2);
     configureOperatorControllerBindingLevel.accept(xbox.b(), Superstructure.State.L1);
+    configureOperatorControllerBindingLevel.accept(xbox.x().and(algae), Superstructure.State.L3_ALGAE);
+    configureOperatorControllerBindingLevel.accept(xbox.a().and(algae), Superstructure.State.L2_ALGAE);
 
-    final double intakeManualSpeed = 0.24;
-    anyButton.and(xbox.rightBumper()).whileTrue(coralIntake.runMotors(-intakeManualSpeed));
-    anyButton.and(xbox.leftBumper()).whileTrue(coralIntake.runMotors(+intakeManualSpeed));
+    xbox.leftStick()
+        .onTrue(superstructure.run(Superstructure.State.STOW_HIGH));
 
     xbox.rightStick()
-        .onTrue(
-            Commands.parallel(
-                Commands.runOnce(() -> elevator.setGoalHeightMeters(State.STOW_HIGH.getHeight())),
-                Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW_HIGH.getAngle()))));
+        .onTrue(superstructure.run(Superstructure.State.STOW_LOW));
 
     // Intake
 
-    coralIntake.setDefaultCommand(superstructure.passiveIntake());
+    coralIntake.setDefaultCommand(superstructure.stopWheels());
 
     xbox.start()
         .debounce(0.3)
@@ -576,9 +575,9 @@ public class RobotContainer {
                 -1,
                 +1);
 
-    // new Trigger(() -> hangSpeed.getAsDouble() != 0)
-    //     .and(DriverStation::isTeleopEnabled)
-    //     .whileTrue(hang.run(() -> hang.set(hangSpeed.getAsDouble())).finallyDo(hang::stop));
+    new Trigger(() -> hangSpeed.getAsDouble() != 0)
+        .and(DriverStation::isTeleopEnabled)
+        .whileTrue(hang.run(() -> hang.set(hangSpeed.getAsDouble())).finallyDo(hang::stop));
 
     Function<RumbleType, Command> rumble =
         (rumbleType) ->
@@ -587,7 +586,6 @@ public class RobotContainer {
                 .withTimeout(0.2);
 
     if (hangSetpoints) {
-      // TODO for district comps!
       xbox.rightBumper()
           .debounce(0.1)
           .and(xbox.leftBumper().negate().debounce(0.1))

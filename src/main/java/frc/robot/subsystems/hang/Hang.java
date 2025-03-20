@@ -1,7 +1,7 @@
 package frc.robot.subsystems.hang;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.util.Color;
@@ -26,18 +26,19 @@ public class Hang extends SubsystemBase {
   private static final LoggedTunableNumber kD =
       hangFactory.getNumber("kD", HangConstants.FEEDBACK.kD());
 
-  private HangVisualization measuredVisualizer = new HangVisualization("Measured", Color.kYellow);
-  private HangVisualization setpointVisualizer = new HangVisualization("Goal", Color.kGreen);
+  private final HangVisualization measuredVisualizer =
+      new HangVisualization("Measured", Color.kYellow);
+  private final HangVisualization setpointVisualizer = new HangVisualization("Goal", Color.kGreen);
 
   private final Alert motorConnectedAlert = new Alert("Hang Motor Disconnected", AlertType.kError);
 
-  private Rotation2d lastGoal = Rotation2d.kZero;
+  private final PIDController controller = new PIDController(0.0, 0.0, 0.0);
+  private boolean runClosedLoop = false;
 
   public Hang(HangIO io) {
     this.io = io;
-
-    io.setPID(kP.get(), kI.get(), kD.get());
     io.setBrakeMode(true);
+    io.setLimits(HangConstants.RELATIVE_MIN_ROTATIONS, HangConstants.RELATIVE_MAX_ROTATIONS);
   }
 
   @Override
@@ -45,59 +46,46 @@ public class Hang extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Hang", inputs);
 
+    Logger.recordOutput("Hang/RunClosedLoop", runClosedLoop);
+
+    if (runClosedLoop) {
+      io.runOpenLoop(controller.calculate(inputs.positionRotations));
+    }
+
     motorConnectedAlert.set(!inputs.motorConnected);
 
     LoggedTunableNumber.ifChanged(
-        hashCode(), (values) -> io.setPID(values[0], values[1], values[2]), kP, kI, kD);
+        hashCode(), (values) -> controller.setPID(values[0], values[1], values[2]), kP, kI, kD);
 
     measuredVisualizer.update(Rotation2d.fromRotations(inputs.positionRotations));
   }
 
-  private void setLastGoal(Rotation2d goal) {
-    io.runPosition(goal.getRotations());
-    lastGoal = goal;
-    setpointVisualizer.update(goal);
+  private void setGoal(double rotations) {
+    runClosedLoop = true;
+    controller.setSetpoint(rotations);
+    setpointVisualizer.update(Rotation2d.fromRotations(rotations));
   }
 
-  public Rotation2d getMeasuredPosition() {
-    return Rotation2d.fromRotations(inputs.positionRotations);
-  }
-
-  public Rotation2d getLastGoal() {
-    return lastGoal;
-  }
-
-  @AutoLogOutput(key = "Hang/MeasuredPositionDegrees")
-  public double getMeasuredPositionDegrees() {
-    return Units.rotationsToDegrees(inputs.positionRotations);
-  }
-
-  @AutoLogOutput(key = "Hang/LastGoalDegrees")
-  public double getLastGoalDegrees() {
-    return lastGoal.getDegrees();
-  }
-
-  // TEMP FOR QUICK FIX
-  public double getRawValue() {
+  @AutoLogOutput(key = "Hang/MeasuredPositionRotations")
+  public double getMeasuredPosition() {
     return inputs.positionRotations;
   }
 
-  // TEMP FOR QUICK FIX
-  public boolean withinSafeToleranceSoftLimits() {
-    return inputs.positionRotations > HangConstants.MIN_SAFE_RAW_VALUE_SOFT_LIMIT
-        && inputs.positionRotations < HangConstants.MAX_SAFE_RAW_VALUE_SOFT_LIMIT;
+  @AutoLogOutput(key = "Hang/LastGoalPositionRotations")
+  public double getGoal() {
+    return controller.getSetpoint();
   }
 
   public Command stow() {
-    return runOnce(() -> setLastGoal(HangConstants.STOWED_POSITION_ROTATIONS));
+    return runOnce(() -> setGoal(HangConstants.STOWED_POSITION_ROTATIONS));
   }
 
   public Command deploy() {
-    return runOnce(() -> setLastGoal(HangConstants.DEPLOY_POSITION_ROTATIONS));
+    return runOnce(() -> setGoal(HangConstants.DEPLOY_POSITION_ROTATIONS));
   }
 
   public Command retract() {
-    return runOnce(() -> setLastGoal(HangConstants.RETRACT_POSITION_ROTATIONS));
+    return runOnce(() -> setGoal(HangConstants.RETRACT_POSITION_ROTATIONS));
   }
 
   public Command runSet(double speed) {
@@ -105,11 +93,13 @@ public class Hang extends SubsystemBase {
   }
 
   public void set(double speed) {
+    runClosedLoop = false;
     io.runOpenLoop(speed);
   }
 
   /** Stop the arm from moving. */
   public void stop() {
+    runClosedLoop = false;
     io.stop();
   }
 }
