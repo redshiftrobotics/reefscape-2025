@@ -740,9 +740,9 @@ public class RobotContainer {
 
     // Path planner Autos
     // https://pathplanner.dev/gui-editing-paths-and-autos.html#autos
-    dashboardChooser.addOption("Center Test", AutoBuilder.buildAuto("Center-Auto"));
-    dashboardChooser.addOption("Right Test", AutoBuilder.buildAuto("Right-Auto"));
-    dashboardChooser.addOption("Left Test", AutoBuilder.buildAuto("Left-Auto"));
+    dashboardChooser.addOption("Center L4s", AutoBuilder.buildAuto("Center-Auto"));
+    dashboardChooser.addOption("Right L4s", AutoBuilder.buildAuto("Right-Auto"));
+    dashboardChooser.addOption("Left L4s", AutoBuilder.buildAuto("Left-Auto"));
     // dashboardChooser.addOption("SAFE-SAFE-SAFE", AutoBuilder.buildAuto("TEST SAFE AUTO"));
 
     // // Choreo Autos
