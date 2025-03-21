@@ -1,5 +1,6 @@
 package frc.robot.subsystems.hang;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.utility.records.PIDConstants;
@@ -26,9 +27,9 @@ public class HangConstants {
   public static final int MOTOR_CURRENT_LIMIT = 40;
   public static final double GEAR_REDUCTION = 5 * 5 * 5;
 
-  public static final double STOWED_POSITION_ROTATIONS = 0.0;
-  public static final double DEPLOY_POSITION_ROTATIONS = 0.0;
-  public static final double RETRACT_POSITION_ROTATIONS = 0.0;
+  public static final Rotation2d STOWED_POSITION_ROTATIONS = Rotation2d.fromDegrees(0);
+  public static final Rotation2d DEPLOY_POSITION_ROTATIONS = Rotation2d.fromDegrees(60);
+  public static final Rotation2d RETRACT_POSITION_ROTATIONS = Rotation2d.fromDegrees(-30);
 
   public static final double RELATIVE_MIN_ROTATIONS = -1;
   public static final double RELATIVE_MAX_ROTATIONS = +1;

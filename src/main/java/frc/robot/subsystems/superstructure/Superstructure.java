@@ -24,7 +24,7 @@ public class Superstructure extends VirtualSubsystem {
     INTAKE(-0.3),
     OUTTAKE(-1),
     OUTTAKE_L1(0.5, 0.3),
-    ALGAE(-0.2),
+    ALGAE(-0.25),
     STOP(0, 0);
 
     private final double leftSpeed;
@@ -94,8 +94,12 @@ public class Superstructure extends VirtualSubsystem {
       offsetAngle = Rotation2d.kZero;
     }
 
-    public boolean isLevel() {
+    public boolean isCoral() {
       return this == L1 || this == L2 || this == L3 || this == L4;
+    }
+
+    public boolean isAlgae() {
+      return this == L2_ALGAE || this == State.L3_ALGAE;
     }
 
     public boolean isIntake() {

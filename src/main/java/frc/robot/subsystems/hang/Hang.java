@@ -32,7 +32,7 @@ public class Hang extends SubsystemBase {
 
   private final Alert motorConnectedAlert = new Alert("Hang Motor Disconnected", AlertType.kError);
 
-  private final PIDController controller = new PIDController(0.0, 0.0, 0.0);
+  private final PIDController controller = new PIDController(kP.get(), kI.get(), kD.get());
   private boolean runClosedLoop = false;
 
   public Hang(HangIO io) {
@@ -49,7 +49,7 @@ public class Hang extends SubsystemBase {
     Logger.recordOutput("Hang/RunClosedLoop", runClosedLoop);
 
     if (runClosedLoop) {
-      io.runOpenLoop(controller.calculate(inputs.positionRotations));
+      io.runOpenLoop(controller.calculate(inputs.absPositionRotations));
     }
 
     motorConnectedAlert.set(!inputs.motorConnected);
@@ -60,20 +60,33 @@ public class Hang extends SubsystemBase {
     measuredVisualizer.update(Rotation2d.fromRotations(inputs.positionRotations));
   }
 
-  private void setGoal(double rotations) {
+  private void setGoal(Rotation2d rotation) {
     runClosedLoop = true;
-    controller.setSetpoint(rotations);
-    setpointVisualizer.update(Rotation2d.fromRotations(rotations));
+    controller.setSetpoint(rotation.getRotations());
+    setpointVisualizer.update(rotation);
   }
 
-  @AutoLogOutput(key = "Hang/MeasuredPositionRotations")
-  public double getMeasuredPosition() {
+  public Rotation2d getMeasured() {
+    return Rotation2d.fromRotations(inputs.absPositionRotations);
+  }
+
+  public Rotation2d getGoal() {
+    return Rotation2d.fromRotations(controller.getSetpoint());
+  }
+
+  @AutoLogOutput(key = "Hang/MeasuredDegrees")
+  public double getMeasuredDegrees() {
+    return getMeasured().getDegrees();
+  }
+
+  @AutoLogOutput(key = "Hang/GoalDegrees")
+  public double getGoalDegrees() {
+    return getGoal().getDegrees();
+  }
+
+  @AutoLogOutput(key = "Hang/RelativeRotations")
+  public double getRelativeRotations() {
     return inputs.positionRotations;
-  }
-
-  @AutoLogOutput(key = "Hang/LastGoalPositionRotations")
-  public double getGoal() {
-    return controller.getSetpoint();
   }
 
   public Command stow() {

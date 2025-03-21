@@ -277,7 +277,7 @@ public class RobotContainer {
 
     dashboard.setSensorSuppliers(
         coralIntake::usingSensor, () -> coralIntake.hasCoral().orElse(false));
-    dashboard.setHangSuppliers(hang::getMeasuredPosition);
+    dashboard.setHangSuppliers(hang::getMeasuredDegrees);
     dashboard.setSuperstructureAtGoal(superstructure::atGoal);
 
     dashboard.addCommand("Reset Pose", () -> drive.resetPose(new Pose2d()), true);
@@ -481,7 +481,7 @@ public class RobotContainer {
 
     final BiConsumer<Trigger, Superstructure.State> configureOperatorControllerBindingLevel =
         (trigger, level) -> {
-          if (level.isLevel()) {
+          if (level.isCoral()) {
             if (level.equals(Superstructure.State.L1)) {
               trigger.whileTrue(superstructure.run(level));
             } else {
@@ -491,13 +491,12 @@ public class RobotContainer {
             trigger.whileTrue(superstructure.run(level));
           }
 
-          if (level.isLevel()) {
+          if (level.isCoral()) {
             trigger
                 .and(xbox.rightTrigger())
                 .and(superstructure::atGoal)
                 .whileTrue(superstructure.runWheels(level))
                 .onTrue(Commands.runOnce(sensor::simulateItemEjection));
-            trigger.and(xbox.rightBumper().whileTrue(superstructure.runWheels(level)));
           } else if (level.isIntake()) {
             trigger.whileTrue(
                 superstructure.runWheels(level).until(() -> coralIntake.hasCoral().orElse(false)));
@@ -526,19 +525,21 @@ public class RobotContainer {
 
     final Trigger anyButton = xbox.a().or(xbox.x()).or(xbox.y()).or(xbox.b());
 
-    final Trigger algae = xbox.leftBumper();
+    final Trigger algae = new Trigger(() -> false);
     configureOperatorControllerBindingLevel.accept(xbox.y(), Superstructure.State.L4);
-    configureOperatorControllerBindingLevel.accept(xbox.x().and(algae.negate()), Superstructure.State.L3);
-    configureOperatorControllerBindingLevel.accept(xbox.a().and(algae.negate()), Superstructure.State.L2);
+    configureOperatorControllerBindingLevel.accept(
+        xbox.x().and(algae.negate()), Superstructure.State.L3);
+    configureOperatorControllerBindingLevel.accept(
+        xbox.a().and(algae.negate()), Superstructure.State.L2);
     configureOperatorControllerBindingLevel.accept(xbox.b(), Superstructure.State.L1);
-    configureOperatorControllerBindingLevel.accept(xbox.x().and(algae), Superstructure.State.L3_ALGAE);
-    configureOperatorControllerBindingLevel.accept(xbox.a().and(algae), Superstructure.State.L2_ALGAE);
+    configureOperatorControllerBindingLevel.accept(
+        xbox.x().and(algae), Superstructure.State.L3_ALGAE);
+    configureOperatorControllerBindingLevel.accept(
+        xbox.a().and(algae), Superstructure.State.L2_ALGAE);
 
-    xbox.leftStick()
-        .onTrue(superstructure.run(Superstructure.State.STOW_HIGH));
+    xbox.leftStick().onTrue(superstructure.run(Superstructure.State.STOW_HIGH));
 
-    xbox.rightStick()
-        .onTrue(superstructure.run(Superstructure.State.STOW_LOW));
+    xbox.rightStick().onTrue(superstructure.run(Superstructure.State.STOW_LOW));
 
     // Intake
 
