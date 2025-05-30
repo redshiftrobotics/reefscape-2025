@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -115,7 +116,7 @@ public class DriverDashboard extends SubsystemBase {
 
     if (poseSupplier != null) {
       Pose2d pose = poseSupplier.get();
-      SmartDashboard.putNumber("Heading Degrees", -pose.getRotation().getDegrees());
+      SmartDashboard.putNumber("Heading Degrees", ((-pose.getRotation().getDegrees() + 360) % 360));
       field.setRobotPose(pose);
 
       // SmartDashboard.putNumber(
