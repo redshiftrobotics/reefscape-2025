@@ -32,7 +32,7 @@ This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 * One button auto align for driver, automatically finds nearest scoring location
 
 #### Code structure
-* AdvantageKit IO layers to separate control logic with hardware implantations, allowed for logic to be simulated on fake simulated hardware
+* AdvantageKit IO layers to separate control logic with hardware implantation, allowed for logic to be simulated on fake simulated hardware
 * Full logging and real time monitoring on AdvantageScope to view robot state, whether simulated or real
 * WPILib style command based programming with subsystems and command for clean reusable code
 
@@ -42,7 +42,7 @@ This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 
 ## Robot Abilities
 * 4 MK4i Swerve Modules using NEO Brushless Motor for swerve drive
-* Pigion2 gyroscope for heading data, allowing for field relative drive
+* Pigeon2 gyroscope for heading data, allowing for field relative drive
 * Controlled by two Xbox controllers with intuitive controls
 * Two stage elevator with pivoting wrist able to reach all 4 scoring levels
 * End effector with beam break sensor able to automatically obtain and release Coral
