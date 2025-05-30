@@ -322,7 +322,7 @@ public class RobotContainer {
   private void configureControllerBindings() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     configureDriverControllerBindings(driverController, true);
-    configureOperatorControllerBindings(operatorController, true);
+    configureOperatorControllerBindings(operatorController, false);
     configureAlertTriggers();
   }
 
