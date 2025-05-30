@@ -1,7 +1,7 @@
 # SAASquatch Robot Code for Reefscape
 
 This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
-  
+
 ## Software Features
 
 #### Drive Train
@@ -11,7 +11,7 @@ This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 * High-frequency odometry (Inspired by team 6328)
 * Full simulation using real swerve drive and module logic allowing for assurance of drive code and pathing logic
 
-#### Superstructure 
+#### Superstructure
 * State based control to automatically reach setpoints while avoiding collisions
 * Detection for when Coral is held, triggering different states
 * All on-controller feedback loops, enhanced with feed forward to counter gravity and friction
@@ -22,17 +22,17 @@ This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 * Smart camera placement to view relevant April Tags
 * Custom advanced filtering and standard deviations calculations to throw out bad results and trust good results more
 * Kalman filter to integrate vision results with odometry data
-* Allowed for smart auto alignment system and consistent autos when localization was used in pathing 
+* Allowed for smart auto alignment system and consistent autos when localization was used in pathing
 
 #### Driving
 * Two controller scheme, drive and operator
-* Strategic controller rumble for drivers to understand robot  
+* Strategic controller rumble for drivers to understand robot
 * Elastic dashboard for key information
 * Dashboard alerts for disconnected devices and other errors
 * One button auto align for driver, automatically finds nearest scoring location
 
 #### Code structure
-* AdvantageKit IO layers to separate control logic with hardware implantations, allowed for logic to be simulated on fake simulated hardware
+* AdvantageKit IO layers to separate control logic with hardware implantation, allowed for logic to be simulated on fake simulated hardware
 * Full logging and real time monitoring on AdvantageScope to view robot state, whether simulated or real
 * WPILib style command based programming with subsystems and command for clean reusable code
 
@@ -42,12 +42,12 @@ This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 
 ## Robot Abilities
 * 4 MK4i Swerve Modules using NEO Brushless Motor for swerve drive
-* Pigion2 gyroscope for heading data, allowing for field relative drive
-* Controlled by two Xbox controllers with intuitive controls 
+* Pigeon2 gyroscope for heading data, allowing for field relative drive
+* Controlled by two Xbox controllers with intuitive controls
 * Two stage elevator with pivoting wrist able to reach all 4 scoring levels
 * End effector with beam break sensor able to automatically obtain and release Coral
 * Two OrangePi 5s with two low distortion, global shuttle Arducam OV9281s, allowing for localization and smart auto alignment
-* Reliable deep hang using unique pivoting design 
+* Reliable deep hang using unique pivoting design
 
 ## Structure
 * Robot

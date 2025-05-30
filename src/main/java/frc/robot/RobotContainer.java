@@ -70,6 +70,7 @@ import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.visualizer.ObjectVisualizer;
 import frc.robot.utility.JoystickUtil;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
@@ -107,6 +108,11 @@ public class RobotContainer {
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
+
+  // Visualizer
+  private final ObjectVisualizer coralVisualizer;
+
+  // Alerts for controller disconnection
 
   private final Alert driverDisconnected =
       new Alert(
@@ -238,6 +244,9 @@ public class RobotContainer {
           }
         });
 
+    coralVisualizer =
+        new ObjectVisualizer("Coral", drive::getRobotPose, superstructure::getEndPose);
+
     // Can also use AutoBuilder.buildAutoChooser(); instead of SendableChooser to auto populate
     registerNamedCommands();
     autoChooser = new LoggedDashboardChooser<>("Auto Chooser", new SendableChooser<Command>());
@@ -313,7 +322,7 @@ public class RobotContainer {
   private void configureControllerBindings() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     configureDriverControllerBindings(driverController, true);
-    configureOperatorControllerBindings(operatorController, true);
+    configureOperatorControllerBindings(operatorController, false);
     configureAlertTriggers();
   }
 
@@ -543,7 +552,11 @@ public class RobotContainer {
 
     // Intake
 
-    coralIntake.setDefaultCommand(superstructure.stopWheels());
+    coralIntake.setDefaultCommand(
+        superstructure
+            .stopWheels()
+            .onlyIf(DriverStation::isTeleopEnabled)
+            .withName("DEFAULT Coral Stop"));
 
     xbox.start()
         .debounce(0.3)
@@ -632,12 +645,25 @@ public class RobotContainer {
     RobotModeTriggers.teleop()
         .and(RobotBase::isReal)
         .onChange(rumbleControllers(0.2).withTimeout(0.2));
+
+    new Trigger(sensor::isDetected)
+        .onTrue(Commands.runOnce(() -> coralVisualizer.setHolding(true)))
+        .onFalse(
+            Commands.runOnce(
+                () -> coralVisualizer.placeItemOnNearest(FieldConstants.Reef.branchPositionsList)));
   }
 
   private void registerNamedCommands() {
     // Set up named commands for path planner auto
     // https://pathplanner.dev/pplib-named-commands.html
 
+    // THIS IS NOT HOW YOU ARE MEANT TO DO AUTOs  , IDK WHY HAVING REQUIREMENTS BREAKS IT ALL
+
+    NamedCommands.registerCommand(
+        "startSim",
+        Commands.none()
+            .andThen(sensor::simulateItemNow)
+            .andThen(coralVisualizer::clearPlacedItems));
     NamedCommands.registerCommand(
         "l1_stow",
         Commands.sequence(

@@ -19,5 +19,7 @@ public interface SensorIO {
 
   default void simulateItemDesire() {}
 
+  default void simulatedItemNow() {}
+
   default void simulateItemEjection() {}
 }

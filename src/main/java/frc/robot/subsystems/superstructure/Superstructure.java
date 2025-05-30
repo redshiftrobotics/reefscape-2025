@@ -1,12 +1,16 @@
 package frc.robot.subsystems.superstructure;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
+import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
 import frc.robot.utility.VirtualSubsystem;
@@ -212,5 +216,22 @@ public class Superstructure extends VirtualSubsystem {
         elevator.getGoalHeightMeters(),
         coralWrist.getGoalRotations().getRadians(),
         coralIntake.getMotorsAvg());
+  }
+
+  public Transform3d getEndPose() {
+    // this sucks
+    return new Transform3d(
+            Units.inchesToMeters(2),
+            0,
+            elevator.getMeasuredHeightMeters()
+                + ElevatorConstants.carriageHeight
+                + ElevatorConstants.elevatorDistanceFromGround,
+            Rotation3d.kZero)
+        .plus(
+            new Transform3d(
+                    Translation3d.kZero,
+                    new Rotation3d(
+                        0, Units.degreesToRadians(coralWrist.getMeasuredDegrees() + 90), 0))
+                .plus(new Transform3d(0, 0, Units.inchesToMeters(-10), Rotation3d.kZero)));
   }
 }
