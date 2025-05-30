@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "startSim"
+          }
+        },
+        {
           "type": "wait",
           "data": {
             "waitTime": 1.0
@@ -43,7 +49,7 @@
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": "No Algae Clear",
   "choreoAuto": false
 }

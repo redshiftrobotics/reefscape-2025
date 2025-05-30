@@ -63,7 +63,7 @@ public class SuperstructureVisualizer {
   }
 
   public void update(double carriageHeight, double wristRadians, double coralIntakeOutput) {
-    elevatorMechanism.setLength(carriageHeight);
+    elevatorMechanism.setLength(carriageHeight + ElevatorConstants.elevatorDistanceFromGround);
     coralWristLigament.setAngle(new Rotation2d(-wristRadians));
 
     coralIntake.setLength(coralIntakeOutput * Units.inchesToMeters(3.0));

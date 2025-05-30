@@ -1,7 +1,7 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2025.3.1"
-    id "com.peterabeles.gversion" version "1.10"
+    // id "com.peterabeles.gversion" version "1.10"
     id "com.diffplug.spotless" version "6.12.0"
 }
 
@@ -140,15 +140,15 @@ tasks.withType(JavaCompile) {
 }
 
 // Create version file
-project.compileJava.dependsOn(createVersionFile)
-gversion {
-    srcDir       = "src/main/java/"
-    classPackage = "frc.robot"
-    className    = "BuildConstants"
-    dateFormat   = "yyyy-MM-dd HH:mm:ss z"
-    timeZone     = "US/Pacific"
-    indent       = "    "
-}
+// project.compileJava.dependsOn(createVersionFile)
+// gversion {
+//     srcDir       = "src/main/java/"
+//     classPackage = "frc.robot"
+//     className    = "BuildConstants"
+//     dateFormat   = "yyyy-MM-dd HH:mm:ss z"
+//     timeZone     = "US/Pacific"
+//     indent       = "    "
+// }
 
 // Create commit with working changes on event branches
 // task(eventDeploy) {

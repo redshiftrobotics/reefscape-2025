@@ -41,6 +41,11 @@ public class Sensor extends SubsystemBase {
     io.simulateItemDesire();
   }
 
+  /** For simulation, set item as detected */
+  public void simulateItemNow() {
+    io.simulatedItemNow();
+  }
+
   /** For simulation, eject item */
   public void simulateItemEjection() {
     io.simulateItemEjection();

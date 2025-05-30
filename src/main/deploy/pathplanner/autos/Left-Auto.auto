@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "startSim"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "SL-C4"
@@ -119,7 +125,7 @@
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": "No Algae Clear",
   "choreoAuto": false
 }

@@ -106,6 +106,8 @@ public class FieldConstants {
     public static final List<Map<ReefHeight, Pose3d>> branchPositions =
         new ArrayList<>(); // Starting at the right branch facing the driver station in clockwise
 
+    public static final List<Pose3d> branchPositionsList = new ArrayList<>();
+
     static {
       // Initialize faces
       centerFaces[0] =
@@ -194,6 +196,8 @@ public class FieldConstants {
 
         branchPositions.add((face * 2) + 0, fillRight);
         branchPositions.add((face * 2) + 1, fillLeft);
+        branchPositionsList.addAll(fillRight.values());
+        branchPositionsList.addAll(fillLeft.values());
       }
     }
   }

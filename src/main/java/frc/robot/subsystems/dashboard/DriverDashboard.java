@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -27,6 +28,7 @@ public class DriverDashboard extends SubsystemBase {
     SmartDashboard.putString("RobotName", Constants.getRobot().toString());
     SmartDashboard.putString("RobotRoboRioSerialNumber", RobotController.getSerialNumber());
     SmartDashboard.putData("Field", field);
+    SmartDashboard.putData(CommandScheduler.getInstance());
   }
 
   public static DriverDashboard getInstance() {
