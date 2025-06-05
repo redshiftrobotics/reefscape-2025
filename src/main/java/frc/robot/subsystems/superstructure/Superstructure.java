@@ -149,9 +149,9 @@ public class Superstructure extends VirtualSubsystem {
   public Command runSequenced(State goal) {
     return Commands.parallel(
             elevator.runPositionPrepare(goal::getHeight),
-            coralWrist.runPositionPrepare(State.STOW_HIGH.getAngle()))
+            coralWrist.runPositionPrepare(State.STOW_HIGH::getAngle))
         .andThen(Commands.waitUntil(elevator::atGoalHeightRough))
-        .andThen(coralWrist.runPositionPrepare(goal.getAngle()))
+        .andThen(coralWrist.runPositionPrepare(goal::getAngle))
         .andThen(Commands.idle(elevator, coralWrist))
         .finallyDo(this::setPositionStow);
   }

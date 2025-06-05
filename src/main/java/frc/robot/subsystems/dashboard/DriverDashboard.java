@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,11 +24,14 @@ public class DriverDashboard extends SubsystemBase {
 
   private static DriverDashboard instance;
 
+  private final Field2d field = new Field2d();
+
   private DriverDashboard() {
-    SmartDashboard.putString("RobotName", Constants.getRobot().toString());
-    SmartDashboard.putString("RobotRoboRioSerialNumber", RobotController.getSerialNumber());
     SmartDashboard.putData("Field", field);
     SmartDashboard.putData(CommandScheduler.getInstance());
+
+    SmartDashboard.putString("RobotName", Constants.getRobot().toString());
+    SmartDashboard.putString("RobotRoboRioSerialNumber", RobotController.getSerialNumber());
   }
 
   public static DriverDashboard getInstance() {
@@ -39,15 +41,15 @@ public class DriverDashboard extends SubsystemBase {
 
   // --- Fields ---
 
-  private final Debouncer debouncer = new Debouncer(0.1, DebounceType.kFalling);
-
   private BooleanSupplier fieldRelativeSupplier;
   private BooleanSupplier headingControlledSupplier;
 
   private Supplier<Pose2d> poseSupplier;
   private Supplier<Pose2d> autoAlginPoseSupplier;
   private Supplier<ChassisSpeeds> speedsSupplier;
+
   private BooleanSupplier hasVisionEstimate;
+  private Debouncer debouncer;
 
   private BooleanSupplier usingIntakeSensor;
   private BooleanSupplier hasCoral;
@@ -55,8 +57,6 @@ public class DriverDashboard extends SubsystemBase {
   private BooleanSupplier superstructureAtGoal;
 
   private DoubleSupplier hangValue;
-
-  private final Field2d field = new Field2d();
 
   // --- Setters ---
 
@@ -92,8 +92,9 @@ public class DriverDashboard extends SubsystemBase {
     this.headingControlledSupplier = headingControlledSupplier;
   }
 
-  public void setHasVisionEstimateSupplier(BooleanSupplier hasVisionEstimate) {
+  public void setHasVisionEstimateSupplier(BooleanSupplier hasVisionEstimate, double debounceTime) {
     this.hasVisionEstimate = hasVisionEstimate;
+    debouncer = new Debouncer(debounceTime, DebounceType.kFalling);
   }
 
   public void setSensorSuppliers(BooleanSupplier usingIntakeSensor, BooleanSupplier hasCoral) {
@@ -107,6 +108,10 @@ public class DriverDashboard extends SubsystemBase {
 
   public void setSuperstructureAtGoal(BooleanSupplier superstructureAtGoal) {
     this.superstructureAtGoal = superstructureAtGoal;
+  }
+
+  public Field2d getField() {
+    return field;
   }
 
   @Override

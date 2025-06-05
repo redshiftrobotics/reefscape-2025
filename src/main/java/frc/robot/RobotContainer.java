@@ -132,9 +132,7 @@ public class RobotContainer {
 
   // Alerts
   private final Alert notPrimaryBotAlert =
-      new Alert(
-          "Robot type is not the primary robot type. Be careful you are not using the wrong robot.",
-          AlertType.kInfo);
+      new Alert("Robot type is not the primary robot type.", AlertType.kInfo);
   private final Alert tuningModeActiveAlert =
       new Alert("Tuning mode active, do not use in competition.", AlertType.kWarning);
   private static final Alert testPlansAvailable =
@@ -282,7 +280,7 @@ public class RobotContainer {
 
     dashboard.setAutoAlignPoseSupplier(AdaptiveAutoAlignCommands::getCurrentAutoAlignGoal);
 
-    dashboard.setHasVisionEstimateSupplier(vision::hasVisionEstimate);
+    dashboard.setHasVisionEstimateSupplier(vision::hasVisionEstimate, 0.1);
 
     dashboard.setSensorSuppliers(
         coralIntake::usingSensor, () -> coralIntake.hasCoral().orElse(false));
@@ -653,24 +651,28 @@ public class RobotContainer {
                 () -> coralVisualizer.placeItemOnNearest(FieldConstants.Reef.branchPositionsList)));
   }
 
+  private void registerNamedCommands(String name, Command command) {
+    NamedCommands.registerCommand(name, command.withName("AUTO: " + name));
+  }
+
   private void registerNamedCommands() {
     // Set up named commands for path planner auto
     // https://pathplanner.dev/pplib-named-commands.html
 
     // THIS IS NOT HOW YOU ARE MEANT TO DO AUTOs  , IDK WHY HAVING REQUIREMENTS BREAKS IT ALL
 
-    NamedCommands.registerCommand(
+    registerNamedCommands(
         "startSim",
         Commands.none()
             .andThen(sensor::simulateItemNow)
             .andThen(coralVisualizer::clearPlacedItems));
-    NamedCommands.registerCommand(
+    registerNamedCommands(
         "l1_stow",
         Commands.sequence(
                 Commands.runOnce(() -> elevator.setGoalHeightMeters(State.L1.getHeight())),
                 Commands.runOnce(() -> coralWrist.setGoalRotation(State.L1.getAngle())))
             .finallyDo(() -> superstructure.startState = State.L1));
-    NamedCommands.registerCommand(
+    registerNamedCommands(
         "l1",
         Commands.sequence(
                 Commands.parallel(
@@ -686,7 +688,7 @@ public class RobotContainer {
                     .withTimeout(0.5))
             .finallyDo(() -> superstructure.startState = State.L1));
 
-    NamedCommands.registerCommand(
+    registerNamedCommands(
         "l4",
         Commands.sequence(
                 Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle())),
@@ -710,13 +712,13 @@ public class RobotContainer {
             .finallyDo(() -> elevator.setGoalHeightMeters(State.L4.getHeight()))
             .finallyDo(() -> superstructure.startState = State.L4_STOW));
 
-    NamedCommands.registerCommand(
+    registerNamedCommands(
         "intake_prep",
         Commands.parallel(
                 Commands.runOnce(() -> elevator.setGoalHeightMeters(State.INTAKE.getHeight())),
                 Commands.runOnce(() -> coralWrist.setGoalRotation(State.INTAKE.getAngle())))
             .finallyDo(() -> superstructure.startState = State.INTAKE));
-    NamedCommands.registerCommand(
+    registerNamedCommands(
         "intake_prep_delay",
         Commands.sequence(
             Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle())),
@@ -727,14 +729,14 @@ public class RobotContainer {
             Commands.waitSeconds(0.2),
             Commands.runOnce(() -> superstructure.startState = State.INTAKE)));
 
-    NamedCommands.registerCommand(
+    registerNamedCommands(
         "stow",
         Commands.parallel(
                 Commands.runOnce(() -> elevator.setGoalHeightMeters(State.STOW_HIGHER.getHeight())),
                 Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle())))
             .finallyDo(() -> superstructure.startState = State.STOW_HIGH));
 
-    NamedCommands.registerCommand(
+    registerNamedCommands(
         "stow_delay",
         Commands.sequence(
             Commands.waitSeconds(0.4),
@@ -744,7 +746,7 @@ public class RobotContainer {
             Commands.waitSeconds(0.2),
             Commands.runOnce(() -> superstructure.startState = State.STOW_HIGH)));
 
-    NamedCommands.registerCommand(
+    registerNamedCommands(
         "intake",
         Commands.deadline(
                 Commands.parallel(

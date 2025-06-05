@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.utility.AllianceFlipUtil;
 import frc.robot.utility.LocalADStarAK;
 import java.util.Arrays;
@@ -148,8 +149,10 @@ public class Drive extends SubsystemBase {
     PathfindingCommand.warmupCommand();
 
     PathPlannerLogging.setLogActivePathCallback(
-        activePath ->
-            Logger.recordOutput("Odometry/Trajectory", activePath.toArray(Pose2d[]::new)));
+        activePath -> {
+          Logger.recordOutput("Odometry/Trajectory", activePath.toArray(Pose2d[]::new));
+          DriverDashboard.getInstance().getField().getObject("Trajectory").setPoses(activePath);
+        });
     PathPlannerLogging.setLogTargetPoseCallback(
         targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
 
