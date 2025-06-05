@@ -71,6 +71,7 @@ import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.visualizer.ObjectVisualizer;
+import frc.robot.utility.Elastic;
 import frc.robot.utility.JoystickUtil;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
@@ -643,6 +644,16 @@ public class RobotContainer {
     RobotModeTriggers.teleop()
         .and(RobotBase::isReal)
         .onChange(rumbleControllers(0.2).withTimeout(0.2));
+
+    Trigger isMatch = new Trigger(() -> DriverStation.getMatchTime() != -1);
+
+    RobotModeTriggers.teleop()
+        .and(isMatch)
+        .onTrue(Commands.runOnce(() -> Elastic.selectTab("Teleoperated")));
+
+    RobotModeTriggers.autonomous()
+        .and(isMatch)
+        .onTrue(Commands.runOnce(() -> Elastic.selectTab("Autonomous")));
 
     new Trigger(sensor::isDetected)
         .onTrue(Commands.runOnce(() -> coralVisualizer.setHolding(true)))

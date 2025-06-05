@@ -68,6 +68,13 @@
                     "type": "mechanism",
                     "logKey": "/RealOutputs/SuperstructureVisualizer/Goal",
                     "logType": "Mechanism2d",
+                    "visible": false,
+                    "options": {}
+                  },
+                  {
+                    "type": "mechanism",
+                    "logKey": "/RealOutputs/HangVisualizer/Measured",
+                    "logType": "Mechanism2d",
                     "visible": true,
                     "options": {}
                   },
@@ -95,7 +102,7 @@
                     "type": "ghost",
                     "logKey": "/RealOutputs/Vision/robotPosesAccepted",
                     "logType": "Pose3d[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "model": "demo_8032",
                       "color": "#ff00ff"
@@ -105,7 +112,7 @@
                     "type": "ghost",
                     "logKey": "/RealOutputs/Vision/robotPosesRejected",
                     "logType": "Pose3d[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "model": "demo_8032",
                       "color": "#ffff00"
@@ -115,7 +122,7 @@
                     "type": "axes",
                     "logKey": "/RealOutputs/Vision/tagPoses",
                     "logType": "Pose3d[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {}
                   },
                   {
@@ -152,7 +159,7 @@
               },
               "controllerUUID": "e8hgomb1yslv0cwpvfxkohzvzsz5j7n2",
               "renderer": {
-                "cameraIndex": -5,
+                "cameraIndex": -3,
                 "orbitFov": 50,
                 "cameraPosition": [
                   10.28116,
@@ -243,6 +250,21 @@
                 "size": 30
               },
               "controllerUUID": "rdy54xgxb86v999c510rijuebtpjrgc5",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 2,
+              "title": "Odometry",
+              "controller": {
+                "sources": [],
+                "game": "2025 Field (Welded)",
+                "bumpers": "auto",
+                "origin": "blue",
+                "orientation": 0,
+                "size": 30
+              },
+              "controllerUUID": "zmhi7fxxg1blfr1vdsh7oqjd8pfk5ebs",
               "renderer": null,
               "controlsHeight": 200
             },
@@ -515,7 +537,7 @@
                 "leftSources": [
                   {
                     "type": "stepped",
-                    "logKey": "/Wrist/Position",
+                    "logKey": "/RealOutputs/Wrist/goalDegrees",
                     "logType": "Number",
                     "visible": true,
                     "options": {
@@ -525,7 +547,7 @@
                   },
                   {
                     "type": "stepped",
-                    "logKey": "/Wrist/Setpoint",
+                    "logKey": "/RealOutputs/Wrist/measuredDegrees",
                     "logType": "Number",
                     "visible": true,
                     "options": {

@@ -17,19 +17,22 @@ public class HangVisualization {
   private final LoggedMechanismRoot2d root;
   private final LoggedMechanismLigament2d arm;
 
+  public static final double ROOT_X = Units.inchesToMeters(34.886649) * 3.0 / 4.0;
+  public static final double ROOT_Y = Units.inchesToMeters(7);
+
   public HangVisualization(String name, Color color) {
     this.name = name;
 
     mechanism =
         new LoggedMechanism2d(
-            Units.feetToMeters(4.0), Units.feetToMeters(4.0), new Color8Bit(Color.kDarkGray));
+            Units.inchesToMeters(28.0), Units.feetToMeters(3.0), new Color8Bit(Color.kDarkGray));
 
-    root = mechanism.getRoot(name + " Root", Units.feetToMeters(2.0), Units.feetToMeters(2.0));
+    root = mechanism.getRoot(name + " Root", ROOT_X, ROOT_Y);
 
     arm =
         root.append(
             new LoggedMechanismLigament2d(
-                name + " Hang", Units.feetToMeters(1.5), 0, 8, new Color8Bit(color)));
+                name + " Hang", Units.feetToMeters(1.5), 0, 6, new Color8Bit(color)));
   }
 
   public void update(Rotation2d angle) {

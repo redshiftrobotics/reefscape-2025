@@ -13,6 +13,7 @@ import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
+import frc.robot.subsystems.superstructure.wrist.WristConstants;
 import frc.robot.utility.VirtualSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -220,18 +221,22 @@ public class Superstructure extends VirtualSubsystem {
 
   public Transform3d getEndPose() {
     // this sucks
+
     return new Transform3d(
-            Units.inchesToMeters(2),
-            0,
-            elevator.getMeasuredHeightMeters()
-                + ElevatorConstants.carriageHeight
-                + ElevatorConstants.elevatorDistanceFromGround,
-            Rotation3d.kZero)
+            -SuperstructureVisualizer.ROOT_X, 0, SuperstructureVisualizer.ROOT_Y, Rotation3d.kZero)
+        .plus(
+            new Transform3d(
+                Units.inchesToMeters(2),
+                0,
+                elevator.getMeasuredHeightMeters()
+                    + ElevatorConstants.carriageHeight
+                    + ElevatorConstants.elevatorDistanceFromGround,
+                Rotation3d.kZero))
         .plus(
             new Transform3d(
                     Translation3d.kZero,
                     new Rotation3d(
                         0, Units.degreesToRadians(coralWrist.getMeasuredDegrees() + 90), 0))
-                .plus(new Transform3d(0, 0, Units.inchesToMeters(-10), Rotation3d.kZero)));
+                .plus(new Transform3d(0, 0, -WristConstants.WRIST_LENGTH, Rotation3d.kZero)));
   }
 }

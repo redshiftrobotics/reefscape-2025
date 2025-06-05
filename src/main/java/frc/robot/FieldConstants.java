@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -196,8 +197,27 @@ public class FieldConstants {
 
         branchPositions.add((face * 2) + 0, fillRight);
         branchPositions.add((face * 2) + 1, fillLeft);
+
         branchPositionsList.addAll(fillRight.values());
         branchPositionsList.addAll(fillLeft.values());
+        branchPositionsList.addAll(
+            fillLeft.values().stream()
+                .map(
+                    p -> {
+                      Pose2d p2d = p.toPose2d();
+                      return new Pose3d(FlippingUtil.flipFieldPose(p2d))
+                          .plus(p.minus(new Pose3d(p2d)));
+                    })
+                .toList());
+        branchPositionsList.addAll(
+            fillRight.values().stream()
+                .map(
+                    p -> {
+                      Pose2d p2d = p.toPose2d();
+                      return new Pose3d(FlippingUtil.flipFieldPose(p2d))
+                          .plus(p.minus(new Pose3d(p2d)));
+                    })
+                .toList());
       }
     }
   }

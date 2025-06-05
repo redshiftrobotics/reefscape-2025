@@ -20,8 +20,8 @@ public class HangIOSim implements HangIO {
           HangConstants.GEAR_REDUCTION,
           0.0025,
           Units.inchesToMeters(18),
-          -Math.PI,
-          +Math.PI,
+          -Math.PI / 2.0,
+          +Math.PI / 2.0,
           false,
           0);
 
@@ -43,7 +43,7 @@ public class HangIOSim implements HangIO {
       appliedVolts = 0;
     }
 
-    arm.setInputVoltage(appliedVolts);
+    arm.setInputVoltage(-appliedVolts / Math.PI);
 
     arm.update(Constants.LOOP_PERIOD_SECONDS);
 

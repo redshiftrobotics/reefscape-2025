@@ -23,7 +23,7 @@ public class WristIOSim implements WristIO {
             MOTOR,
             GEAR_REDUCTION,
             0.025,
-            Units.inchesToMeters(18),
+            WristConstants.WRIST_LENGTH,
             Units.degreesToRadians(WristConstants.MIN_POSITION_DEGREES),
             Units.degreesToRadians(WristConstants.MAX_POSITION_DEGREES),
             true,

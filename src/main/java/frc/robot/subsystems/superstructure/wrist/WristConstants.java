@@ -19,6 +19,8 @@ public class WristConstants {
   public static final double MAX_POSITION_DEGREES = 100.0;
   public static final double MIN_POSITION_DEGREES = -90.0;
 
+  public static final double WRIST_LENGTH = Units.inchesToMeters(15);
+
   public record WristConfig(
       int motorId, double absoluteEncoderOffset, boolean motorInverted, boolean encoderInverted) {}
 
