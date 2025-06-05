@@ -116,7 +116,6 @@ public class DriverDashboard extends SubsystemBase {
 
   @Override
   public void periodic() {
-
     SmartDashboard.putNumber("Game Time", DriverStation.getMatchTime());
 
     if (poseSupplier != null) {
