@@ -246,6 +246,8 @@ public class RobotContainer {
     coralVisualizer =
         new ObjectVisualizer("Coral", drive::getRobotPose, superstructure::getEndPose);
 
+    sensor.setSimulationSource(coralVisualizer::isHolding);
+
     // Can also use AutoBuilder.buildAutoChooser(); instead of SendableChooser to auto populate
     registerNamedCommands();
     autoChooser = new LoggedDashboardChooser<>("Auto Chooser", new SendableChooser<Command>());
@@ -504,13 +506,16 @@ public class RobotContainer {
                 .and(xbox.rightTrigger())
                 .and(superstructure::atGoal)
                 .whileTrue(superstructure.runWheels(level))
-                .onTrue(Commands.runOnce(sensor::simulateItemEjection));
+                .onTrue(
+                    Commands.runOnce(
+                        () ->
+                            coralVisualizer.placeItemOnNearest(
+                                FieldConstants.Reef.branchPositionsList,
+                                Units.inchesToMeters(15))));
           } else if (level.isIntake()) {
             trigger.whileTrue(
                 superstructure.runWheels(level).until(() -> coralIntake.hasCoral().orElse(false)));
-            trigger
-                .and(superstructure::atGoal)
-                .onTrue(Commands.runOnce(sensor::simulateItemRequest));
+            trigger.and(superstructure::atGoal).onTrue(Commands.runOnce(coralVisualizer::hold));
           }
 
           trigger
@@ -654,12 +659,6 @@ public class RobotContainer {
     RobotModeTriggers.autonomous()
         .and(isMatch)
         .onTrue(Commands.runOnce(() -> Elastic.selectTab("Autonomous")));
-
-    new Trigger(sensor::isDetected)
-        .onTrue(Commands.runOnce(() -> coralVisualizer.setHolding(true)))
-        .onFalse(
-            Commands.runOnce(
-                () -> coralVisualizer.placeItemOnNearest(FieldConstants.Reef.branchPositionsList)));
   }
 
   private void registerNamedCommands(String name, Command command) {
@@ -675,8 +674,8 @@ public class RobotContainer {
     registerNamedCommands(
         "startSim",
         Commands.none()
-            .andThen(sensor::simulateItemNow)
-            .andThen(coralVisualizer::clearPlacedItems));
+            .andThen(coralVisualizer::clearPlacedItems)
+            .andThen(() -> coralVisualizer.setHolding(true)));
     registerNamedCommands(
         "l1_stow",
         Commands.sequence(
@@ -716,7 +715,11 @@ public class RobotContainer {
                 Commands.waitSeconds(0.1),
                 Commands.runEnd(() -> coralIntake.setMotors(-1), coralIntake::stopMotors)
                     .withTimeout(0.5)
-                    .alongWith(Commands.runOnce(sensor::simulateItemEjection)),
+                    .alongWith(
+                        Commands.runOnce(
+                            () ->
+                                coralVisualizer.placeItemOnNearest(
+                                    FieldConstants.Reef.branchPositionsList))),
                 Commands.runOnce(() -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle())),
                 Commands.waitUntil(coralWrist::atGoal).withTimeout(0.6))
             .finallyDo(() -> coralWrist.setGoalRotation(State.STOW_HIGHER.getAngle()))
@@ -770,7 +773,7 @@ public class RobotContainer {
                     .withTimeout(3),
                 Commands.waitUntil(superstructure::atGoal)
                     .withTimeout(3)
-                    .andThen(sensor::simulateItemRequest))
+                    .andThen(coralVisualizer::hold))
             .finallyDo(() -> superstructure.startState = State.STOW_HIGH));
   }
 

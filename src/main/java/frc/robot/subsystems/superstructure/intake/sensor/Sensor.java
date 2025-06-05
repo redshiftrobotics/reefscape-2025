@@ -4,6 +4,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Sensor extends SubsystemBase {
@@ -36,18 +37,7 @@ public class Sensor extends SubsystemBase {
     return hasItem;
   }
 
-  /** For simulation, request item */
-  public void simulateItemRequest() {
-    io.simulateItemDesire();
-  }
-
-  /** For simulation, set item as detected */
-  public void simulateItemNow() {
-    io.simulatedItemNow();
-  }
-
-  /** For simulation, eject item */
-  public void simulateItemEjection() {
-    io.simulateItemEjection();
+  public void setSimulationSource(BooleanSupplier hasItemSupplier) {
+    io.setSimulationSource(hasItemSupplier);
   }
 }

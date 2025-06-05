@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superstructure.intake.sensor;
 
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface SensorIO {
@@ -17,9 +18,6 @@ public interface SensorIO {
   /** Updates the set of loggable inputs. */
   default void updateInputs(SensorIOInputs inputs) {}
 
-  default void simulateItemDesire() {}
-
-  default void simulatedItemNow() {}
-
-  default void simulateItemEjection() {}
+  /** For sim, can be used to simulate having an item */
+  default void setSimulationSource(BooleanSupplier hasItemSupplier) {}
 }

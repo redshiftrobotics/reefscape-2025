@@ -51,6 +51,18 @@ public class ObjectVisualizer extends VirtualSubsystem {
     this.isHolding = isHolding;
   }
 
+  public void hold() {
+    setHolding(true);
+  }
+
+  public void clearHeldItem() {
+    setHolding(false);
+  }
+
+  public boolean isHolding() {
+    return isHolding;
+  }
+
   /**
    * Place the item currently held by the subsystem at its current position.
    *
@@ -59,7 +71,7 @@ public class ObjectVisualizer extends VirtualSubsystem {
   public boolean placeHeldItem() {
     if (isHolding) {
       addPlacedItem(getHeldItemPosition());
-      setHolding(false);
+      clearHeldItem();
       return true;
     }
     return false;
@@ -68,38 +80,50 @@ public class ObjectVisualizer extends VirtualSubsystem {
   /**
    * Place an item at the nearest position from a list of positions.
    *
-   * @param positionsToPlace a list of positions where the item can be placed.
+   * @param targets a list of positions where the item can be placed.
    * @return true if the item was successfully placed, false if not holding an item.
    */
-  public boolean placeItemOnNearest(List<Pose3d> positionsToPlace) {
-    if (positionsToPlace == null || positionsToPlace.isEmpty()) {
+  public boolean placeItemOnNearest(List<Pose3d> targets) {
+    return placeItemOnNearest(targets, Double.POSITIVE_INFINITY);
+  }
+
+  /**
+   * Place an item at the nearest position from a list of positions.
+   *
+   * @param targets a list of positions where the item can be placed.
+   * @param maxDistance max distance a position can be to place in meters.
+   * @return true if the item was successfully placed, false if not holding an item.
+   */
+  public boolean placeItemOnNearest(List<Pose3d> targets, double maxDistance) {
+    if (targets == null || targets.isEmpty()) {
       return false;
     }
 
     if (isHolding) {
       Pose3d position = getHeldItemPosition();
       Pose3d nearestPosition =
-          positionsToPlace.stream()
+          targets.stream()
               .min(
                   (p1, p2) ->
                       Double.compare(
                           p1.getTranslation().getDistance(position.getTranslation()),
                           p2.getTranslation().getDistance(position.getTranslation())))
+              .filter(p -> p.getTranslation().getDistance(position.getTranslation()) < maxDistance)
               .orElse(null);
 
       if (nearestPosition != null) {
         addPlacedItem(nearestPosition);
       }
-
+      
       setHolding(false);
       return true;
     }
     return false;
   }
 
-  private void addPlacedItem(Pose3d position) {
+  private void addPlacedItem(Pose3d target) {
     placedItems = Arrays.copyOf(placedItems, placedItems.length + 1);
-    placedItems[placedItems.length - 1] = position;
+    placedItems[placedItems.length - 1] = target;
   }
 
   public Pose3d getHeldItemPosition() {
