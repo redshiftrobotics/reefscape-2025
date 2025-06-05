@@ -60,7 +60,6 @@ This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 * End effector with beam break sensor able to automatically obtain and release Coral
 * Two OrangePi 5s with two low distortion, global shuttle Arducam OV9281s, allowing for localization and smart auto alignment
 * Reliable deep hang using unique pivoting design
-* Reliable deep hang using unique pivoting design
 
 ## Dependencies
 * WPILib
