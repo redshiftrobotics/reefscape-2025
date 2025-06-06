@@ -1,10 +1,3 @@
-// Copyright (c) 2025 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project.
-
 package frc.robot.commands;
 
 import static frc.robot.subsystems.drive.DriveConstants.DRIVE_CONFIG;
@@ -28,7 +21,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.utility.AllianceFlipUtil;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -247,8 +240,8 @@ public class DriveCommands {
 
   /** Estimated feed forward Ks and Kv by driving robot forward, control motors by voltage */
   public static Command feedforwardCharacterization(Drive drive) {
-    List<Double> velocitySamples = new LinkedList<>();
-    List<Double> voltageSamples = new LinkedList<>();
+    List<Double> velocitySamples = new ArrayList<>();
+    List<Double> voltageSamples = new ArrayList<>();
     Timer timer = new Timer();
 
     return Commands.sequence(

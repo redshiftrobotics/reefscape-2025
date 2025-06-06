@@ -107,7 +107,7 @@ public class FieldConstants {
     public static final List<Map<ReefHeight, Pose3d>> branchPositions =
         new ArrayList<>(); // Starting at the right branch facing the driver station in clockwise
 
-    public static final List<Pose3d> branchPositionsList = new ArrayList<>();
+    public static final List<Pose3d> coralPlacementPositions = new ArrayList<>();
 
     static {
       // Initialize faces
@@ -198,9 +198,9 @@ public class FieldConstants {
         branchPositions.add((face * 2) + 0, fillRight);
         branchPositions.add((face * 2) + 1, fillLeft);
 
-        branchPositionsList.addAll(fillRight.values());
-        branchPositionsList.addAll(fillLeft.values());
-        branchPositionsList.addAll(
+        coralPlacementPositions.addAll(fillRight.values());
+        coralPlacementPositions.addAll(fillLeft.values());
+        coralPlacementPositions.addAll(
             fillLeft.values().stream()
                 .map(
                     p -> {
@@ -209,7 +209,7 @@ public class FieldConstants {
                           .plus(p.minus(new Pose3d(p2d)));
                     })
                 .toList());
-        branchPositionsList.addAll(
+        coralPlacementPositions.addAll(
             fillRight.values().stream()
                 .map(
                     p -> {
@@ -219,6 +219,23 @@ public class FieldConstants {
                     })
                 .toList());
       }
+    }
+
+    static {
+      // idk
+      var flipped =
+          coralPlacementPositions.stream()
+              .map(
+                  p ->
+                      new Pose3d(
+                          p.getTranslation(),
+                          new Rotation3d(
+                              p.getRotation().getX(),
+                              p.getRotation().getY() + Math.PI,
+                              p.getRotation().getZ())))
+              .toList();
+      coralPlacementPositions.clear();
+      coralPlacementPositions.addAll(flipped);
     }
   }
 
