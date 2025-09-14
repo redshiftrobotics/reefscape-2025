@@ -58,7 +58,7 @@ public class LEDSubsystem extends SubsystemBase {
     }
 
     if (startupTimer.isRunning()) {
-      applyAll(2125); // 5 volt mode
+      applyAll(2125); // 5 volt mode (THIS IS IMPORTANT)
     } else {
       alliance = DriverStation.getAlliance();
 
@@ -75,9 +75,9 @@ public class LEDSubsystem extends SubsystemBase {
     }
 
     // Update all the strips
-    strips().forEach(LEDStrip::update);
+    Stream.of(strips).forEach(LEDStrip::update);
 
-    Logger.recordOutput("LED/pulses", strips().mapToInt(strip -> strip.pulse).toArray());
+    Logger.recordOutput("LED/pulses", Stream.of(strips).mapToInt(strip -> strip.pulse).toArray());
   }
 
   /**
@@ -120,9 +120,5 @@ public class LEDSubsystem extends SubsystemBase {
    */
   private void applyAll(int blue, int red, int backup) {
     applyAll(alliance.map(a -> a == Alliance.Blue ? blue : red).orElse(backup));
-  }
-
-  private Stream<LEDStrip> strips() {
-    return Stream.of(strips);
   }
 }
