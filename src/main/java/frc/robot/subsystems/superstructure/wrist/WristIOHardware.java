@@ -22,6 +22,10 @@ import frc.robot.subsystems.superstructure.wrist.WristConstants.WristConfig;
 import frc.robot.utility.SparkUtil;
 
 public class WristIOHardware implements WristIO {
+
+  private final static FeedbackSensor SENSOR_TYPE = FeedbackSensor.kAbsoluteEncoder;
+  // private final static FeedbackSensor SENSOR_TYPE = FeedbackSensor.kPrimaryEncoder;
+  
   private final SparkMax motor;
   private final RelativeEncoder encoder;
   private final SparkAbsoluteEncoder absEncoder;
@@ -52,7 +56,7 @@ public class WristIOHardware implements WristIO {
         .inverted(config.encoderInverted())
         .zeroOffset(config.absoluteEncoderOffset())
         .zeroCentered(true);
-    motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
+    motorConfig.closedLoop.pidf(0, 0, 0, 0).feedbackSensor(SENSOR_TYPE);
 
     motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
