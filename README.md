@@ -23,6 +23,10 @@ This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 * One button auto align for driver, automatically finds nearest scoring location
 <!-- real robot scoring AND sim auto alignment  -->
 
+<img width="350" alt="Driver Xbox Control Scheme" src="https://github.com/user-attachments/assets/80fe2d9a-7706-4655-ab8e-83e323117ebf" />
+<img width="350" alt="Operator Xbox Control Scheme" src="https://github.com/user-attachments/assets/bddfd905-e608-4e04-a1af-e1560d8cafb6" />
+
+
 #### Superstructure
 * State based control to automatically reach setpoints while avoiding collisions
 * Detection for when Coral is held, triggering different states
