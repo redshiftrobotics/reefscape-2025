@@ -23,9 +23,9 @@ import frc.robot.utility.SparkUtil;
 
 public class WristIOHardware implements WristIO {
 
-  private final static FeedbackSensor SENSOR_TYPE = FeedbackSensor.kAbsoluteEncoder;
+  private static final FeedbackSensor SENSOR_TYPE = FeedbackSensor.kAbsoluteEncoder;
   // private final static FeedbackSensor SENSOR_TYPE = FeedbackSensor.kPrimaryEncoder;
-  
+
   private final SparkMax motor;
   private final RelativeEncoder encoder;
   private final SparkAbsoluteEncoder absEncoder;

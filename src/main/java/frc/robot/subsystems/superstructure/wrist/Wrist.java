@@ -58,7 +58,7 @@ public class Wrist extends SubsystemBase {
 
   private final Alert motorConnectedAlert =
       new Alert("Wrist motor disconnected!", Alert.AlertType.kError);
-  
+
   private final Debouncer disabledDebouncer = new Debouncer(3, DebounceType.kRising);
 
   enum IdleModeControl {

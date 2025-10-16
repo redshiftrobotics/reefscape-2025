@@ -49,7 +49,7 @@ This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 
 <details>
 <summary>Diagram of code structure</summary>
-  
+
 Subsystem design with AKit IO layers.
 ![IO Layer Diagram](https://github.com/user-attachments/assets/2ff990a1-d31f-4188-9fbc-afdf1ed5c5f0)
 
