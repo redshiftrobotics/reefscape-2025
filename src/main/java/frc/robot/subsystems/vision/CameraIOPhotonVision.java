@@ -2,7 +2,10 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose3d;
+import frc.robot.subsystems.vision.Camera.TrackedTarget;
 import frc.robot.subsystems.vision.VisionConstants.CameraConfig;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
@@ -18,6 +21,8 @@ public class CameraIOPhotonVision implements CameraIO {
   private final PhotonPoseEstimator photonPoseEstimator;
 
   private final String cameraPositionTitle;
+
+  private List<PhotonTrackedTarget> latestTargets = new ArrayList<>();
 
   public CameraIOPhotonVision(CameraConfig config) {
     this.cameraPositionTitle = config.cameraPosition();
@@ -38,7 +43,7 @@ public class CameraIOPhotonVision implements CameraIO {
 
     photonPoseEstimator =
         new PhotonPoseEstimator(
-            VisionConstants.FIELD,
+            VisionConstants.DEFAULT_FIELD,
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             config.robotToCamera());
 
@@ -75,9 +80,14 @@ public class CameraIOPhotonVision implements CameraIO {
 
     inputs.updatesReceived = pipelineResults.size();
 
+    this.latestTargets.clear();
+
     for (int i = 0; i < pipelineResults.size(); i++) {
+      PhotonPipelineResult cameraResult = pipelineResults.get(i);
       Optional<EstimatedRobotPose> estimatedRobotPoseOptional =
-          photonPoseEstimator.update(pipelineResults.get(i));
+          photonPoseEstimator.update(cameraResult);
+
+      this.latestTargets.addAll(cameraResult.getTargets());
 
       if (estimatedRobotPoseOptional.isPresent()) {
 
@@ -104,6 +114,19 @@ public class CameraIOPhotonVision implements CameraIO {
     inputs.tagsUsed = tagsUsed;
     inputs.hasNewData = hasNewData;
     inputs.connected = camera.isConnected();
+  }
+
+  @Override
+  public List<TrackedTarget> getLatestTargets() {
+    return latestTargets.stream()
+        .map(
+            t ->
+                new TrackedTarget(
+                    t.getFiducialId(),
+                    t.getBestCameraToTarget(),
+                    photonPoseEstimator.getRobotToCameraTransform(),
+                    t.getPoseAmbiguity()))
+        .toList();
   }
 
   @Override

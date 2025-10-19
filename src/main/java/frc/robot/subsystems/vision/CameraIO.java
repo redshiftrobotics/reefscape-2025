@@ -2,6 +2,10 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose3d;
+import frc.robot.subsystems.vision.Camera.TrackedTarget;
+
+import java.util.List;
+
 import org.littletonrobotics.junction.AutoLog;
 
 /** IO layer interface for april tag detection systems */
@@ -20,6 +24,10 @@ public interface CameraIO {
 
   /** Updates the set of loggable inputs. */
   default void updateInputs(CameraIOInputs inputs) {}
+
+  default List<TrackedTarget> getLatestTargets() {
+    return List.of();
+  }
 
   /** Get name of io camera */
   default String getCameraName() {

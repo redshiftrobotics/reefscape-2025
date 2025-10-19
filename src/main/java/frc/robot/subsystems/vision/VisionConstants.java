@@ -6,12 +6,17 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import java.util.List;
 
 public class VisionConstants {
   // --- Vision Config ---
 
-  public static final AprilTagFieldLayout FIELD =
-      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+  public static final AprilTagFieldLayout DEFAULT_FIELD =
+      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
+  public static final AprilTagFieldLayout BLANK_FIELD =
+      new AprilTagFieldLayout(
+          List.of(), DEFAULT_FIELD.getFieldLength(), DEFAULT_FIELD.getFieldWidth());
 
   // Set cameraName on PhotonVision web interface. Edit camera name from camera type to camera
   // position. To find robotToCamera, measure the distance from the camera to the center of the
@@ -29,7 +34,7 @@ public class VisionConstants {
               new Translation3d(Units.inchesToMeters(27.5 / 2.0 + 1.0), 0, Units.inchesToMeters(6)),
               new Rotation3d(0, Units.degreesToRadians(0), 0)));
 
-  public static final CameraConfig WOODV2_LEFT_CAMERA =
+  public static final CameraConfig WOOD_V2_LEFT_CAMERA =
       new CameraConfig(
           "leftCamera",
           "left",

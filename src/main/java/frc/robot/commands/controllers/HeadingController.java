@@ -9,12 +9,33 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.utility.tunable.LoggedTunableNumber;
+import frc.robot.utility.tunable.LoggedTunableNumberFactory;
+
 import org.littletonrobotics.junction.Logger;
 
 /** Controller for rotating robot to goal heading using ProfiledPIDController */
 public class HeadingController {
 
   private final Drive drive;
+
+  private static final LoggedTunableNumberFactory factory =
+      new LoggedTunableNumberFactory("HeadingController/");
+
+  private static final LoggedTunableNumber kP =
+      factory.getNumber("kP", HEADING_CONTROLLER_CONFIG.pid().kP());
+
+  private static final LoggedTunableNumber kI =
+      factory.getNumber("kI", HEADING_CONTROLLER_CONFIG.pid().kI());
+
+  private static final LoggedTunableNumber kD =
+      factory.getNumber("kD", HEADING_CONTROLLER_CONFIG.pid().kD());
+
+  private static final LoggedTunableNumber kAngularVelocity =
+      factory.getNumber("kAngularVelocity", DRIVE_CONFIG.maxAngularVelocity());
+
+  private static final LoggedTunableNumber kAngularAcceleration =
+      factory.getNumber("kAngularAcceleration", DRIVE_CONFIG.maxAngularAcceleration());
 
   private final ProfiledPIDController headingControllerRadians;
 
@@ -37,11 +58,11 @@ public class HeadingController {
 
     headingControllerRadians =
         new ProfiledPIDController(
-            HEADING_CONTROLLER_CONFIG.pid().kP(),
-            HEADING_CONTROLLER_CONFIG.pid().kI(),
-            HEADING_CONTROLLER_CONFIG.pid().kD(),
+            kP.get(),
+            kI.get(),
+            kD.get(),
             new TrapezoidProfile.Constraints(
-                DRIVE_CONFIG.maxAngularVelocity(), DRIVE_CONFIG.maxAngularAcceleration()),
+                kAngularVelocity.get(), kAngularAcceleration.get()),
             Constants.LOOP_PERIOD_SECONDS);
 
     headingControllerRadians.enableContinuousInput(-Math.PI, Math.PI);
@@ -96,16 +117,37 @@ public class HeadingController {
    * @return rotation speed to reach heading goal, omega radians per second
    */
   public double calculate() {
+    
+   // Update PID values
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> {
+          headingControllerRadians.setPID(values[0], values[1], values[2]);
+        },
+        kP,
+        kI,
+        kD);
+
+    // Update motion profile constraints
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> {
+          headingControllerRadians.setConstraints(
+              new TrapezoidProfile.Constraints(values[0], values[1]));
+        },
+        kAngularVelocity,
+        kAngularAcceleration);
+
     // Calculate output
     double measurement = drive.getRobotPose().getRotation().getRadians();
     double output = headingControllerRadians.calculate(measurement);
 
+    // Record data
+    Logger.recordOutput("HeadingController/Goal", headingControllerRadians.getGoal().position);
+    Logger.recordOutput("HeadingController/Output", output);
     Logger.recordOutput(
-        "Drive/HeadingController/Goal", headingControllerRadians.getGoal().position);
-    Logger.recordOutput("Drive/HeadingController/Output", output);
-    Logger.recordOutput(
-        "Drive/HeadingController/HeadingError", headingControllerRadians.getPositionError());
-    Logger.recordOutput("Drive/HeadingController/AtGoal", headingControllerRadians.atGoal());
+        "HeadingController/HeadingError", headingControllerRadians.getPositionError());
+    Logger.recordOutput("HeadingController/AtGoal", headingControllerRadians.atGoal());
 
     return output;
   }

@@ -1,10 +1,12 @@
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -13,6 +15,7 @@ import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
 import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -43,6 +46,7 @@ public class Camera {
   private final CameraIO io;
   private final CameraIOInputsAutoLogged inputs = new CameraIOInputsAutoLogged();
 
+  private AprilTagFieldLayout aprilTagFieldLayout;
   private Set<Integer> tagsIdsOnField;
 
   private VisionResult[] results = new VisionResult[0];
@@ -68,12 +72,16 @@ public class Camera {
   public Camera(CameraIO io) {
     this.io = io;
 
-    io.setAprilTagFieldLayout(VisionConstants.FIELD);
-    this.tagsIdsOnField =
-        VisionConstants.FIELD.getTags().stream().map((tag) -> tag.ID).collect(Collectors.toSet());
-
     this.missingCameraAlert =
         new Alert(String.format("Missing cameras %s", getCameraName()), Alert.AlertType.kWarning);
+  }
+
+  public void setFieldTags(AprilTagFieldLayout field) {
+    if (field != this.aprilTagFieldLayout) {
+      io.setAprilTagFieldLayout(field);
+      field.getTags().stream().map((tag) -> tag.ID).collect(Collectors.toSet());
+      this.aprilTagFieldLayout = field;
+    }
   }
 
   /** Get name of camera as specified by IO */
@@ -120,8 +128,12 @@ public class Camera {
     }
   }
 
-  public void setLastRobotPoseSupplier(Supplier<Pose2d> lastRobotPose) {
-    this.lastRobotPoseSupplier = lastRobotPose;
+  public List<TrackedTarget> getLatestTargets() {
+    return io.getLatestTargets();
+  }
+
+  public void filterBasedOnLastPose(boolean filter, Supplier<Pose2d> lastRobotPose) {
+    this.lastRobotPoseSupplier = filter ? lastRobotPose : null;
   }
 
   public VisionResult[] getResults() {
@@ -130,7 +142,7 @@ public class Camera {
 
   private Pose3d[] getTagPositionsOnField(int[] tagsUsed) {
     return Arrays.stream(tagsUsed)
-        .mapToObj(VisionConstants.FIELD::getTagPose)
+        .mapToObj(aprilTagFieldLayout::getTagPose)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toArray(Pose3d[]::new);
@@ -206,8 +218,8 @@ public class Camera {
 
     if (estimatedRobotPose.getX() < 0
         || estimatedRobotPose.getY() < 0
-        || estimatedRobotPose.getX() > VisionConstants.FIELD.getFieldLength()
-        || estimatedRobotPose.getY() > VisionConstants.FIELD.getFieldWidth()) {
+        || estimatedRobotPose.getX() > aprilTagFieldLayout.getFieldLength()
+        || estimatedRobotPose.getY() > aprilTagFieldLayout.getFieldWidth()) {
       return VisionResultStatus.INVALID_POSE_OUTSIDE_FIELD;
     }
 
@@ -225,6 +237,13 @@ public class Camera {
     }
 
     return VisionResultStatus.SUCCESSFUL;
+  }
+
+  public record TrackedTarget(
+      int id, Transform3d cameraToTarget, Transform3d robotToCamera, double poseAmbiguity) {
+    public boolean isGoodPoseAmbiguity() {
+      return poseAmbiguity < 0.2;
+    }
   }
 
   public enum VisionResultStatus {

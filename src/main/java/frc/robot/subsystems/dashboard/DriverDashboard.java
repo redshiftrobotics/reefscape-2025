@@ -1,7 +1,5 @@
 package frc.robot.subsystems.dashboard;
 
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -49,7 +47,6 @@ public class DriverDashboard extends SubsystemBase {
   private Supplier<ChassisSpeeds> speedsSupplier;
 
   private BooleanSupplier hasVisionEstimate;
-  private Debouncer debouncer;
 
   private BooleanSupplier usingIntakeSensor;
   private BooleanSupplier hasCoral;
@@ -92,9 +89,8 @@ public class DriverDashboard extends SubsystemBase {
     this.headingControlledSupplier = headingControlledSupplier;
   }
 
-  public void setHasVisionEstimateSupplier(BooleanSupplier hasVisionEstimate, double debounceTime) {
+  public void setHasVisionEstimateSupplier(BooleanSupplier hasVisionEstimate) {
     this.hasVisionEstimate = hasVisionEstimate;
-    debouncer = new Debouncer(debounceTime, DebounceType.kFalling);
   }
 
   public void setSensorSuppliers(BooleanSupplier usingIntakeSensor, BooleanSupplier hasCoral) {
@@ -120,7 +116,7 @@ public class DriverDashboard extends SubsystemBase {
 
     if (poseSupplier != null) {
       Pose2d pose = poseSupplier.get();
-      SmartDashboard.putNumber("Heading Degrees", ((-pose.getRotation().getDegrees() + 360) % 360));
+      SmartDashboard.putNumber("Heading Degrees", (-pose.getRotation().getDegrees() + 360) % 360);
       field.setRobotPose(pose);
 
       // SmartDashboard.putNumber(
@@ -160,7 +156,7 @@ public class DriverDashboard extends SubsystemBase {
 
     if (hasVisionEstimate != null) {
       SmartDashboard.putBoolean(
-          "Has Vision", debouncer.calculate(hasVisionEstimate.getAsBoolean()));
+          "Has Vision", hasVisionEstimate.getAsBoolean());
     }
 
     if (usingIntakeSensor != null) {

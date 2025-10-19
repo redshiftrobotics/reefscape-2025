@@ -72,22 +72,21 @@ public class HangIOHardware implements HangIO {
 
   @Override
   public void setLimits(double forward, double backward) {
-    // SparkMaxConfig motorConfig = new SparkMaxConfig();
+    SparkMaxConfig motorConfig = new SparkMaxConfig();
 
-    //   motorConfig
-    //       .softLimit
-    //       .forwardSoftLimitEnabled(true)
-    //       .forwardSoftLimit(forward)
-    //       .reverseSoftLimitEnabled(true)
-    //       .reverseSoftLimit(backward);
+    motorConfig
+        .softLimit
+        .forwardSoftLimitEnabled(true)
+        .forwardSoftLimit(forward)
+        .reverseSoftLimitEnabled(true)
+        .reverseSoftLimit(backward);
 
-    //   tryUntilOk(
-    //       motor,
-    //       5,
-    //       () ->
-    //           motor.configure(
-    //               motorConfig, ResetMode.kNoResetSafeParameters,
-    // PersistMode.kPersistParameters));
+    tryUntilOk(
+        motor,
+        5,
+        () ->
+            motor.configure(
+                motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters));
   }
 
   @Override
