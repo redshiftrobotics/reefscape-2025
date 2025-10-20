@@ -27,7 +27,8 @@ public class VisionDemoCommand extends Command {
 
     public default void reset() {}
 
-    public Pose2d updateSetpoint(Pose2d robotPose, Pose3d tagPose);
+    public Pose2d getRawPose(Pose2d robotPose, Pose3d tagPose);
+    public Pose2d getSafePose(Pose2d robotPose, Pose3d tagPose);
 
     public default boolean blocksDriving() {
       return false;
@@ -71,6 +72,8 @@ public class VisionDemoCommand extends Command {
     this.mode = mode;
     this.useSuperstructure = useSuperstructure;
     this.tagId = tagId;
+
+    controller.setTolerance(new Pose2d(Units.inchesToMeters(2), Units.inchesToMeters(2), Rotation2d.fromDegrees(3)));
 
     addRequirements(drive, elevator, wrist, leds);
   }
@@ -124,18 +127,22 @@ public class VisionDemoCommand extends Command {
           TagFollowUtil.averagePoses(
               filtedTags.stream().map(t -> t.getTargetPose(robotPose)).toList());
 
-      Logger.recordOutput("TagFollowing/Target/Pose3d", new Pose3d[] {averageTagPose});
+      Logger.recordOutput("TagFollowing/Target/Pose3d", averageTagPose);
       Logger.recordOutput(
           "TagFollowing/Target/CameraPoses3d",
           filtedTags.stream().map(t -> t.getCamearaPose(robotPose)).toArray(Pose3d[]::new));
 
-      Pose2d setpointPose = mode.updateSetpoint(robotPose, averageTagPose);
+
+      Pose2d rawSetpointPose = mode.getRawPose(robotPose, averageTagPose);
+      Logger.recordOutput("TagFollowing/RobotRawSetpointPose", rawSetpointPose);
+      SmartDashboard.putNumber("Target Heading", -rawSetpointPose.getRotation().getDegrees());
+
+      Pose2d setpointPose = mode.getSafePose(robotPose, averageTagPose);
 
       if (setpointPose != null) {
         controller.setSetpoint(setpointPose);
         Logger.recordOutput(
-            "TagFollowing/RobotSetpointPose", new Pose3d[] {new Pose3d(setpointPose)});
-        SmartDashboard.putNumber("Target Heading", -setpointPose.getRotation().getDegrees());
+            "TagFollowing/RobotSetpointPose", setpointPose);
       }
 
       if (useSuperstructure.getAsBoolean()) {

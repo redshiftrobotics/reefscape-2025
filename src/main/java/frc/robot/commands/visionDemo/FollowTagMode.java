@@ -17,7 +17,7 @@ public class FollowTagMode implements VisionDemoState {
 
   private static final Rotation2d TARGET_HEADING_OFFSET = Rotation2d.k180deg;
 
-  private static final double FILTER_SLEW_RATE = Units.feetToMeters(4);
+  private static final double FILTER_SLEW_RATE = Units.feetToMeters(6);
   private static final double MAX_TAG_JUMP = Units.feetToMeters(1);
 
   private final Translation2d targetOffset;
@@ -26,8 +26,7 @@ public class FollowTagMode implements VisionDemoState {
 
   private final Timer resetTimer = new Timer();
 
-  private boolean shouldDrive = false;
-  private final Debouncer shouldDriveDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kRising);
+  private boolean allowDriving = false;
 
   public FollowTagMode(Translation2d targetOffset) {
     this.targetOffset = targetOffset;
@@ -38,12 +37,22 @@ public class FollowTagMode implements VisionDemoState {
     tagFilteredPosition = null;
     resetTimer.reset();
 
-    shouldDrive = false;
-    shouldDriveDebouncer.calculate(false);
+    allowDriving = false;
   }
 
   @Override
-  public Pose2d updateSetpoint(Pose2d robotPose, Pose3d tagPose) {
+  public Pose2d getRawPose(Pose2d robotPose, Pose3d tagPose) {
+    Rotation2d targetRotation =
+        tagPose.getRotation().toRotation2d().plus(Rotation2d.k180deg).plus(TARGET_HEADING_OFFSET);
+
+    Translation2d targetTranslation =
+        tagPose.toPose2d().plus(new Transform2d(targetOffset, Rotation2d.kZero)).getTranslation();
+
+    return new Pose2d(targetTranslation, targetRotation);
+  }
+
+  @Override
+  public Pose2d getSafePose(Pose2d robotPose, Pose3d tagPose) {
 
     if (tagFilteredPosition == null) {
       tagFilteredPosition = tagPose.getTranslation();
@@ -57,13 +66,7 @@ public class FollowTagMode implements VisionDemoState {
 
     resetTimer.restart();
 
-    Rotation2d targetRotation =
-        tagPose.getRotation().toRotation2d().plus(Rotation2d.k180deg).plus(TARGET_HEADING_OFFSET);
-
-    Translation2d targetTranslation =
-        tagPose.toPose2d().plus(new Transform2d(targetOffset, Rotation2d.kZero)).getTranslation();
-
-    Pose2d target = new Pose2d(targetTranslation, targetRotation);
+    Pose2d target = getRawPose(robotPose, tagPose);
 
     double distance = tagFilteredPosition.getDistance(tagPose.getTranslation());
     boolean withinMaxJump = distance < MAX_TAG_JUMP;
@@ -73,20 +76,17 @@ public class FollowTagMode implements VisionDemoState {
     Logger.recordOutput(
         "TagFollowing/Follow/TagFilteredPosition",
         new Pose3d(this.tagFilteredPosition, tagPose.getRotation()));
-    Logger.recordOutput("TagFollowing/Follow/RawTargetPosition", target);
-
-    shouldDrive = shouldDriveDebouncer.calculate(withinMaxJump);
-    Logger.recordOutput("TagFollowing/Follow/ShouldDrive", shouldDrive);
 
     if (!withinMaxJump) {
       return null;
     }
 
+    allowDriving = true;
     return target;
   }
 
   @Override
   public boolean blocksDriving() {
-    return !shouldDrive;
+    return !allowDriving;
   }
 }

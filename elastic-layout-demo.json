@@ -445,86 +445,7 @@
     {
       "name": "VisionDemo",
       "grid_layout": {
-        "layouts": [
-          {
-            "title": "Drive",
-            "x": 0.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 256.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "Follow Tag",
-                "x": 960.0,
-                "y": 448.0,
-                "width": 256.0,
-                "height": 128.0,
-                "type": "Command",
-                "properties": {
-                  "topic": "/SmartDashboard/Follow Tag",
-                  "period": 0.06,
-                  "show_type": false
-                }
-              },
-              {
-                "title": "Aim At Tag",
-                "x": 960.0,
-                "y": 384.0,
-                "width": 256.0,
-                "height": 128.0,
-                "type": "Command",
-                "properties": {
-                  "topic": "/SmartDashboard/Aim At Tag",
-                  "period": 0.06,
-                  "show_type": false
-                }
-              }
-            ]
-          },
-          {
-            "title": "Drive + Point",
-            "x": 128.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 256.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "Aim At Tag Superstructure",
-                "x": 960.0,
-                "y": 384.0,
-                "width": 256.0,
-                "height": 128.0,
-                "type": "Command",
-                "properties": {
-                  "topic": "/SmartDashboard/Aim At Tag Superstructure",
-                  "period": 0.06,
-                  "show_type": false
-                }
-              },
-              {
-                "title": "Follow Tag Superstructure",
-                "x": 1024.0,
-                "y": 512.0,
-                "width": 256.0,
-                "height": 128.0,
-                "type": "Command",
-                "properties": {
-                  "topic": "/SmartDashboard/Follow Tag Superstructure",
-                  "period": 0.06,
-                  "show_type": false
-                }
-              }
-            ]
-          }
-        ],
+        "layouts": [],
         "containers": [
           {
             "title": "Alerts",
@@ -561,8 +482,8 @@
           },
           {
             "title": "Reset Rotation",
-            "x": 0.0,
-            "y": 384.0,
+            "x": 512.0,
+            "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Command",
@@ -570,20 +491,6 @@
               "topic": "/SmartDashboard/Reset Rotation",
               "period": 0.06,
               "show_type": false
-            }
-          },
-          {
-            "title": "Tag To Follow",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Tag To Follow",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
             }
           },
           {
@@ -624,31 +531,14 @@
           {
             "title": "Reset To Center",
             "x": 512.0,
-            "y": 128.0,
+            "y": 0.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Command",
             "properties": {
               "topic": "/SmartDashboard/Reset To Center",
               "period": 0.06,
-              "show_type": true
-            }
-          },
-          {
-            "title": "Has Track Target",
-            "x": 128.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Has Track Target",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
+              "show_type": false
             }
           },
           {
@@ -706,6 +596,62 @@
               "time_displayed": 5.0,
               "color": 4278238420,
               "line_width": 2.0
+            }
+          },
+          {
+            "title": "Superstructure Aim",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/SmartDashboard/Superstructure Aim",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Sees Tags?",
+            "x": 128.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Sees Tags?",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Follow Tag",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Follow Tag",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "Aim At Tag",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Aim At Tag",
+              "period": 0.06,
+              "show_type": false
             }
           }
         ]

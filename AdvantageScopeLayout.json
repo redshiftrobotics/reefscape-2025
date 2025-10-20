@@ -10,10 +10,14 @@
           "width": 373,
           "expanded": [
             "/RealOutputs",
-            "/RealOutputs/TagFollowing",
             "/RealOutputs/TagFollowing/Target",
             "/RealOutputs/TagFollowing/Targets",
-            "/RealOutputs/SimControlledTarget"
+            "/RealOutputs/SimControlledTarget",
+            "/RealOutputs/SimControlledTarget/1",
+            "/RealOutputs/TagFollowing/Follow1",
+            "/RealOutputs/TagFollowing/Follow",
+            "/RealOutputs/TagFollowing",
+            "/RealOutputs/TagFollowing/Tags"
           ]
         },
         "tabs": {
@@ -242,9 +246,55 @@
                     }
                   },
                   {
-                    "type": "ghost",
-                    "logKey": "/RealOutputs/TagFollowing/Target/RobotSetpointPose",
+                    "type": "axes",
+                    "logKey": "/RealOutputs/SimControlledTarget/17/TagPose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "aprilTag",
+                    "logKey": "/RealOutputs/TagFollowing/Tags/Pose3ds",
                     "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "family": "36h11"
+                    }
+                  },
+                  {
+                    "type": "cone",
+                    "logKey": "/RealOutputs/TagFollowing/Target/CameraPoses3d",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ffff",
+                      "position": "center"
+                    }
+                  },
+                  {
+                    "type": "cone",
+                    "logKey": "/RealOutputs/TagFollowing/Follow/TagFilteredPosition",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "position": "center"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/TagFollowing/RobotRawSetpointPose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "demo_8032",
+                      "color": "#ff00ff"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/TagFollowing/RobotSetpointPose",
+                    "logType": "Pose2d",
                     "visible": true,
                     "options": {
                       "model": "demo_8032",
@@ -260,14 +310,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  4.289712248489006,
-                  2.855068070790881,
-                  -2.0340889086706357
+                  0.7142812783393657,
+                  5.553539221839815,
+                  -12.088981419447926
                 ],
                 "cameraTarget": [
-                  -0.34826774648072156,
-                  0.6715988772413075,
-                  0.3955525310677692
+                  1.124430133003306,
+                  0.8985185384035308,
+                  -0.09185763882205353
                 ]
               },
               "controlsHeight": 251
@@ -348,21 +398,6 @@
                 "size": 30
               },
               "controllerUUID": "rdy54xgxb86v999c510rijuebtpjrgc5",
-              "renderer": null,
-              "controlsHeight": 200
-            },
-            {
-              "type": 2,
-              "title": "Odometry",
-              "controller": {
-                "sources": [],
-                "game": "2025 Field (Welded)",
-                "bumpers": "auto",
-                "origin": "blue",
-                "orientation": 0,
-                "size": 30
-              },
-              "controllerUUID": "zmhi7fxxg1blfr1vdsh7oqjd8pfk5ebs",
               "renderer": null,
               "controlsHeight": 200
             },
@@ -696,6 +731,29 @@
       }
     }
   ],
-  "satellites": [],
+  "satellites": [
+    {
+      "x": 1085,
+      "y": 215,
+      "width": 900,
+      "height": 500,
+      "state": {
+        "type": 1,
+        "visualizer": null
+      },
+      "uuid": "qj29letyre9xjjtpp9t2ipxd72z01y27"
+    },
+    {
+      "x": 1825,
+      "y": 421,
+      "width": 654,
+      "height": 677,
+      "state": {
+        "type": 9,
+        "visualizer": null
+      },
+      "uuid": "rimbjrz22qw8iu6qzsjs9l9ebw1jgshb"
+    }
+  ],
   "version": "4.1.5"
 }
