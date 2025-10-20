@@ -69,7 +69,7 @@ public class LEDSubsystem extends SubsystemBase {
     return applyColor(BlinkenLEDPattern.OFF);
   }
 
-  private void set(BlinkenLEDPattern pattern) {
+  public void set(BlinkenLEDPattern pattern) {
     Stream.of(strips).forEach(strip -> strip.setPattern(pattern));
   }
 }

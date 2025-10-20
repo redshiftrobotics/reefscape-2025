@@ -11,6 +11,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
+import frc.robot.subsystems.vision.VisionConstants.CameraConfig;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
 import java.util.Arrays;
@@ -79,14 +80,14 @@ public class Camera {
   public void setFieldTags(AprilTagFieldLayout field) {
     if (field != this.aprilTagFieldLayout) {
       io.setAprilTagFieldLayout(field);
-      field.getTags().stream().map((tag) -> tag.ID).collect(Collectors.toSet());
+      tagsIdsOnField = field.getTags().stream().map((tag) -> tag.ID).collect(Collectors.toSet());
       this.aprilTagFieldLayout = field;
     }
   }
 
   /** Get name of camera as specified by IO */
   public String getCameraName() {
-    return io.getCameraPosition() + " (" + io.getCameraName() + ")";
+    return io.getCameraConfig() + " (" + io.getCameraName() + ")";
   }
 
   /** Run periodic of module. Updates the set of loggable inputs, updating vision result. */
@@ -240,9 +241,17 @@ public class Camera {
   }
 
   public record TrackedTarget(
-      int id, Transform3d cameraToTarget, Transform3d robotToCamera, double poseAmbiguity) {
+      int id, Transform3d cameraToTarget, CameraConfig camera, double poseAmbiguity) {
     public boolean isGoodPoseAmbiguity() {
       return poseAmbiguity < 0.2;
+    }
+
+    public Pose3d getCamearaPose(Pose2d robot) {
+      return new Pose3d(robot).plus(camera.robotToCamera());
+    }
+
+    public Pose3d getTargetPose(Pose2d robot) {
+      return getCamearaPose(robot).plus(cameraToTarget);
     }
   }
 

@@ -11,7 +11,6 @@ import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
-
 import org.littletonrobotics.junction.Logger;
 
 /** Controller for rotating robot to goal heading using ProfiledPIDController */
@@ -61,8 +60,7 @@ public class HeadingController {
             kP.get(),
             kI.get(),
             kD.get(),
-            new TrapezoidProfile.Constraints(
-                kAngularVelocity.get(), kAngularAcceleration.get()),
+            new TrapezoidProfile.Constraints(kAngularVelocity.get(), kAngularAcceleration.get()),
             Constants.LOOP_PERIOD_SECONDS);
 
     headingControllerRadians.enableContinuousInput(-Math.PI, Math.PI);
@@ -117,8 +115,8 @@ public class HeadingController {
    * @return rotation speed to reach heading goal, omega radians per second
    */
   public double calculate() {
-    
-   // Update PID values
+
+    // Update PID values
     LoggedTunableNumber.ifChanged(
         hashCode(),
         (values) -> {

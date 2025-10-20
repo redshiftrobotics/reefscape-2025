@@ -443,6 +443,275 @@
       }
     },
     {
+      "name": "VisionDemo",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "Drive",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Follow Tag",
+                "x": 960.0,
+                "y": 448.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/SmartDashboard/Follow Tag",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Aim At Tag",
+                "x": 960.0,
+                "y": 384.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/SmartDashboard/Aim At Tag",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Drive + Point",
+            "x": 128.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Aim At Tag Superstructure",
+                "x": 960.0,
+                "y": 384.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/SmartDashboard/Aim At Tag Superstructure",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Follow Tag Superstructure",
+                "x": 1024.0,
+                "y": 512.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/SmartDashboard/Follow Tag Superstructure",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              }
+            ]
+          }
+        ],
+        "containers": [
+          {
+            "title": "Alerts",
+            "x": 896.0,
+            "y": 128.0,
+            "width": 384.0,
+            "height": 512.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/SmartDashboard/Alerts",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Heading Degrees",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/Heading Degrees",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -180.0,
+              "end_angle": 180.0,
+              "min_value": -180.0,
+              "max_value": 180.0,
+              "number_of_labels": 8,
+              "wrap_value": true,
+              "show_pointer": true,
+              "show_ticks": true
+            }
+          },
+          {
+            "title": "Reset Rotation",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Reset Rotation",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "Tag To Follow",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Tag To Follow",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Target Heading",
+            "x": 256.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/Target Heading",
+              "period": 0.033,
+              "data_type": "double",
+              "start_angle": -180.0,
+              "end_angle": 180.0,
+              "min_value": -180.0,
+              "max_value": 180.0,
+              "number_of_labels": 8,
+              "wrap_value": true,
+              "show_pointer": true,
+              "show_ticks": true
+            }
+          },
+          {
+            "title": "CommsDisableCount",
+            "x": 1152.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/SystemStats/CommsDisableCount",
+              "period": 0.06,
+              "data_type": "int",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Reset To Center",
+            "x": 512.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Reset To Center",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Has Track Target",
+            "x": 128.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Has Track Target",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "FMSInfo",
+            "x": 512.0,
+            "y": 256.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "FMSInfo",
+            "properties": {
+              "topic": "/FMSInfo",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Drive",
+            "x": 512.0,
+            "y": 384.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Subsystem",
+            "properties": {
+              "topic": "/SmartDashboard/Drive",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "BrownedOut",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/SystemStats/BrownedOut",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "BatteryVoltage",
+            "x": 896.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/AdvantageKit/SystemStats/BatteryVoltage",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "Debug",
       "grid_layout": {
         "layouts": [

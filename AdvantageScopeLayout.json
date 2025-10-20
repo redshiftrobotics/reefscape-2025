@@ -3,17 +3,21 @@
     {
       "x": -8,
       "y": -8,
-      "width": 1552,
-      "height": 832,
+      "width": 2576,
+      "height": 1408,
       "state": {
         "sidebar": {
           "width": 373,
           "expanded": [
-            "/RealOutputs"
+            "/RealOutputs",
+            "/RealOutputs/TagFollowing",
+            "/RealOutputs/TagFollowing/Target",
+            "/RealOutputs/TagFollowing/Targets",
+            "/RealOutputs/SimControlledTarget"
           ]
         },
         "tabs": {
-          "selected": 1,
+          "selected": 2,
           "tabs": [
             {
               "type": 0,
@@ -51,7 +55,7 @@
                     "type": "swerveStates",
                     "logKey": "/RealOutputs/SwerveStates/MeasuredWheelSpeeds",
                     "logType": "SwerveModuleState[]",
-                    "visible": false,
+                    "visible": true,
                     "options": {
                       "color": "#ff0000",
                       "arrangement": "0,1,2,3"
@@ -68,7 +72,7 @@
                     "type": "mechanism",
                     "logKey": "/RealOutputs/SuperstructureVisualizer/Goal",
                     "logType": "Mechanism2d",
-                    "visible": false,
+                    "visible": true,
                     "options": {}
                   },
                   {
@@ -170,6 +174,100 @@
                   0,
                   0.5,
                   0
+                ]
+              },
+              "controlsHeight": 251
+            },
+            {
+              "type": 3,
+              "title": "3D Vision Demo",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "robot",
+                    "logKey": "/RealOutputs/Odometry/Robot",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "demo_8032"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "/RealOutputs/SwerveStates/MeasuredWheelSpeeds",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "mechanism",
+                    "logKey": "/RealOutputs/SuperstructureVisualizer/Measured",
+                    "logType": "Mechanism2d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "mechanism",
+                    "logKey": "/RealOutputs/SuperstructureVisualizer/Goal",
+                    "logType": "Mechanism2d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "mechanism",
+                    "logKey": "/RealOutputs/HangVisualizer/Measured",
+                    "logType": "Mechanism2d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "/RealOutputs/ObjectVisualizer/Coral/HeldCoral",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "variant": "None"
+                    }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "/RealOutputs/ObjectVisualizer/Coral/PlacedCoral",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "variant": "None"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/TagFollowing/Target/RobotSetpointPose",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "model": "demo_8032",
+                      "color": "#00ff00"
+                    }
+                  }
+                ],
+                "game": "Evergreen",
+                "origin": "blue"
+              },
+              "controllerUUID": "e8hgomb1yslv0cwpvfxkohzvzsz5j7n2",
+              "renderer": {
+                "cameraIndex": -1,
+                "orbitFov": 50,
+                "cameraPosition": [
+                  4.289712248489006,
+                  2.855068070790881,
+                  -2.0340889086706357
+                ],
+                "cameraTarget": [
+                  -0.34826774648072156,
+                  0.6715988772413075,
+                  0.3955525310677692
                 ]
               },
               "controlsHeight": 251
@@ -599,5 +697,5 @@
     }
   ],
   "satellites": [],
-  "version": "4.1.0"
+  "version": "4.1.5"
 }

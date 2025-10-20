@@ -4,7 +4,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose3d;
 import frc.robot.subsystems.vision.Camera.TrackedTarget;
 import frc.robot.subsystems.vision.VisionConstants.CameraConfig;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,12 +19,12 @@ public class CameraIOPhotonVision implements CameraIO {
   private final PhotonCamera camera;
   private final PhotonPoseEstimator photonPoseEstimator;
 
-  private final String cameraPositionTitle;
+  private final CameraConfig config;
 
   private List<PhotonTrackedTarget> latestTargets = new ArrayList<>();
 
   public CameraIOPhotonVision(CameraConfig config) {
-    this.cameraPositionTitle = config.cameraPosition();
+    this.config = config;
 
     // --- Setup Camera ---
     camera = new PhotonCamera(config.cameraName());
@@ -59,8 +58,8 @@ public class CameraIOPhotonVision implements CameraIO {
   }
 
   @Override
-  public String getCameraPosition() {
-    return cameraPositionTitle;
+  public CameraConfig getCameraConfig() {
+    return config;
   }
 
   @Override
@@ -122,10 +121,7 @@ public class CameraIOPhotonVision implements CameraIO {
         .map(
             t ->
                 new TrackedTarget(
-                    t.getFiducialId(),
-                    t.getBestCameraToTarget(),
-                    photonPoseEstimator.getRobotToCameraTransform(),
-                    t.getPoseAmbiguity()))
+                    t.getFiducialId(), t.getBestCameraToTarget(), config, t.getPoseAmbiguity()))
         .toList();
   }
 

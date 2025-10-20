@@ -60,11 +60,8 @@ public class SimControlledTarget extends VirtualSubsystem {
                     tagPose.getRotation().getZ()
                         - JoystickUtil.applyDeadband(controller.getRightX()) * ROTATION_SPEED)));
 
-    Logger.recordOutput("SimControlledTarget/TagPose", tagPose);
-    Logger.recordOutput(
-        "SimControlledTarget/VisibleTags", tagHidden ? new Pose3d[] {} : new Pose3d[] {tagPose});
-
-    Logger.recordOutput("SimControlledTarget/TagId", tagId);
+    Logger.recordOutput("SimControlledTarget/" + tagId + "/TagPose", tagPose);
+    Logger.recordOutput("SimControlledTarget/" + tagId + "/TagId", tagId);
   }
 
   public AprilTagFieldLayout createFieldWithTarget(AprilTagFieldLayout initialField) {

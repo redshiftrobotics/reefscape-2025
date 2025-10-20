@@ -62,11 +62,11 @@ public class DriverDashboard extends SubsystemBase {
   }
 
   public void addCommand(String name, Runnable runnable, boolean runsWhenDisabled) {
-    addCommand(name, Commands.runOnce(runnable), runsWhenDisabled);
+    addCommand(name, Commands.runOnce(runnable).ignoringDisable(runsWhenDisabled));
   }
 
-  public void addCommand(String name, Command command, boolean runsWhenDisabled) {
-    SmartDashboard.putData(name, command.withName(name).ignoringDisable(runsWhenDisabled));
+  public void addCommand(String name, Command command) {
+    SmartDashboard.putData(name, command.withName(name));
   }
 
   public void setPoseSupplier(Supplier<Pose2d> robotPoseSupplier) {
@@ -116,20 +116,8 @@ public class DriverDashboard extends SubsystemBase {
 
     if (poseSupplier != null) {
       Pose2d pose = poseSupplier.get();
-      SmartDashboard.putNumber("Heading Degrees", (-pose.getRotation().getDegrees() + 360) % 360);
+      SmartDashboard.putNumber("Heading Degrees", -pose.getRotation().getDegrees());
       field.setRobotPose(pose);
-
-      // SmartDashboard.putNumber(
-      // "Distance To Reef [Tag 8] [Test]",
-      // Units.metersToInches(
-      //     Math.abs(
-      //             AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
-      //                 .getTagPose(18)
-      //                 .get()
-      //                 .toPose2d()
-      //                 .minus(pose)
-      //                 .getX())
-      //         - DRIVE_CONFIG.bumperCornerToCorner().getX() / 2.0));
     }
 
     if (autoAlginPoseSupplier != null) {
@@ -155,8 +143,7 @@ public class DriverDashboard extends SubsystemBase {
     }
 
     if (hasVisionEstimate != null) {
-      SmartDashboard.putBoolean(
-          "Has Vision", hasVisionEstimate.getAsBoolean());
+      SmartDashboard.putBoolean("Has Vision", hasVisionEstimate.getAsBoolean());
     }
 
     if (usingIntakeSensor != null) {

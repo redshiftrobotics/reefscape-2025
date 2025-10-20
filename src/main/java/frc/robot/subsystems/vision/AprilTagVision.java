@@ -21,8 +21,6 @@ import java.util.stream.Collectors;
 import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVision extends SubsystemBase {
-  ;
-
   private final Camera[] cameras;
 
   private final Debouncer debouncer = new Debouncer(0.2, DebounceType.kFalling);
@@ -123,7 +121,7 @@ public class AprilTagVision extends SubsystemBase {
     return Arrays.stream(cameras)
         .flatMap(camera -> camera.getLatestTargets().stream())
         .collect(Collectors.toList());
-  } 
+  }
 
   public void setFieldTags(AprilTagFieldLayout fieldTags) {
     this.fieldTags = fieldTags;

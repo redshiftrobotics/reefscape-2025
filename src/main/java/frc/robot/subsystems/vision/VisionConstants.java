@@ -24,12 +24,23 @@ public class VisionConstants {
 
   // Docs: https://docs.photonvision.org/en/latest/docs/apriltag-pipelines/coordinate-systems.html
 
-  public record CameraConfig(String cameraName, String cameraPosition, Transform3d robotToCamera) {}
+  enum CameraPositions {
+    FRONT,
+    LEFT,
+    RIGHT,
+    FRONT_LEFT,
+    FRONT_RIGHT,
+    BACK_LEFT,
+    BACK_RIGHT
+  }
+
+  public record CameraConfig(
+      String cameraName, CameraPositions cameraPosition, Transform3d robotToCamera) {}
 
   public static final CameraConfig SIM_FRONT_CAMERA =
       new CameraConfig(
           "frontCam",
-          "front",
+          CameraPositions.FRONT,
           new Transform3d(
               new Translation3d(Units.inchesToMeters(27.5 / 2.0 + 1.0), 0, Units.inchesToMeters(6)),
               new Rotation3d(0, Units.degreesToRadians(0), 0)));
@@ -37,7 +48,7 @@ public class VisionConstants {
   public static final CameraConfig WOOD_V2_LEFT_CAMERA =
       new CameraConfig(
           "leftCamera",
-          "left",
+          CameraPositions.LEFT,
           new Transform3d(
               new Translation3d(0, Units.inchesToMeters(27.5 / 2.0 - 0.5), 0),
               new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(90))));
@@ -45,7 +56,7 @@ public class VisionConstants {
   public static final CameraConfig WOODV2_RIGHT_CAMERA =
       new CameraConfig(
           "rightCamera",
-          "right",
+          CameraPositions.RIGHT,
           new Transform3d(
               new Translation3d(
                   0, -Units.inchesToMeters(27.5 / 2.0 + 1.0), Units.inchesToMeters(3)),
@@ -66,7 +77,7 @@ public class VisionConstants {
   public static final CameraConfig COMP_FRONT_LEFT_CAMERA =
       new CameraConfig(
           "plzwork",
-          "Front Left",
+          CameraPositions.FRONT_LEFT,
           new Transform3d(
               new Translation3d(+CAMERA_OFFSET_X, +CAMERA_OFFSET_Y, FRONT_CAMERA_OFFSET_Z),
               new Rotation3d(0, -FRONT_CAMERA_PITCH, +FRONT_CAMERA_YAW)));
@@ -74,7 +85,7 @@ public class VisionConstants {
   public static final CameraConfig COMP_FRONT_RIGHT_CAMERA =
       new CameraConfig(
           "FrontRight8032",
-          "Front Right",
+          CameraPositions.FRONT_RIGHT,
           new Transform3d(
               new Translation3d(+CAMERA_OFFSET_X, -CAMERA_OFFSET_Y, FRONT_CAMERA_OFFSET_Z),
               new Rotation3d(0, -FRONT_CAMERA_PITCH, -FRONT_CAMERA_YAW)));
@@ -82,7 +93,7 @@ public class VisionConstants {
   public static final CameraConfig COMP_BACK_LEFT_CAMERA =
       new CameraConfig(
           "jarreaucam",
-          "Back Left",
+          CameraPositions.BACK_LEFT,
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, +CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
               new Rotation3d(0, -BACK_CAMERA_PITCH, Units.degreesToRadians(180 + 32.46))));
@@ -90,7 +101,7 @@ public class VisionConstants {
   public static final CameraConfig COMP_BACK_RIGHT_CAMERA =
       new CameraConfig(
           "BackRightCamera8032",
-          "Back Right",
+          CameraPositions.BACK_RIGHT,
           new Transform3d(
               new Translation3d(-CAMERA_OFFSET_X, -CAMERA_OFFSET_Y, BACK_CAMERA_OFFSET_Z),
               new Rotation3d(0, -BACK_CAMERA_PITCH, Units.degreesToRadians(180 - 30))));

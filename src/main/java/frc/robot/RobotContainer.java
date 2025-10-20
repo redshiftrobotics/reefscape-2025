@@ -33,7 +33,10 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ManualAlignCommands;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
-import frc.robot.commands.visionDemo.AimAtTag;
+import frc.robot.commands.visionDemo.AimAtTagMode;
+import frc.robot.commands.visionDemo.FollowTagMode;
+import frc.robot.commands.visionDemo.TagIdleMode;
+import frc.robot.commands.visionDemo.VisionDemoCommand;
 import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -85,8 +88,10 @@ import frc.robot.utility.JoystickUtil;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -263,6 +268,7 @@ public class RobotContainer {
                   FieldConstants.FIELD.getX() / 2, FieldConstants.FIELD.getY() / 2, 1),
               Rotation3d.kZero);
       vision.addSimulatedTarget(new SimControlledTarget(17, startPose, new XboxController(3)));
+      vision.addSimulatedTarget(new SimControlledTarget(1, startPose, new XboxController(4)));
     } else {
       vision.addVisionEstimateConsumer(
           (estimate) -> {
@@ -346,6 +352,24 @@ public class RobotContainer {
                     new Transform2d(
                         DRIVE_CONFIG.bumperCornerToCorner().getX() / 2, 0, Rotation2d.kPi))),
         true);
+
+    if (Constants.VISION_DEMO_MODE) {
+      SmartDashboard.putBoolean("Superstructure Aim", true);
+      BooleanSupplier superstructureAim =
+          () -> SmartDashboard.getBoolean("Superstructure Aim", true);
+
+      dashboard.addCommand(
+          "Tag Following Demo",
+          new VisionDemoCommand(
+              vision,
+              drive,
+              elevator,
+              coralWrist,
+              ledSubsystem,
+              List.of(new AimAtTagMode(17), new FollowTagMode(1, new Translation2d(2, 0))),
+              new TagIdleMode(),
+              superstructureAim));
+    }
   }
 
   public void updateAlerts() {
@@ -515,10 +539,6 @@ public class RobotContainer {
               CustomCommands.reInitCommand(
                   intakeAlignmentCommands.driveToPrevious(drive).withName("Align INTAKE -1")));
     }
-
-    AimAtTag.drivingTranslationSupplier = input::getTranslationMetersPerSecond;
-    AimAtTag.fieldRelativeDrivingSupplier = useFieldRelative::getAsBoolean;
-    FollowTag.drivingTranslationSupplier = input::getTranslationMetersPerSecond;
   }
 
   private void configureOperatorControllerBindings(CommandXboxController xbox) {
