@@ -1,6 +1,7 @@
 package frc.robot.commands.visionDemo;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -9,9 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Constants;
 import frc.robot.commands.visionDemo.VisionDemoCommand.VisionDemoState;
-import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class FollowTagMode implements VisionDemoState {
@@ -22,29 +21,39 @@ public class FollowTagMode implements VisionDemoState {
   private static final double MAX_TAG_JUMP = Units.feetToMeters(1);
 
   private final Translation2d targetOffset;
-  private final BooleanSupplier useSuperstructure;
 
-  private final int tagId;
-  private Translation3d tagFilteredPosition = Translation3d.kZero;
+  private Translation3d tagFilteredPosition;
 
   private final Timer resetTimer = new Timer();
 
-  public FollowTagMode(int tag, Translation2d targetOffset, BooleanSupplier useSuperstructure) {
-    this.tagId = tag;
+  private boolean shouldDrive = false;
+  private final Debouncer shouldDriveDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kRising);
+
+  public FollowTagMode(Translation2d targetOffset) {
     this.targetOffset = targetOffset;
-    this.useSuperstructure = useSuperstructure;
-    resetTimer.start();
+  }
+
+  @Override
+  public void reset() {
+    tagFilteredPosition = null;
+    resetTimer.reset();
+
+    shouldDrive = false;
+    shouldDriveDebouncer.calculate(false);
   }
 
   @Override
   public Pose2d updateSetpoint(Pose2d robotPose, Pose3d tagPose) {
 
+    if (tagFilteredPosition == null) {
+      tagFilteredPosition = tagPose.getTranslation();
+    }
+
+    Logger.recordOutput("TagFollowing/Follow/DeltaTime", resetTimer.get());
+
     tagFilteredPosition =
         MathUtil.slewRateLimit(
-            tagFilteredPosition,
-            tagPose.getTranslation(),
-            resetTimer.get(),
-            FILTER_SLEW_RATE);
+            tagFilteredPosition, tagPose.getTranslation(), resetTimer.get(), FILTER_SLEW_RATE);
 
     resetTimer.restart();
 
@@ -59,14 +68,15 @@ public class FollowTagMode implements VisionDemoState {
     double distance = tagFilteredPosition.getDistance(tagPose.getTranslation());
     boolean withinMaxJump = distance < MAX_TAG_JUMP;
 
-    String keyPrefix = "TagFollowing/Follow" + tagId + "/";
-
-    Logger.recordOutput(keyPrefix + "TagDistanceToSafe", distance);
-    Logger.recordOutput(keyPrefix + "WithinMaxJump", withinMaxJump);
+    Logger.recordOutput("TagFollowing/Follow/TagDistanceToSafe", distance);
+    Logger.recordOutput("TagFollowing/Follow/WithinMaxJump", withinMaxJump);
     Logger.recordOutput(
-        keyPrefix + "TagFilteredPosition",
+        "TagFollowing/Follow/TagFilteredPosition",
         new Pose3d(this.tagFilteredPosition, tagPose.getRotation()));
-    Logger.recordOutput(keyPrefix + "RawTargetPosition", target);
+    Logger.recordOutput("TagFollowing/Follow/RawTargetPosition", target);
+
+    shouldDrive = shouldDriveDebouncer.calculate(withinMaxJump);
+    Logger.recordOutput("TagFollowing/Follow/ShouldDrive", shouldDrive);
 
     if (!withinMaxJump) {
       return null;
@@ -76,22 +86,7 @@ public class FollowTagMode implements VisionDemoState {
   }
 
   @Override
-  public String name() {
-    return "FOLLOW TAG " + tagId;
-  }
-
-  @Override
-  public int tagId() {
-    return tagId;
-  }
-
-  @Override
-  public int priority() {
-    return 2;
-  }
-
-  @Override
-  public boolean usesSuperstructure() {
-    return useSuperstructure.getAsBoolean();
+  public boolean blocksDriving() {
+    return !shouldDrive;
   }
 }

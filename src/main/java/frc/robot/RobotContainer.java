@@ -35,7 +35,6 @@ import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.commands.visionDemo.AimAtTagMode;
 import frc.robot.commands.visionDemo.FollowTagMode;
-import frc.robot.commands.visionDemo.TagIdleMode;
 import frc.robot.commands.visionDemo.VisionDemoCommand;
 import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
@@ -88,7 +87,6 @@ import frc.robot.utility.JoystickUtil;
 import frc.robot.utility.OverrideSwitch;
 import frc.robot.utility.commands.CustomCommands;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
@@ -268,7 +266,6 @@ public class RobotContainer {
                   FieldConstants.FIELD.getX() / 2, FieldConstants.FIELD.getY() / 2, 1),
               Rotation3d.kZero);
       vision.addSimulatedTarget(new SimControlledTarget(17, startPose, new XboxController(3)));
-      vision.addSimulatedTarget(new SimControlledTarget(1, startPose, new XboxController(4)));
     } else {
       vision.addVisionEstimateConsumer(
           (estimate) -> {
@@ -358,18 +355,28 @@ public class RobotContainer {
       BooleanSupplier useSuperstructure =
           () -> SmartDashboard.getBoolean("Superstructure Aim", true);
 
-      dashboard.addCommand(
-          "Tag Following Demo",
+      SmartDashboard.putData(
+          "Aim At Tag",
           new VisionDemoCommand(
               vision,
               drive,
               elevator,
               coralWrist,
               ledSubsystem,
-              List.of(
-                  new AimAtTagMode(17, useSuperstructure),
-                  new FollowTagMode(1, new Translation2d(2, 0), useSuperstructure)),
-              new TagIdleMode()));
+              new AimAtTagMode(),
+              useSuperstructure,
+              17));
+      SmartDashboard.putData(
+          "Follow Tag",
+          new VisionDemoCommand(
+              vision,
+              drive,
+              elevator,
+              coralWrist,
+              ledSubsystem,
+              new FollowTagMode(new Translation2d(2, 0)),
+              useSuperstructure,
+              17));
     }
   }
 

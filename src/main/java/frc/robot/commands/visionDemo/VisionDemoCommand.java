@@ -18,35 +18,19 @@ import frc.robot.subsystems.superstructure.wrist.Wrist;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.Camera.TrackedTarget;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class VisionDemoCommand extends Command {
 
-  public interface VisionDemoState extends Comparable<VisionDemoState> {
+  public interface VisionDemoState {
+
+    public default void reset() {}
 
     public Pose2d updateSetpoint(Pose2d robotPose, Pose3d tagPose);
 
-    public default ChassisSpeeds updateSpeeds(ChassisSpeeds currentSpeeds) {
-      return currentSpeeds;
-    }
-
-    public String name();
-
-    public int tagId();
-
-    public default int priority() {
-      return 0;
-    }
-
-    public default boolean usesSuperstructure() {
+    public default boolean blocksDriving() {
       return false;
-    }
-
-    @Override
-    default int compareTo(VisionDemoState other) {
-      return Integer.compare(this.priority(), other.priority());
     }
   }
 
@@ -58,20 +42,17 @@ public class VisionDemoCommand extends Command {
 
   private final LEDSubsystem leds;
 
-  private final List<VisionDemoState> tagToFollow;
-  private final VisionDemoState passiveMode;
+  private final VisionDemoState mode;
+  private final BooleanSupplier useSuperstructure;
+  private final int tagId;
 
   private final SimpleDriveController controller = new SimpleDriveController();
   private final Debouncer atGoalDebouncer = new Debouncer(0.2);
-
-  private VisionDemoState currentMode;
 
   private final ComboFilter elevatorHeightFilter = new ComboFilter(3, 5);
   private final ComboFilter wristAngleFilter = new ComboFilter(3, 5);
 
   private final Debouncer hasTargetDebouncer = new Debouncer(0.2, Debouncer.DebounceType.kFalling);
-
-  private final Debouncer modeSwitchDebouncer = new Debouncer(1);
 
   public VisionDemoCommand(
       AprilTagVision vision,
@@ -79,24 +60,26 @@ public class VisionDemoCommand extends Command {
       Elevator elevator,
       Wrist wrist,
       LEDSubsystem leds,
-      List<VisionDemoState> tags,
-      VisionDemoState passiveMode) {
+      VisionDemoState mode,
+      BooleanSupplier useSuperstructure,
+      int tagId) {
     this.vision = vision;
     this.drive = drive;
     this.elevator = elevator;
     this.wrist = wrist;
     this.leds = leds;
-    this.tagToFollow = tags;
-    this.passiveMode = passiveMode;
+    this.mode = mode;
+    this.useSuperstructure = useSuperstructure;
+    this.tagId = tagId;
 
     addRequirements(drive, elevator, wrist, leds);
   }
 
   @Override
   public void initialize() {
-    this.currentMode = passiveMode;
     controller.reset(drive.getRobotPose());
     controller.setSetpoint(drive.getRobotPose());
+    mode.reset();
   }
 
   @Override
@@ -105,17 +88,16 @@ public class VisionDemoCommand extends Command {
 
     // --- Tag Collection and Filtering ---
 
-    List<TrackedTarget> tags = vision.getLatestTargets(); // 36h11
-
-    Map<Integer, VisionDemoState> tagMap =
-        tagToFollow.stream().collect(Collectors.toMap(VisionDemoState::tagId, t -> t));
+    List<TrackedTarget> tags = vision.getLatestTargets();
 
     List<TrackedTarget> filtedTags =
         tags.stream()
             .filter(TrackedTarget::isGoodPoseAmbiguity)
             .filter(
-                t -> Math.abs(t.cameraToTarget().getRotation().getY()) < Units.degreesToRadians(80))
-            .filter(t -> tagMap.containsKey(t.id()))
+                tag ->
+                    Math.abs(tag.cameraToTarget().getRotation().getY())
+                        < Units.degreesToRadians(80))
+            .filter(tag -> tag.id() == tagId)
             .toList();
 
     boolean hasTags = !filtedTags.isEmpty();
@@ -126,7 +108,7 @@ public class VisionDemoCommand extends Command {
 
     if (!filtedTags.isEmpty() || !hasTagsDebounced) {
       Logger.recordOutput(
-          "TagFollowing/Tags/IDs", filtedTags.stream().mapToInt(TrackedTarget::id).toArray());
+          "TagFollowing/Tags/Number", filtedTags.stream().mapToInt(TrackedTarget::id).toArray());
       Logger.recordOutput(
           "TagFollowing/Tags/Pose3ds",
           filtedTags.stream().map(t -> t.getTargetPose(robotPose)).toArray(Pose3d[]::new));
@@ -135,41 +117,19 @@ public class VisionDemoCommand extends Command {
           filtedTags.stream().map(t -> t.getCamearaPose(robotPose)).toArray(Pose3d[]::new));
     }
 
-    // --- Mode Selection ---
-
-    VisionDemoState desiredMode =
-        filtedTags.stream()
-            .map(t -> tagMap.get(t.id()))
-            .max(VisionDemoState::compareTo)
-            .orElse(passiveMode);
-
-    if (desiredMode.priority() > currentMode.priority()
-        || modeSwitchDebouncer.calculate(desiredMode != currentMode)) {
-      currentMode = desiredMode;
-    }
-
-    List<TrackedTarget> usedTags =
-        filtedTags.stream().filter(t -> t.id() == currentMode.tagId()).toList();
-
-    Logger.recordOutput("TagFollowing/DesiredMode", desiredMode.name());
-    Logger.recordOutput("TagFollowing/CurrentMode", currentMode.name());
-
-    SmartDashboard.putString("Tag Following Mode", currentMode.name());
-
     // --- Target Logging ---
 
-    if (!usedTags.isEmpty()) {
+    if (!filtedTags.isEmpty()) {
       Pose3d averageTagPose =
           TagFollowUtil.averagePoses(
-              usedTags.stream().map(t -> t.getTargetPose(robotPose)).toList());
+              filtedTags.stream().map(t -> t.getTargetPose(robotPose)).toList());
 
-      Logger.recordOutput("TagFollowing/Target/ID", currentMode.tagId());
       Logger.recordOutput("TagFollowing/Target/Pose3d", new Pose3d[] {averageTagPose});
       Logger.recordOutput(
           "TagFollowing/Target/CameraPoses3d",
           filtedTags.stream().map(t -> t.getCamearaPose(robotPose)).toArray(Pose3d[]::new));
 
-      Pose2d setpointPose = currentMode.updateSetpoint(robotPose, averageTagPose);
+      Pose2d setpointPose = mode.updateSetpoint(robotPose, averageTagPose);
 
       if (setpointPose != null) {
         controller.setSetpoint(setpointPose);
@@ -178,7 +138,7 @@ public class VisionDemoCommand extends Command {
         SmartDashboard.putNumber("Target Heading", -setpointPose.getRotation().getDegrees());
       }
 
-      if (currentMode.usesSuperstructure()) {
+      if (useSuperstructure.getAsBoolean()) {
         TagFollowingSuperstructureState desiredState = getSuperstructureState(averageTagPose);
 
         double filteredElevatorHeight =
@@ -204,7 +164,10 @@ public class VisionDemoCommand extends Command {
       speeds = new ChassisSpeeds(0, 0, 0);
     }
 
-    speeds = currentMode.updateSpeeds(speeds);
+    if (mode.blocksDriving()) {
+      speeds.vxMetersPerSecond = 0;
+      speeds.vyMetersPerSecond = 0;
+    }
 
     drive.setRobotSpeeds(speeds);
   }
