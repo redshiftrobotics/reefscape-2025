@@ -355,7 +355,7 @@ public class RobotContainer {
 
     if (Constants.VISION_DEMO_MODE) {
       SmartDashboard.putBoolean("Superstructure Aim", true);
-      BooleanSupplier superstructureAim =
+      BooleanSupplier useSuperstructure =
           () -> SmartDashboard.getBoolean("Superstructure Aim", true);
 
       dashboard.addCommand(
@@ -366,9 +366,10 @@ public class RobotContainer {
               elevator,
               coralWrist,
               ledSubsystem,
-              List.of(new AimAtTagMode(17), new FollowTagMode(1, new Translation2d(2, 0))),
-              new TagIdleMode(),
-              superstructureAim));
+              List.of(
+                  new AimAtTagMode(17, useSuperstructure),
+                  new FollowTagMode(1, new Translation2d(2, 0), useSuperstructure)),
+              new TagIdleMode()));
     }
   }
 

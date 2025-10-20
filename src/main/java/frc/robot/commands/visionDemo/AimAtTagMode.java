@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.commands.visionDemo.filters.ComboFilter;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class AimAtTagMode implements VisionDemoCommand.VisionDemoState {
@@ -11,11 +12,13 @@ public class AimAtTagMode implements VisionDemoCommand.VisionDemoState {
   private static final Rotation2d TARGET_HEADING_OFFSET = Rotation2d.k180deg;
 
   private final int tagId;
+  private final BooleanSupplier useSuperstructure;
 
-  private final ComboFilter angleFilter = new ComboFilter(3, 5);
+  private final ComboFilter angleFilter = new ComboFilter(15, 5);
 
-  public AimAtTagMode(int tagId) {
+  public AimAtTagMode(int tagId, BooleanSupplier useSuperstructure) {
     this.tagId = tagId;
+    this.useSuperstructure = useSuperstructure;
   }
 
   @Override
@@ -51,5 +54,10 @@ public class AimAtTagMode implements VisionDemoCommand.VisionDemoState {
   @Override
   public int priority() {
     return 1;
+  }
+
+  @Override
+  public boolean usesSuperstructure() {
+    return useSuperstructure.getAsBoolean();
   }
 }

@@ -8,27 +8,32 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.commands.visionDemo.VisionDemoCommand.VisionDemoState;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class FollowTagMode implements VisionDemoState {
 
   private static final Rotation2d TARGET_HEADING_OFFSET = Rotation2d.k180deg;
 
-  private static final double FILTER_SLEW_RATE = Units.feetToMeters(5);
+  private static final double FILTER_SLEW_RATE = Units.feetToMeters(4);
   private static final double MAX_TAG_JUMP = Units.feetToMeters(1);
 
   private final Translation2d targetOffset;
+  private final BooleanSupplier useSuperstructure;
 
   private final int tagId;
   private Translation3d tagFilteredPosition = Translation3d.kZero;
 
-  private boolean hasValidTag = false;
+  private final Timer resetTimer = new Timer();
 
-  public FollowTagMode(int tag, Translation2d targetOffset) {
+  public FollowTagMode(int tag, Translation2d targetOffset, BooleanSupplier useSuperstructure) {
     this.tagId = tag;
     this.targetOffset = targetOffset;
+    this.useSuperstructure = useSuperstructure;
+    resetTimer.start();
   }
 
   @Override
@@ -38,8 +43,10 @@ public class FollowTagMode implements VisionDemoState {
         MathUtil.slewRateLimit(
             tagFilteredPosition,
             tagPose.getTranslation(),
-            Constants.LOOP_PERIOD_SECONDS,
+            resetTimer.get(),
             FILTER_SLEW_RATE);
+
+    resetTimer.restart();
 
     Rotation2d targetRotation =
         tagPose.getRotation().toRotation2d().plus(Rotation2d.k180deg).plus(TARGET_HEADING_OFFSET);
@@ -81,5 +88,10 @@ public class FollowTagMode implements VisionDemoState {
   @Override
   public int priority() {
     return 2;
+  }
+
+  @Override
+  public boolean usesSuperstructure() {
+    return useSuperstructure.getAsBoolean();
   }
 }

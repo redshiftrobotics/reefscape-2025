@@ -18,7 +18,8 @@ import frc.robot.subsystems.superstructure.wrist.Wrist;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.Camera.TrackedTarget;
 import java.util.List;
-import java.util.function.BooleanSupplier;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.littletonrobotics.junction.Logger;
 
 public class VisionDemoCommand extends Command {
@@ -70,7 +71,7 @@ public class VisionDemoCommand extends Command {
 
   private final Debouncer hasTargetDebouncer = new Debouncer(0.2, Debouncer.DebounceType.kFalling);
 
-  private final Debouncer modeSwitchDebouncer = new Debouncer(1, Debouncer.DebounceType.kRising);
+  private final Debouncer modeSwitchDebouncer = new Debouncer(1);
 
   public VisionDemoCommand(
       AprilTagVision vision,
@@ -79,8 +80,7 @@ public class VisionDemoCommand extends Command {
       Wrist wrist,
       LEDSubsystem leds,
       List<VisionDemoState> tags,
-      VisionDemoState passiveMode,
-      BooleanSupplier followWithSuperstructure) {
+      VisionDemoState passiveMode) {
     this.vision = vision;
     this.drive = drive;
     this.elevator = elevator;
@@ -107,14 +107,15 @@ public class VisionDemoCommand extends Command {
 
     List<TrackedTarget> tags = vision.getLatestTargets(); // 36h11
 
-    List<Integer> desiredTagIds = tagToFollow.stream().map(VisionDemoState::tagId).toList();
+    Map<Integer, VisionDemoState> tagMap =
+        tagToFollow.stream().collect(Collectors.toMap(VisionDemoState::tagId, t -> t));
 
     List<TrackedTarget> filtedTags =
         tags.stream()
             .filter(TrackedTarget::isGoodPoseAmbiguity)
             .filter(
                 t -> Math.abs(t.cameraToTarget().getRotation().getY()) < Units.degreesToRadians(80))
-            .filter(t -> desiredTagIds.contains(t.id()))
+            .filter(t -> tagMap.containsKey(t.id()))
             .toList();
 
     boolean hasTags = !filtedTags.isEmpty();
@@ -138,16 +139,12 @@ public class VisionDemoCommand extends Command {
 
     VisionDemoState desiredMode =
         filtedTags.stream()
-            .map(
-                t ->
-                    tagToFollow.stream()
-                        .filter(mode -> mode.tagId() == t.id())
-                        .findFirst()
-                        .orElse(passiveMode))
+            .map(t -> tagMap.get(t.id()))
             .max(VisionDemoState::compareTo)
             .orElse(passiveMode);
 
-    if (modeSwitchDebouncer.calculate(desiredMode != currentMode)) {
+    if (desiredMode.priority() > currentMode.priority()
+        || modeSwitchDebouncer.calculate(desiredMode != currentMode)) {
       currentMode = desiredMode;
     }
 
