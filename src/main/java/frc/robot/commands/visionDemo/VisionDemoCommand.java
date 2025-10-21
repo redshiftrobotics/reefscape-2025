@@ -28,6 +28,7 @@ public class VisionDemoCommand extends Command {
     public default void reset() {}
 
     public Pose2d getRawPose(Pose2d robotPose, Pose3d tagPose);
+
     public Pose2d getSafePose(Pose2d robotPose, Pose3d tagPose);
 
     public default boolean blocksDriving() {
@@ -73,7 +74,8 @@ public class VisionDemoCommand extends Command {
     this.useSuperstructure = useSuperstructure;
     this.tagId = tagId;
 
-    controller.setTolerance(new Pose2d(Units.inchesToMeters(2), Units.inchesToMeters(2), Rotation2d.fromDegrees(3)));
+    controller.setTolerance(
+        new Pose2d(Units.inchesToMeters(2), Units.inchesToMeters(2), Rotation2d.fromDegrees(3)));
 
     addRequirements(drive, elevator, wrist, leds);
   }
@@ -132,7 +134,6 @@ public class VisionDemoCommand extends Command {
           "TagFollowing/Target/CameraPoses3d",
           filtedTags.stream().map(t -> t.getCamearaPose(robotPose)).toArray(Pose3d[]::new));
 
-
       Pose2d rawSetpointPose = mode.getRawPose(robotPose, averageTagPose);
       Logger.recordOutput("TagFollowing/RobotRawSetpointPose", rawSetpointPose);
       SmartDashboard.putNumber("Target Heading", -rawSetpointPose.getRotation().getDegrees());
@@ -141,8 +142,7 @@ public class VisionDemoCommand extends Command {
 
       if (setpointPose != null) {
         controller.setSetpoint(setpointPose);
-        Logger.recordOutput(
-            "TagFollowing/RobotSetpointPose", setpointPose);
+        Logger.recordOutput("TagFollowing/RobotSetpointPose", setpointPose);
       }
 
       if (useSuperstructure.getAsBoolean()) {
