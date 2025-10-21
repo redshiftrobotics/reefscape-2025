@@ -363,8 +363,7 @@ public class RobotContainer {
               elevator,
               coralWrist,
               ledSubsystem,
-              new AimAtTagMode(),
-              useSuperstructure,
+              new AimAtTagMode(useSuperstructure),
               17));
       SmartDashboard.putData(
           "Follow Tag",
@@ -374,8 +373,7 @@ public class RobotContainer {
               elevator,
               coralWrist,
               ledSubsystem,
-              new FollowTagMode(new Translation2d(2, 0)),
-              useSuperstructure,
+              new FollowTagMode(new Translation2d(2, 0), useSuperstructure),
               17));
     }
   }

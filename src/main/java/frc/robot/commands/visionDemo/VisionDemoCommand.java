@@ -30,25 +30,26 @@ public class VisionDemoCommand extends Command {
 
     public default void reset() {}
 
+    public ResultSaftyMode getExspectedSaftyMode();
+
     public Pose2d getRawPose(Pose2d robotPose, Pose3d tagPose);
 
     public VisionDemoResult calculate(Pose2d robotPose, Pose3d tagPose, double dt);
 
     public Optional<SuperstructureState> getSuperstructureState(Pose2d robotPose, Pose3d tagPose3d);
-
-    public Optional<BlinkenLEDPattern> getLEDPattern(Pose2d robotPose, Pose3d tagPose3d);
   }
 
-  public record VisionDemoResult(
-    Optional<Pose2d> setpointPose, ResultSaftyMode saftyMode
-  ) {}
+  public record VisionDemoResult(Optional<Pose2d> setpointPose, ResultSaftyMode saftyMode) {}
 
   public enum ResultSaftyMode {
-    SAFE, BLOCK_DRIVING, STOP;
+    FULL_CONTROL,
+    ROTATIONAL_CONTROL,
+    STOP,
+    UNKNOWN;
   }
 
   private final Drive drive;
-  private final VisionSystem vision;
+  private final AprilTagVision vision;
 
   private final Elevator elevator;
   private final Wrist wrist;
@@ -64,7 +65,9 @@ public class VisionDemoCommand extends Command {
   private final ComboFilter elevatorHeightFilter = new ComboFilter(3, 5);
   private final ComboFilter wristAngleFilter = new ComboFilter(3, 5);
 
-  private final Debouncer hasTargetDebouncer = new Debouncer(0.2, Debouncer.DebounceType.kFalling);
+  private ResultSaftyMode saftyMode = ResultSaftyMode.STOP;
+
+  private final Debouncer hasTargetDebouncer = new Debouncer(0.3, Debouncer.DebounceType.kFalling);
 
   private final Timer deltaTimeTimer = new Timer();
 
@@ -75,9 +78,8 @@ public class VisionDemoCommand extends Command {
       Wrist wrist,
       LEDSubsystem leds,
       VisionDemoMode mode,
-      BooleanSupplier useSuperstructure,
       int tagId) {
-    this.vision = new VisionSystem(vision);
+    this.vision = vision;
     this.drive = drive;
     this.elevator = elevator;
     this.wrist = wrist;
@@ -97,6 +99,7 @@ public class VisionDemoCommand extends Command {
     controller.setSetpoint(drive.getRobotPose());
     mode.reset();
     deltaTimeTimer.restart();
+    saftyMode = ResultSaftyMode.UNKNOWN;
   }
 
   @Override
@@ -105,7 +108,7 @@ public class VisionDemoCommand extends Command {
 
     // --- Tag Collection and Filtering ---
 
-    List<TrackedTarget> tags = vision.getTag(tagId);
+    List<TrackedTarget> tags = getTag(tagId);
 
     boolean hasTags = !tags.isEmpty();
     boolean hasTagsDebounced = hasTargetDebouncer.calculate(hasTags);
@@ -124,10 +127,12 @@ public class VisionDemoCommand extends Command {
 
     // --- Target Logging ---
 
-    if (!tags.isEmpty()) {
+    Logger.recordOutput("TagFollowing/Result/SaftyMode", saftyMode.toString());
+    updateLEDS(hasTagsDebounced);
+
+    if (hasTags) {
       Pose3d averageTagPose =
-          TagFollowUtil.averagePoses(
-              tags.stream().map(t -> t.getTargetPose(robotPose)).toList());
+          TagFollowUtil.averagePoses(tags.stream().map(t -> t.getTargetPose(robotPose)).toList());
 
       Logger.recordOutput("TagFollowing/Target/Pose3d", averageTagPose);
       Logger.recordOutput(
@@ -143,45 +148,92 @@ public class VisionDemoCommand extends Command {
       deltaTimeTimer.restart();
 
       VisionDemoResult setpointPose = mode.calculate(robotPose, averageTagPose, dt);
+      saftyMode = setpointPose.saftyMode();
 
       mode.getSuperstructureState(robotPose, averageTagPose).ifPresent(this::updateSuperstructure);
-      mode.getLEDPattern(robotPose, averageTagPose).ifPresent(leds::set);
 
-      setpointPose.setpointPose().ifPresent(pose -> {
-        controller.setSetpoint(pose);
-        Logger.recordOutput("TagFollowing/RobotSetpointPose", pose);
-      });
+      setpointPose
+          .setpointPose()
+          .ifPresent(
+              pose -> {
+                controller.setSetpoint(pose);
+                Logger.recordOutput("TagFollowing/RobotSetpointPose", pose);
+              });
     }
 
-    // --- Chassis Speed Calculation ---
-
-    ChassisSpeeds speeds = controller.calculate(drive.getRobotPose());
-
-    if (atGoalDebouncer.calculate(controller.atReference())) {
-      speeds = new ChassisSpeeds(0, 0, 0);
-    }
-
-    if (mode.blocksDriving()) {
-      speeds.vxMetersPerSecond = 0;
-      speeds.vyMetersPerSecond = 0;
-    }
-
+    ChassisSpeeds speeds = getChassisSpeeds();
     drive.setRobotSpeeds(speeds);
   }
 
+  private List<TrackedTarget> getTag(int tagId) {
+    return vision.getLatestTargets().stream()
+        .filter(TrackedTarget::isGoodPoseAmbiguity)
+        .filter(
+            tag -> Math.abs(tag.cameraToTarget().getRotation().getY()) < Units.degreesToRadians(80))
+        .filter(tag -> tag.id() == tagId)
+        .toList();
+  }
+
+  private void updateLEDS(boolean isUpdating) {
+
+    ResultSaftyMode saftyMode = this.saftyMode;
+
+    if (saftyMode == ResultSaftyMode.UNKNOWN) {
+      saftyMode = mode.getExspectedSaftyMode();
+    }
+
+    BlinkenLEDPattern pattern =
+        switch (saftyMode) {
+          case FULL_CONTROL -> isUpdating ? BlinkenLEDPattern.CHASE_RED : BlinkenLEDPattern.ORANGE;
+          case ROTATIONAL_CONTROL -> isUpdating
+              ? BlinkenLEDPattern.CHASE_BLUE
+              : BlinkenLEDPattern.GREEN;
+          case STOP -> BlinkenLEDPattern.WHITE;
+          case UNKNOWN -> BlinkenLEDPattern.RED;
+        };
+
+    Logger.recordOutput("TagFollowing/LEDPattern", pattern.toString());
+
+    leds.set(pattern);
+  }
+
   private void updateSuperstructure(SuperstructureState state) {
-      double filteredElevatorHeight =
-      elevatorHeightFilter.calculate(state.elevatorHeight());
-  Rotation2d filteredWristAngle =
-      new Rotation2d(wristAngleFilter.calculate(state.wristAngle().getRadians()));
+    double filteredElevatorHeight = elevatorHeightFilter.calculate(state.elevatorHeight());
+    Rotation2d filteredWristAngle =
+        new Rotation2d(wristAngleFilter.calculate(state.wristAngle().getRadians()));
 
-  elevator.setGoalHeightMeters(filteredElevatorHeight);
-  wrist.setGoalRotation(filteredWristAngle);
+    elevator.setGoalHeightMeters(filteredElevatorHeight);
+    wrist.setGoalRotation(filteredWristAngle);
 
-  Logger.recordOutput(
-      "TagFollowing/Superstructure/DesiredElevatorHeight", filteredElevatorHeight);
-  Logger.recordOutput(
-      "TagFollowing/Superstructure/DesiredWristAngle", filteredWristAngle.getDegrees());
+    Logger.recordOutput(
+        "TagFollowing/Superstructure/DesiredElevatorHeight", filteredElevatorHeight);
+    Logger.recordOutput(
+        "TagFollowing/Superstructure/DesiredWristAngle", filteredWristAngle.getDegrees());
+  }
+
+  private ChassisSpeeds getChassisSpeeds() {
+    ChassisSpeeds speeds = controller.calculate(drive.getRobotPose());
+
+    boolean atGoal = atGoalDebouncer.calculate(controller.atReference());
+    Logger.recordOutput("TagFollowing/AtGoal", atGoal);
+    if (atGoal) {
+      speeds = new ChassisSpeeds(0, 0, 0);
+    }
+
+    switch (saftyMode) {
+      case FULL_CONTROL:
+        // Do nothing, full control
+        break;
+      case ROTATIONAL_CONTROL:
+        speeds.vxMetersPerSecond = 0;
+        speeds.vyMetersPerSecond = 0;
+        break;
+      case STOP, UNKNOWN:
+        speeds = new ChassisSpeeds(0, 0, 0);
+        break;
+    }
+
+    return speeds;
   }
 
   @Override

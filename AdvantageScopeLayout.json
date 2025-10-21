@@ -12,12 +12,13 @@
             "/RealOutputs",
             "/RealOutputs/TagFollowing/Target",
             "/RealOutputs/TagFollowing/Targets",
-            "/RealOutputs/SimControlledTarget",
             "/RealOutputs/SimControlledTarget/1",
             "/RealOutputs/TagFollowing/Follow1",
+            "/RealOutputs/TagFollowing/Tags",
+            "/RealOutputs/TagFollowing/Result",
             "/RealOutputs/TagFollowing/Follow",
-            "/RealOutputs/TagFollowing",
-            "/RealOutputs/TagFollowing/Tags"
+            "/RealOutputs/ObjectVisualizer",
+            "/RealOutputs/ObjectVisualizer/Coral"
           ]
         },
         "tabs": {
@@ -253,15 +254,6 @@
                     "options": {}
                   },
                   {
-                    "type": "aprilTag",
-                    "logKey": "/RealOutputs/TagFollowing/Tags/Pose3ds",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {
-                      "family": "36h11"
-                    }
-                  },
-                  {
                     "type": "cone",
                     "logKey": "/RealOutputs/TagFollowing/Target/CameraPoses3d",
                     "logType": "Pose3d[]",
@@ -285,7 +277,7 @@
                     "type": "ghost",
                     "logKey": "/RealOutputs/TagFollowing/RobotRawSetpointPose",
                     "logType": "Pose2d",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "model": "demo_8032",
                       "color": "#ff00ff"
@@ -300,6 +292,25 @@
                       "model": "demo_8032",
                       "color": "#00ff00"
                     }
+                  },
+                  {
+                    "type": "aprilTag",
+                    "logKey": "/RealOutputs/TagFollowing/Tags/Pose3d",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "family": "36h11"
+                    }
+                  },
+                  {
+                    "type": "cone",
+                    "logKey": "/RealOutputs/ObjectVisualizer/Coral/HeldCoral",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ffff00",
+                      "position": "center"
+                    }
                   }
                 ],
                 "game": "Evergreen",
@@ -310,14 +321,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  0.7142812783393657,
-                  5.553539221839815,
-                  -12.088981419447926
+                  -0.46851039456849264,
+                  3.6787130745218386,
+                  -7.942674535110541
                 ],
                 "cameraTarget": [
-                  1.124430133003306,
-                  0.8985185384035308,
-                  -0.09185763882205353
+                  -0.490369349078673,
+                  1.29107333883965,
+                  -0.1143442703967752
                 ]
               },
               "controlsHeight": 251
@@ -731,29 +742,6 @@
       }
     }
   ],
-  "satellites": [
-    {
-      "x": 1085,
-      "y": 215,
-      "width": 900,
-      "height": 500,
-      "state": {
-        "type": 1,
-        "visualizer": null
-      },
-      "uuid": "qj29letyre9xjjtpp9t2ipxd72z01y27"
-    },
-    {
-      "x": 1825,
-      "y": 421,
-      "width": 654,
-      "height": 677,
-      "state": {
-        "type": 9,
-        "visualizer": null
-      },
-      "uuid": "rimbjrz22qw8iu6qzsjs9l9ebw1jgshb"
-    }
-  ],
+  "satellites": [],
   "version": "4.1.5"
 }

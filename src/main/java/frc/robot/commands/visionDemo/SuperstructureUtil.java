@@ -27,7 +27,7 @@ public class SuperstructureUtil {
         default -> Units.inchesToMeters(18);
       };
 
-  public static SuperstructureState getSuperstructureState(Pose3d tagPose) {
+  public static SuperstructureState pointAtTag(Pose3d tagPose) {
     final Rotation2d wristAngle = new Rotation2d(tagPose.getRotation().getY());
     final double elevatorHeight =
         tagPose.getTranslation().getZ()
