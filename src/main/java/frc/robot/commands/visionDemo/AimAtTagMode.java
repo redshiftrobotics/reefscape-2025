@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.commands.visionDemo.SuperstructureUtil.SuperstructureState;
 import frc.robot.commands.visionDemo.VisionDemoCommand.ResultSaftyMode;
 import frc.robot.commands.visionDemo.VisionDemoCommand.VisionDemoResult;
-import frc.robot.commands.visionDemo.filters.ComboFilter;
+import frc.robot.commands.visionDemo.filters.ComboAngleFilter;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
@@ -14,7 +14,7 @@ public class AimAtTagMode implements VisionDemoCommand.VisionDemoMode {
 
   private static final Rotation2d TARGET_HEADING_OFFSET = Rotation2d.k180deg;
 
-  private final ComboFilter angleFilter = new ComboFilter(3, 5);
+  private final ComboAngleFilter angleFilter = new ComboAngleFilter(3, 5);
 
   private final BooleanSupplier followWithSuperstructure;
 
@@ -43,11 +43,9 @@ public class AimAtTagMode implements VisionDemoCommand.VisionDemoMode {
   @Override
   public VisionDemoResult calculate(Pose2d robotPose, Pose3d tagPose, double dt) {
     Pose2d rawPose = getRawPose(robotPose, tagPose);
-    Rotation2d filteredAngle =
-        new Rotation2d(angleFilter.calculate(rawPose.getRotation().getRadians()));
-
     return new VisionDemoResult(
-        Optional.of(new Pose2d(rawPose.getTranslation(), filteredAngle)),
+        Optional.of(
+            new Pose2d(rawPose.getTranslation(), angleFilter.calculate(rawPose.getRotation()))),
         ResultSaftyMode.ROTATIONAL_CONTROL);
   }
 

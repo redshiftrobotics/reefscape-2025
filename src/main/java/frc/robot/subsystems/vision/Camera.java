@@ -52,7 +52,6 @@ public class Camera {
 
   private VisionResult[] results = new VisionResult[0];
 
-  private boolean filterBasedOnLastPose = false;
   private Supplier<Pose2d> lastRobotPoseSupplier;
 
   private final Alert missingCameraAlert;

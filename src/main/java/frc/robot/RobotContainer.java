@@ -34,6 +34,7 @@ import frc.robot.commands.ManualAlignCommands;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.commands.visionDemo.AimAtTagMode;
+import frc.robot.commands.visionDemo.ContainmentBox;
 import frc.robot.commands.visionDemo.FollowTagMode;
 import frc.robot.commands.visionDemo.VisionDemoCommand;
 import frc.robot.subsystems.dashboard.DriverDashboard;
@@ -355,26 +356,38 @@ public class RobotContainer {
       BooleanSupplier useSuperstructure =
           () -> SmartDashboard.getBoolean("Superstructure Aim", true);
 
+      double boxRadiusX = Units.feetToMeters(5);
+      double boxRadiusY = Units.feetToMeters(6);
+
+      ContainmentBox box =
+          new ContainmentBox(
+              FieldConstants.FIELD.div(2).minus(new Translation2d(boxRadiusX, boxRadiusY)),
+              FieldConstants.FIELD.div(2).plus(new Translation2d(boxRadiusX, boxRadiusY)));
+
       SmartDashboard.putData(
           "Aim At Tag",
           new VisionDemoCommand(
-              vision,
-              drive,
-              elevator,
-              coralWrist,
-              ledSubsystem,
-              new AimAtTagMode(useSuperstructure),
-              17));
+                  vision,
+                  drive,
+                  elevator,
+                  coralWrist,
+                  ledSubsystem,
+                  new AimAtTagMode(useSuperstructure),
+                  box,
+                  17)
+              .onlyIf(() -> box.contains(drive.getRobotPose())));
       SmartDashboard.putData(
           "Follow Tag",
           new VisionDemoCommand(
-              vision,
-              drive,
-              elevator,
-              coralWrist,
-              ledSubsystem,
-              new FollowTagMode(new Translation2d(2, 0), useSuperstructure),
-              17));
+                  vision,
+                  drive,
+                  elevator,
+                  coralWrist,
+                  ledSubsystem,
+                  new FollowTagMode(new Translation2d(2, 0), useSuperstructure),
+                  box,
+                  17)
+              .onlyIf(() -> box.contains(drive.getRobotPose())));
     }
   }
 

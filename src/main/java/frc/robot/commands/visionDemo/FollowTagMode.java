@@ -15,7 +15,6 @@ import frc.robot.commands.visionDemo.VisionDemoCommand.VisionDemoMode;
 import frc.robot.commands.visionDemo.VisionDemoCommand.VisionDemoResult;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
-
 import org.littletonrobotics.junction.Logger;
 
 public class FollowTagMode implements VisionDemoMode {
@@ -101,6 +100,31 @@ public class FollowTagMode implements VisionDemoMode {
     }
 
     return new VisionDemoResult(Optional.of(target), ResultSaftyMode.FULL_CONTROL);
+  }
+
+  @Override
+  public VisionDemoResult calculate(
+      Pose2d robotPose, Pose3d tagPose, double dt, ContainmentBox box) {
+    VisionDemoResult result = calculate(robotPose, tagPose, dt);
+
+    return new VisionDemoResult(
+        result
+            .setpointPose()
+            .map(
+                pose ->
+                    box.contains(pose)
+                        ? pose
+                        : new Pose2d(
+                            box.clamp(pose.getTranslation()), aimAtPose(robotPose, pose))),
+        result.saftyMode());
+  }
+
+  private static Rotation2d aimAtPose(Pose2d robotPose, Pose2d tagPose) {
+    return tagPose
+        .getTranslation()
+        .minus(robotPose.getTranslation())
+        .getAngle()
+        .plus(TARGET_HEADING_OFFSET);
   }
 
   @Override

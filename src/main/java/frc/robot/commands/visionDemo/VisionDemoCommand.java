@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.controllers.SimpleDriveController;
 import frc.robot.commands.visionDemo.SuperstructureUtil.SuperstructureState;
+import frc.robot.commands.visionDemo.filters.ComboAngleFilter;
 import frc.robot.commands.visionDemo.filters.ComboFilter;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.led.BlinkenLEDPattern;
@@ -21,7 +22,6 @@ import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.Camera.TrackedTarget;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class VisionDemoCommand extends Command {
@@ -35,6 +35,11 @@ public class VisionDemoCommand extends Command {
     public Pose2d getRawPose(Pose2d robotPose, Pose3d tagPose);
 
     public VisionDemoResult calculate(Pose2d robotPose, Pose3d tagPose, double dt);
+
+    public default VisionDemoResult calculate(
+        Pose2d robotPose, Pose3d tagPose, double dt, ContainmentBox box) {
+      return calculate(robotPose, tagPose, dt);
+    }
 
     public Optional<SuperstructureState> getSuperstructureState(Pose2d robotPose, Pose3d tagPose3d);
   }
@@ -59,11 +64,13 @@ public class VisionDemoCommand extends Command {
   private final VisionDemoMode mode;
   private final int tagId;
 
+  private final ContainmentBox box;
+
   private final SimpleDriveController controller = new SimpleDriveController();
   private final Debouncer atGoalDebouncer = new Debouncer(0.2);
 
   private final ComboFilter elevatorHeightFilter = new ComboFilter(3, 5);
-  private final ComboFilter wristAngleFilter = new ComboFilter(3, 5);
+  private final ComboAngleFilter wristAngleFilter = new ComboAngleFilter(3, 5);
 
   private ResultSaftyMode saftyMode = ResultSaftyMode.STOP;
 
@@ -78,6 +85,7 @@ public class VisionDemoCommand extends Command {
       Wrist wrist,
       LEDSubsystem leds,
       VisionDemoMode mode,
+      ContainmentBox box,
       int tagId) {
     this.vision = vision;
     this.drive = drive;
@@ -85,6 +93,7 @@ public class VisionDemoCommand extends Command {
     this.wrist = wrist;
     this.leds = leds;
     this.mode = mode;
+    this.box = box;
     this.tagId = tagId;
 
     controller.setTolerance(
@@ -100,6 +109,7 @@ public class VisionDemoCommand extends Command {
     mode.reset();
     deltaTimeTimer.restart();
     saftyMode = ResultSaftyMode.UNKNOWN;
+    Logger.recordOutput("TagFollowing/Box/Coners", box.getCorners());
   }
 
   @Override
@@ -147,7 +157,7 @@ public class VisionDemoCommand extends Command {
       Logger.recordOutput("TagFollowing/DeltaTime", dt);
       deltaTimeTimer.restart();
 
-      VisionDemoResult setpointPose = mode.calculate(robotPose, averageTagPose, dt);
+      VisionDemoResult setpointPose = mode.calculate(robotPose, averageTagPose, dt, box);
       saftyMode = setpointPose.saftyMode();
 
       mode.getSuperstructureState(robotPose, averageTagPose).ifPresent(this::updateSuperstructure);
@@ -156,10 +166,15 @@ public class VisionDemoCommand extends Command {
           .setpointPose()
           .ifPresent(
               pose -> {
-                controller.setSetpoint(pose);
-                Logger.recordOutput("TagFollowing/RobotSetpointPose", pose);
+                Pose2d clampedPose = box.clamp(pose);
+                controller.setSetpoint(clampedPose);
+                Logger.recordOutput("TagFollowing/Box/RobotUnclampedSetpointPose", pose);
+                Logger.recordOutput("TagFollowing/RobotSetpointPose", clampedPose);
+                Logger.recordOutput("TagFollowing/Box/SetpointPoseInBox", box.contains(pose));
               });
     }
+
+    Logger.recordOutput("TagFollowing/Box/CurrentPoseInBox", box.contains(robotPose));
 
     ChassisSpeeds speeds = getChassisSpeeds();
     drive.setRobotSpeeds(speeds);
@@ -169,7 +184,7 @@ public class VisionDemoCommand extends Command {
     return vision.getLatestTargets().stream()
         .filter(TrackedTarget::isGoodPoseAmbiguity)
         .filter(
-            tag -> Math.abs(tag.cameraToTarget().getRotation().getY()) < Units.degreesToRadians(80))
+            tag -> Math.abs(tag.cameraToTarget().getRotation().getY()) < Units.degreesToRadians(70))
         .filter(tag -> tag.id() == tagId)
         .toList();
   }
@@ -199,8 +214,7 @@ public class VisionDemoCommand extends Command {
 
   private void updateSuperstructure(SuperstructureState state) {
     double filteredElevatorHeight = elevatorHeightFilter.calculate(state.elevatorHeight());
-    Rotation2d filteredWristAngle =
-        new Rotation2d(wristAngleFilter.calculate(state.wristAngle().getRadians()));
+    Rotation2d filteredWristAngle = wristAngleFilter.calculate(state.wristAngle());
 
     elevator.setGoalHeightMeters(filteredElevatorHeight);
     wrist.setGoalRotation(filteredWristAngle);

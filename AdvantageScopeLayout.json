@@ -1,10 +1,10 @@
 {
   "hubs": [
     {
-      "x": -8,
-      "y": -8,
-      "width": 2576,
-      "height": 1408,
+      "x": 310,
+      "y": 42,
+      "width": 1322,
+      "height": 803,
       "state": {
         "sidebar": {
           "width": 373,
@@ -15,10 +15,9 @@
             "/RealOutputs/SimControlledTarget/1",
             "/RealOutputs/TagFollowing/Follow1",
             "/RealOutputs/TagFollowing/Tags",
-            "/RealOutputs/TagFollowing/Result",
-            "/RealOutputs/TagFollowing/Follow",
-            "/RealOutputs/ObjectVisualizer",
-            "/RealOutputs/ObjectVisualizer/Coral"
+            "/RealOutputs/TagFollowing",
+            "/RealOutputs/TagFollowing/Superstructure",
+            "/RealOutputs/TagFollowing/Box"
           ]
         },
         "tabs": {
@@ -257,6 +256,16 @@
                     "type": "cone",
                     "logKey": "/RealOutputs/TagFollowing/Target/CameraPoses3d",
                     "logType": "Pose3d[]",
+                    "visible": false,
+                    "options": {
+                      "color": "#00ffff",
+                      "position": "center"
+                    }
+                  },
+                  {
+                    "type": "cone",
+                    "logKey": "/RealOutputs/TagFollowing/Tags/CameraPoses3d",
+                    "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
                       "color": "#00ffff",
@@ -269,7 +278,7 @@
                     "logType": "Pose3d",
                     "visible": true,
                     "options": {
-                      "color": "#ff0000",
+                      "color": "#00ff00",
                       "position": "center"
                     }
                   },
@@ -277,10 +286,10 @@
                     "type": "ghost",
                     "logKey": "/RealOutputs/TagFollowing/RobotRawSetpointPose",
                     "logType": "Pose2d",
-                    "visible": false,
+                    "visible": true,
                     "options": {
                       "model": "demo_8032",
-                      "color": "#ff00ff"
+                      "color": "#00ffff"
                     }
                   },
                   {
@@ -311,6 +320,16 @@
                       "color": "#ffff00",
                       "position": "center"
                     }
+                  },
+                  {
+                    "type": "trajectory",
+                    "logKey": "/RealOutputs/TagFollowing/Box/Coners",
+                    "logType": "Pose2d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
                   }
                 ],
                 "game": "Evergreen",
@@ -321,14 +340,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -0.46851039456849264,
-                  3.6787130745218386,
-                  -7.942674535110541
+                  -0.23530126784672145,
+                  4.070161056426613,
+                  -8.131144174144254
                 ],
                 "cameraTarget": [
-                  -0.490369349078673,
+                  -0.988367407666639,
                   1.29107333883965,
-                  -0.1143442703967752
+                  -0.11573482451760728
                 ]
               },
               "controlsHeight": 251
@@ -609,125 +628,6 @@
                 "highlight": true
               },
               "controlsHeight": 0
-            },
-            {
-              "type": 1,
-              "title": "Elevator Position",
-              "controller": {
-                "leftSources": [
-                  {
-                    "type": "stepped",
-                    "logKey": "/RealOutputs/Elevator/measuredHeightMeters",
-                    "logType": "Number",
-                    "visible": true,
-                    "options": {
-                      "color": "#af2437",
-                      "size": "normal"
-                    }
-                  },
-                  {
-                    "type": "stepped",
-                    "logKey": "/RealOutputs/Elevator/goalHeightMeters",
-                    "logType": "Number",
-                    "visible": true,
-                    "options": {
-                      "color": "#2b66a2",
-                      "size": "normal"
-                    }
-                  }
-                ],
-                "rightSources": [],
-                "discreteSources": [
-                  {
-                    "type": "stripes",
-                    "logKey": "/RealOutputs/Elevator/shouldRunProfiled",
-                    "logType": "Boolean",
-                    "visible": true,
-                    "options": {
-                      "color": "#2b66a2"
-                    }
-                  },
-                  {
-                    "type": "stripes",
-                    "logKey": "/RealOutputs/Elevator/atGoal",
-                    "logType": "Boolean",
-                    "visible": true,
-                    "options": {
-                      "color": "#e5b31b"
-                    }
-                  }
-                ],
-                "leftLockedRange": null,
-                "rightLockedRange": null,
-                "leftUnitConversion": {
-                  "type": null,
-                  "factor": 1
-                },
-                "rightUnitConversion": {
-                  "type": null,
-                  "factor": 1
-                },
-                "leftFilter": 0,
-                "rightFilter": 0
-              },
-              "controllerUUID": "oiu5oi42qt8vfmq0k0h1w7bsfl7fkcnn",
-              "renderer": null,
-              "controlsHeight": 200
-            },
-            {
-              "type": 1,
-              "title": "Wrist Position",
-              "controller": {
-                "leftSources": [
-                  {
-                    "type": "stepped",
-                    "logKey": "/RealOutputs/Wrist/goalDegrees",
-                    "logType": "Number",
-                    "visible": true,
-                    "options": {
-                      "color": "#2b66a2",
-                      "size": "normal"
-                    }
-                  },
-                  {
-                    "type": "stepped",
-                    "logKey": "/RealOutputs/Wrist/measuredDegrees",
-                    "logType": "Number",
-                    "visible": true,
-                    "options": {
-                      "color": "#e5b31b",
-                      "size": "normal"
-                    }
-                  }
-                ],
-                "rightSources": [],
-                "discreteSources": [
-                  {
-                    "type": "stripes",
-                    "logKey": "/DriverStation/Enabled",
-                    "logType": "Boolean",
-                    "visible": true,
-                    "options": {
-                      "color": "#af2437"
-                    }
-                  }
-                ],
-                "leftLockedRange": null,
-                "rightLockedRange": null,
-                "leftUnitConversion": {
-                  "type": null,
-                  "factor": 1
-                },
-                "rightUnitConversion": {
-                  "type": null,
-                  "factor": 1
-                },
-                "leftFilter": 0,
-                "rightFilter": 0
-              },
-              "controllerUUID": "2zzgpw1p2fbc52n945hh8ii98enf3t2t",
-              "renderer": null,
-              "controlsHeight": 200
             },
             {
               "type": 12,

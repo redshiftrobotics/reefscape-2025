@@ -230,12 +230,12 @@
               "topic": "/SmartDashboard/Heading Degrees",
               "period": 0.06,
               "data_type": "double",
-              "start_angle": 0.0,
-              "end_angle": 360.0,
-              "min_value": 0.0,
-              "max_value": 360.0,
+              "start_angle": -180.0,
+              "end_angle": 180.0,
+              "min_value": -180.0,
+              "max_value": 180.0,
               "number_of_labels": 8,
-              "wrap_value": false,
+              "wrap_value": true,
               "show_pointer": true,
               "show_ticks": true
             }
@@ -643,6 +643,53 @@
                 }
               }
             ]
+          },
+          {
+            "title": "Box",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "SetpointPoseInBox",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/AdvantageKit/RealOutputs/TagFollowing/Box/SetpointPoseInBox",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "CurrentPoseInBox",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/AdvantageKit/RealOutputs/TagFollowing/Box/CurrentPoseInBox",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              }
+            ]
           }
         ],
         "containers": [
@@ -715,19 +762,6 @@
             }
           },
           {
-            "title": "Reset To Center",
-            "x": 512.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Command",
-            "properties": {
-              "topic": "/SmartDashboard/Reset To Center",
-              "period": 0.06,
-              "show_type": false
-            }
-          },
-          {
             "title": "BrownedOut",
             "x": 1024.0,
             "y": 0.0,
@@ -742,22 +776,6 @@
               "false_color": 4294198070,
               "true_icon": "None",
               "false_icon": "None"
-            }
-          },
-          {
-            "title": "BatteryVoltage",
-            "x": 896.0,
-            "y": 384.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Graph",
-            "properties": {
-              "topic": "/AdvantageKit/SystemStats/BatteryVoltage",
-              "period": 0.033,
-              "data_type": "double",
-              "time_displayed": 5.0,
-              "color": 4278238420,
-              "line_width": 2.0
             }
           },
           {
@@ -851,6 +869,86 @@
               "topic": "/AdvantageKit/RealOutputs/TagFollowing/Result/SaftyMode",
               "period": 0.06,
               "data_type": "string"
+            }
+          },
+          {
+            "title": "At Goal?",
+            "x": 640.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/At Goal?",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Has Coral?",
+            "x": 512.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Has Coral?",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Reset To Center",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Reset To Center",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "BatteryVoltage",
+            "x": 896.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/AdvantageKit/SystemStats/BatteryVoltage",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Has Vision",
+            "x": 896.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Has Vision",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           }
         ]
@@ -1158,6 +1256,19 @@
                 "type": "Command",
                 "properties": {
                   "topic": "/SmartDashboard/Reset To Reef",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Reset To Center",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/SmartDashboard/Reset To Center",
                   "period": 0.06,
                   "show_type": false
                 }
