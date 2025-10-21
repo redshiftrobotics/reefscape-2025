@@ -1,23 +1,15 @@
 {
   "hubs": [
     {
-      "x": 310,
-      "y": 42,
-      "width": 1322,
-      "height": 803,
+      "x": -8,
+      "y": -8,
+      "width": 2576,
+      "height": 1408,
       "state": {
         "sidebar": {
           "width": 373,
           "expanded": [
-            "/RealOutputs",
-            "/RealOutputs/TagFollowing/Target",
-            "/RealOutputs/TagFollowing/Targets",
-            "/RealOutputs/SimControlledTarget/1",
-            "/RealOutputs/TagFollowing/Follow1",
-            "/RealOutputs/TagFollowing/Tags",
-            "/RealOutputs/TagFollowing",
-            "/RealOutputs/TagFollowing/Superstructure",
-            "/RealOutputs/TagFollowing/Box"
+            "/RealOutputs"
           ]
         },
         "tabs": {
@@ -217,7 +209,7 @@
                     "type": "mechanism",
                     "logKey": "/RealOutputs/SuperstructureVisualizer/Goal",
                     "logType": "Mechanism2d",
-                    "visible": true,
+                    "visible": false,
                     "options": {}
                   },
                   {
@@ -273,14 +265,11 @@
                     }
                   },
                   {
-                    "type": "cone",
+                    "type": "axes",
                     "logKey": "/RealOutputs/TagFollowing/Follow/TagFilteredPosition",
                     "logType": "Pose3d",
                     "visible": true,
-                    "options": {
-                      "color": "#00ff00",
-                      "position": "center"
-                    }
+                    "options": {}
                   },
                   {
                     "type": "ghost",
@@ -291,6 +280,13 @@
                       "model": "demo_8032",
                       "color": "#00ffff"
                     }
+                  },
+                  {
+                    "type": "mechanism",
+                    "logKey": "/RealOutputs/SuperstructureVisualizer/Goal",
+                    "logType": "Mechanism2d",
+                    "visible": true,
+                    "options": {}
                   },
                   {
                     "type": "ghost",
@@ -322,8 +318,18 @@
                     }
                   },
                   {
+                    "type": "cone",
+                    "logKey": "/RealOutputs/ContainmentBox/Vision Demo Box/Cones",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "position": "back"
+                    }
+                  },
+                  {
                     "type": "trajectory",
-                    "logKey": "/RealOutputs/TagFollowing/Box/Coners",
+                    "logKey": "/RealOutputs/ContainmentBox/Vision Demo Box/Outline",
                     "logType": "Pose2d[]",
                     "visible": true,
                     "options": {
@@ -340,14 +346,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -0.23530126784672145,
-                  4.070161056426613,
-                  -8.131144174144254
+                  -0.7296037440452763,
+                  2.2008166175592536,
+                  -3.8879462486356915
                 ],
                 "cameraTarget": [
-                  -0.988367407666639,
-                  1.29107333883965,
-                  -0.11573482451760728
+                  0.5132906350564872,
+                  0.14838565616515131,
+                  1.4724477308858366
                 ]
               },
               "controlsHeight": 251

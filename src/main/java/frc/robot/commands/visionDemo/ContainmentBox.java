@@ -1,16 +1,60 @@
 package frc.robot.commands.visionDemo;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import frc.robot.utility.VirtualSubsystem;
+import frc.robot.utility.tunable.LoggedTunableNumber;
+import frc.robot.utility.tunable.LoggedTunableNumberFactory;
+import java.util.Arrays;
+import org.littletonrobotics.junction.Logger;
 
-public class ContainmentBox {
-  private final Translation2d bottomLeft;
-  private final Translation2d topRight;
+public class ContainmentBox extends VirtualSubsystem {
 
-  public ContainmentBox(Translation2d bottomLeft, Translation2d topRight) {
-    this.bottomLeft = bottomLeft;
-    this.topRight = topRight;
+  private final Translation2d center;
+
+  private Translation2d bottomLeft;
+  private Translation2d topRight;
+
+  private final String name;
+
+  private final LoggedTunableNumberFactory tunableFactory;
+  private final LoggedTunableNumber lengthTunable;
+  private final LoggedTunableNumber widthTunable;
+
+  public ContainmentBox(String name, Translation2d center, double length, double width) {
+    this.name = name;
+    this.center = center;
+
+    this.tunableFactory = new LoggedTunableNumberFactory("ContainmentBox/" + name);
+
+    bottomLeft = new Translation2d(center.getX() - length / 2.0, center.getY() - width / 2.0);
+
+    topRight = new Translation2d(center.getX() + length / 2.0, center.getY() + width / 2.0);
+
+    this.lengthTunable = tunableFactory.getNumber("Length", length);
+    this.widthTunable = tunableFactory.getNumber("Width", width);
+  }
+
+  @Override
+  public void periodic() {
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> {
+          bottomLeft =
+              new Translation2d(center.getX() - values[0] / 2.0, center.getY() - values[1] / 2.0);
+          topRight =
+              new Translation2d(center.getX() + values[0] / 2.0, center.getY() + values[1] / 2.0);
+        },
+        lengthTunable,
+        widthTunable);
+
+    Logger.recordOutput("ContainmentBox/" + name + "/Outline", getOutline());
+    Logger.recordOutput("ContainmentBox/" + name + "/Cones", getCones());
+    Logger.recordOutput("ContainmentBox/" + name + "/Center", center);
   }
 
   public Translation2d clamp(Translation2d point) {
@@ -35,13 +79,29 @@ public class ContainmentBox {
     return contains(pose.getTranslation());
   }
 
-  public Pose2d[] getCorners() {
+  private final Pose3d[] getCones() {
+    Rotation3d rotation = new Rotation3d(0, -Math.PI / 2, 0);
+    return Arrays.stream(getCorners())
+        .map(corner -> new Pose3d(new Translation3d(corner.getTranslation()), rotation))
+        .toArray(Pose3d[]::new);
+  }
+
+  private Pose2d[] getOutline() {
     return new Pose2d[] {
       new Pose2d(bottomLeft, Rotation2d.kZero),
       new Pose2d(new Translation2d(topRight.getX(), bottomLeft.getY()), Rotation2d.kZero),
       new Pose2d(topRight, Rotation2d.kZero),
       new Pose2d(new Translation2d(bottomLeft.getX(), topRight.getY()), Rotation2d.kZero),
       new Pose2d(bottomLeft, Rotation2d.kZero),
+    };
+  }
+
+  public Pose2d[] getCorners() {
+    return new Pose2d[] {
+      new Pose2d(bottomLeft, Rotation2d.kZero),
+      new Pose2d(new Translation2d(topRight.getX(), bottomLeft.getY()), Rotation2d.kZero),
+      new Pose2d(topRight, Rotation2d.kZero),
+      new Pose2d(new Translation2d(bottomLeft.getX(), topRight.getY()), Rotation2d.kZero),
     };
   }
 }

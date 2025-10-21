@@ -266,7 +266,10 @@ public class RobotContainer {
               new Translation3d(
                   FieldConstants.FIELD.getX() / 2, FieldConstants.FIELD.getY() / 2, 1),
               Rotation3d.kZero);
+
       vision.addSimulatedTarget(new SimControlledTarget(17, startPose, new XboxController(3)));
+      drive.resetPose(startPose.toPose2d());
+
     } else {
       vision.addVisionEstimateConsumer(
           (estimate) -> {
@@ -356,13 +359,12 @@ public class RobotContainer {
       BooleanSupplier useSuperstructure =
           () -> SmartDashboard.getBoolean("Superstructure Aim", true);
 
-      double boxRadiusX = Units.feetToMeters(5);
-      double boxRadiusY = Units.feetToMeters(6);
+      double length = Units.feetToMeters(10);
+      double width = Units.feetToMeters(10);
 
-      ContainmentBox box =
-          new ContainmentBox(
-              FieldConstants.FIELD.div(2).minus(new Translation2d(boxRadiusX, boxRadiusY)),
-              FieldConstants.FIELD.div(2).plus(new Translation2d(boxRadiusX, boxRadiusY)));
+      Translation2d boxCenter = FieldConstants.FIELD.div(2);
+
+      ContainmentBox box = new ContainmentBox("Vision Demo Box", boxCenter, length, width);
 
       SmartDashboard.putData(
           "Aim At Tag",
