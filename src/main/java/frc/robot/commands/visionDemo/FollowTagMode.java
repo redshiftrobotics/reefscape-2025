@@ -9,10 +9,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.commands.visionDemo.VisionDemoCommand.VisionDemoState;
+import frc.robot.commands.visionDemo.VisionDemoCommand.VisionDemoMode;
 import org.littletonrobotics.junction.Logger;
 
-public class FollowTagMode implements VisionDemoState {
+public class FollowTagMode implements VisionDemoMode {
 
   private static final Rotation2d TARGET_HEADING_OFFSET = Rotation2d.k180deg;
 
@@ -23,8 +23,6 @@ public class FollowTagMode implements VisionDemoState {
 
   private Translation3d tagFilteredPosition;
 
-  private final Timer resetTimer = new Timer();
-
   private boolean allowDriving = false;
 
   public FollowTagMode(Translation2d targetOffset) {
@@ -34,8 +32,6 @@ public class FollowTagMode implements VisionDemoState {
   @Override
   public void reset() {
     tagFilteredPosition = null;
-    resetTimer.reset();
-
     allowDriving = false;
   }
 
@@ -51,19 +47,15 @@ public class FollowTagMode implements VisionDemoState {
   }
 
   @Override
-  public Pose2d getSafePose(Pose2d robotPose, Pose3d tagPose) {
+  public Pose2d calculate(Pose2d robotPose, Pose3d tagPose, double dt) {
 
     if (tagFilteredPosition == null) {
       tagFilteredPosition = tagPose.getTranslation();
     }
 
-    Logger.recordOutput("TagFollowing/Follow/DeltaTime", resetTimer.get());
-
     tagFilteredPosition =
         MathUtil.slewRateLimit(
-            tagFilteredPosition, tagPose.getTranslation(), resetTimer.get(), FILTER_SLEW_RATE);
-
-    resetTimer.restart();
+            tagFilteredPosition, tagPose.getTranslation(), dt, FILTER_SLEW_RATE);
 
     Pose2d target = getRawPose(robotPose, tagPose);
 

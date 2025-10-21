@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.commands.visionDemo.filters.ComboFilter;
 
-public class AimAtTagMode implements VisionDemoCommand.VisionDemoState {
+public class AimAtTagMode implements VisionDemoCommand.VisionDemoMode {
 
   private static final Rotation2d TARGET_HEADING_OFFSET = Rotation2d.k180deg;
 
@@ -25,7 +25,7 @@ public class AimAtTagMode implements VisionDemoCommand.VisionDemoState {
   }
 
   @Override
-  public Pose2d getSafePose(Pose2d robotPose, Pose3d tagPose) {
+  public Pose2d calculate(Pose2d robotPose, Pose3d tagPose, double dt) {
     Pose2d rawPose = getRawPose(robotPose, tagPose);
     Rotation2d filteredAngle =
         new Rotation2d(angleFilter.calculate(rawPose.getRotation().getRadians()));

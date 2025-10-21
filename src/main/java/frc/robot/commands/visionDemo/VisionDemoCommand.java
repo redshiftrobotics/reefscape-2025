@@ -6,46 +6,56 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.controllers.SimpleDriveController;
-import frc.robot.commands.visionDemo.TagFollowUtil.TagFollowingSuperstructureState;
+import frc.robot.commands.visionDemo.SuperstructureUtil.SuperstructureState;
 import frc.robot.commands.visionDemo.filters.ComboFilter;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.led.BlinkenLEDPattern;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.Camera.TrackedTarget;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class VisionDemoCommand extends Command {
 
-  public interface VisionDemoState {
+  public interface VisionDemoMode {
 
     public default void reset() {}
 
     public Pose2d getRawPose(Pose2d robotPose, Pose3d tagPose);
 
-    public Pose2d getSafePose(Pose2d robotPose, Pose3d tagPose);
+    public VisionDemoResult calculate(Pose2d robotPose, Pose3d tagPose, double dt);
 
-    public default boolean blocksDriving() {
-      return false;
-    }
+    public Optional<SuperstructureState> getSuperstructureState(Pose2d robotPose, Pose3d tagPose3d);
+
+    public Optional<BlinkenLEDPattern> getLEDPattern(Pose2d robotPose, Pose3d tagPose3d);
+  }
+
+  public record VisionDemoResult(
+    Optional<Pose2d> setpointPose, ResultSaftyMode saftyMode
+  ) {}
+
+  public enum ResultSaftyMode {
+    SAFE, BLOCK_DRIVING, STOP;
   }
 
   private final Drive drive;
-  private final AprilTagVision vision;
+  private final VisionSystem vision;
 
   private final Elevator elevator;
   private final Wrist wrist;
 
   private final LEDSubsystem leds;
 
-  private final VisionDemoState mode;
-  private final BooleanSupplier useSuperstructure;
+  private final VisionDemoMode mode;
   private final int tagId;
 
   private final SimpleDriveController controller = new SimpleDriveController();
@@ -56,22 +66,23 @@ public class VisionDemoCommand extends Command {
 
   private final Debouncer hasTargetDebouncer = new Debouncer(0.2, Debouncer.DebounceType.kFalling);
 
+  private final Timer deltaTimeTimer = new Timer();
+
   public VisionDemoCommand(
       AprilTagVision vision,
       Drive drive,
       Elevator elevator,
       Wrist wrist,
       LEDSubsystem leds,
-      VisionDemoState mode,
+      VisionDemoMode mode,
       BooleanSupplier useSuperstructure,
       int tagId) {
-    this.vision = vision;
+    this.vision = new VisionSystem(vision);
     this.drive = drive;
     this.elevator = elevator;
     this.wrist = wrist;
     this.leds = leds;
     this.mode = mode;
-    this.useSuperstructure = useSuperstructure;
     this.tagId = tagId;
 
     controller.setTolerance(
@@ -85,6 +96,7 @@ public class VisionDemoCommand extends Command {
     controller.reset(drive.getRobotPose());
     controller.setSetpoint(drive.getRobotPose());
     mode.reset();
+    deltaTimeTimer.restart();
   }
 
   @Override
@@ -93,74 +105,52 @@ public class VisionDemoCommand extends Command {
 
     // --- Tag Collection and Filtering ---
 
-    List<TrackedTarget> tags = vision.getLatestTargets();
+    List<TrackedTarget> tags = vision.getTag(tagId);
 
-    List<TrackedTarget> filtedTags =
-        tags.stream()
-            .filter(TrackedTarget::isGoodPoseAmbiguity)
-            .filter(
-                tag ->
-                    Math.abs(tag.cameraToTarget().getRotation().getY())
-                        < Units.degreesToRadians(80))
-            .filter(tag -> tag.id() == tagId)
-            .toList();
-
-    boolean hasTags = !filtedTags.isEmpty();
+    boolean hasTags = !tags.isEmpty();
     boolean hasTagsDebounced = hasTargetDebouncer.calculate(hasTags);
 
     Logger.recordOutput("TagFollowing/hasTags", hasTags);
     SmartDashboard.putBoolean("Sees Tags?", hasTagsDebounced);
 
-    if (!filtedTags.isEmpty() || !hasTagsDebounced) {
+    if (!tags.isEmpty() || !hasTagsDebounced) {
       Logger.recordOutput(
-          "TagFollowing/Tags/Number", filtedTags.stream().mapToInt(TrackedTarget::id).toArray());
+          "TagFollowing/Tags/Pose3d",
+          tags.stream().map(t -> t.getTargetPose(robotPose)).toArray(Pose3d[]::new));
       Logger.recordOutput(
-          "TagFollowing/Tags/Pose3ds",
-          filtedTags.stream().map(t -> t.getTargetPose(robotPose)).toArray(Pose3d[]::new));
-      Logger.recordOutput(
-          "TagFollowing/Tags/CameraPose3ds",
-          filtedTags.stream().map(t -> t.getCamearaPose(robotPose)).toArray(Pose3d[]::new));
+          "TagFollowing/Tags/CameraPoses3d",
+          tags.stream().map(t -> t.getCamearaPose(robotPose)).toArray(Pose3d[]::new));
     }
 
     // --- Target Logging ---
 
-    if (!filtedTags.isEmpty()) {
+    if (!tags.isEmpty()) {
       Pose3d averageTagPose =
           TagFollowUtil.averagePoses(
-              filtedTags.stream().map(t -> t.getTargetPose(robotPose)).toList());
+              tags.stream().map(t -> t.getTargetPose(robotPose)).toList());
 
       Logger.recordOutput("TagFollowing/Target/Pose3d", averageTagPose);
       Logger.recordOutput(
           "TagFollowing/Target/CameraPoses3d",
-          filtedTags.stream().map(t -> t.getCamearaPose(robotPose)).toArray(Pose3d[]::new));
+          tags.stream().map(t -> t.getCamearaPose(robotPose)).toArray(Pose3d[]::new));
 
       Pose2d rawSetpointPose = mode.getRawPose(robotPose, averageTagPose);
       Logger.recordOutput("TagFollowing/RobotRawSetpointPose", rawSetpointPose);
       SmartDashboard.putNumber("Target Heading", -rawSetpointPose.getRotation().getDegrees());
 
-      Pose2d setpointPose = mode.getSafePose(robotPose, averageTagPose);
+      double dt = deltaTimeTimer.get();
+      Logger.recordOutput("TagFollowing/DeltaTime", dt);
+      deltaTimeTimer.restart();
 
-      if (setpointPose != null) {
-        controller.setSetpoint(setpointPose);
-        Logger.recordOutput("TagFollowing/RobotSetpointPose", setpointPose);
-      }
+      VisionDemoResult setpointPose = mode.calculate(robotPose, averageTagPose, dt);
 
-      if (useSuperstructure.getAsBoolean()) {
-        TagFollowingSuperstructureState desiredState = getSuperstructureState(averageTagPose);
+      mode.getSuperstructureState(robotPose, averageTagPose).ifPresent(this::updateSuperstructure);
+      mode.getLEDPattern(robotPose, averageTagPose).ifPresent(leds::set);
 
-        double filteredElevatorHeight =
-            elevatorHeightFilter.calculate(desiredState.elevatorHeight());
-        Rotation2d filteredWristAngle =
-            new Rotation2d(wristAngleFilter.calculate(desiredState.wristAngle().getRadians()));
-
-        elevator.setGoalHeightMeters(filteredElevatorHeight);
-        wrist.setGoalRotation(filteredWristAngle);
-
-        Logger.recordOutput(
-            "TagFollowing/Superstructure/DesiredElevatorHeight", filteredElevatorHeight);
-        Logger.recordOutput(
-            "TagFollowing/Superstructure/DesiredWristAngle", filteredWristAngle.getDegrees());
-      }
+      setpointPose.setpointPose().ifPresent(pose -> {
+        controller.setSetpoint(pose);
+        Logger.recordOutput("TagFollowing/RobotSetpointPose", pose);
+      });
     }
 
     // --- Chassis Speed Calculation ---
@@ -179,13 +169,19 @@ public class VisionDemoCommand extends Command {
     drive.setRobotSpeeds(speeds);
   }
 
-  private static TagFollowingSuperstructureState getSuperstructureState(Pose3d tagPose) {
-    final Rotation2d wristAngle = new Rotation2d(tagPose.getRotation().getY());
-    final double elevatorHeight =
-        tagPose.getTranslation().getZ()
-            - TagFollowUtil.WRIST_LENGTH * wristAngle.getSin()
-            - TagFollowUtil.ELEVATOR_HEIGHT_OFF_GROUND;
-    return new TagFollowingSuperstructureState(elevatorHeight, wristAngle);
+  private void updateSuperstructure(SuperstructureState state) {
+      double filteredElevatorHeight =
+      elevatorHeightFilter.calculate(state.elevatorHeight());
+  Rotation2d filteredWristAngle =
+      new Rotation2d(wristAngleFilter.calculate(state.wristAngle().getRadians()));
+
+  elevator.setGoalHeightMeters(filteredElevatorHeight);
+  wrist.setGoalRotation(filteredWristAngle);
+
+  Logger.recordOutput(
+      "TagFollowing/Superstructure/DesiredElevatorHeight", filteredElevatorHeight);
+  Logger.recordOutput(
+      "TagFollowing/Superstructure/DesiredWristAngle", filteredWristAngle.getDegrees());
   }
 
   @Override
