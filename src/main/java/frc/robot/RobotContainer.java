@@ -258,7 +258,7 @@ public class RobotContainer {
 
     vision.filterBasedOnLastPose(false, drive::getRobotPose);
 
-    if (Constants.VISION_DEMO_MODE) {
+    if (!Constants.isOnField() && Constants.VISION_DEMO_MODE) {
       Elastic.selectTab("Vision Demo");
 
       Pose3d startPose =
@@ -267,7 +267,8 @@ public class RobotContainer {
                   FieldConstants.FIELD.getX() / 2, FieldConstants.FIELD.getY() / 2, 1),
               Rotation3d.kZero);
 
-      vision.addSimulatedTarget(new SimControlledTarget(17, startPose, new XboxController(3)));
+      vision.addSimulatedTarget(
+          new SimControlledTarget(Constants.VISION_DEMO_TAG_ID, startPose, new XboxController(3)));
       drive.resetPose(startPose.toPose2d());
 
     } else {
@@ -376,7 +377,7 @@ public class RobotContainer {
                   ledSubsystem,
                   new AimAtTagMode(useSuperstructure),
                   box,
-                  17)
+                  Constants.VISION_DEMO_TAG_ID)
               .onlyIf(() -> box.contains(drive.getRobotPose())));
       SmartDashboard.putData(
           "Follow Tag",
@@ -388,7 +389,7 @@ public class RobotContainer {
                   ledSubsystem,
                   new FollowTagMode(new Translation2d(2, 0), useSuperstructure),
                   box,
-                  17)
+                  Constants.VISION_DEMO_TAG_ID)
               .onlyIf(() -> box.contains(drive.getRobotPose())));
     }
   }
