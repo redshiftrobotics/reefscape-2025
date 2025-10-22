@@ -114,7 +114,9 @@ public class FollowTagMode implements VisionDemoMode {
                 pose ->
                     box.contains(pose)
                         ? pose
-                        : new Pose2d(box.clamp(pose.getTranslation()), aimAtPose(robotPose, tagPose.toPose2d()))),
+                        : new Pose2d(
+                            box.clamp(pose.getTranslation()),
+                            aimAtPose(robotPose, tagPose.toPose2d()))),
         result.saftyMode());
   }
 
