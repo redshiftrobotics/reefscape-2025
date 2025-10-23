@@ -1,6 +1,7 @@
 package frc.robot.commands.visionDemo;
 
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,6 +14,7 @@ import frc.robot.commands.controllers.SimpleDriveController;
 import frc.robot.commands.visionDemo.SuperstructureUtil.SuperstructureState;
 import frc.robot.commands.visionDemo.filters.ComboAngleFilter;
 import frc.robot.commands.visionDemo.filters.ComboFilter;
+import frc.robot.commands.visionDemo.filters.MeanPoseFilterTimeBased;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.led.BlinkenLEDPattern;
 import frc.robot.subsystems.led.LEDSubsystem;
@@ -22,6 +24,8 @@ import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
 public class VisionDemoCommand extends Command {
+
+  private final boolean DO_SLEW = false;
 
   public interface VisionDemoMode {
 
@@ -71,6 +75,13 @@ public class VisionDemoCommand extends Command {
   private ResultSaftyMode saftyMode = ResultSaftyMode.STOP;
 
   private final Timer deltaTimeTimer = new Timer();
+
+  private final MeanPoseFilterTimeBased setpointStablityCheckingFilter =
+      new MeanPoseFilterTimeBased(0.6);
+
+  private final SlewRateLimiter vxLimiter = new SlewRateLimiter(3); // m/s^2
+  private final SlewRateLimiter vyLimiter = new SlewRateLimiter(3); // m/s^2
+  private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(3); // rad/s^2
 
   public VisionDemoCommand(
       Drive drive,
@@ -138,6 +149,9 @@ public class VisionDemoCommand extends Command {
                         Pose2d clampedPose = box.clamp(pose);
                         controller.setSetpoint(clampedPose);
 
+                        setpointStablityCheckingFilter.calculate(
+                            clampedPose, Timer.getFPGATimestamp());
+
                         Logger.recordOutput("TagFollowing/Box/RobotUnclampedSetpointPose", pose);
                         Logger.recordOutput("TagFollowing/RobotSetpointPose", clampedPose);
                         Logger.recordOutput(
@@ -196,6 +210,8 @@ public class VisionDemoCommand extends Command {
     Logger.recordOutput("TagFollowing/AtReference", atReference);
     Logger.recordOutput("TagFollowing/AtReferenceStable", atReferenceStable);
 
+    boolean stopped = false;
+
     if (atReferenceStable) {
       speeds = new ChassisSpeeds(0, 0, 0);
     }
@@ -210,10 +226,37 @@ public class VisionDemoCommand extends Command {
         break;
       case STOP, UNKNOWN:
         speeds = new ChassisSpeeds(0, 0, 0);
+        stopped = true;
         break;
     }
 
-    return speeds;
+    ChassisSpeeds slewSpeeds =
+        new ChassisSpeeds(
+            vxLimiter.calculate(speeds.vxMetersPerSecond),
+            vyLimiter.calculate(speeds.vyMetersPerSecond),
+            omegaLimiter.calculate(speeds.omegaRadiansPerSecond));
+
+    Logger.recordOutput("TagFollowing/ChassisSpeeds/Unslewed", speeds);
+    Logger.recordOutput("TagFollowing/ChassisSpeeds/Slewed", slewSpeeds);
+
+    boolean isSafeToSlew = !stopped && box.contains(drive.getRobotPose());
+
+    boolean stableUnslewed =
+        setpointStablityCheckingFilter.lastValue() == null
+            || setpointStablityCheckingFilter
+                    .calculateMean()
+                    .getTranslation()
+                    .getDistance(setpointStablityCheckingFilter.lastValue().getTranslation())
+                < Units.inchesToMeters(6);
+
+    Logger.recordOutput("TagFollowing/ChassisSpeeds/IsSafeToSlew", isSafeToSlew);
+    Logger.recordOutput("TagFollowing/ChassisSpeeds/StableUnslewed", stableUnslewed);
+
+    if (!isSafeToSlew || stableUnslewed || !DO_SLEW) {
+      return speeds;
+    }
+
+    return slewSpeeds;
   }
 
   @Override
