@@ -15,6 +15,7 @@ import org.littletonrobotics.junction.Logger;
 public class ContainmentBox extends VirtualSubsystem {
 
   private final Translation2d center;
+  private final Translation2d containedObjectSzie;
 
   private Translation2d bottomLeft;
   private Translation2d topRight;
@@ -25,9 +26,15 @@ public class ContainmentBox extends VirtualSubsystem {
   private final LoggedTunableNumber lengthTunable;
   private final LoggedTunableNumber widthTunable;
 
-  public ContainmentBox(String name, Translation2d center, double length, double width) {
+  public ContainmentBox(
+      String name,
+      Translation2d center,
+      double length,
+      double width,
+      Translation2d containedObjectSize) {
     this.name = name;
     this.center = center;
+    this.containedObjectSzie = containedObjectSize;
 
     this.tunableFactory = new LoggedTunableNumberFactory("ContainmentBox/" + name);
 
@@ -58,14 +65,19 @@ public class ContainmentBox extends VirtualSubsystem {
   }
 
   public Translation2d clamp(Translation2d point) {
-    double clampedX = Math.max(bottomLeft.getX(), Math.min(topRight.getX(), point.getX()));
-    double clampedY = Math.max(bottomLeft.getY(), Math.min(topRight.getY(), point.getY()));
+    double clampedX =
+        Math.min(
+            Math.max(point.getX(), bottomLeft.getX() + containedObjectSzie.getX() / 2.0),
+            topRight.getX() - containedObjectSzie.getX() / 2.0);
+    double clampedY =
+        Math.min(
+            Math.max(point.getY(), bottomLeft.getY() + containedObjectSzie.getY() / 2.0),
+            topRight.getY() - containedObjectSzie.getY() / 2.0);
     return new Translation2d(clampedX, clampedY);
   }
 
   public Pose2d clamp(Pose2d pose) {
-    Translation2d clampedTranslation = clamp(pose.getTranslation());
-    return new Pose2d(clampedTranslation, pose.getRotation());
+    return new Pose2d(clamp(pose.getTranslation()), pose.getRotation());
   }
 
   public boolean contains(Translation2d point) {

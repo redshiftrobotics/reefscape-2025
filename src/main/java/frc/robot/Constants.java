@@ -25,7 +25,7 @@ public final class Constants {
   public static final boolean TUNING_MODE = false;
 
   public static final boolean VISION_DEMO_MODE = true;
-  public static final int VISION_DEMO_TAG_ID = 1;
+  public static final int VISION_DEMO_TAG_ID = 18;
 
   private static final boolean IS_ON_FIELD = false;
 

@@ -65,6 +65,31 @@ public class Camera {
       Matrix<N3, N1> standardDeviation,
       VisionResultStatus status) {}
 
+  public record RelativeTrackedTarget(
+      int id, Transform3d cameraToTarget, CameraConfig camera, double poseAmbiguity) {}
+
+  public record AbsoluteTrackedTarget(
+      int id,
+      Pose3d targetPose,
+      Pose3d cameraPose,
+      Transform3d cameraToTarget,
+      CameraConfig camera,
+      double poseAmbiguity,
+      Pose2d robotPose) {
+    public AbsoluteTrackedTarget(RelativeTrackedTarget relativeTarget, Pose2d robotPose) {
+      this(
+          relativeTarget.id,
+          new Pose3d(robotPose)
+              .plus(relativeTarget.camera.robotToCamera())
+              .plus(relativeTarget.cameraToTarget),
+          new Pose3d(robotPose).plus(relativeTarget.camera.robotToCamera()),
+          relativeTarget.cameraToTarget,
+          relativeTarget.camera,
+          relativeTarget.poseAmbiguity,
+          robotPose);
+    }
+  }
+
   /**
    * Create a new robot camera with IO layer
    *
@@ -101,6 +126,13 @@ public class Camera {
       Pose3d[] tagPositionsOnField = getTagPositionsOnField(inputs.tagsUsed[i]);
 
       if (inputs.hasNewData[i]) {
+        Matrix<N3, N1> standardDeviations =
+            getStandardDeviations(tagPositionsOnField, inputs.estimatedRobotPose[i]);
+        VisionResultStatus status =
+            lastRobotPoseSupplier == null
+                ? getStatus(inputs.estimatedRobotPose[i], inputs.tagsUsed[i])
+                : getStatus(
+                    inputs.estimatedRobotPose[i], inputs.tagsUsed[i], lastRobotPoseSupplier.get());
         results[i] =
             new VisionResult(
                 true,
@@ -108,13 +140,8 @@ public class Camera {
                 inputs.timestampSecondFPGA[i],
                 inputs.tagsUsed[i],
                 tagPositionsOnField,
-                getStandardDeviations(tagPositionsOnField, inputs.estimatedRobotPose[i]),
-                lastRobotPoseSupplier == null
-                    ? getStatus(inputs.estimatedRobotPose[i], inputs.tagsUsed[i])
-                    : getStatus(
-                        inputs.estimatedRobotPose[i],
-                        inputs.tagsUsed[i],
-                        lastRobotPoseSupplier.get()));
+                standardDeviations,
+                status);
       } else {
         results[i] =
             new VisionResult(
@@ -129,11 +156,16 @@ public class Camera {
     }
   }
 
-  public List<TrackedTarget> getLatestTargets() {
-    return io.getLatestTargets();
+  public List<AbsoluteTrackedTarget> getAbsoluteTargets() {
+    return io.getAbsoluteTargets();
+  }
+
+  public List<RelativeTrackedTarget> getRelativeTargets() {
+    return io.getRelativeTargets();
   }
 
   public void filterBasedOnLastPose(boolean filter, Supplier<Pose2d> lastRobotPose) {
+    this.io.setLastPoseSupplier(lastRobotPose);
     this.lastRobotPoseSupplier = filter ? lastRobotPose : null;
   }
 
@@ -238,21 +270,6 @@ public class Camera {
     }
 
     return VisionResultStatus.SUCCESSFUL;
-  }
-
-  public record TrackedTarget(
-      int id, Transform3d cameraToTarget, CameraConfig camera, double poseAmbiguity) {
-    public boolean isGoodPoseAmbiguity() {
-      return poseAmbiguity < 0.2;
-    }
-
-    public Pose3d getCamearaPose(Pose2d robot) {
-      return new Pose3d(robot).plus(camera.robotToCamera());
-    }
-
-    public Pose3d getTargetPose(Pose2d robot) {
-      return getCamearaPose(robot).plus(cameraToTarget);
-    }
   }
 
   public enum VisionResultStatus {

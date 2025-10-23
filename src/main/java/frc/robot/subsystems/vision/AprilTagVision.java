@@ -9,7 +9,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.vision.Camera.TrackedTarget;
+import frc.robot.subsystems.vision.Camera.AbsoluteTrackedTarget;
+import frc.robot.subsystems.vision.Camera.RelativeTrackedTarget;
 import frc.robot.subsystems.vision.Camera.VisionResult;
 import frc.robot.subsystems.vision.Camera.VisionResultStatus;
 import java.util.ArrayList;
@@ -74,10 +75,6 @@ public class AprilTagVision extends SubsystemBase {
       for (VisionResult result : camera.getResults()) {
 
         if (!result.hasNewData()) {
-          Logger.recordOutput(cameraRoot + "/tagsUsedPositions", new Pose3d[] {});
-          Logger.recordOutput(cameraRoot + "/positionEstimate", new Pose3d[] {});
-          Logger.recordOutput(cameraRoot + "/status", VisionResultStatus.NO_DATA);
-          Logger.recordOutput(cameraRoot + "/success", false);
           continue;
         }
 
@@ -92,9 +89,7 @@ public class AprilTagVision extends SubsystemBase {
         hasVisionEstimate = hasVisionEstimate || visionEstimate.isSuccess();
 
         Logger.recordOutput(cameraRoot + "/tagsUsedPositions", result.tagPositionsOnField());
-
         Logger.recordOutput(cameraRoot + "/positionEstimate", visionEstimate.robotPose());
-
         Logger.recordOutput(cameraRoot + "/status", visionEstimate.status());
         Logger.recordOutput(cameraRoot + "/success", visionEstimate.status().isSuccess());
 
@@ -117,10 +112,12 @@ public class AprilTagVision extends SubsystemBase {
     Logger.recordOutput(root + "/tagPoses", tagPoses.toArray(Pose3d[]::new));
   }
 
-  public List<TrackedTarget> getLatestTargets() {
-    return Arrays.stream(cameras)
-        .flatMap(camera -> camera.getLatestTargets().stream())
-        .collect(Collectors.toList());
+  public List<RelativeTrackedTarget> getRelativeTrackedTargets() {
+    return Arrays.stream(cameras).flatMap(camera -> camera.getRelativeTargets().stream()).toList();
+  }
+
+  public List<AbsoluteTrackedTarget> getAbsoluteTrackedTargets() {
+    return Arrays.stream(cameras).flatMap(camera -> camera.getAbsoluteTargets().stream()).toList();
   }
 
   public void setFieldTags(AprilTagFieldLayout fieldTags) {
@@ -136,7 +133,7 @@ public class AprilTagVision extends SubsystemBase {
     return hasVisionEstimate;
   }
 
-  public boolean hasVisionEstimateDebounce() {
+  public boolean hasStableVisionEstimate() {
     return debouncer.calculate(hasVisionEstimate);
   }
 

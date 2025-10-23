@@ -18,9 +18,6 @@ import frc.robot.subsystems.led.BlinkenLEDPattern;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.wrist.Wrist;
-import frc.robot.subsystems.vision.AprilTagVision;
-import frc.robot.subsystems.vision.Camera.TrackedTarget;
-import java.util.List;
 import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
@@ -54,7 +51,7 @@ public class VisionDemoCommand extends Command {
   }
 
   private final Drive drive;
-  private final AprilTagVision vision;
+  private final TagFollowingVision vision;
 
   private final Elevator elevator;
   private final Wrist wrist;
@@ -62,7 +59,6 @@ public class VisionDemoCommand extends Command {
   private final LEDSubsystem leds;
 
   private final VisionDemoMode mode;
-  private final int tagId;
 
   private final ContainmentBox box;
 
@@ -74,30 +70,26 @@ public class VisionDemoCommand extends Command {
 
   private ResultSaftyMode saftyMode = ResultSaftyMode.STOP;
 
-  private final Debouncer hasTargetDebouncer = new Debouncer(0.3, Debouncer.DebounceType.kFalling);
-
   private final Timer deltaTimeTimer = new Timer();
 
   public VisionDemoCommand(
-      AprilTagVision vision,
       Drive drive,
+      TagFollowingVision vision,
       Elevator elevator,
       Wrist wrist,
       LEDSubsystem leds,
       VisionDemoMode mode,
-      ContainmentBox box,
-      int tagId) {
-    this.vision = vision;
+      ContainmentBox box) {
     this.drive = drive;
+    this.vision = vision;
     this.elevator = elevator;
     this.wrist = wrist;
     this.leds = leds;
     this.mode = mode;
     this.box = box;
-    this.tagId = tagId;
 
     controller.setTolerance(
-        new Pose2d(Units.inchesToMeters(2), Units.inchesToMeters(2), Rotation2d.fromDegrees(3)));
+        new Pose2d(Units.inchesToMeters(4), Units.inchesToMeters(4), Rotation2d.fromDegrees(5)));
 
     addRequirements(drive, elevator, wrist, leds);
   }
@@ -116,77 +108,47 @@ public class VisionDemoCommand extends Command {
   public void execute() {
     Pose2d robotPose = drive.getRobotPose();
 
-    // --- Tag Collection and Filtering ---
-
-    List<TrackedTarget> tags = getTag(tagId);
-
-    boolean hasTags = !tags.isEmpty();
-    boolean hasTagsDebounced = hasTargetDebouncer.calculate(hasTags);
-
-    Logger.recordOutput("TagFollowing/hasTags", hasTags);
-    SmartDashboard.putBoolean("Sees Tags?", hasTagsDebounced);
-
-    if (!tags.isEmpty() || !hasTagsDebounced) {
-      Logger.recordOutput(
-          "TagFollowing/Tags/Pose3d",
-          tags.stream().map(t -> t.getTargetPose(robotPose)).toArray(Pose3d[]::new));
-      Logger.recordOutput(
-          "TagFollowing/Tags/CameraPoses3d",
-          tags.stream().map(t -> t.getCamearaPose(robotPose)).toArray(Pose3d[]::new));
-    }
-
     // --- Target Logging ---
 
     Logger.recordOutput("TagFollowing/Result/SaftyMode", saftyMode.toString());
-    updateLEDS(hasTagsDebounced);
+    updateLEDS(vision.isTracking());
 
-    if (hasTags) {
-      Pose3d averageTagPose =
-          TagFollowUtil.averagePoses(tags.stream().map(t -> t.getTargetPose(robotPose)).toList());
+    vision
+        .getLastTagPose()
+        .ifPresent(
+            tagPose -> {
+              Pose2d rawSetpointPose = mode.getRawPose(robotPose, tagPose);
+              Logger.recordOutput("TagFollowing/RobotRawSetpointPose", rawSetpointPose);
+              SmartDashboard.putNumber(
+                  "Target Heading", -rawSetpointPose.getRotation().getDegrees());
 
-      Logger.recordOutput("TagFollowing/Target/Pose3d", averageTagPose);
-      Logger.recordOutput(
-          "TagFollowing/Target/CameraPoses3d",
-          tags.stream().map(t -> t.getCamearaPose(robotPose)).toArray(Pose3d[]::new));
+              double dt = deltaTimeTimer.get();
+              Logger.recordOutput("TagFollowing/DeltaTime", dt);
+              deltaTimeTimer.restart();
 
-      Pose2d rawSetpointPose = mode.getRawPose(robotPose, averageTagPose);
-      Logger.recordOutput("TagFollowing/RobotRawSetpointPose", rawSetpointPose);
-      SmartDashboard.putNumber("Target Heading", -rawSetpointPose.getRotation().getDegrees());
+              VisionDemoResult setpointPose = mode.calculate(robotPose, tagPose, dt, box);
+              saftyMode = setpointPose.saftyMode();
 
-      double dt = deltaTimeTimer.get();
-      Logger.recordOutput("TagFollowing/DeltaTime", dt);
-      deltaTimeTimer.restart();
+              mode.getSuperstructureState(robotPose, tagPose).ifPresent(this::updateSuperstructure);
 
-      VisionDemoResult setpointPose = mode.calculate(robotPose, averageTagPose, dt, box);
-      saftyMode = setpointPose.saftyMode();
+              setpointPose
+                  .setpointPose()
+                  .ifPresent(
+                      pose -> {
+                        Pose2d clampedPose = box.clamp(pose);
+                        controller.setSetpoint(clampedPose);
 
-      mode.getSuperstructureState(robotPose, averageTagPose).ifPresent(this::updateSuperstructure);
-
-      setpointPose
-          .setpointPose()
-          .ifPresent(
-              pose -> {
-                Pose2d clampedPose = box.clamp(pose);
-                controller.setSetpoint(clampedPose);
-                Logger.recordOutput("TagFollowing/Box/RobotUnclampedSetpointPose", pose);
-                Logger.recordOutput("TagFollowing/RobotSetpointPose", clampedPose);
-                Logger.recordOutput("TagFollowing/Box/SetpointPoseInBox", box.contains(pose));
-              });
-    }
+                        Logger.recordOutput("TagFollowing/Box/RobotUnclampedSetpointPose", pose);
+                        Logger.recordOutput("TagFollowing/RobotSetpointPose", clampedPose);
+                        Logger.recordOutput(
+                            "TagFollowing/Box/SetpointPoseInBox", box.contains(pose));
+                      });
+            });
 
     Logger.recordOutput("TagFollowing/Box/CurrentPoseInBox", box.contains(robotPose));
 
     ChassisSpeeds speeds = getChassisSpeeds();
     drive.setRobotSpeeds(speeds);
-  }
-
-  private List<TrackedTarget> getTag(int tagId) {
-    return vision.getLatestTargets().stream()
-        .filter(TrackedTarget::isGoodPoseAmbiguity)
-        .filter(
-            tag -> Math.abs(tag.cameraToTarget().getRotation().getY()) < Units.degreesToRadians(70))
-        .filter(tag -> tag.id() == tagId)
-        .toList();
   }
 
   private void updateLEDS(boolean isUpdating) {
@@ -228,9 +190,13 @@ public class VisionDemoCommand extends Command {
   private ChassisSpeeds getChassisSpeeds() {
     ChassisSpeeds speeds = controller.calculate(drive.getRobotPose());
 
-    boolean atGoal = atGoalDebouncer.calculate(controller.atReference());
-    Logger.recordOutput("TagFollowing/AtGoal", atGoal);
-    if (atGoal) {
+    boolean atReference = controller.atReference();
+    boolean atReferenceStable = atGoalDebouncer.calculate(atReference);
+
+    Logger.recordOutput("TagFollowing/AtReference", atReference);
+    Logger.recordOutput("TagFollowing/AtReferenceStable", atReferenceStable);
+
+    if (atReferenceStable) {
       speeds = new ChassisSpeeds(0, 0, 0);
     }
 

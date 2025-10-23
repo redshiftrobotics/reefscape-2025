@@ -9,7 +9,22 @@
         "sidebar": {
           "width": 373,
           "expanded": [
-            "/RealOutputs"
+            "/RealOutputs",
+            "/RealOutputs/TagFollowing/Target",
+            "/RealOutputs/TagFollowing/Targets",
+            "/RealOutputs/TagFollowing/Follow1",
+            "/RealOutputs/TagFollowing/Tags",
+            "/RealOutputs/Box",
+            "/RealOutputs/ContainmentBox/Vision Demo Box",
+            "/RealOutputs/SimControlledTarget/1/TagPose/translation",
+            "/RealOutputs/SimControlledTarget/1",
+            "/RealOutputs/SimControlledTarget/18",
+            "/RealOutputs/TagTracking",
+            "/RealOutputs/TagTracking/Tags",
+            "/RealOutputs/SimControlledTarget/17",
+            "/RealOutputs/TagTracking/Target",
+            "/LED",
+            "/RealOutputs/TagFollowing"
           ]
         },
         "tabs": {
@@ -239,33 +254,6 @@
                   },
                   {
                     "type": "axes",
-                    "logKey": "/RealOutputs/SimControlledTarget/17/TagPose",
-                    "logType": "Pose3d",
-                    "visible": true,
-                    "options": {}
-                  },
-                  {
-                    "type": "cone",
-                    "logKey": "/RealOutputs/TagFollowing/Target/CameraPoses3d",
-                    "logType": "Pose3d[]",
-                    "visible": false,
-                    "options": {
-                      "color": "#00ffff",
-                      "position": "center"
-                    }
-                  },
-                  {
-                    "type": "cone",
-                    "logKey": "/RealOutputs/TagFollowing/Tags/CameraPoses3d",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#00ffff",
-                      "position": "center"
-                    }
-                  },
-                  {
-                    "type": "axes",
                     "logKey": "/RealOutputs/TagFollowing/Follow/TagFilteredPosition",
                     "logType": "Pose3d",
                     "visible": true,
@@ -299,15 +287,6 @@
                     }
                   },
                   {
-                    "type": "aprilTag",
-                    "logKey": "/RealOutputs/TagFollowing/Tags/Pose3d",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {
-                      "family": "36h11"
-                    }
-                  },
-                  {
                     "type": "cone",
                     "logKey": "/RealOutputs/ObjectVisualizer/Coral/HeldCoral",
                     "logType": "Pose3d",
@@ -336,6 +315,39 @@
                       "color": "#00ff00",
                       "size": "normal"
                     }
+                  },
+                  {
+                    "type": "aprilTag",
+                    "logKey": "/RealOutputs/TagTracking/Tags/Pose3d",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "family": "36h11"
+                    }
+                  },
+                  {
+                    "type": "cone",
+                    "logKey": "/RealOutputs/TagTracking/Tags/CameraPoses3d",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ffff",
+                      "position": "center"
+                    }
+                  },
+                  {
+                    "type": "axes",
+                    "logKey": "/RealOutputs/SimControlledTarget/18/TagPose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "axes",
+                    "logKey": "/RealOutputs/SimControlledTarget/17/TagPose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
                   }
                 ],
                 "game": "Evergreen",
@@ -346,14 +358,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -0.7296037440452763,
-                  2.2008166175592536,
-                  -3.8879462486356915
+                  5.941601023786575,
+                  1.3117000341331806,
+                  -5.891811296104322
                 ],
                 "cameraTarget": [
-                  0.5132906350564872,
-                  0.14838565616515131,
-                  1.4724477308858366
+                  3.891168135301554,
+                  -0.1323856683214253,
+                  1.0740439392540626
                 ]
               },
               "controlsHeight": 251

@@ -492,6 +492,81 @@
       "grid_layout": {
         "layouts": [
           {
+            "title": "TagFollowing",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "AtReference",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/AdvantageKit/RealOutputs/TagFollowing/AtReference",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "AtReferenceStable",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/AdvantageKit/RealOutputs/TagFollowing/AtReferenceStable",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "DeltaTime",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/RealOutputs/TagFollowing/DeltaTime",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "LEDPattern",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/RealOutputs/TagFollowing/LEDPattern",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
             "title": "Follow",
             "x": 640.0,
             "y": 0.0,
@@ -570,25 +645,53 @@
             ]
           },
           {
-            "title": "TagFollowing",
-            "x": 512.0,
-            "y": 0.0,
+            "title": "TagTracking",
+            "x": 896.0,
+            "y": 128.0,
             "width": 128.0,
-            "height": 256.0,
+            "height": 128.0,
             "type": "List Layout",
             "properties": {
               "label_position": "TOP"
             },
             "children": [
               {
-                "title": "AtGoal",
+                "title": "TotalDetected",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/RealOutputs/TagTracking/TotalDetected",
+                  "period": 0.06,
+                  "data_type": "int",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "TotalFiltered",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/RealOutputs/TagTracking/TotalFiltered",
+                  "period": 0.06,
+                  "data_type": "int",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "noTargets",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/AdvantageKit/RealOutputs/TagFollowing/AtGoal",
+                  "topic": "/AdvantageKit/RealOutputs/TagTracking/noTargets",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -598,42 +701,14 @@
                 }
               },
               {
-                "title": "DeltaTime",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/AdvantageKit/RealOutputs/TagFollowing/DeltaTime",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "LEDPattern",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/AdvantageKit/RealOutputs/TagFollowing/LEDPattern",
-                  "period": 0.06,
-                  "data_type": "string",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "hasTags",
+                "title": "noTargetsStable",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/AdvantageKit/RealOutputs/TagFollowing/hasTags",
+                  "topic": "/AdvantageKit/RealOutputs/TagTracking/noTargetsStable",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -656,14 +731,14 @@
             },
             "children": [
               {
-                "title": "SetpointPoseInBox",
+                "title": "CurrentPoseInBox",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/AdvantageKit/RealOutputs/TagFollowing/Box/SetpointPoseInBox",
+                  "topic": "/AdvantageKit/RealOutputs/TagFollowing/Box/CurrentPoseInBox",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -673,14 +748,14 @@
                 }
               },
               {
-                "title": "CurrentPoseInBox",
+                "title": "SetpointPoseInBox",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Boolean Box",
                 "properties": {
-                  "topic": "/AdvantageKit/RealOutputs/TagFollowing/Box/CurrentPoseInBox",
+                  "topic": "/AdvantageKit/RealOutputs/TagFollowing/Box/SetpointPoseInBox",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
@@ -698,7 +773,7 @@
             "x": 1024.0,
             "y": 128.0,
             "width": 256.0,
-            "height": 384.0,
+            "height": 256.0,
             "type": "Alerts",
             "properties": {
               "topic": "/SmartDashboard/Alerts",
@@ -789,23 +864,6 @@
               "topic": "/SmartDashboard/Superstructure Aim",
               "period": 0.06,
               "data_type": "boolean"
-            }
-          },
-          {
-            "title": "Sees Tags?",
-            "x": 128.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Sees Tags?",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
             }
           },
           {
@@ -920,9 +978,9 @@
           },
           {
             "title": "BatteryVoltage",
-            "x": 896.0,
-            "y": 128.0,
-            "width": 128.0,
+            "x": 1024.0,
+            "y": 384.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Graph",
             "properties": {
@@ -943,6 +1001,23 @@
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Has Vision",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Is Tracking Tag?",
+            "x": 128.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Is Tracking Tag?",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,

@@ -36,6 +36,7 @@ import frc.robot.commands.controllers.SpeedLevelController;
 import frc.robot.commands.visionDemo.AimAtTagMode;
 import frc.robot.commands.visionDemo.ContainmentBox;
 import frc.robot.commands.visionDemo.FollowTagMode;
+import frc.robot.commands.visionDemo.TagFollowingVision;
 import frc.robot.commands.visionDemo.VisionDemoCommand;
 import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
@@ -267,8 +268,10 @@ public class RobotContainer {
                   FieldConstants.FIELD.getX() / 2, FieldConstants.FIELD.getY() / 2, 1),
               Rotation3d.kZero);
 
+      XboxController controller = new XboxController(3);
+      TagFollowingVision.debugModeSupplier = controller::getYButton;
       vision.addSimulatedTarget(
-          new SimControlledTarget(Constants.VISION_DEMO_TAG_ID, startPose, new XboxController(3)));
+          new SimControlledTarget(Constants.VISION_DEMO_TAG_ID, startPose, controller));
       drive.resetPose(startPose.toPose2d());
 
     } else {
@@ -325,7 +328,7 @@ public class RobotContainer {
 
     dashboard.setAutoAlignPoseSupplier(AdaptiveAutoAlignCommands::getCurrentAutoAlignGoal);
 
-    dashboard.setHasVisionEstimateSupplier(vision::hasVisionEstimateDebounce);
+    dashboard.setHasVisionEstimateSupplier(vision::hasStableVisionEstimate);
 
     dashboard.setSensorSuppliers(
         coralIntake::usingSensor, () -> coralIntake.hasCoral().orElse(false));
@@ -365,32 +368,37 @@ public class RobotContainer {
 
       Translation2d boxCenter = FieldConstants.FIELD.div(2);
 
-      ContainmentBox box = new ContainmentBox("Vision Demo Box", boxCenter, length, width);
+      ContainmentBox box =
+          new ContainmentBox(
+              "Vision Demo Box", boxCenter, length, width, DRIVE_CONFIG.bumperCornerToCorner());
+
+      TagFollowingVision tagFollowingVision =
+          new TagFollowingVision(vision, Constants.VISION_DEMO_TAG_ID);
 
       SmartDashboard.putData(
           "Aim At Tag",
           new VisionDemoCommand(
-                  vision,
                   drive,
+                  tagFollowingVision,
                   elevator,
                   coralWrist,
                   ledSubsystem,
                   new AimAtTagMode(useSuperstructure),
-                  box,
-                  Constants.VISION_DEMO_TAG_ID)
-              .onlyIf(() -> box.contains(drive.getRobotPose())));
+                  box)
+              .onlyIf(() -> box.contains(drive.getRobotPose()))
+              .withName("Aim At Tag"));
       SmartDashboard.putData(
           "Follow Tag",
           new VisionDemoCommand(
-                  vision,
                   drive,
+                  tagFollowingVision,
                   elevator,
                   coralWrist,
                   ledSubsystem,
                   new FollowTagMode(new Translation2d(2, 0), useSuperstructure),
-                  box,
-                  Constants.VISION_DEMO_TAG_ID)
-              .onlyIf(() -> box.contains(drive.getRobotPose())));
+                  box)
+              .onlyIf(() -> box.contains(drive.getRobotPose()))
+              .withName("Follow Tag"));
     }
   }
 
