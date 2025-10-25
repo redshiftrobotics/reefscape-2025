@@ -25,8 +25,6 @@
             "/LED",
             "/RealOutputs/TagFollowing",
             "/RealOutputs/TagFollowing/ChassisSpeeds",
-            "/RealOutputs/Odometry",
-            "/RealOutputs/Odometry/Robot",
             "/Tuning",
             "/Tuning/ContainmentBox",
             "/Tuning/ContainmentBox/Vision Demo Box",
