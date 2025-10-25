@@ -55,6 +55,8 @@ public class DriverDashboard extends SubsystemBase {
 
   private DoubleSupplier hangValue;
 
+  private BooleanSupplier isInBox;
+
   // --- Setters ---
 
   public void addSubsystem(SubsystemBase subsystem) {
@@ -104,6 +106,10 @@ public class DriverDashboard extends SubsystemBase {
 
   public void setSuperstructureAtGoal(BooleanSupplier superstructureAtGoal) {
     this.superstructureAtGoal = superstructureAtGoal;
+  }
+
+  public void setIsInBox(BooleanSupplier isInBox) {
+    this.isInBox = isInBox;
   }
 
   public Field2d getField() {
@@ -160,6 +166,10 @@ public class DriverDashboard extends SubsystemBase {
 
     if (hangValue != null) {
       SmartDashboard.putNumber("Hang Value", hangValue.getAsDouble());
+    }
+
+    if (isInBox != null) {
+      SmartDashboard.putBoolean("Is In Box?", isInBox.getAsBoolean());
     }
   }
 }

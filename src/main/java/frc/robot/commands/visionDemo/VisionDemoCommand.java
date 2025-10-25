@@ -1,7 +1,6 @@
 package frc.robot.commands.visionDemo;
 
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,8 +23,6 @@ import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
 public class VisionDemoCommand extends Command {
-
-  private final boolean DO_SLEW = false;
 
   public interface VisionDemoMode {
 
@@ -79,9 +76,12 @@ public class VisionDemoCommand extends Command {
   private final MeanPoseFilterTimeBased setpointStablityCheckingFilter =
       new MeanPoseFilterTimeBased(0.6);
 
-  private final SlewRateLimiter vxLimiter = new SlewRateLimiter(3); // m/s^2
-  private final SlewRateLimiter vyLimiter = new SlewRateLimiter(3); // m/s^2
-  private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(3); // rad/s^2
+  private final ComboFilter vxLimiter = new ComboFilter(10, 3); // m/s^2
+  private final ComboFilter vyLimiter = new ComboFilter(10, 3); // m/s^2
+  private final ComboFilter omegaLimiter = new ComboFilter(10, 3); // rad/s^2
+  // private final SlewRateLimiter vxLimiter = new SlewRateLimiter(3); // m/s^2
+  // private final SlewRateLimiter vyLimiter = new SlewRateLimiter(3); // m/s^2
+  // private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(3); // rad/s^2
 
   public VisionDemoCommand(
       Drive drive,
@@ -230,18 +230,18 @@ public class VisionDemoCommand extends Command {
         break;
     }
 
-    ChassisSpeeds slewSpeeds =
+    ChassisSpeeds filteredSPeeds =
         new ChassisSpeeds(
             vxLimiter.calculate(speeds.vxMetersPerSecond),
             vyLimiter.calculate(speeds.vyMetersPerSecond),
             omegaLimiter.calculate(speeds.omegaRadiansPerSecond));
 
-    Logger.recordOutput("TagFollowing/ChassisSpeeds/Unslewed", speeds);
-    Logger.recordOutput("TagFollowing/ChassisSpeeds/Slewed", slewSpeeds);
+    Logger.recordOutput("TagFollowing/ChassisSpeeds/Speeds", speeds);
+    Logger.recordOutput("TagFollowing/ChassisSpeeds/FilteredSpeeds", filteredSPeeds);
 
-    boolean isSafeToSlew = !stopped && box.contains(drive.getRobotPose());
+    boolean isSafeToAntiJitter = !stopped && box.contains(drive.getRobotPose());
 
-    boolean stableUnslewed =
+    boolean hasStableTarget =
         setpointStablityCheckingFilter.lastValue() == null
             || setpointStablityCheckingFilter
                     .calculateMean()
@@ -249,14 +249,17 @@ public class VisionDemoCommand extends Command {
                     .getDistance(setpointStablityCheckingFilter.lastValue().getTranslation())
                 < Units.inchesToMeters(6);
 
-    Logger.recordOutput("TagFollowing/ChassisSpeeds/IsSafeToSlew", isSafeToSlew);
-    Logger.recordOutput("TagFollowing/ChassisSpeeds/StableUnslewed", stableUnslewed);
+    Logger.recordOutput("TagFollowing/ChassisSpeeds/IsSafeToAntiJitter", isSafeToAntiJitter);
+    Logger.recordOutput("TagFollowing/ChassisSpeeds/hasStableTarget", hasStableTarget);
 
-    if (!isSafeToSlew || stableUnslewed || !DO_SLEW) {
-      return speeds;
+    boolean isAntiJitter = isSafeToAntiJitter && !hasStableTarget;
+    Logger.recordOutput("TagFollowing/ChassisSpeeds/IsAntiJitter", isAntiJitter);
+
+    if (isAntiJitter) {
+      return filteredSPeeds;
     }
 
-    return slewSpeeds;
+    return speeds;
   }
 
   @Override
@@ -268,6 +271,7 @@ public class VisionDemoCommand extends Command {
   public void end(boolean interrupted) {
     SmartDashboard.putBoolean("Has Track Target", false);
     SmartDashboard.putNumber("Target Heading", Double.NaN);
+    Logger.recordOutput("TagFollowing/Result/SaftyMode", ResultSaftyMode.UNKNOWN.toString());
     drive.stop();
   }
 }

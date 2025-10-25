@@ -372,6 +372,8 @@ public class RobotContainer {
           new ContainmentBox(
               "Vision Demo Box", boxCenter, length, width, DRIVE_CONFIG.bumperCornerToCorner());
 
+      dashboard.setIsInBox(() -> box.contains(drive.getRobotPose()));
+
       TagFollowingVision tagFollowingVision =
           new TagFollowingVision(vision, Constants.VISION_DEMO_TAG_ID);
 

@@ -19,12 +19,20 @@
             "/RealOutputs/SimControlledTarget/1/TagPose/translation",
             "/RealOutputs/SimControlledTarget/1",
             "/RealOutputs/SimControlledTarget/18",
-            "/RealOutputs/TagTracking",
             "/RealOutputs/TagTracking/Tags",
             "/RealOutputs/SimControlledTarget/17",
             "/RealOutputs/TagTracking/Target",
             "/LED",
-            "/RealOutputs/TagFollowing"
+            "/RealOutputs/TagFollowing",
+            "/RealOutputs/TagFollowing/ChassisSpeeds",
+            "/RealOutputs/Odometry",
+            "/RealOutputs/Odometry/Robot",
+            "/Tuning",
+            "/Tuning/ContainmentBox",
+            "/Tuning/ContainmentBox/Vision Demo Box",
+            "/Tuning/VisionResultsStatus",
+            "/Tuning/VisionDemo",
+            "/RealOutputs/SwerveStates"
           ]
         },
         "tabs": {
@@ -358,14 +366,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  5.941601023786575,
-                  1.3117000341331806,
-                  -5.891811296104322
+                  -1.0799999999999996,
+                  2.573226373964618,
+                  -4.85375699379604
                 ],
                 "cameraTarget": [
-                  3.891168135301554,
-                  -0.1323856683214253,
-                  1.0740439392540626
+                  -1.08,
+                  -0.16053570895895541,
+                  -0.41991407324430385
                 ]
               },
               "controlsHeight": 251
@@ -499,6 +507,56 @@
                 }
               ],
               "controllerUUID": "h7ytpjliaoa92toa1gvqc2gew3s6jwyj",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 9,
+              "title": "Tag Following Speeds",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "rotation",
+                    "logKey": "/RealOutputs/Odometry/Robot/rotation",
+                    "logType": "Rotation2d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "chassisSpeeds",
+                    "logKey": "/RealOutputs/TagFollowing/ChassisSpeeds/FilteredSpeeds",
+                    "logType": "ChassisSpeeds",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff00ff"
+                    }
+                  },
+                  {
+                    "type": "chassisSpeeds",
+                    "logKey": "/RealOutputs/TagFollowing/ChassisSpeeds/Speeds",
+                    "logType": "ChassisSpeeds",
+                    "visible": true,
+                    "options": {
+                      "color": "#ffff00"
+                    }
+                  },
+                  {
+                    "type": "states",
+                    "logKey": "/RealOutputs/SwerveStates/DesiredWheelSpeeds",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  }
+                ],
+                "maxSpeed": 5,
+                "sizeX": 0.65,
+                "sizeY": 0.65,
+                "orientation": 1
+              },
+              "controllerUUID": "so82myjp23e7sa47u18vp0szp9c1zoki",
               "renderer": null,
               "controlsHeight": 200
             },
@@ -660,6 +718,29 @@
       }
     }
   ],
-  "satellites": [],
+  "satellites": [
+    {
+      "x": 1788,
+      "y": 642,
+      "width": 498,
+      "height": 498,
+      "state": {
+        "type": 9,
+        "visualizer": null
+      },
+      "uuid": "rimbjrz22qw8iu6qzsjs9l9ebw1jgshb"
+    },
+    {
+      "x": 1758,
+      "y": 106,
+      "width": 545,
+      "height": 545,
+      "state": {
+        "type": 9,
+        "visualizer": null
+      },
+      "uuid": "so82myjp23e7sa47u18vp0szp9c1zoki"
+    }
+  ],
   "version": "4.1.5"
 }
