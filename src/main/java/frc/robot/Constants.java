@@ -21,7 +21,7 @@ public final class Constants {
   public static final RobotType PRIMARY_ROBOT_TYPE = RobotType.COMP_BOT_2025;
   private static RobotType robotType;
 
-  public static final boolean TUNING_MODE = false;
+  public static final boolean TUNING_MODE = true;
 
   public static final boolean HIDE_COMMAND_LOOP_OVERRUN = true;
 
