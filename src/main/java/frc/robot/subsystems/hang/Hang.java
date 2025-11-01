@@ -38,7 +38,6 @@ public class Hang extends SubsystemBase {
   public Hang(HangIO io) {
     this.io = io;
     io.setBrakeMode(true);
-    io.setLimits(HangConstants.RELATIVE_MIN_ROTATIONS, HangConstants.RELATIVE_MAX_ROTATIONS);
   }
 
   @Override
@@ -60,7 +59,7 @@ public class Hang extends SubsystemBase {
     measuredVisualizer.update(Rotation2d.fromRotations(inputs.positionRotations));
   }
 
-  private void setGoal(Rotation2d rotation) {
+  public void setGoal(Rotation2d rotation) {
     runClosedLoop = true;
     controller.setSetpoint(rotation.getRotations());
     setpointVisualizer.update(rotation);
@@ -87,18 +86,6 @@ public class Hang extends SubsystemBase {
   @AutoLogOutput(key = "Hang/RelativeRotations")
   public double getRelativeRotations() {
     return inputs.positionRotations;
-  }
-
-  public Command stow() {
-    return runOnce(() -> setGoal(HangConstants.STOWED_POSITION_ROTATIONS));
-  }
-
-  public Command deploy() {
-    return runOnce(() -> setGoal(HangConstants.DEPLOY_POSITION_ROTATIONS));
-  }
-
-  public Command retract() {
-    return runOnce(() -> setGoal(HangConstants.RETRACT_POSITION_ROTATIONS));
   }
 
   public Command runSet(double speed) {

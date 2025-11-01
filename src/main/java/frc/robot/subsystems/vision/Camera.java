@@ -1,18 +1,22 @@
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
+import frc.robot.subsystems.vision.VisionConstants.CameraConfig;
 import frc.robot.utility.tunable.LoggedTunableNumber;
 import frc.robot.utility.tunable.LoggedTunableNumberFactory;
 import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -43,6 +47,7 @@ public class Camera {
   private final CameraIO io;
   private final CameraIOInputsAutoLogged inputs = new CameraIOInputsAutoLogged();
 
+  private AprilTagFieldLayout aprilTagFieldLayout;
   private Set<Integer> tagsIdsOnField;
 
   private VisionResult[] results = new VisionResult[0];
@@ -60,6 +65,31 @@ public class Camera {
       Matrix<N3, N1> standardDeviation,
       VisionResultStatus status) {}
 
+  public record RelativeTrackedTarget(
+      int id, Transform3d cameraToTarget, CameraConfig camera, double poseAmbiguity) {}
+
+  public record AbsoluteTrackedTarget(
+      int id,
+      Pose3d targetPose,
+      Pose3d cameraPose,
+      Transform3d cameraToTarget,
+      CameraConfig camera,
+      double poseAmbiguity,
+      Pose2d robotPose) {
+    public AbsoluteTrackedTarget(RelativeTrackedTarget relativeTarget, Pose2d robotPose) {
+      this(
+          relativeTarget.id,
+          new Pose3d(robotPose)
+              .plus(relativeTarget.camera.robotToCamera())
+              .plus(relativeTarget.cameraToTarget),
+          new Pose3d(robotPose).plus(relativeTarget.camera.robotToCamera()),
+          relativeTarget.cameraToTarget,
+          relativeTarget.camera,
+          relativeTarget.poseAmbiguity,
+          robotPose);
+    }
+  }
+
   /**
    * Create a new robot camera with IO layer
    *
@@ -68,17 +98,21 @@ public class Camera {
   public Camera(CameraIO io) {
     this.io = io;
 
-    io.setAprilTagFieldLayout(VisionConstants.FIELD);
-    this.tagsIdsOnField =
-        VisionConstants.FIELD.getTags().stream().map((tag) -> tag.ID).collect(Collectors.toSet());
-
     this.missingCameraAlert =
         new Alert(String.format("Missing cameras %s", getCameraName()), Alert.AlertType.kWarning);
   }
 
+  public void setFieldTags(AprilTagFieldLayout field) {
+    if (field != this.aprilTagFieldLayout) {
+      io.setAprilTagFieldLayout(field);
+      tagsIdsOnField = field.getTags().stream().map((tag) -> tag.ID).collect(Collectors.toSet());
+      this.aprilTagFieldLayout = field;
+    }
+  }
+
   /** Get name of camera as specified by IO */
   public String getCameraName() {
-    return io.getCameraPosition() + " (" + io.getCameraName() + ")";
+    return io.getCameraConfig() + " (" + io.getCameraName() + ")";
   }
 
   /** Run periodic of module. Updates the set of loggable inputs, updating vision result. */
@@ -92,6 +126,13 @@ public class Camera {
       Pose3d[] tagPositionsOnField = getTagPositionsOnField(inputs.tagsUsed[i]);
 
       if (inputs.hasNewData[i]) {
+        Matrix<N3, N1> standardDeviations =
+            getStandardDeviations(tagPositionsOnField, inputs.estimatedRobotPose[i]);
+        VisionResultStatus status =
+            lastRobotPoseSupplier == null
+                ? getStatus(inputs.estimatedRobotPose[i], inputs.tagsUsed[i])
+                : getStatus(
+                    inputs.estimatedRobotPose[i], inputs.tagsUsed[i], lastRobotPoseSupplier.get());
         results[i] =
             new VisionResult(
                 true,
@@ -99,13 +140,8 @@ public class Camera {
                 inputs.timestampSecondFPGA[i],
                 inputs.tagsUsed[i],
                 tagPositionsOnField,
-                getStandardDeviations(tagPositionsOnField, inputs.estimatedRobotPose[i]),
-                lastRobotPoseSupplier == null
-                    ? getStatus(inputs.estimatedRobotPose[i], inputs.tagsUsed[i])
-                    : getStatus(
-                        inputs.estimatedRobotPose[i],
-                        inputs.tagsUsed[i],
-                        lastRobotPoseSupplier.get()));
+                standardDeviations,
+                status);
       } else {
         results[i] =
             new VisionResult(
@@ -120,8 +156,17 @@ public class Camera {
     }
   }
 
-  public void setLastRobotPoseSupplier(Supplier<Pose2d> lastRobotPose) {
-    this.lastRobotPoseSupplier = lastRobotPose;
+  public List<AbsoluteTrackedTarget> getAbsoluteTargets() {
+    return io.getAbsoluteTargets();
+  }
+
+  public List<RelativeTrackedTarget> getRelativeTargets() {
+    return io.getRelativeTargets();
+  }
+
+  public void filterBasedOnLastPose(boolean filter, Supplier<Pose2d> lastRobotPose) {
+    this.io.setLastPoseSupplier(lastRobotPose);
+    this.lastRobotPoseSupplier = filter ? lastRobotPose : null;
   }
 
   public VisionResult[] getResults() {
@@ -130,7 +175,7 @@ public class Camera {
 
   private Pose3d[] getTagPositionsOnField(int[] tagsUsed) {
     return Arrays.stream(tagsUsed)
-        .mapToObj(VisionConstants.FIELD::getTagPose)
+        .mapToObj(aprilTagFieldLayout::getTagPose)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .toArray(Pose3d[]::new);
@@ -206,8 +251,8 @@ public class Camera {
 
     if (estimatedRobotPose.getX() < 0
         || estimatedRobotPose.getY() < 0
-        || estimatedRobotPose.getX() > VisionConstants.FIELD.getFieldLength()
-        || estimatedRobotPose.getY() > VisionConstants.FIELD.getFieldWidth()) {
+        || estimatedRobotPose.getX() > aprilTagFieldLayout.getFieldLength()
+        || estimatedRobotPose.getY() > aprilTagFieldLayout.getFieldWidth()) {
       return VisionResultStatus.INVALID_POSE_OUTSIDE_FIELD;
     }
 

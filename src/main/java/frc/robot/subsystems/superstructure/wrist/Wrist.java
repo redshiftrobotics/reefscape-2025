@@ -56,19 +56,28 @@ public class Wrist extends SubsystemBase {
   private final WristIO io;
   private final WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
 
-  private TrapezoidProfile profile;
-  private TrapezoidProfile profileSlow;
-  private BooleanSupplier slowModeSupplier = () -> false;
+  private final Alert motorConnectedAlert =
+      new Alert("Wrist motor disconnected!", Alert.AlertType.kError);
+
+  private final Debouncer disabledDebouncer = new Debouncer(3, DebounceType.kRising);
+
+  enum IdleModeControl {
+    BRAKE,
+    AUTO,
+    COAST
+  }
+
+  private IdleModeControl coastMode = IdleModeControl.BRAKE;
+  private boolean brakeModeEnabled = true;
 
   private ArmFeedforward feedforward;
 
   private State setpoint = null;
   private Supplier<State> goalSupplier = State::new;
 
-  private final Alert motorConnectedAlert =
-      new Alert("Wrist motor disconnected!", Alert.AlertType.kError);
-
-  private final Debouncer disabledDebouncer = new Debouncer(3, DebounceType.kRising);
+  private TrapezoidProfile profile;
+  private TrapezoidProfile profileSlow;
+  private BooleanSupplier slowModeSupplier = () -> false;
 
   /** Creates a new Wrist. */
   public Wrist(WristIO io) {
@@ -79,7 +88,7 @@ public class Wrist extends SubsystemBase {
         new TrapezoidProfile(new Constraints(maxVelocitySlow.get(), maxAccelerationSlow.get()));
 
     io.setPID(kP.get(), kI.get(), kD.get());
-    io.setBrakeMode(true);
+    io.setBrakeMode(brakeModeEnabled);
     this.feedforward = new ArmFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
   }
 
@@ -91,7 +100,45 @@ public class Wrist extends SubsystemBase {
 
     Logger.recordOutput("Wrist/slowMode", slowModeSupplier.getAsBoolean());
 
-    io.setBrakeMode(!disabledDebouncer.calculate(DriverStation.isDisabled()));
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> {
+          io.setPID(values[0], values[1], values[2]);
+        },
+        kP,
+        kI,
+        kD);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> feedforward = new ArmFeedforward(values[0], values[1], values[2], values[3]),
+        kS,
+        kG,
+        kV,
+        kA);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> profile = new TrapezoidProfile(new Constraints(values[0], values[1])),
+        maxVelocity,
+        maxAcceleration);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> profileSlow = new TrapezoidProfile(new Constraints(values[0], values[1])),
+        maxVelocitySlow,
+        maxAccelerationSlow);
+
+    brakeModeEnabled =
+        switch (coastMode) {
+          case BRAKE -> true;
+          case AUTO -> !disabledDebouncer.calculate(DriverStation.isDisabled());
+          case COAST -> false;
+        };
+
+    io.setBrakeMode(brakeModeEnabled);
+
+    Logger.recordOutput("Wrist/breakModeEnabled", brakeModeEnabled);
 
     if (DriverStation.isEnabled()) {
       Logger.recordOutput("Wrist/shouldRunProfiled", true);
@@ -127,35 +174,6 @@ public class Wrist extends SubsystemBase {
 
       setpoint = new State(inputs.positionRad, inputs.velocityRadPerSec);
     }
-
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        (values) -> {
-          io.setPID(values[0], values[1], values[2]);
-        },
-        kP,
-        kI,
-        kD);
-
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        (values) -> feedforward = new ArmFeedforward(values[0], values[1], values[2], values[3]),
-        kS,
-        kG,
-        kV,
-        kA);
-
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        (values) -> profile = new TrapezoidProfile(new Constraints(values[0], values[1])),
-        maxVelocity,
-        maxAcceleration);
-
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        (values) -> profileSlow = new TrapezoidProfile(new Constraints(values[0], values[1])),
-        maxVelocitySlow,
-        maxAccelerationSlow);
 
     motorConnectedAlert.set(!inputs.motorConnected);
   }

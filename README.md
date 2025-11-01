@@ -2,7 +2,7 @@
 
 This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 
-![AdvantageScope_WPILib_76WDTWyWqM-ezgif com-optimize](https://github.com/user-attachments/assets/29608a4a-011a-4e52-b6e9-f55b69552322)
+![Simulation Demo Video](https://github.com/user-attachments/assets/82d81fd8-b114-4d88-bd92-67431d91ece3)
 
 ## Software Features
 
@@ -23,6 +23,10 @@ This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 * One button auto align for driver, automatically finds nearest scoring location
 <!-- real robot scoring AND sim auto alignment  -->
 
+<img width="350" alt="Driver Xbox Control Scheme" src="https://github.com/user-attachments/assets/80fe2d9a-7706-4655-ab8e-83e323117ebf" />
+<img width="350" alt="Operator Xbox Control Scheme" src="https://github.com/user-attachments/assets/bddfd905-e608-4e04-a1af-e1560d8cafb6" />
+
+
 #### Superstructure
 * State based control to automatically reach setpoints while avoiding collisions
 * Detection for when Coral is held, triggering different states
@@ -31,8 +35,8 @@ This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 <!-- Real robot scoring on practice field AND simulated view of robot with operator control -->
 
 #### Vision
-* PhotonVision based full field localization, robot always new where it was
-* Smart camera placement to view relevant April Tags
+* PhotonVision based full field localization
+* Smart camera placement to view  April Tags
 * Custom advanced filtering and standard deviations calculations to throw out bad results and trust good results more
 * Kalman filter to integrate vision results with odometry data
 * Allowed for smart auto alignment system and consistent autos when localization was used in pathing
@@ -46,7 +50,10 @@ This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 <details>
 <summary>Diagram of code structure</summary>
 
+Subsystem design with AKit IO layers.
 ![IO Layer Diagram](https://github.com/user-attachments/assets/2ff990a1-d31f-4188-9fbc-afdf1ed5c5f0)
+
+Overall command based design.
 ![Command Based Diagram](https://github.com/user-attachments/assets/36cf5fe0-066d-4685-ba1a-818f49612820)
 
 </details>

@@ -1,10 +1,15 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import frc.robot.subsystems.vision.Camera.AbsoluteTrackedTarget;
+import frc.robot.subsystems.vision.Camera.RelativeTrackedTarget;
 import frc.robot.subsystems.vision.VisionConstants.CameraConfig;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -17,10 +22,14 @@ public class CameraIOPhotonVision implements CameraIO {
   private final PhotonCamera camera;
   private final PhotonPoseEstimator photonPoseEstimator;
 
-  private final String cameraPositionTitle;
+  private final CameraConfig config;
+
+  private List<PhotonTrackedTarget> latestTargets = new ArrayList<>();
+
+  private Supplier<Pose2d> lastPoseSupplier;
 
   public CameraIOPhotonVision(CameraConfig config) {
-    this.cameraPositionTitle = config.cameraPosition();
+    this.config = config;
 
     // --- Setup Camera ---
     camera = new PhotonCamera(config.cameraName());
@@ -38,7 +47,7 @@ public class CameraIOPhotonVision implements CameraIO {
 
     photonPoseEstimator =
         new PhotonPoseEstimator(
-            VisionConstants.FIELD,
+            VisionConstants.DEFAULT_FIELD,
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             config.robotToCamera());
 
@@ -54,8 +63,13 @@ public class CameraIOPhotonVision implements CameraIO {
   }
 
   @Override
-  public String getCameraPosition() {
-    return cameraPositionTitle;
+  public void setLastPoseSupplier(Supplier<Pose2d> robotPoseSupplier) {
+    this.lastPoseSupplier = robotPoseSupplier;
+  }
+
+  @Override
+  public CameraConfig getCameraConfig() {
+    return config;
   }
 
   @Override
@@ -75,9 +89,18 @@ public class CameraIOPhotonVision implements CameraIO {
 
     inputs.updatesReceived = pipelineResults.size();
 
+    if (lastPoseSupplier != null) {
+      photonPoseEstimator.setLastPose(lastPoseSupplier.get());
+    }
+
+    this.latestTargets.clear();
+
     for (int i = 0; i < pipelineResults.size(); i++) {
+      PhotonPipelineResult cameraResult = pipelineResults.get(i);
       Optional<EstimatedRobotPose> estimatedRobotPoseOptional =
-          photonPoseEstimator.update(pipelineResults.get(i));
+          photonPoseEstimator.update(cameraResult);
+
+      this.latestTargets.addAll(cameraResult.getTargets());
 
       if (estimatedRobotPoseOptional.isPresent()) {
 
@@ -104,6 +127,27 @@ public class CameraIOPhotonVision implements CameraIO {
     inputs.tagsUsed = tagsUsed;
     inputs.hasNewData = hasNewData;
     inputs.connected = camera.isConnected();
+  }
+
+  @Override
+  public List<RelativeTrackedTarget> getRelativeTargets() {
+    return latestTargets.stream()
+        .map(
+            t ->
+                new RelativeTrackedTarget(
+                    t.getFiducialId(), t.getBestCameraToTarget(), config, t.getPoseAmbiguity()))
+        .toList();
+  }
+
+  @Override
+  public List<AbsoluteTrackedTarget> getAbsoluteTargets() {
+    if (lastPoseSupplier == null) {
+      throw new IllegalStateException(
+          "Robot pose supplier not set for absolute target calculation");
+    }
+    return getRelativeTargets().stream()
+        .map(r -> new AbsoluteTrackedTarget(r, lastPoseSupplier.get()))
+        .toList();
   }
 
   @Override
