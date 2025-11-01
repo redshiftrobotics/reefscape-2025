@@ -60,7 +60,10 @@ public class DriveConstants {
             new Translation2d(Units.inchesToMeters(22.729228), Units.inchesToMeters(22.729228)),
             new Translation2d(Units.inchesToMeters(35), Units.inchesToMeters(35)),
             7.05968,
-            14.5);
+            14.5
+                * (Constants.VISION_DEMO_MODE
+                    ? Constants.DEMO_SPEED_TRANSLATION_SPEED_COFICIENT
+                    : 1.0));
         case T_SHIRT_CANNON_CHASSIS -> new DriveConfig(
             new Translation2d(Units.inchesToMeters(22.729226), Units.inchesToMeters(22.729226)),
             new Translation2d(Units.inchesToMeters(25.729226), Units.inchesToMeters(25.729226)),

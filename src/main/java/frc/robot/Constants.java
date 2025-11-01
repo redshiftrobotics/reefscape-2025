@@ -24,6 +24,7 @@ public final class Constants {
 
   public static final boolean TUNING_MODE = false;
 
+  public static final double DEMO_SPEED_TRANSLATION_SPEED_COFICIENT = 1;
   public static final boolean VISION_DEMO_MODE = true;
   public static final int VISION_DEMO_TAG_ID = 18;
 
