@@ -259,7 +259,7 @@ public class RobotContainer {
 
     vision.filterBasedOnLastPose(false, drive::getRobotPose);
 
-    if (!Constants.isOnField() && Constants.VISION_DEMO_MODE) {
+    if (!Constants.isOnField() && Constants.isDemoMode()) {
       Elastic.selectTab("Vision Demo");
 
       Pose3d startPose =
@@ -305,7 +305,7 @@ public class RobotContainer {
 
     // Hide controller missing warnings for sim
     DriverStation.silenceJoystickConnectionWarning(
-        Constants.getMode() != Mode.REAL || Constants.VISION_DEMO_MODE);
+        Constants.getMode() != Mode.REAL || Constants.isDemoMode());
 
     initDashboard();
 
@@ -358,7 +358,7 @@ public class RobotContainer {
                         DRIVE_CONFIG.bumperCornerToCorner().getX() / 2, 0, Rotation2d.kPi))),
         true);
 
-    if (Constants.VISION_DEMO_MODE) {
+    if (Constants.isDemoMode()) {
       SmartDashboard.putBoolean("Superstructure Aim", true);
       BooleanSupplier useSuperstructure =
           () -> SmartDashboard.getBoolean("Superstructure Aim", true);

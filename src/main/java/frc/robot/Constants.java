@@ -22,13 +22,13 @@ public final class Constants {
   public static final RobotType PRIMARY_ROBOT_TYPE = RobotType.COMP_BOT_2025;
   private static RobotType robotType;
 
-  public static final boolean TUNING_MODE = true;
-
-  public static final double DEMO_SPEED_TRANSLATION_SPEED_COFICIENT = 1;
-  public static final boolean VISION_DEMO_MODE = true;
-  public static final int VISION_DEMO_TAG_ID = 18;
+  public static final boolean TUNING_MODE = false;
 
   private static final boolean IS_ON_FIELD = false;
+  private static final boolean VISION_DEMO_MODE = true;
+
+  public static final double DEMO_SPEED_TRANSLATION_SPEED_COFICIENT = 1;
+  public static final int VISION_DEMO_TAG_ID = 18;
 
   /** Enables all test plan autos in the auto chooser. */
   public static final boolean RUNNING_TEST_PLANS = false;
@@ -67,6 +67,10 @@ public final class Constants {
       return true;
     }
     return IS_ON_FIELD;
+  }
+
+  public static boolean isDemoMode() {
+    return !isOnField() && VISION_DEMO_MODE;
   }
 
   public enum Mode {
