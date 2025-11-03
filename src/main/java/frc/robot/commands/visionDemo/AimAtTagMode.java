@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.commands.visionDemo.SuperstructureUtil.SuperstructureState;
-import frc.robot.commands.visionDemo.VisionDemoCommand.ResultSaftyMode;
+import frc.robot.commands.visionDemo.VisionDemoCommand.ResultSafetyMode;
 import frc.robot.commands.visionDemo.VisionDemoCommand.VisionDemoResult;
 import frc.robot.commands.visionDemo.filters.ComboAngleFilter;
 import java.util.Optional;
@@ -23,8 +23,8 @@ public class AimAtTagMode implements VisionDemoCommand.VisionDemoMode {
   }
 
   @Override
-  public ResultSaftyMode getExspectedSaftyMode() {
-    return ResultSaftyMode.ROTATIONAL_CONTROL;
+  public ResultSafetyMode getExspectedSafetyMode() {
+    return ResultSafetyMode.ROTATIONAL_CONTROL;
   }
 
   @Override
@@ -46,7 +46,7 @@ public class AimAtTagMode implements VisionDemoCommand.VisionDemoMode {
     return new VisionDemoResult(
         Optional.of(
             new Pose2d(rawPose.getTranslation(), angleFilter.calculate(rawPose.getRotation()))),
-        ResultSaftyMode.ROTATIONAL_CONTROL);
+        ResultSafetyMode.ROTATIONAL_CONTROL);
   }
 
   @Override

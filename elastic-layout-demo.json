@@ -856,14 +856,14 @@
             }
           },
           {
-            "title": "SaftyMode",
+            "title": "SafetyMode",
             "x": 768.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Large Text Display",
             "properties": {
-              "topic": "/AdvantageKit/RealOutputs/TagFollowing/Result/SaftyMode",
+              "topic": "/AdvantageKit/RealOutputs/TagFollowing/Result/SafetyMode",
               "period": 0.06,
               "data_type": "string"
             }

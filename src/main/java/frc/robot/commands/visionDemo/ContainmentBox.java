@@ -1,5 +1,6 @@
 package frc.robot.commands.visionDemo;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,10 +17,13 @@ import org.littletonrobotics.junction.Logger;
 public class ContainmentBox extends VirtualSubsystem {
 
   private final Translation2d center;
-  private final Translation2d containedObjectSzie;
+  private final Translation2d objectSize;
 
   private Translation2d bottomLeft;
   private Translation2d topRight;
+
+  private Translation2d innerBottomLeft;
+  private Translation2d innerTopRight;
 
   private final String name;
 
@@ -35,13 +39,11 @@ public class ContainmentBox extends VirtualSubsystem {
       Translation2d containedObjectSize) {
     this.name = name;
     this.center = center;
-    this.containedObjectSzie = containedObjectSize;
+    this.objectSize = containedObjectSize;
 
     this.tunableFactory = new LoggedTunableNumberFactory("ContainmentBox/" + name);
 
-    bottomLeft = new Translation2d(center.getX() - length / 2.0, center.getY() - width / 2.0);
-
-    topRight = new Translation2d(center.getX() + length / 2.0, center.getY() + width / 2.0);
+    updateSize(length, width);
 
     this.lengthTunable = tunableFactory.getNumber("Length", length);
     this.widthTunable = tunableFactory.getNumber("Width", width);
@@ -52,10 +54,9 @@ public class ContainmentBox extends VirtualSubsystem {
     LoggedTunableNumber.ifChanged(
         hashCode(),
         (values) -> {
-          bottomLeft =
-              new Translation2d(center.getX() - values[0] / 2.0, center.getY() - values[1] / 2.0);
-          topRight =
-              new Translation2d(center.getX() + values[0] / 2.0, center.getY() + values[1] / 2.0);
+          double length = values[0];
+          double width = values[1];
+          updateSize(length, width);
         },
         lengthTunable,
         widthTunable);
@@ -65,16 +66,18 @@ public class ContainmentBox extends VirtualSubsystem {
     Logger.recordOutput("ContainmentBox/" + name + "/Center", center);
   }
 
+  public void updateSize(double length, double width) {
+    Translation2d size = new Translation2d(length, width);
+    bottomLeft = center.minus(size.div(2.0));
+    topRight = center.plus(size.div(2.0));
+    innerBottomLeft = bottomLeft.plus(objectSize.div(2.0));
+    innerTopRight = topRight.minus(objectSize.div(2.0));
+  }
+
   public Translation2d clamp(Translation2d point) {
-    double clampedX =
-        Math.min(
-            Math.max(point.getX(), bottomLeft.getX() + containedObjectSzie.getX() / 2.0),
-            topRight.getX() - containedObjectSzie.getX() / 2.0);
-    double clampedY =
-        Math.min(
-            Math.max(point.getY(), bottomLeft.getY() + containedObjectSzie.getY() / 2.0),
-            topRight.getY() - containedObjectSzie.getY() / 2.0);
-    return new Translation2d(clampedX, clampedY);
+    return new Translation2d(
+        MathUtil.clamp(point.getX(), innerBottomLeft.getX(), innerTopRight.getX()),
+        MathUtil.clamp(point.getY(), innerBottomLeft.getY(), innerTopRight.getY()));
   }
 
   public Pose2d clamp(Pose2d pose) {
@@ -82,10 +85,10 @@ public class ContainmentBox extends VirtualSubsystem {
   }
 
   public boolean contains(Translation2d point) {
-    return point.getX() >= bottomLeft.getX()
-        && point.getX() <= topRight.getX()
-        && point.getY() >= bottomLeft.getY()
-        && point.getY() <= topRight.getY();
+    return point.getX() >= innerBottomLeft.getX()
+        && point.getX() <= innerTopRight.getX()
+        && point.getY() >= innerBottomLeft.getY()
+        && point.getY() <= innerTopRight.getY();
   }
 
   public boolean contains(Pose2d pose) {

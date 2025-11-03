@@ -9,28 +9,7 @@
         "sidebar": {
           "width": 373,
           "expanded": [
-            "/RealOutputs",
-            "/RealOutputs/TagFollowing/Target",
-            "/RealOutputs/TagFollowing/Targets",
-            "/RealOutputs/TagFollowing/Follow1",
-            "/RealOutputs/TagFollowing/Tags",
-            "/RealOutputs/Box",
-            "/RealOutputs/ContainmentBox/Vision Demo Box",
-            "/RealOutputs/SimControlledTarget/1/TagPose/translation",
-            "/RealOutputs/SimControlledTarget/1",
-            "/RealOutputs/SimControlledTarget/18",
-            "/RealOutputs/TagTracking/Tags",
-            "/RealOutputs/SimControlledTarget/17",
-            "/RealOutputs/TagTracking/Target",
-            "/LED",
-            "/RealOutputs/TagFollowing",
-            "/RealOutputs/TagFollowing/ChassisSpeeds",
-            "/Tuning",
-            "/Tuning/ContainmentBox",
-            "/Tuning/ContainmentBox/Vision Demo Box",
-            "/Tuning/VisionResultsStatus",
-            "/Tuning/VisionDemo",
-            "/RealOutputs/SwerveStates"
+            "/RealOutputs"
           ]
         },
         "tabs": {
@@ -717,28 +696,6 @@
     }
   ],
   "satellites": [
-    {
-      "x": 1788,
-      "y": 642,
-      "width": 498,
-      "height": 498,
-      "state": {
-        "type": 9,
-        "visualizer": null
-      },
-      "uuid": "rimbjrz22qw8iu6qzsjs9l9ebw1jgshb"
-    },
-    {
-      "x": 1758,
-      "y": 106,
-      "width": 545,
-      "height": 545,
-      "state": {
-        "type": 9,
-        "visualizer": null
-      },
-      "uuid": "so82myjp23e7sa47u18vp0szp9c1zoki"
-    }
   ],
   "version": "4.1.5"
 }
