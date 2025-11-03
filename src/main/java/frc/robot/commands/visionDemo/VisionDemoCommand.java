@@ -28,7 +28,7 @@ public class VisionDemoCommand extends Command {
 
     public default void reset() {}
 
-    public ResultSaftyMode getExspectedSaftyMode();
+    public ResultSafetyMode getExspectedSafetyMode();
 
     public Pose2d getRawPose(Pose2d robotPose, Pose3d tagPose);
 
@@ -42,9 +42,9 @@ public class VisionDemoCommand extends Command {
     public Optional<SuperstructureState> getSuperstructureState(Pose2d robotPose, Pose3d tagPose3d);
   }
 
-  public record VisionDemoResult(Optional<Pose2d> setpointPose, ResultSaftyMode saftyMode) {}
+  public record VisionDemoResult(Optional<Pose2d> setpointPose, ResultSafetyMode safetyMode) {}
 
-  public enum ResultSaftyMode {
+  public enum ResultSafetyMode {
     FULL_CONTROL,
     ROTATIONAL_CONTROL,
     STOP,
@@ -69,7 +69,7 @@ public class VisionDemoCommand extends Command {
   private final ComboFilter elevatorHeightFilter = new ComboFilter(3, 5);
   private final ComboAngleFilter wristAngleFilter = new ComboAngleFilter(3, 5);
 
-  private ResultSaftyMode saftyMode = ResultSaftyMode.STOP;
+  private ResultSafetyMode safetyMode = ResultSafetyMode.STOP;
 
   private final Timer deltaTimeTimer = new Timer();
 
@@ -111,7 +111,7 @@ public class VisionDemoCommand extends Command {
     controller.setSetpoint(drive.getRobotPose());
     mode.reset();
     deltaTimeTimer.restart();
-    saftyMode = ResultSaftyMode.UNKNOWN;
+    safetyMode = ResultSafetyMode.UNKNOWN;
     Logger.recordOutput("TagFollowing/Box/Coners", box.getCorners());
   }
 
@@ -121,7 +121,7 @@ public class VisionDemoCommand extends Command {
 
     // --- Target Logging ---
 
-    Logger.recordOutput("TagFollowing/Result/SaftyMode", saftyMode.toString());
+    Logger.recordOutput("TagFollowing/Result/SafetyMode", safetyMode.toString());
     updateLEDS(vision.isTracking());
 
     vision
@@ -138,7 +138,7 @@ public class VisionDemoCommand extends Command {
               deltaTimeTimer.restart();
 
               VisionDemoResult setpointPose = mode.calculate(robotPose, tagPose, dt, box);
-              saftyMode = setpointPose.saftyMode();
+              safetyMode = setpointPose.safetyMode();
 
               mode.getSuperstructureState(robotPose, tagPose).ifPresent(this::updateSuperstructure);
 
@@ -167,14 +167,14 @@ public class VisionDemoCommand extends Command {
 
   private void updateLEDS(boolean isUpdating) {
 
-    ResultSaftyMode saftyMode = this.saftyMode;
+    ResultSafetyMode safetyMode = this.safetyMode;
 
-    if (saftyMode == ResultSaftyMode.UNKNOWN) {
-      saftyMode = mode.getExspectedSaftyMode();
+    if (safetyMode == ResultSafetyMode.UNKNOWN) {
+      safetyMode = mode.getExspectedSafetyMode();
     }
 
     BlinkenLEDPattern pattern =
-        switch (saftyMode) {
+        switch (safetyMode) {
           case FULL_CONTROL -> isUpdating ? BlinkenLEDPattern.CHASE_RED : BlinkenLEDPattern.ORANGE;
           case ROTATIONAL_CONTROL -> isUpdating
               ? BlinkenLEDPattern.CHASE_BLUE
@@ -216,7 +216,7 @@ public class VisionDemoCommand extends Command {
       speeds = new ChassisSpeeds(0, 0, 0);
     }
 
-    switch (saftyMode) {
+    switch (safetyMode) {
       case FULL_CONTROL:
         // Do nothing, full control
         break;
@@ -271,7 +271,7 @@ public class VisionDemoCommand extends Command {
   public void end(boolean interrupted) {
     SmartDashboard.putBoolean("Has Track Target", false);
     SmartDashboard.putNumber("Target Heading", Double.NaN);
-    Logger.recordOutput("TagFollowing/Result/SaftyMode", ResultSaftyMode.UNKNOWN.toString());
+    Logger.recordOutput("TagFollowing/Result/SafetyMode", ResultSafetyMode.UNKNOWN.toString());
     drive.stop();
   }
 }

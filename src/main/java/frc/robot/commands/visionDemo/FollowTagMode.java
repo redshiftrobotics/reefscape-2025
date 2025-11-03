@@ -10,7 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.commands.visionDemo.SuperstructureUtil.SuperstructureState;
-import frc.robot.commands.visionDemo.VisionDemoCommand.ResultSaftyMode;
+import frc.robot.commands.visionDemo.VisionDemoCommand.ResultSafetyMode;
 import frc.robot.commands.visionDemo.VisionDemoCommand.VisionDemoMode;
 import frc.robot.commands.visionDemo.VisionDemoCommand.VisionDemoResult;
 import java.util.Optional;
@@ -46,8 +46,8 @@ public class FollowTagMode implements VisionDemoMode {
   }
 
   @Override
-  public ResultSaftyMode getExspectedSaftyMode() {
-    return ResultSaftyMode.FULL_CONTROL;
+  public ResultSafetyMode getExspectedSafetyMode() {
+    return ResultSafetyMode.FULL_CONTROL;
   }
 
   @Override
@@ -81,7 +81,7 @@ public class FollowTagMode implements VisionDemoMode {
         MathUtil.slewRateLimit(tagFilteredPosition, tagPose.getTranslation(), dt, FILTER_SLEW_RATE);
 
     if (!isActive) {
-      return new VisionDemoResult(Optional.empty(), ResultSaftyMode.UNKNOWN);
+      return new VisionDemoResult(Optional.empty(), ResultSafetyMode.UNKNOWN);
     }
 
     Pose2d target = getRawPose(robotPose, tagPose);
@@ -96,10 +96,10 @@ public class FollowTagMode implements VisionDemoMode {
         new Pose3d(this.tagFilteredPosition, tagPose.getRotation()));
 
     if (!withinMaxJump) {
-      return new VisionDemoResult(Optional.empty(), ResultSaftyMode.FULL_CONTROL);
+      return new VisionDemoResult(Optional.empty(), ResultSafetyMode.FULL_CONTROL);
     }
 
-    return new VisionDemoResult(Optional.of(target), ResultSaftyMode.FULL_CONTROL);
+    return new VisionDemoResult(Optional.of(target), ResultSafetyMode.FULL_CONTROL);
   }
 
   @Override
@@ -117,7 +117,7 @@ public class FollowTagMode implements VisionDemoMode {
                         : new Pose2d(
                             box.clamp(pose.getTranslation()),
                             aimAtPose(robotPose, tagPose.toPose2d()))),
-        result.saftyMode());
+        result.safetyMode());
   }
 
   private static Rotation2d aimAtPose(Pose2d robotPose, Pose2d tagPose) {
