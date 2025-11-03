@@ -1,128 +1,75 @@
 package frc.robot.subsystems.led;
 
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.PWM;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.led.LEDConstants.FixedPalettePattern;
-import frc.robot.subsystems.led.LEDConstants.SolidColors;
-import java.util.Optional;
+import java.util.Arrays;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+/**
+ * Subsystem to manage multiple LED strips with Blinken LED Drivers.
+ *
+ * <p>LEDs will retain their last set pattern until a new pattern is set, unless a default pattern
+ * is given though a default command.
+ */
 public class LEDSubsystem extends SubsystemBase {
 
-  private final Timer startupTimer = new Timer();
+  private LEDStripIO[] strips;
+  private LEDStripIOInputsAutoLogged[] inputs;
 
-  // In future, this could be an IO layer
-  private class LEDStrip {
-    private final PWM pwm;
-    private int pulse;
+  private final Debouncer setupDebouncer = new Debouncer(0.8);
 
-    public LEDStrip(PWM pwmController, int initialPattern) {
-      pwm = pwmController;
-      pulse = initialPattern;
-    }
+  public LEDSubsystem(LEDStripIO... strips) {
+    this.strips = strips;
 
-    public void setPulse(int pulse) {
-      this.pulse = pulse;
-    }
+    inputs =
+        Arrays.stream(strips)
+            .map(s -> new LEDStripIOInputsAutoLogged())
+            .toArray(LEDStripIOInputsAutoLogged[]::new);
 
-    public void update() {
-      pwm.setPulseTimeMicroseconds(pulse);
-    }
+    Logger.recordOutput("led/numStrips", strips.length);
   }
-
-  private LEDStrip[] strips;
-
-  public LEDSubsystem(int... pwmPorts) {
-
-    // Create all the strip objects
-    strips = new LEDStrip[pwmPorts.length];
-    for (int i = 0; i < pwmPorts.length; i++) {
-      strips[i] = new LEDStrip(new PWM(pwmPorts[i]), LEDConstants.DEFAULT);
-    }
-  }
-
-  private Optional<Alliance> alliance = Optional.empty();
 
   @Override
   public void periodic() {
+    boolean runSetup =
+        !setupDebouncer.calculate(DriverStation.isEnabled()) && DriverStation.isEnabled();
 
-    if (DriverStation.isEnabled() && !startupTimer.isRunning()) {
-      startupTimer.restart();
-    } else if (startupTimer.hasElapsed(0.08)) {
-      startupTimer.stop();
-    }
-
-    if (startupTimer.isRunning()) {
-      applyAll(2125); // 5 volt mode
-    } else {
-      alliance = DriverStation.getAlliance();
-
-      if (DriverStation.isEStopped()) {
-        applyAll(SolidColors.GRAY);
-      } else if (DriverStation.isDisabled()) {
-        applyAll(SolidColors.BLUE, SolidColors.RED, SolidColors.WHITE);
-      } else {
-        applyAll(
-            FixedPalettePattern.ColorWaves.OCEAN_PALETTE,
-            FixedPalettePattern.ColorWaves.LAVA_PALETTE,
-            FixedPalettePattern.ColorWaves.FOREST_PALETTE);
-      }
-    }
-
-    // Update all the strips
-    strips().forEach(LEDStrip::update);
-
-    Logger.recordOutput("LED/pulses", strips().mapToInt(strip -> strip.pulse).toArray());
-  }
-
-  /**
-   * Apply a pattern to a specific LED strip
-   *
-   * @param strip The strip index to apply to. These are the same as the indices of LEDStrip objects
-   *     in the constructor
-   * @param pattern The pattern to apply to the strip. See the below link for details, or use the
-   *     LEDPatterns constant.
-   * @link https://www.revrobotics.com/content/docs/REV-11-1105-UM.pdf
-   */
-  public void apply(int strip, int pattern) {
-    if (strip >= 0 && strip < strips.length) strips[strip].setPulse(pattern);
-  }
-
-  /**
-   * Apply a pattern to all LED strips
-   *
-   * @param pattern The pattern to apply to the strips. See the below link for details, or use the
-   *     LEDPatterns constant.
-   * @link https://www.revrobotics.com/content/docs/REV-11-1105-UM.pdf
-   */
-  public void applyAll(int pattern) {
-    for (LEDStrip strip : strips) {
-      strip.setPulse(pattern);
+    for (int i = 0; i < strips.length; i++) {
+      strips[i].runSetup(runSetup);
+      strips[i].updateInputs(inputs[i]);
+      Logger.processInputs("LED/strip" + i, inputs[i]);
     }
   }
 
-  @AutoLogOutput(key = "LED/hasSetUp")
-  public boolean hasSetUp() {
-    return !startupTimer.isRunning();
+  public Command applyColor(BlinkenLEDPattern color) {
+    return run(() -> set(color));
   }
 
-  /**
-   * Apply a pattern to all LED strips based on the alliance color
-   *
-   * @param blue The pattern to apply if the alliance color is blue
-   * @param red The pattern to apply if the alliance color is red
-   * @param backup The pattern to apply if the alliance color is unknown
-   */
-  private void applyAll(int blue, int red, int backup) {
-    applyAll(alliance.map(a -> a == Alliance.Blue ? blue : red).orElse(backup));
+  public Command applyColor(Supplier<BlinkenLEDPattern> color) {
+    return run(() -> set(color.get()));
   }
 
-  private Stream<LEDStrip> strips() {
-    return Stream.of(strips);
+  public Command applyColor(
+      BlinkenLEDPattern colorIfBlue,
+      BlinkenLEDPattern colorIfRed,
+      BlinkenLEDPattern colorIfUnknown) {
+    return applyColor(
+        () ->
+            DriverStation.getAlliance()
+                .map(a -> a == Alliance.Blue ? colorIfBlue : colorIfRed)
+                .orElse(colorIfUnknown));
+  }
+
+  public Command turnOff() {
+    return applyColor(BlinkenLEDPattern.OFF);
+  }
+
+  public void set(BlinkenLEDPattern pattern) {
+    Stream.of(strips).forEach(strip -> strip.setPattern(pattern));
   }
 }

@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 
@@ -21,9 +22,13 @@ public final class Constants {
   public static final RobotType PRIMARY_ROBOT_TYPE = RobotType.COMP_BOT_2025;
   private static RobotType robotType;
 
-  public static final boolean TUNING_MODE = true;
+  public static final boolean TUNING_MODE = false;
 
-  public static final boolean HIDE_COMMAND_LOOP_OVERRUN = true;
+  private static final boolean IS_ON_FIELD = false;
+  private static final boolean VISION_DEMO_MODE = true;
+
+  public static final double DEMO_SPEED_TRANSLATION_SPEED_COFICIENT = 1;
+  public static final int VISION_DEMO_TAG_ID = 18;
 
   /** Enables all test plan autos in the auto chooser. */
   public static final boolean RUNNING_TEST_PLANS = false;
@@ -55,6 +60,17 @@ public final class Constants {
           CRESCENDO_CHASSIS_2024 -> RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
       case SIM_BOT -> Mode.SIM;
     };
+  }
+
+  public static boolean isOnField() {
+    if (DriverStation.isFMSAttached()) {
+      return true;
+    }
+    return IS_ON_FIELD;
+  }
+
+  public static boolean isDemoMode() {
+    return !isOnField() && VISION_DEMO_MODE;
   }
 
   public enum Mode {

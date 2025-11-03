@@ -134,8 +134,11 @@ public class ObjectVisualizer extends SubsystemBase {
       List<Pose3d> targets, double maxDistance, double seconds) {
     return defer(
         () -> {
-          Optional<Pose3d> target = findHeldItemPlacementTarget(targets, maxDistance);
-          return placeHeldItemWithInterpolation(target.get(), seconds).onlyIf(target::isPresent);
+          Optional<Pose3d> nearestTarget = findHeldItemPlacementTarget(targets, maxDistance);
+          if (nearestTarget.isPresent()) {
+            return placeHeldItemWithInterpolation(nearestTarget.get(), seconds);
+          }
+          return runOnce(this::ejectHeldItem);
         });
   }
 

@@ -6,19 +6,23 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -29,6 +33,11 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ManualAlignCommands;
 import frc.robot.commands.controllers.JoystickInputController;
 import frc.robot.commands.controllers.SpeedLevelController;
+import frc.robot.commands.visionDemo.AimAtTagMode;
+import frc.robot.commands.visionDemo.ContainmentBox;
+import frc.robot.commands.visionDemo.FollowTagMode;
+import frc.robot.commands.visionDemo.TagFollowingVision;
+import frc.robot.commands.visionDemo.VisionDemoCommand;
 import frc.robot.subsystems.dashboard.DriverDashboard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -43,7 +52,10 @@ import frc.robot.subsystems.hang.HangConstants;
 import frc.robot.subsystems.hang.HangIO;
 import frc.robot.subsystems.hang.HangIOHardware;
 import frc.robot.subsystems.hang.HangIOSim;
+import frc.robot.subsystems.led.BlinkenLEDPattern;
 import frc.robot.subsystems.led.LEDConstants;
+import frc.robot.subsystems.led.LEDStripIOBlinken;
+import frc.robot.subsystems.led.LEDStripIOSim;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.Superstructure.State;
@@ -69,6 +81,7 @@ import frc.robot.subsystems.superstructure.wrist.WristIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIOPhotonVision;
 import frc.robot.subsystems.vision.CameraIOSim;
+import frc.robot.subsystems.vision.SimControlledTarget;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.visualizer.ObjectVisualizer;
 import frc.robot.utility.Elastic;
@@ -78,8 +91,8 @@ import frc.robot.utility.commands.CustomCommands;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import java.util.function.Function;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -104,7 +117,7 @@ public class RobotContainer {
 
   private final Hang hang;
 
-  private final LEDSubsystem ledSubsystem = new LEDSubsystem(LEDConstants.PWM_PORTS);
+  private final LEDSubsystem ledSubsystem;
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -166,6 +179,12 @@ public class RobotContainer {
         coralWrist = new Wrist(new WristIOHardware(WristConstants.WRIST_CONFIG));
         sensor = new Sensor(new SensorIOBeam());
         coralIntake = new Intake(new IntakeIOHardware(IntakeConstants.CORAL_INTAKE_CONFIG), sensor);
+        ledSubsystem =
+            new LEDSubsystem(
+                new LEDStripIOBlinken(
+                    LEDConstants.LEDS_STRIP_2025_LEFT, LEDConstants.DEFAULT_PATTERN),
+                new LEDStripIOBlinken(
+                    LEDConstants.LEDS_STRIP_2025_RIGHT, LEDConstants.DEFAULT_PATTERN));
         break;
 
       case WOOD_BOT_TWO_2025:
@@ -179,12 +198,13 @@ public class RobotContainer {
                 new ModuleIOSparkMax(ModuleConstants.FRONT_RIGHT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_LEFT_MODULE_CONFIG),
                 new ModuleIOSparkMax(ModuleConstants.BACK_RIGHT_MODULE_CONFIG));
-        vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOODV2_LEFT_CAMERA));
+        vision = new AprilTagVision(new CameraIOPhotonVision(VisionConstants.WOOD_V2_LEFT_CAMERA));
         elevator = new Elevator(new ElevatorIO() {});
         hang = new Hang(new HangIO() {});
         coralWrist = new Wrist(new WristIO() {});
         sensor = new Sensor(new SensorIO() {});
         coralIntake = new Intake(new IntakeIO() {}, sensor);
+        ledSubsystem = new LEDSubsystem();
         break;
 
       case SIM_BOT:
@@ -208,6 +228,7 @@ public class RobotContainer {
         coralWrist = new Wrist(new WristIOSim(WristConstants.WRIST_CONFIG));
         sensor = new Sensor(new SensorIOSim());
         coralIntake = new Intake(new IntakeIOSim(), sensor);
+        ledSubsystem = new LEDSubsystem(new LEDStripIOSim(LEDConstants.DEFAULT_PATTERN));
         break;
 
       default:
@@ -225,6 +246,7 @@ public class RobotContainer {
         coralWrist = new Wrist(new WristIO() {});
         sensor = new Sensor(new SensorIO() {});
         coralIntake = new Intake(new IntakeIO() {}, sensor);
+        ledSubsystem = new LEDSubsystem();
         break;
     }
 
@@ -232,16 +254,37 @@ public class RobotContainer {
     superstructure = new Superstructure(elevator, coralWrist, coralIntake);
 
     // Vision setup
-    // vision.setLastRobotPoseSupplier(drive::getRobotPose);
-    vision.addVisionEstimateConsumer(
-        (estimate) -> {
-          if (estimate.status().isSuccess() && Constants.getMode() != Mode.SIM) {
-            drive.addVisionMeasurement(
-                estimate.robotPose().toPose2d(),
-                estimate.timestampSeconds(),
-                estimate.standardDeviations());
-          }
-        });
+    vision.setFieldTags(
+        Constants.isOnField() ? FieldConstants.FIELD_TAGS : VisionConstants.BLANK_FIELD);
+
+    vision.filterBasedOnLastPose(false, drive::getRobotPose);
+
+    if (!Constants.isOnField() && Constants.isDemoMode()) {
+      Elastic.selectTab("Vision Demo");
+
+      Pose3d startPose =
+          new Pose3d(
+              new Translation3d(
+                  FieldConstants.FIELD.getX() / 2, FieldConstants.FIELD.getY() / 2, 1),
+              Rotation3d.kZero);
+
+      XboxController controller = new XboxController(3);
+      TagFollowingVision.debugModeSupplier = controller::getYButton;
+      vision.addSimulatedTarget(
+          new SimControlledTarget(Constants.VISION_DEMO_TAG_ID, startPose, controller));
+      drive.resetPose(startPose.toPose2d());
+
+    } else {
+      vision.addVisionEstimateConsumer(
+          (estimate) -> {
+            if (estimate.status().isSuccess() && Constants.getMode() != Mode.SIM) {
+              drive.addVisionMeasurement(
+                  estimate.robotPose().toPose2d(),
+                  estimate.timestampSeconds(),
+                  estimate.standardDeviations());
+            }
+          });
+    }
 
     coralSimulator = new ObjectVisualizer("Coral", drive::getRobotPose, superstructure::getEndPose);
 
@@ -250,7 +293,6 @@ public class RobotContainer {
     // Can also use AutoBuilder.buildAutoChooser(); instead of SendableChooser to auto populate
     registerNamedCommands();
     autoChooser = new LoggedDashboardChooser<>("Auto Chooser", new SendableChooser<Command>());
-    // autoChooser = new LoggedDashboardChooser<>("Auto Chooser", AutoBuilder.buildAutoChooser());
     autoChooser.addDefaultOption("None", Commands.none());
 
     // Configure autos
@@ -262,12 +304,16 @@ public class RobotContainer {
     notPrimaryBotAlert.set(Constants.getRobot() != Constants.PRIMARY_ROBOT_TYPE);
 
     // Hide controller missing warnings for sim
-    DriverStation.silenceJoystickConnectionWarning(Constants.getMode() != Mode.REAL);
+    DriverStation.silenceJoystickConnectionWarning(
+        Constants.getMode() != Mode.REAL || Constants.isDemoMode());
 
     initDashboard();
 
-    // Configure the button bindings
-    configureControllerBindings();
+    configureAlertTriggers();
+
+    configureDriverControllerBindings(
+        driverController, Constants.isOnField(), Constants.isOnField());
+    configureOperatorControllerBindings(operatorController);
   }
 
   /** Configure drive dashboard object */
@@ -282,20 +328,25 @@ public class RobotContainer {
 
     dashboard.setAutoAlignPoseSupplier(AdaptiveAutoAlignCommands::getCurrentAutoAlignGoal);
 
-    dashboard.setHasVisionEstimateSupplier(vision::hasVisionEstimate, 0.1);
+    dashboard.setHasVisionEstimateSupplier(vision::hasStableVisionEstimate);
 
     dashboard.setSensorSuppliers(
         coralIntake::usingSensor, () -> coralIntake.hasCoral().orElse(false));
     dashboard.setHangSuppliers(hang::getMeasuredDegrees);
     dashboard.setSuperstructureAtGoal(superstructure::atGoal);
 
-    dashboard.addCommand("Reset Pose", () -> drive.resetPose(new Pose2d()), true);
+    dashboard.addCommand("Reset Pose", () -> drive.resetPose(Pose2d.kZero), true);
+
     dashboard.addCommand(
         "Reset Rotation",
-        drive.runOnce(
-            () ->
-                drive.resetPose(
-                    new Pose2d(drive.getRobotPose().getTranslation(), Rotation2d.kZero))),
+        () -> drive.resetPose(new Pose2d(drive.getRobotPose().getTranslation(), Rotation2d.kZero)),
+        true);
+
+    dashboard.addCommand(
+        "Reset To Center",
+        () ->
+            drive.resetPose(
+                new Pose2d(FieldConstants.FIELD.div(2), drive.getRobotPose().getRotation())),
         true);
 
     dashboard.addCommand(
@@ -306,6 +357,51 @@ public class RobotContainer {
                     new Transform2d(
                         DRIVE_CONFIG.bumperCornerToCorner().getX() / 2, 0, Rotation2d.kPi))),
         true);
+
+    if (Constants.isDemoMode()) {
+      SmartDashboard.putBoolean("Superstructure Aim", true);
+      BooleanSupplier useSuperstructure =
+          () -> SmartDashboard.getBoolean("Superstructure Aim", true);
+
+      double length = Units.feetToMeters(10);
+      double width = Units.feetToMeters(10);
+
+      Translation2d boxCenter = FieldConstants.FIELD.div(2);
+
+      ContainmentBox box =
+          new ContainmentBox(
+              "Vision Demo Box", boxCenter, length, width, DRIVE_CONFIG.bumperCornerToCorner());
+
+      dashboard.setIsInBox(() -> box.contains(drive.getRobotPose()));
+
+      TagFollowingVision tagFollowingVision =
+          new TagFollowingVision(vision, Constants.VISION_DEMO_TAG_ID);
+
+      SmartDashboard.putData(
+          "Aim At Tag",
+          new VisionDemoCommand(
+                  drive,
+                  tagFollowingVision,
+                  elevator,
+                  coralWrist,
+                  ledSubsystem,
+                  new AimAtTagMode(useSuperstructure),
+                  box)
+              .onlyIf(() -> box.contains(drive.getRobotPose()))
+              .withName("Aim At Tag"));
+      SmartDashboard.putData(
+          "Follow Tag",
+          new VisionDemoCommand(
+                  drive,
+                  tagFollowingVision,
+                  elevator,
+                  coralWrist,
+                  ledSubsystem,
+                  new FollowTagMode(new Translation2d(2, 0), useSuperstructure),
+                  box)
+              .onlyIf(() -> box.contains(drive.getRobotPose()))
+              .withName("Follow Tag"));
+    }
   }
 
   public void updateAlerts() {
@@ -318,16 +414,8 @@ public class RobotContainer {
             || !DriverStation.getJoystickIsXbox(operatorController.getHID().getPort()));
   }
 
-  /** Define button->command mappings. */
-  private void configureControllerBindings() {
-    CommandScheduler.getInstance().getActiveButtonLoop().clear();
-    configureDriverControllerBindings(driverController, true);
-    configureOperatorControllerBindings(operatorController, false);
-    configureAlertTriggers();
-  }
-
   private void configureDriverControllerBindings(
-      CommandXboxController xbox, boolean includeAutoAlign) {
+      CommandXboxController xbox, boolean includeAutoAlign, boolean includeAngleAlign) {
     final Trigger useFieldRelative =
         new Trigger(new OverrideSwitch(xbox.y(), OverrideSwitch.Mode.TOGGLE, true));
 
@@ -383,6 +471,10 @@ public class RobotContainer {
         .or(RobotModeTriggers.disabled())
         .onTrue(drive.runOnce(drive::stop).withName("CANCEL and stop"));
 
+    xbox.b()
+        .debounce(0.5)
+        .whileTrue(drive.run(drive::stopUsingForwardArrangement).withName("ORIENT and stop"));
+
     // Reset the gyro heading
     xbox.start()
         .debounce(0.3)
@@ -398,17 +490,29 @@ public class RobotContainer {
 
     xbox.back().onTrue(superstructure.runAction(Superstructure.State.STOW_LOW));
 
-    final BiConsumer<Trigger, Command> configureAlignmentAuto =
-        (trigger, command) -> {
-          trigger.onTrue(command.until(() -> input.getOmegaRadiansPerSecond() != 0));
-        };
+    if (includeAngleAlign) {
+      final BiConsumer<Trigger, Command> configureAlignmentAuto =
+          (trigger, command) -> {
+            trigger.onTrue(command.until(() -> input.getOmegaRadiansPerSecond() != 0));
+          };
 
-    configureAlignmentAuto.accept(
-        xbox.povRight(), ManualAlignCommands.alignToSourceRight(drive, input));
-    configureAlignmentAuto.accept(
-        xbox.povLeft(), ManualAlignCommands.alignToSourceLeft(drive, input));
-    configureAlignmentAuto.accept(xbox.povDown(), ManualAlignCommands.alignToCageAdv(drive, input));
-    configureAlignmentAuto.accept(xbox.povUp(), ManualAlignCommands.alignToReef(drive, input));
+      configureAlignmentAuto.accept(
+          xbox.povRight(), ManualAlignCommands.alignToSourceRight(drive, input));
+      configureAlignmentAuto.accept(
+          xbox.povLeft(), ManualAlignCommands.alignToSourceLeft(drive, input));
+      configureAlignmentAuto.accept(
+          xbox.povDown(), ManualAlignCommands.alignToCageAdv(drive, input));
+      configureAlignmentAuto.accept(xbox.povUp(), ManualAlignCommands.alignToReef(drive, input));
+    } else {
+      for (int pov = 0; pov < 360; pov += 45) {
+        final Translation2d translation = new Translation2d(1, Rotation2d.fromDegrees(-pov));
+        final ChassisSpeeds speeds =
+            new ChassisSpeeds(
+                translation.getX(), translation.getY(), input.getOmegaRadiansPerSecond());
+        xbox.pov(pov)
+            .whileTrue(drive.run(() -> drive.setRobotSpeeds(speeds)).withName("Drive POV " + pov));
+      }
+    }
 
     if (includeAutoAlign) {
       // Align to reef
@@ -469,8 +573,7 @@ public class RobotContainer {
     }
   }
 
-  private void configureOperatorControllerBindings(
-      CommandXboxController xbox, boolean hangSetpoints) {
+  private void configureOperatorControllerBindings(CommandXboxController xbox) {
 
     // Enable
 
@@ -507,13 +610,12 @@ public class RobotContainer {
                 .and(xbox.rightTrigger())
                 .and(superstructure::atGoal)
                 .whileTrue(superstructure.runWheels(level))
-                .onTrue(
-                    Commands.runOnce(
-                        () ->
-                            coralSimulator.placeHeldItemOnNearestWithInterpolation(
-                                FieldConstants.Reef.coralPlacementPositions,
-                                Units.inchesToMeters(15),
-                                0.2)));
+                .onTrue(Commands.print("Spinning wheels to place coral"))
+                .whileTrue(
+                    coralSimulator.placeHeldItemOnNearestWithInterpolation(
+                        FieldConstants.Reef.coralPlacementPositions,
+                        Units.inchesToMeters(15),
+                        0.2));
           } else if (level.isIntake()) {
             trigger.whileTrue(
                 superstructure.runWheels(level).until(() -> coralIntake.hasCoral().orElse(false)));
@@ -537,8 +639,6 @@ public class RobotContainer {
         };
 
     configureOperatorControllerBindingLevel.accept(xbox.leftTrigger(), Superstructure.State.INTAKE);
-
-    final Trigger anyButton = xbox.a().or(xbox.x()).or(xbox.y()).or(xbox.b());
 
     final Trigger algae = new Trigger(() -> false);
     configureOperatorControllerBindingLevel.accept(xbox.y(), Superstructure.State.L4);
@@ -599,31 +699,8 @@ public class RobotContainer {
         .and(DriverStation::isTeleopEnabled)
         .whileTrue(hang.run(() -> hang.set(hangSpeed.getAsDouble())).finallyDo(hang::stop));
 
-    Function<RumbleType, Command> rumble =
-        (rumbleType) ->
-            Commands.runEnd(
-                    () -> xbox.setRumble(rumbleType, 1), () -> xbox.setRumble(rumbleType, 0))
-                .withTimeout(0.2);
-
-    if (hangSetpoints) {
-      xbox.rightBumper()
-          .debounce(0.1)
-          .and(xbox.leftBumper().negate().debounce(0.1))
-          .and(anyButton.negate())
-          .onTrue(hang.retract().andThen(rumble.apply(RumbleType.kRightRumble)));
-      xbox.leftBumper()
-          .debounce(0.1)
-          .and(xbox.rightBumper().negate().debounce(0.1))
-          .and(anyButton.negate())
-          .onTrue(hang.deploy().andThen(rumble.apply(RumbleType.kLeftRumble)));
-      xbox.rightBumper()
-          .and(xbox.leftBumper())
-          .and(anyButton.negate())
-          .onTrue(hang.stow().andThen(rumble.apply(RumbleType.kBothRumble)));
-    } else {
-      xbox.rightBumper().whileTrue(hang.runSet(-1));
-      xbox.leftBumper().whileTrue(hang.runSet(+1));
-    }
+    xbox.rightBumper().whileTrue(hang.runSet(-1));
+    xbox.leftBumper().whileTrue(hang.runSet(+1));
   }
 
   private Command rumbleController(CommandXboxController controller, double rumbleIntensity) {
@@ -661,6 +738,17 @@ public class RobotContainer {
     RobotModeTriggers.autonomous()
         .and(isMatch)
         .onTrue(Commands.runOnce(() -> Elastic.selectTab("Autonomous")));
+
+    RobotModeTriggers.autonomous()
+        .whileTrue(
+            ledSubsystem.applyColor(
+                BlinkenLEDPattern.HEARTBEAT_BLUE,
+                BlinkenLEDPattern.HEARTBEAT_RED,
+                BlinkenLEDPattern.HEARTBEAT_WHITE));
+
+    ledSubsystem.setDefaultCommand(
+        ledSubsystem.applyColor(
+            BlinkenLEDPattern.BLUE, BlinkenLEDPattern.RED, BlinkenLEDPattern.WHITE));
   }
 
   private void registerNamedCommands(String name, Command command) {
@@ -802,10 +890,6 @@ public class RobotContainer {
     // }
 
     if (Constants.RUNNING_TEST_PLANS) {
-      dashboardChooser.addOption("[TEST] Stow Hang Arm", hang.stow());
-      dashboardChooser.addOption("[TEST] Deploy Hang Arm", hang.deploy());
-      dashboardChooser.addOption("[TEST] Retract Hang Arm", hang.retract());
-
       dashboardChooser.addOption(
           "[Characterization] Elevator Static Forward", elevator.staticCharacterization(0.02));
       dashboardChooser.addOption(

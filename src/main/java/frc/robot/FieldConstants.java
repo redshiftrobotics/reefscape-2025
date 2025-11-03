@@ -8,6 +8,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.util.FlippingUtil;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -34,8 +36,12 @@ import java.util.Map;
  * @see https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
  */
 public class FieldConstants {
-  public static final double fieldLength = Units.inchesToMeters(690.876);
-  public static final double fieldWidth = Units.inchesToMeters(317);
+
+  public static final AprilTagFieldLayout FIELD_TAGS =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+
+  public static final Translation2d FIELD =
+      new Translation2d(FIELD_TAGS.getFieldLength(), FIELD_TAGS.getFieldWidth());
 
   public static final double startingLineX =
       Units.inchesToMeters(299.438); // Measured from the inside of starting line

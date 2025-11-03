@@ -1,5 +1,6 @@
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -8,6 +9,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.vision.Camera.AbsoluteTrackedTarget;
+import frc.robot.subsystems.vision.Camera.RelativeTrackedTarget;
 import frc.robot.subsystems.vision.Camera.VisionResult;
 import frc.robot.subsystems.vision.Camera.VisionResultStatus;
 import java.util.ArrayList;
@@ -19,10 +22,6 @@ import java.util.stream.Collectors;
 import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVision extends SubsystemBase {
-
-  public static final boolean DO_SUMMARY_LOGGING = true;
-  public static final boolean DO_CAMERA_LOGGING = true;
-
   private final Camera[] cameras;
 
   private final Debouncer debouncer = new Debouncer(0.2, DebounceType.kFalling);
@@ -32,12 +31,23 @@ public class AprilTagVision extends SubsystemBase {
 
   private boolean hasVisionEstimate = false;
 
+  private AprilTagFieldLayout fieldTags = null;
+  private List<SimControlledTarget> simulatedTargets = new ArrayList<>();
+
   public AprilTagVision(CameraIO... camerasIO) {
     this.cameras = Arrays.stream(camerasIO).map(io -> new Camera(io)).toArray(Camera[]::new);
   }
 
   @Override
   public void periodic() {
+
+    AprilTagFieldLayout fieldTags = this.fieldTags;
+    for (SimControlledTarget target : simulatedTargets) {
+      fieldTags = target.createFieldWithTarget(fieldTags);
+    }
+    for (Camera camera : cameras) {
+      camera.setFieldTags(fieldTags);
+    }
 
     // Run periodic for all cameras, as they are not real subsystems
     for (Camera camera : cameras) {
@@ -56,21 +66,15 @@ public class AprilTagVision extends SubsystemBase {
     for (Camera camera : cameras) {
       String cameraRoot = root + "/" + camera.getCameraName();
 
-      if (DO_CAMERA_LOGGING && camera.getResults().length == 0) {
-        Logger.recordOutput(cameraRoot + "/tagsUsedPositions", new Pose3d[] {});
-        Logger.recordOutput(cameraRoot + "/positionEstimate", new Pose3d[] {});
-        Logger.recordOutput(cameraRoot + "/status", VisionResultStatus.NO_DATA);
-        Logger.recordOutput(cameraRoot + "/success", false);
-      }
+      Logger.recordOutput(cameraRoot + "/tagsUsedPositions", new Pose3d[] {});
+      Logger.recordOutput(cameraRoot + "/positionEstimate", new Pose3d[] {});
+      Logger.recordOutput(cameraRoot + "/status", VisionResultStatus.NO_DATA);
+      Logger.recordOutput(cameraRoot + "/success", false);
 
       // Loop through all results that the camera has
       for (VisionResult result : camera.getResults()) {
 
         if (!result.hasNewData()) {
-          Logger.recordOutput(cameraRoot + "/tagsUsedPositions", new Pose3d[] {});
-          Logger.recordOutput(cameraRoot + "/positionEstimate", new Pose3d[] {});
-          Logger.recordOutput(cameraRoot + "/status", VisionResultStatus.NO_DATA);
-          Logger.recordOutput(cameraRoot + "/success", false);
           continue;
         }
 
@@ -84,24 +88,17 @@ public class AprilTagVision extends SubsystemBase {
 
         hasVisionEstimate = hasVisionEstimate || visionEstimate.isSuccess();
 
-        // Logging
-        if (DO_CAMERA_LOGGING) {
-          Logger.recordOutput(cameraRoot + "/tagsUsedPositions", result.tagPositionsOnField());
+        Logger.recordOutput(cameraRoot + "/tagsUsedPositions", result.tagPositionsOnField());
+        Logger.recordOutput(cameraRoot + "/positionEstimate", visionEstimate.robotPose());
+        Logger.recordOutput(cameraRoot + "/status", visionEstimate.status());
+        Logger.recordOutput(cameraRoot + "/success", visionEstimate.status().isSuccess());
 
-          Logger.recordOutput(cameraRoot + "/positionEstimate", visionEstimate.robotPose());
-
-          Logger.recordOutput(cameraRoot + "/status", visionEstimate.status());
-          Logger.recordOutput(cameraRoot + "/success", visionEstimate.status().isSuccess());
+        if (visionEstimate.isSuccess()) {
+          robotPosesAccepted.add(visionEstimate.robotPose());
+        } else {
+          robotPosesRejected.add(visionEstimate.robotPose());
         }
-
-        if (DO_SUMMARY_LOGGING) {
-          if (visionEstimate.isSuccess()) {
-            robotPosesAccepted.add(visionEstimate.robotPose());
-          } else {
-            robotPosesRejected.add(visionEstimate.robotPose());
-          }
-          tagPoses.addAll(Arrays.asList(result.tagPositionsOnField()));
-        }
+        tagPoses.addAll(Arrays.asList(result.tagPositionsOnField()));
 
         for (Consumer<TimestampedRobotPoseEstimate> consumer :
             timestampRobotPoseEstimateConsumers) {
@@ -110,11 +107,25 @@ public class AprilTagVision extends SubsystemBase {
       }
     }
 
-    if (DO_SUMMARY_LOGGING) {
-      Logger.recordOutput(root + "/robotPosesAccepted", robotPosesAccepted.toArray(Pose3d[]::new));
-      Logger.recordOutput(root + "/robotPosesRejected", robotPosesRejected.toArray(Pose3d[]::new));
-      Logger.recordOutput(root + "/tagPoses", tagPoses.toArray(Pose3d[]::new));
-    }
+    Logger.recordOutput(root + "/robotPosesAccepted", robotPosesAccepted.toArray(Pose3d[]::new));
+    Logger.recordOutput(root + "/robotPosesRejected", robotPosesRejected.toArray(Pose3d[]::new));
+    Logger.recordOutput(root + "/tagPoses", tagPoses.toArray(Pose3d[]::new));
+  }
+
+  public List<RelativeTrackedTarget> getRelativeTrackedTargets() {
+    return Arrays.stream(cameras).flatMap(camera -> camera.getRelativeTargets().stream()).toList();
+  }
+
+  public List<AbsoluteTrackedTarget> getAbsoluteTrackedTargets() {
+    return Arrays.stream(cameras).flatMap(camera -> camera.getAbsoluteTargets().stream()).toList();
+  }
+
+  public void setFieldTags(AprilTagFieldLayout fieldTags) {
+    this.fieldTags = fieldTags;
+  }
+
+  public void addSimulatedTarget(SimControlledTarget target) {
+    simulatedTargets.add(target);
   }
 
   /** Get whether or not the vision system has a valid estimate */
@@ -122,18 +133,19 @@ public class AprilTagVision extends SubsystemBase {
     return hasVisionEstimate;
   }
 
-  public boolean hasVisionEstimateDebounce() {
+  public boolean hasStableVisionEstimate() {
     return debouncer.calculate(hasVisionEstimate);
   }
 
   /**
    * Set the last robot pose supplier for all cameras
    *
+   * @param filter if robot pose filtering should be applied
    * @param lastRobotPose the last robot pose supplier
    */
-  public void setLastRobotPoseSupplier(Supplier<Pose2d> lastRobotPose) {
+  public void filterBasedOnLastPose(boolean filter, Supplier<Pose2d> lastRobotPose) {
     for (Camera camera : cameras) {
-      camera.setLastRobotPoseSupplier(lastRobotPose);
+      camera.filterBasedOnLastPose(filter, lastRobotPose);
     }
   }
 
