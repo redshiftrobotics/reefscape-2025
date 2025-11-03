@@ -12,6 +12,7 @@ import frc.robot.utility.tunable.LoggedTunableNumberFactory;
 import java.util.Arrays;
 import org.littletonrobotics.junction.Logger;
 
+/** Virtual subsystem for logging/displaying the state of the Safety box. */
 public class ContainmentBox extends VirtualSubsystem {
 
   private final Translation2d center;
