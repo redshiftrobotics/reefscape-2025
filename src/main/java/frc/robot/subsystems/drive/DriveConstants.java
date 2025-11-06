@@ -62,7 +62,7 @@ public class DriveConstants {
             7.05968,
             14.5
                 * (Constants.isDemoMode()
-                    ? Constants.DEMO_SPEED_TRANSLATION_SPEED_COFICIENT
+                    ? Constants.DEMO_SPEED_TRANSLATION_SPEED_COEFFICIENT
                     : 1.0));
         case T_SHIRT_CANNON_CHASSIS -> new DriveConfig(
             new Translation2d(Units.inchesToMeters(22.729226), Units.inchesToMeters(22.729226)),

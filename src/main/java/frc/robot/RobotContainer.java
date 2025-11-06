@@ -907,6 +907,10 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    if (Constants.isDemoMode() && !Constants.isOnField()) {
+      Elastic.sendNotification(new Elastic.Notification(Elastic.Notification.NotificationLevel.WARNING, "Demo mode active, no autonomous command will be run.", "Autonomous is disabled is disabled when not on field and in demo mode."));
+      return null;
+    }
     return autoChooser.get();
   }
 }
