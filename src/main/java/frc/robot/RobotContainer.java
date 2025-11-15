@@ -359,6 +359,8 @@ public class RobotContainer {
         true);
 
     if (Constants.isDemoMode()) {
+      SmartDashboard.putNumber("Vision Demo Tag ID", Constants.VISION_DEMO_TAG_ID);
+
       SmartDashboard.putBoolean("Superstructure Aim", true);
       BooleanSupplier useSuperstructure =
           () -> SmartDashboard.getBoolean("Superstructure Aim", true);
@@ -908,7 +910,11 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     if (Constants.isDemoMode() && !Constants.isOnField()) {
-      Elastic.sendNotification(new Elastic.Notification(Elastic.Notification.NotificationLevel.WARNING, "Demo mode active, no autonomous command will be run.", "Autonomous is disabled is disabled when not on field and in demo mode."));
+      Elastic.sendNotification(
+          new Elastic.Notification(
+              Elastic.Notification.NotificationLevel.WARNING,
+              "Demo mode active, no autonomous command will be run.",
+              "Autonomous is disabled is disabled when not on field and in demo mode."));
       return null;
     }
     return autoChooser.get();
