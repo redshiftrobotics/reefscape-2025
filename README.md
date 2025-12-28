@@ -50,7 +50,7 @@ This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 
 ## Competition Vidoe 
 
-[Match 9 PNW District Bonney Lake Event 2025 on Youtube](https://www.thebluealliance.com/match/2025wabon_sf12m1)
+[Match 9 PNW District Bonney Lake Event 2025 on Youtube](https://www.youtube.com/watch?v=vZ7B3l8zD34). We are in blue bumpers on the top right.
 
 ![Match GIF](https://github.com/user-attachments/assets/674bc3b2-d65a-4bd4-8c6e-84cd63734c1d)
 
