@@ -48,15 +48,19 @@ This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 * WPILib style command based programming with subsystems and command for clean reusable code
 <img width="400" alt="IO Layer Diagram" src="https://github.com/user-attachments/assets/2ff990a1-d31f-4188-9fbc-afdf1ed5c5f0" />
 
-## Video
+## Competition Vidoe 
 
 [Match 9 PNW District Bonney Lake Event 2025 on Youtube](https://www.thebluealliance.com/match/2025wabon_sf12m1)
 
 ![Match GIF](https://github.com/user-attachments/assets/674bc3b2-d65a-4bd4-8c6e-84cd63734c1d)
 
-https://github.com/user-attachments/assets/cb0efbbe-dee6-46fc-958f-ac099eb08747
+## Demo Videos
 
-https://github.com/user-attachments/assets/34145ca2-ab8b-4352-9960-e7cf050fe658
+https://github.com/user-attachments/assets/939ff323-dfbc-4b03-a983-78f02153d8be
+
+https://github.com/user-attachments/assets/5c20ec2c-83ac-47bd-9ef6-04c292a016e0
+
+https://github.com/user-attachments/assets/d41aed77-06f0-4669-8848-b3c6ecf47c53
 
 ## Robot Abilities
 * 4 MK4i Swerve Modules using NEO Brushless Motor for swerve drive
