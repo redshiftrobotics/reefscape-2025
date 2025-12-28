@@ -46,18 +46,17 @@ This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 * AdvantageKit IO layers to separate control logic with hardware implantations, allowed for logic to be simulated on fake simulated hardware
 * Full logging and real time monitoring on AdvantageScope to view robot state, whether simulated or real
 * WPILib style command based programming with subsystems and command for clean reusable code
+<img width="400" alt="IO Layer Diagram" src="https://github.com/user-attachments/assets/2ff990a1-d31f-4188-9fbc-afdf1ed5c5f0" />
 
-<details>
-<summary>Diagram of code structure</summary>
+## Video
 
-Subsystem design with AKit IO layers.
-![IO Layer Diagram](https://github.com/user-attachments/assets/2ff990a1-d31f-4188-9fbc-afdf1ed5c5f0)
+[Match 9 PNW District Bonney Lake Event 2025 on Youtube](https://www.thebluealliance.com/match/2025wabon_sf12m1)
 
-Overall command based design.
-![Command Based Diagram](https://github.com/user-attachments/assets/36cf5fe0-066d-4685-ba1a-818f49612820)
+![Match GIF](https://github.com/user-attachments/assets/674bc3b2-d65a-4bd4-8c6e-84cd63734c1d)
 
-</details>
+https://github.com/user-attachments/assets/cb0efbbe-dee6-46fc-958f-ac099eb08747
 
+https://github.com/user-attachments/assets/34145ca2-ab8b-4352-9960-e7cf050fe658
 
 ## Robot Abilities
 * 4 MK4i Swerve Modules using NEO Brushless Motor for swerve drive
