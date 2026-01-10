@@ -48,7 +48,7 @@ This project contains robot code for 8032's robot for FRC 2025 game Reefscape.
 * WPILib style command based programming with subsystems and command for clean reusable code
 <img width="400" alt="IO Layer Diagram" src="https://github.com/user-attachments/assets/2ff990a1-d31f-4188-9fbc-afdf1ed5c5f0" />
 
-## Competition Vidoe 
+## Competition Video
 
 [Match 9 PNW District Bonney Lake Event 2025 on Youtube](https://www.youtube.com/watch?v=vZ7B3l8zD34). We are in blue bumpers with "8032" starting on the top right.
 

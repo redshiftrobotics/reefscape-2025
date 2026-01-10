@@ -5,6 +5,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.utility.JoystickUtil;
 import java.util.Optional;
@@ -13,6 +15,8 @@ import org.littletonrobotics.junction.AutoLogOutput;
 
 /** Controller for converting joystick values to drive components */
 public class JoystickInputController {
+
+  private static final String speedMultiplierKey = "speedMultiplier";
 
   private final Drive drive;
   private final DoubleSupplier xSupplier, ySupplier, xAngleSupplier, yAngleSupplier;
@@ -37,6 +41,14 @@ public class JoystickInputController {
     this.ySupplier = ySupplier;
     this.xAngleSupplier = xAngleSupplier;
     this.yAngleSupplier = yAngleSupplier;
+
+    if (Constants.isDemoMode()) {
+      SmartDashboard.putNumber(speedMultiplierKey, 1.0);
+    }
+  }
+
+  public static double getSpeedMultiplier() {
+    return Constants.isDemoMode() ? SmartDashboard.getNumber(speedMultiplierKey, 1.0) : 1.0;
   }
 
   /**
@@ -48,8 +60,11 @@ public class JoystickInputController {
   public Translation2d getTranslationMetersPerSecond() {
     if (DriverStation.isAutonomous()) return new Translation2d();
 
+    System.out.println("Speed Multiplier: " + getSpeedMultiplier());
     return JoystickInputController.getTranslationMetersPerSecond(
-        xSupplier.getAsDouble(), ySupplier.getAsDouble(), drive.getMaxLinearSpeedMetersPerSec());
+        xSupplier.getAsDouble(),
+        ySupplier.getAsDouble(),
+        drive.getMaxLinearSpeedMetersPerSec() * getSpeedMultiplier());
   }
 
   /**
@@ -62,7 +77,7 @@ public class JoystickInputController {
     if (DriverStation.isAutonomous()) return 0;
 
     return JoystickInputController.getOmegaRadiansPerSecond(
-        yAngleSupplier.getAsDouble(), drive.getMaxAngularSpeedRadPerSec());
+        yAngleSupplier.getAsDouble(), drive.getMaxAngularSpeedRadPerSec() * getSpeedMultiplier());
   }
 
   /**

@@ -145,14 +145,10 @@ public class RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
 
   // Alerts
-  private final Alert notPrimaryBotAlert =
-      new Alert("Robot type is not the primary robot type.", AlertType.kInfo);
-  private final Alert tuningModeActiveAlert =
-      new Alert("Tuning mode active, do not use in competition.", AlertType.kWarning);
+  private final Alert notPrimaryBotAlert = new Alert("Robot type is not primary.", AlertType.kInfo);
+  private final Alert tuningModeActiveAlert = new Alert("Tuning mode active.", AlertType.kWarning);
   private static final Alert testPlansAvailable =
-      new Alert(
-          "Running with test plans enabled, ensure you are using the correct auto.",
-          AlertType.kWarning);
+      new Alert("Running with test plans enabled.", AlertType.kWarning);
 
   /** The container for the robot. Contains subsystems, IO devices, and commands. */
   public RobotContainer() {

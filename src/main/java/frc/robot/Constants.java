@@ -27,7 +27,6 @@ public final class Constants {
   private static final boolean IS_ON_FIELD = false;
   private static final boolean VISION_DEMO_MODE = true;
 
-  public static final double DEMO_SPEED_TRANSLATION_SPEED_COEFFICIENT = 0.5;
   public static final int VISION_DEMO_TAG_ID = 18;
 
   /** Enables all test plan autos in the auto chooser. */
